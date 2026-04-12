@@ -454,7 +454,7 @@
               "__guid": "886d2b3c-1906-42f6-9528-156d4299ff0b",
               "__enabled": true,
               "Flags": 0,
-              "MyStringValue": "Hello World!",
+              "MyStringValue": "[E]Open Computer",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,

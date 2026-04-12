@@ -12,7 +12,7 @@
 
 @code
 {
-	[Property, TextArea] public string MyStringValue { get; set; } = "Hello World!";
+	[Property, TextArea] public string MyStringValue { get; set; } = "";
 
 	private bool IsLookedAt { get; set; } = false;
 
@@ -34,9 +34,7 @@
 			.IgnoreGameObjectHierarchy( player?.GameObject )
 			.Run();
 
-		Log.Info( tr.Hit ? $"Hit: {tr.GameObject?.Name}" : "No hit" );
-
-		IsLookedAt = tr.Hit && tr.GameObject?.Name == "Computer";
+		IsLookedAt = tr.Hit && tr.GameObject == GameObject.Parent;
 	}
 
 	protected override int BuildHash() => System.HashCode.Combine( IsLookedAt );
