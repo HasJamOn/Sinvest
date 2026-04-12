@@ -1,20 +1,49 @@
-CasinoMenu
-{
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: #444;
-	justify-content: center;
-	align-items: center;
-	font-weight: bold;
-	border-radius: 20px;
+CasinoMenu {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  padding: 20px;
 
-	.title
-	{
-		font-size: 25px;
-		font-family: Poppins;
-		color: #fff;
-	}
+  .casino-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px; /* Space for the Back button appearing below */
+  }
+
+  .game-card {
+    width: 180px;
+    height: 120px;
+    background-color: rgba(0, 0, 0, 1);
+    border: 2px solid #0044aa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+    cursor: pointer;
+    pointer-events: all;
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    &:hover {
+      background-color: #0044aa;
+      transform: scale(1.05);
+    }
+
+    &.unnamed {
+      opacity: 0.5;
+
+      &:hover {
+        background-color: #333;
+      }
+    }
+  }
 }

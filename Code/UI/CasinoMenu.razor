@@ -4,16 +4,25 @@
 @namespace Sandbox
 
 <root>
-	<div class="title">@MyStringValue</div>
+	<div class="casino-grid">
+		<button class="game-card" @onclick="@(() => OnGameClick("Coin Flip"))">
+			<label class="title">Coin Flip</label>
+		</button>
+
+		@for (int i = 0; i < 5; i++)
+		{
+			<button class="game-card unnamed" @onclick="@(() => OnGameClick("Unnamed"))">
+				<label class="title">Unnamed</label>
+			</button>
+		}
+	</div>
 </root>
 
 @code
 {
-
-	[Property, TextArea] public string MyStringValue { get; set; } = "Hello World!";
-
-	/// <summary>
-	/// the hash determines if the system should be rebuilt. If it changes, it will be rebuilt
-	/// </summary>
-	protected override int BuildHash() => System.HashCode.Combine( MyStringValue );
+	private void OnGameClick(string gameName)
+	{
+		Log.Info($"Attempting to launch: {gameName}");
+		// Future logic to switch to specific game views will go here
+	}
 }
