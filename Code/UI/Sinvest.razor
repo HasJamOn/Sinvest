@@ -3,59 +3,80 @@
 @inherits PanelComponent
 @namespace Sandbox
 
-<root class="hidden">
-	<div class="title">@MyStringValue</div>
-
+<root class="@(_isOpen ? "" : "hidden")">
 	<div class="hud">
-		<button class="menu-button" @onclick="OnClick">
-			<str>Click Me!</str>
+
+		<button class="menu-button" @onclick="Toggle">
+			Toggle Menu
 		</button>
-		<button id="quit-button" class="menu-button" @onclick="OnQuitClick">
-			<str>Quit Sinvest App</str>
-		</button>
+
+		@if ( _isOpen )
+		{
+			<div class="menu">
+				<button class="menu-button" @onclick="OnQuitClick">
+				</button>
+			</div>
+		}
+
 	</div>
 </root>
 
 @code
 {
-	[Property, TextArea] 
-	public string MyStringValue { get; set; } = "Hello World!";
-
 	private bool _isOpen = false;
+	private PlayerController _cachedController;
 
-	protected override void OnUpdate()
-	{
-		if (Input.Pressed("sinvest"))
-		{
-			_isOpen = !_isOpen;
-
-			Panel.SetClass("hidden", !_isOpen);
-			Mouse.Visible = _isOpen;
-
-			// Disable/enable player controller so input doesn't bleed through
-			var controller = GameObject.Parent.Components.Get<PlayerController>();
-			if (controller != null)
-				controller.Enabled = !_isOpen;
-		}
-	}
-
-	void OnClick()
-	{
-		Log.Info("Button clicked");
-	}
-	
-	void OnQuitClick()
-	{
-		_isOpen = false;
-		Panel.SetClass("hidden", true);
-		Mouse.Visible = false;
-	}
-
-	protected override int BuildHash() => System.HashCode.Combine(MyStringValue);
+	// ===== PUBLIC API (required for InteractComputer) =====
 	public void Open()
 	{
-		_isOpen = true;
-		Panel.SetClass( "hidden", false );
-		Mouse.Visible = true;
+		SetMenuState(true);
+	}
+
+	public void Close()
+	{
+		SetMenuState(false);
+	}
+
+	public void Toggle()
+	{
+		SetMenuState(!_isOpen);
+	}
+
+	// ===== INTERNAL LOGIC =====
+	private void OnQuitClick()
+	{
+		Log.Info("Quit clicked");
+		Game.Close();
+	}
+
+	private void SetMenuState(bool open)
+	{
+		_isOpen = open;
+
+		Panel.SetClass("hidden", !open);
+		Mouse.Visibility = open ? MouseVisibility.Visible : MouseVisibility.Auto;
+
+		if (open && _cachedController == null)
+			_cachedController = Scene.GetAllComponents<PlayerController>().FirstOrDefault();
+
+		if (_cachedController != null)
+		{
+			_cachedController.UseLookControls = !open;
+			_cachedController.UseInputControls = !open;
+
+			// ===== HARD STOP =====
+			if (open)
+			{
+				var body = _cachedController.Body;
+
+				if (body != null)
+				{
+					body.Velocity = Vector3.Zero;
+					body.AngularVelocity = Vector3.Zero;
+
+					Log.Info("Rigidbody velocity cleared");
+				}
+			}
+		}
 	}
 }
