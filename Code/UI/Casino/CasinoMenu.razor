@@ -20,9 +20,17 @@
 
 @code
 {
+	// Define a delegate at the top of your code block
+	public delegate void NavigateDelegate(string gameName);
+
+	// Use the delegate as the property
+	[Property] public NavigateDelegate OnNavigate { get; set; }
+
 	private void OnGameClick(string gameName)
 	{
 		Log.Info($"Attempting to launch: {gameName}");
-		// Future logic to switch to specific game views will go here
+       
+		// Use the standard C# null-conditional invocation
+		OnNavigate?.Invoke(gameName);
 	}
 }

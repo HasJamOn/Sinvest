@@ -1,0 +1,75 @@
+Sinvest
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  /* Centers the .hud container in the middle of the screen */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  pointer-events: all;
+
+  &.hidden
+  {
+    display: none;
+    pointer-events: none;
+  }
+
+  .hud {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    /* Adds consistent space between the Game Card and the Back Button */
+    gap: 24px;
+    pointer-events: all;
+
+    /* Optional: ensures the hud doesn't shrink weirdly */
+    min-width: 450px;
+  }
+
+  /* Combined button styles for consistency */
+  .menu-button, .back-button {
+    min-height: 44px;
+    min-width: 180px; /* Slightly wider for a more "menu" feel */
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0044aa;
+    color: white;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    pointer-events: all;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+
+    &:hover {
+      background-color: #0066ff;
+      transform: scale(1.02);
+    }
+
+    &:active {
+      background-color: #ff0000;
+      transform: scale(0.95);
+    }
+  }
+
+  /* Specific style for the back button to make it look secondary */
+  .back-button {
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid #0044aa;
+
+    &:hover {
+      background-color: #ff4444;
+      border-color: #ff6666;
+    }
+  }
+}

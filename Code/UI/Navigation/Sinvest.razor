@@ -6,23 +6,30 @@
 
 <root class="@(_isOpen ? "" : "hidden")">
     <div class="hud">
-        @if (_currentView == ViewState.Main)
-        {
-            <div class="menu">
-                <button class="menu-button" @onclick="@(() => SetView(ViewState.Casino))">Sin.o</button>
-                <button class="menu-button" @onclick="@(() => SetView(ViewState.Invest))">Invest.o</button>
-                <button class="menu-button" @onclick="@(() => OnQuitClick())">QUIT</button>
-            </div>
-        }
+	    @if (_currentView == ViewState.Main)
+	    {
+		    <div class="menu">
+			    @* Change ViewState.Main to ViewState.Casino here *@
+			    <button class="menu-button" @onclick="@(() => SetView(ViewState.Casino))">Sin.o</button>
+			    <button class="menu-button" @onclick="@(() => SetView(ViewState.Invest))">Invest.o</button>
+			    <button class="menu-button" @onclick="@(() => OnQuitClick())">QUIT</button>
+		    </div>
+	    }
         else if (_currentView == ViewState.Casino)
         {
-            <CasinoMenu></CasinoMenu>
-            <button class="back-button" @onclick="@(() => SetView(ViewState.Main))">Back</button>
+	        /* Use the method name directly without the lambda syntax */
+	        <CasinoMenu OnNavigate="@(new CasinoMenu.NavigateDelegate(HandleNavigation))" />
+	        <button class="back-button" @onclick="@(() => SetView(ViewState.Main))">Back</button>
         }
         else if (_currentView == ViewState.Invest)
         {
-            <InvestMenu></InvestMenu>
+            <InvestMenu />
             <button class="back-button" @onclick="@(() => SetView(ViewState.Main))">Back</button>
+        }
+        else if (_currentView == ViewState.CoinFlip)
+        {
+	        <CoinFlip />
+	        <button class="back-button" @onclick="@(() => SetView(ViewState.Casino))">Back to Casino</button>
         }
     </div>
 </root>
@@ -32,23 +39,34 @@
     private bool _isOpen = false;
     private PlayerController _cachedController;
 
-    private enum ViewState { Main, Casino, Invest }
+    private enum ViewState { Main, Casino, Invest, CoinFlip }
     private ViewState _currentView = ViewState.Main;
+
+    /// <summary>
+    /// Handles the logic when a game is selected from the CasinoMenu
+    /// </summary>
+    private void HandleNavigation(string gameName)
+    {
+	    if (gameName == "Coin Flip")
+	    {
+		    SetView(ViewState.CoinFlip);
+	    }
+    }
 
     private void SetView(ViewState view)
     {
         _currentView = view;
-        StateHasChanged(); // Ensure the UI refreshes to show the new component
+        StateHasChanged(); // Essential for manual delegate updates
     }
 
-    // ===== PUBLIC API (Keep these as they are) =====
+    // ===== PUBLIC API =====
     public void Open() => SetMenuState(true);
     public void Close() => SetMenuState(false);
     
     private void OnQuitClick()
     {
         SetMenuState(false); 
-        _currentView = ViewState.Main; // Reset for next time
+        _currentView = ViewState.Main; 
     }
 
     private void SetMenuState(bool open)
@@ -60,7 +78,6 @@
         
         if (open) Panel.Focus();
 
-        // Handle Player Controller Locking [cite: 13, 14, 15]
         if (open && _cachedController == null)
             _cachedController = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
 

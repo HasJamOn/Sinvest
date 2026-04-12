@@ -1,0 +1,67 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@namespace Sandbox
+
+<root>
+	<div class="coinflip-card">
+		<label class="title">COIN FLIP</label>
+
+		<div class="button-row">
+			<button class="side-btn" @onclick="@(() => SetSide(Side.Heads))">CHOOSE HEADS</button>
+			<button class="side-btn" @onclick="@(() => SetSide(Side.Tails))">CHOOSE TAILS</button>
+		</div>
+
+		<div class="selection-indicator">
+			<label>Current Selection: </label>
+			<label class="highlight">@SelectedSide.ToString()</label>
+		</div>
+
+		<div class="input-group">
+			<label>Amount:</label>
+			<TextEntry Value:bind="@BetAmount" Numeric="@true" />
+		</div>
+
+		<button class="play-btn" @onclick="@PlayGame">FLIP COIN</button>
+
+		@if (!string.IsNullOrEmpty(ResultMessage))
+		{
+			<div class="result-display">
+				<label class="flip-result">The coin landed on: @LastFlip</label>
+				<label class="outcome @(IsWin ? "win" : "loss")">@ResultMessage</label>
+			</div>
+		}
+	</div>
+</root>
+
+@code
+{
+	public enum Side { Heads, Tails }
+
+	private Side SelectedSide = Side.Heads;
+	private string BetAmount = "10";
+	private string LastFlip = "";
+	private string ResultMessage = "";
+	private bool IsWin = false;
+
+	private void SetSide(Side side)
+	{
+		SelectedSide = side;
+		StateHasChanged();
+	}
+
+	private void PlayGame()
+	{
+		// 1 is Heads, 2 is Tails
+		var roll = Game.Random.Int(1, 2);
+		var result = (roll == 1) ? Side.Heads : Side.Tails;
+    
+		LastFlip = result.ToString();
+		IsWin = (SelectedSide == result);
+    
+		ResultMessage = IsWin ? "YOU WON!" : "YOU LOST!";
+		StateHasChanged();
+	}
+
+	protected override int BuildHash() => System.HashCode.Combine(SelectedSide, BetAmount, LastFlip, ResultMessage);
+}
