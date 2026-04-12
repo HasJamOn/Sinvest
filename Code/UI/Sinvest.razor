@@ -8,9 +8,9 @@
     <div class="hud">
        
           <div class="menu">
-             <button class="menu-button" @onclick="OnQuitClick">
-                QUIT
-             </button>
+	          <button class="menu-button" @onclick="@(() => OnQuitClick())">
+		          QUIT
+	          </button>
           </div>
 
     </div>
@@ -40,16 +40,26 @@
     // ===== INTERNAL LOGIC =====
     private void OnQuitClick()
     {
-       Log.Info("Quit clicked");
-       Game.Close();
+	    Log.Info( "Quit button was physically pressed!" );
+	    SetMenuState( false );
     }
 
     private void SetMenuState(bool open)
     {
 	    _isOpen = open;
 
+	    // 1. Visually show/hide
 	    Panel.SetClass("hidden", !open);
+       
+	    // 2. Handle Mouse Lock and Visibility
 	    Mouse.Visibility = open ? MouseVisibility.Visible : MouseVisibility.Auto;
+       
+	    // 3. IMPORTANT: Tell the UI to let the mouse interact with this panel
+	    // This allows buttons to register @onclick events.
+	    Panel.AcceptsFocus = open;
+       
+	    // Focus the panel so it starts receiving input immediately
+	    if ( open ) Panel.Focus();
 
 	    if (open && _cachedController == null)
 		    _cachedController = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
@@ -61,19 +71,13 @@
 
 		    if (open)
 		    {
-			    // 1. Clear the "Intent" to move
-			    // This stops the controller from trying to accelerate again
 			    _cachedController.WishVelocity = Vector3.Zero;
-
-			    // 2. Kill the current physical momentum
 			    var body = _cachedController.Body;
 			    if (body.IsValid())
 			    {
 				    body.Velocity = Vector3.Zero;
 				    body.AngularVelocity = Vector3.Zero;
 			    }
-             
-			    Log.Info("Input and Physics completely zeroed.");
 		    }
 	    }
     }
