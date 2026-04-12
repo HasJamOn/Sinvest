@@ -5,7 +5,6 @@ CoinFlip {
   justify-content: center;
   pointer-events: all;
 
-  /* Ensure all text defaults to a light, readable color */
   color: #eeeeee;
 
   .coinflip-card {
@@ -30,6 +29,8 @@ CoinFlip {
     text-shadow: 0 0 10px rgba(0, 136, 255, 0.3);
   }
 
+  /* ─── Side buttons ──────────────────────────────────────────────────── */
+
   .button-row {
     display: flex;
     gap: 15px;
@@ -51,8 +52,56 @@ CoinFlip {
         border-color: #0088ff;
         color: white;
       }
+
+      &.active {
+        background-color: #003a6e;
+        border-color: #0088ff;
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(0, 136, 255, 0.35);
+      }
     }
   }
+
+  /* ─── Coin (C#-Driven Squish Animation) ──────────────────────────────── */
+
+  .coin-wrapper {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .coin-img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    display: block;
+
+    /* Default state: fully visible */
+    transform: scaleX(1);
+    /* Note: 'transition' property is managed by Razor inline styling to sync with C# timing */
+
+    &.squished {
+      /* When C# applies this class, the transition squishes it to an invisible line */
+      transform: scaleX(0);
+    }
+
+    &.settling {
+      /* Final impact bounce when the loop finishes */
+      animation: coin-land 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+  }
+
+  /* ─── Keyframes ─────────────────────────────────────────────────────── */
+
+  @keyframes coin-land {
+    0%   { transform: scale(1.15); filter: brightness(1.5); }
+    50%  { transform: scale(0.95); filter: brightness(1); }
+    100% { transform: scale(1); }
+  }
+
+  /* ─── Selection indicator ───────────────────────────────────────────── */
 
   .selection-indicator {
     background-color: #0a0a0c;
@@ -63,7 +112,6 @@ CoinFlip {
     gap: 8px;
     font-size: 18px;
 
-    /* Explicitly color the "Current Selection" label */
     label {
       color: #aaaaaa;
     }
@@ -76,6 +124,8 @@ CoinFlip {
     }
   }
 
+  /* ─── Bet input ─────────────────────────────────────────────────────── */
+
   .input-group {
     display: flex;
     align-items: center;
@@ -87,15 +137,12 @@ CoinFlip {
       font-weight: bold;
     }
 
-    /* Target the s&box internal TextEntry component */
     TextEntry {
       flex: 1;
       background-color: #000000;
       border: 1px solid #333333;
       padding: 10px;
       border-radius: 4px;
-
-      /* This ensures the typed text is visible */
       color: #ffffff;
       font-family: monospace;
       font-size: 16px;
@@ -106,6 +153,8 @@ CoinFlip {
       }
     }
   }
+
+  /* ─── Flip button ───────────────────────────────────────────────────── */
 
   .play-btn {
     width: 100%;
@@ -128,7 +177,17 @@ CoinFlip {
       transform: scale(0.97);
       background-color: #0077dd;
     }
+
+    &.flipping {
+      background-color: #004e94;
+      color: rgba(255, 255, 255, 0.4);
+      cursor: default;
+      pointer-events: none;
+      box-shadow: none;
+    }
   }
+
+  /* ─── Result display ────────────────────────────────────────────────── */
 
   .result-display {
     display: flex;

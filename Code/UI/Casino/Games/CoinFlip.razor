@@ -1,5 +1,6 @@
 @using Sandbox;
 @using Sandbox.UI;
+@using System;
 @inherits Panel
 @namespace Sandbox
 
@@ -12,6 +13,12 @@
           <button class="side-btn @(SelectedSide == Side.Tails ? "active" : "")" @onclick="@(() => SetSide(Side.Tails))">CHOOSE TAILS</button>
        </div>
 
+       <div class="coin-wrapper">
+          <img class="coin-img @SquishClass @FlipAnimClass" 
+               style="transition: transform @(SpinSpeed)s ease-in-out;" 
+               src="@CoinImageSrc" />
+       </div>
+
        <div class="selection-indicator">
           <label>Current Selection: </label>
           <label class="highlight">@SelectedSide.ToString()</label>
@@ -22,7 +29,7 @@
           <TextEntry Value:bind="@BetAmount" Numeric="@true" />
        </div>
 
-       <button class="play-btn" @onclick="@PlayGame">FLIP COIN</button>
+       <button class="play-btn @(IsFlipping ? "flipping" : "")" @onclick="@PlayGame">FLIP COIN</button>
 
        @if (!string.IsNullOrEmpty(ResultMessage))
        {
@@ -40,44 +47,114 @@
 
     private Side SelectedSide = Side.Heads;
     private string BetAmount = "10";
-    private string LastFlip = "";
+    private string LastFlip = "Heads";
     private string ResultMessage = "";
     private bool IsWin = false;
+    private bool IsFlipping = false;
+    
+    // Animation States
+    private string FlipAnimClass = "";
+    private bool IsSquished = false;
+    private string SquishClass => IsSquished ? "squished" : "";
+    private float SpinSpeed = 0.05f; 
+    
+    private Side DisplaySide = Side.Heads; 
+    private string CoinImageSrc => $"/ui/casino/coinflip/coin_{DisplaySide.ToString().ToLower()}.png";
 
     private void SetSide(Side side)
     {
+       if (IsFlipping) return;
        SelectedSide = side;
        StateHasChanged();
     }
 
-    private void PlayGame()
+    private async void PlayGame()
     {
-	    // 1. Parse the bet amount safely
-	    if (!float.TryParse(BetAmount, out float amount)) amount = 0;
+        if (IsFlipping) return;
 
-	    // 2. Roll the coin
-	    var roll = Game.Random.Int(1, 2);
-	    var result = (roll == 1) ? Side.Heads : Side.Tails;
-    
-	    LastFlip = result.ToString();
-	    IsWin = (SelectedSide == result);
-    
-	    // 3. Update the Service AND the UI Message
-	    if (IsWin)
-	    {
-		    // This updates the HUD instantly and the cloud simultaneously
-		    Sinvest.Instance?.Transaction(amount);
-		    ResultMessage = $"YOU WON ${amount}!";
-	    }
-	    else
-	    {
-		    Sinvest.Instance?.Transaction(-amount);
-		    ResultMessage = $"YOU LOST ${amount}!";
-	    }
+        // 1. Setup & calculate outcome immediately
+        if (!float.TryParse(BetAmount, out float amount)) amount = 0;
+        var roll = Game.Random.Int(1, 2);
+        var result = (roll == 1) ? Side.Heads : Side.Tails;
+        
+        IsFlipping = true;
+        ResultMessage = "";
+        FlipAnimClass = "";
+        StateHasChanged();
 
-	    // 4. Tell the UI to rebuild
-	    StateHasChanged();
+        // 2. The Controlled Spin Loop
+        int totalFlips = 12; // Number of half-rotations
+        float currentSpeed = 0.05f; // Fast initial spin
+
+        for (int i = 0; i < totalFlips; i++)
+        {
+            // SQUISH (Hide)
+            SpinSpeed = currentSpeed;
+            IsSquished = true;
+            StateHasChanged();
+            await GameTask.DelaySeconds(currentSpeed); // Wait for transition to hit 0 width
+
+            // SWAP IMAGE (While invisible)
+            DisplaySide = (DisplaySide == Side.Heads) ? Side.Tails : Side.Heads;
+
+            // EXPAND (Reveal)
+            IsSquished = false;
+            StateHasChanged();
+            await GameTask.DelaySeconds(currentSpeed); // Wait for transition to hit full width
+
+            // Gradually slow down the flipping speed after a few spins
+            if (i > 4) 
+            {
+                currentSpeed += 0.02f; 
+            }
+        }
+
+        // 3. Final Targeted Settle
+        // One last squish to guarantee we land on the pre-calculated result face
+        SpinSpeed = currentSpeed + 0.05f; // Slow dramatic final turn
+        IsSquished = true;
+        StateHasChanged();
+        await GameTask.DelaySeconds(SpinSpeed);
+
+        DisplaySide = result; // Force the target face
+        IsSquished = false;
+        FlipAnimClass = "settling"; // Trigger the CSS scale bounce
+        StateHasChanged();
+
+        await GameTask.DelaySeconds(0.6f); // Wait for the settle bounce
+
+        // 4. Logic Resolution
+        LastFlip = result.ToString();
+        IsWin = (SelectedSide == result);
+        IsFlipping = false;
+
+        if (IsWin)
+        {
+            Sinvest.Instance?.Transaction(amount);
+            ResultMessage = $"YOU WON ${amount}!";
+        }
+        else
+        {
+            Sinvest.Instance?.Transaction(-amount);
+            ResultMessage = $"YOU LOST ${amount}!";
+        }
+
+        StateHasChanged();
     }
 
-    protected override int BuildHash() => System.HashCode.Combine(SelectedSide, BetAmount, LastFlip, ResultMessage);
+    protected override int BuildHash()
+    {
+	    var hash = new HashCode();
+	    hash.Add(SelectedSide);
+	    hash.Add(BetAmount);
+	    hash.Add(LastFlip);
+	    hash.Add(ResultMessage);
+	    hash.Add(IsFlipping);
+	    hash.Add(FlipAnimClass);
+	    hash.Add(DisplaySide);
+	    hash.Add(IsSquished);
+	    hash.Add(SpinSpeed);
+	    return hash.ToHashCode();
+    }
+    
 }
