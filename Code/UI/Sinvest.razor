@@ -1,82 +1,80 @@
 @using Sandbox;
 @using Sandbox.UI;
+@using System.Linq;
 @inherits PanelComponent
 @namespace Sandbox
 
 <root class="@(_isOpen ? "" : "hidden")">
-	<div class="hud">
+    <div class="hud">
+       
+          <div class="menu">
+             <button class="menu-button" @onclick="OnQuitClick">
+                QUIT
+             </button>
+          </div>
 
-		<button class="menu-button" @onclick="Toggle">
-			Toggle Menu
-		</button>
-
-		@if ( _isOpen )
-		{
-			<div class="menu">
-				<button class="menu-button" @onclick="OnQuitClick">
-				</button>
-			</div>
-		}
-
-	</div>
+    </div>
 </root>
 
 @code
 {
-	private bool _isOpen = false;
-	private PlayerController _cachedController;
+    private bool _isOpen = false;
+    private PlayerController _cachedController;
 
-	// ===== PUBLIC API (required for InteractComputer) =====
-	public void Open()
-	{
-		SetMenuState(true);
-	}
+    // ===== PUBLIC API (required for InteractComputer) =====
+    public void Open()
+    {
+       SetMenuState(true);
+    }
 
-	public void Close()
-	{
-		SetMenuState(false);
-	}
+    public void Close()
+    {
+       SetMenuState(false);
+    }
 
-	public void Toggle()
-	{
-		SetMenuState(!_isOpen);
-	}
+    public void Toggle()
+    {
+       SetMenuState(!_isOpen);
+    }
 
-	// ===== INTERNAL LOGIC =====
-	private void OnQuitClick()
-	{
-		Log.Info("Quit clicked");
-		Game.Close();
-	}
+    // ===== INTERNAL LOGIC =====
+    private void OnQuitClick()
+    {
+       Log.Info("Quit clicked");
+       Game.Close();
+    }
 
-	private void SetMenuState(bool open)
-	{
-		_isOpen = open;
+    private void SetMenuState(bool open)
+    {
+	    _isOpen = open;
 
-		Panel.SetClass("hidden", !open);
-		Mouse.Visibility = open ? MouseVisibility.Visible : MouseVisibility.Auto;
+	    Panel.SetClass("hidden", !open);
+	    Mouse.Visibility = open ? MouseVisibility.Visible : MouseVisibility.Auto;
 
-		if (open && _cachedController == null)
-			_cachedController = Scene.GetAllComponents<PlayerController>().FirstOrDefault();
+	    if (open && _cachedController == null)
+		    _cachedController = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
 
-		if (_cachedController != null)
-		{
-			_cachedController.UseLookControls = !open;
-			_cachedController.UseInputControls = !open;
+	    if (_cachedController != null)
+	    {
+		    _cachedController.UseLookControls = !open;
+		    _cachedController.UseInputControls = !open;
 
-			// ===== HARD STOP =====
-			if (open)
-			{
-				var body = _cachedController.Body;
+		    if (open)
+		    {
+			    // 1. Clear the "Intent" to move
+			    // This stops the controller from trying to accelerate again
+			    _cachedController.WishVelocity = Vector3.Zero;
 
-				if (body != null)
-				{
-					body.Velocity = Vector3.Zero;
-					body.AngularVelocity = Vector3.Zero;
-
-					Log.Info("Rigidbody velocity cleared");
-				}
-			}
-		}
-	}
+			    // 2. Kill the current physical momentum
+			    var body = _cachedController.Body;
+			    if (body.IsValid())
+			    {
+				    body.Velocity = Vector3.Zero;
+				    body.AngularVelocity = Vector3.Zero;
+			    }
+             
+			    Log.Info("Input and Physics completely zeroed.");
+		    }
+	    }
+    }
 }

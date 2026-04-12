@@ -40,7 +40,6 @@
           "__guid": "58f204af-2dd7-43aa-b3d6-90eaee9bcb51",
           "__enabled": true,
           "Flags": 0,
-          "MyStringValue": "Sinvest Activated!",
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
