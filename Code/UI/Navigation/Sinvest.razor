@@ -4,34 +4,37 @@
 @inherits PanelComponent
 @namespace Sandbox
 
-<root class="@(_isOpen ? "" : "hidden")">
-    <div class="hud">
-	    @if (_currentView == ViewState.Main)
-	    {
-		    <div class="menu">
-			    @* Change ViewState.Main to ViewState.Casino here *@
-			    <button class="menu-button" @onclick="@(() => SetView(ViewState.Casino))">Sin.o</button>
-			    <button class="menu-button" @onclick="@(() => SetView(ViewState.Invest))">Invest.o</button>
-			    <button class="menu-button" @onclick="@(() => OnQuitClick())">QUIT</button>
-		    </div>
-	    }
-        else if (_currentView == ViewState.Casino)
-        {
-	        /* Use the method name directly without the lambda syntax */
-	        <CasinoMenu OnNavigate="@(new CasinoMenu.NavigateDelegate(HandleNavigation))" />
-	        <button class="back-button" @onclick="@(() => SetView(ViewState.Main))">Back</button>
-        }
-        else if (_currentView == ViewState.Invest)
-        {
-            <InvestMenu />
-            <button class="back-button" @onclick="@(() => SetView(ViewState.Main))">Back</button>
-        }
-        else if (_currentView == ViewState.CoinFlip)
-        {
-	        <CoinFlip />
-	        <button class="back-button" @onclick="@(() => SetView(ViewState.Casino))">Back to Casino</button>
-        }
-    </div>
+<root class="@( _isOpen ? "" : "hidden" )">
+	<div class="stat-header">
+		<label class="money-label">Cash: $@GetPlayerMoney()</label>
+	</div>
+	<div class="hud">
+		@if ( _currentView == ViewState.Main )
+		{
+			<div class="menu">
+				@* Change ViewState.Main to ViewState.Casino here *@
+				<button class="menu-button" @onclick="@( () => SetView( ViewState.Casino ) )">Sin.o</button>
+				<button class="menu-button" @onclick="@( () => SetView( ViewState.Invest ) )">Invest.o</button>
+				<button class="menu-button" @onclick="@( () => OnQuitClick() )">QUIT</button>
+			</div>
+		}
+		else if ( _currentView == ViewState.Casino )
+		{
+			/* Use the method name directly without the lambda syntax */
+			<CasinoMenu OnNavigate="@( new CasinoMenu.NavigateDelegate( HandleNavigation ) )"/>
+			<button class="back-button" @onclick="@( () => SetView( ViewState.Main ) )">Back</button>
+		}
+		else if ( _currentView == ViewState.Invest )
+		{
+			<InvestMenu/>
+			<button class="back-button" @onclick="@( () => SetView( ViewState.Main ) )">Back</button>
+		}
+		else if ( _currentView == ViewState.CoinFlip )
+		{
+			<CoinFlip/>
+			<button class="back-button" @onclick="@( () => SetView( ViewState.Casino ) )">Back to Casino</button>
+		}
+	</div>
 </root>
 
 @code
@@ -87,5 +90,35 @@
             _cachedController.UseInputControls = !open;
             if (open) _cachedController.WishVelocity = Vector3.Zero;
         }
+    }
+    
+    /// <summary>
+    /// Fetches the current money stat for the local player
+    /// </summary>
+    private double _localMoneyCache = -1;
+
+    private double GetPlayerMoney()
+    {
+	    var stat = Sandbox.Services.Stats.LocalPlayer.Get("money");
+    
+	    // If this is the first run, or the cloud value changed, update our cache
+	    if (_localMoneyCache == -1 || stat.Value != _localMoneyCache)
+	    {
+		    _localMoneyCache = stat.Value;
+	    }
+
+	    return _localMoneyCache;
+    }
+    
+    public static Sinvest Instance { get; private set; }
+    protected override void OnAwake() => Instance = this;
+
+    public void RefreshStats() => StateHasChanged();
+
+    // Call this whenever the player performs an action that changes money
+    public void AddMoney(double amount)
+    {
+	    Sandbox.Services.Stats.Increment("money", amount);
+	    StateHasChanged(); // Force the UI to refresh the numbers
     }
 }

@@ -20,6 +20,23 @@ Sinvest
     pointer-events: none;
   }
 
+  .stat-header {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    border-left: 4px solid #4caf50; // Green for money
+
+    .money-label {
+      font-family: Poppins;
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+    }
+  }
+
   .hud {
     display: flex;
     flex-direction: column;

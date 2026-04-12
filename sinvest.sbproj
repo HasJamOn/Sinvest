@@ -1,7 +1,7 @@
 {
   "Title": "Sinvest",
   "Type": "game",
-  "Org": "local",
+  "Org": "hasjamon",
   "Ident": "sinvest",
   "Schema": 1,
   "IncludeSourceFiles": false,
