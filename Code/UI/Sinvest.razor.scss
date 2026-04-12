@@ -1,0 +1,50 @@
+Sinvest
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;              // enable flex
+  flex-direction: column;     // vertical layout
+  justify-content: center;
+  align-items: center;
+
+  gap: 10px;                 // replaces <br>
+
+  background-color: transparent;
+  font-weight: bold;
+  border-radius: 20px;
+
+  &.hidden
+  {
+    display: none;
+  }
+
+  .title
+  {
+    font-size: 25px;
+    font-family: Poppins;
+    color: #fff;
+  }
+  .menu-button {
+    /* 1. Enforce minimum size (The Safety Net) */
+    /* Use fixed pixels ONLY for the non-negotiable minimum touch target */
+    min-height: 44px;
+    min-width: 100px;
+
+    /* 2. Use REM for internal padding (The Scaling Unit) */
+    /* Padding scales with the root font size, keeping the button balanced. */
+    padding: 0.75rem 1.2rem;
+
+    /* 3. Use display block or flex (The Layout Control) */
+    /* Helps ensure the full padding and min-height are respected. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* temp */
+    background-color: #0044aa;
+  }
+}

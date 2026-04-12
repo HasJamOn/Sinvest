@@ -1,0 +1,61 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root class="hidden">
+	<div class="title">@MyStringValue</div>
+
+	<div class="hud">
+		<button class="menu-button" @onclick="OnClick">
+			<str>Click Me!</str>
+		</button>
+		<button id="quit-button" class="menu-button" @onclick="OnQuitClick">
+			<str>Quit Sinvest App</str>
+		</button>
+	</div>
+</root>
+
+@code
+{
+	[Property, TextArea] 
+	public string MyStringValue { get; set; } = "Hello World!";
+
+	private bool _isOpen = false;
+
+	protected override void OnUpdate()
+	{
+		if (Input.Pressed("sinvest"))
+		{
+			_isOpen = !_isOpen;
+
+			Panel.SetClass("hidden", !_isOpen);
+			Mouse.Visible = _isOpen;
+
+			// Disable/enable player controller so input doesn't bleed through
+			var controller = GameObject.Parent.Components.Get<PlayerController>();
+			if (controller != null)
+				controller.Enabled = !_isOpen;
+		}
+	}
+
+	void OnClick()
+	{
+		Log.Info("Button clicked");
+	}
+	
+	void OnQuitClick()
+	{
+		_isOpen = false;
+		Panel.SetClass("hidden", true);
+		Mouse.Visible = false;
+	}
+
+	protected override int BuildHash() => System.HashCode.Combine(MyStringValue);
+	public void Open()
+	{
+		_isOpen = true;
+		Panel.SetClass( "hidden", false );
+		Mouse.Visible = true;
+	}
+}

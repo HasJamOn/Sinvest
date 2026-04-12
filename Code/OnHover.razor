@@ -1,0 +1,43 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root>
+	@if( IsLookedAt )
+	{
+		<div class="title">@MyStringValue</div>
+	}
+</root>
+
+@code
+{
+	[Property, TextArea] public string MyStringValue { get; set; } = "Hello World!";
+
+	private bool IsLookedAt { get; set; } = false;
+
+	protected override void OnUpdate()
+	{
+		var camera = Scene.GetAllComponents<CameraComponent>()
+			.FirstOrDefault( x => x.IsMainCamera );
+
+		if ( camera is null )
+		{
+			IsLookedAt = false;
+			return;
+		}
+
+		var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault();
+
+		var tr = Scene.Trace
+			.Ray( camera.WorldPosition, camera.WorldPosition + camera.WorldRotation.Forward * 150f )
+			.IgnoreGameObjectHierarchy( player?.GameObject )
+			.Run();
+
+		Log.Info( tr.Hit ? $"Hit: {tr.GameObject?.Name}" : "No hit" );
+
+		IsLookedAt = tr.Hit && tr.GameObject?.Name == "Computer";
+	}
+
+	protected override int BuildHash() => System.HashCode.Combine( IsLookedAt );
+}
