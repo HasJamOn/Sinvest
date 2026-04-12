@@ -1,40 +1,40 @@
 @using Sandbox;
 @using Sandbox.UI;
+@using System;
 @using System.Linq;
 @inherits PanelComponent
 @namespace Sandbox
 
 <root class="@( _isOpen ? "" : "hidden" )">
-	<div class="stat-header">
-		<label class="money-label">Cash: $@GetPlayerMoney()</label>
-	</div>
-	<div class="hud">
-		@if ( _currentView == ViewState.Main )
-		{
-			<div class="menu">
-				@* Change ViewState.Main to ViewState.Casino here *@
-				<button class="menu-button" @onclick="@( () => SetView( ViewState.Casino ) )">Sin.o</button>
-				<button class="menu-button" @onclick="@( () => SetView( ViewState.Invest ) )">Invest.o</button>
-				<button class="menu-button" @onclick="@( () => OnQuitClick() )">QUIT</button>
-			</div>
-		}
-		else if ( _currentView == ViewState.Casino )
-		{
-			/* Use the method name directly without the lambda syntax */
-			<CasinoMenu OnNavigate="@( new CasinoMenu.NavigateDelegate( HandleNavigation ) )"/>
-			<button class="back-button" @onclick="@( () => SetView( ViewState.Main ) )">Back</button>
-		}
-		else if ( _currentView == ViewState.Invest )
-		{
-			<InvestMenu/>
-			<button class="back-button" @onclick="@( () => SetView( ViewState.Main ) )">Back</button>
-		}
-		else if ( _currentView == ViewState.CoinFlip )
-		{
-			<CoinFlip/>
-			<button class="back-button" @onclick="@( () => SetView( ViewState.Casino ) )">Back to Casino</button>
-		}
-	</div>
+    <div class="stat-header">
+       @* The display money is rounded to N0 so you don't see ugly decimals during the animation *@
+       <label class="money-label">Cash: $@_displayMoney.ToString("N0")</label>
+    </div>
+    <div class="hud">
+       @if ( _currentView == ViewState.Main )
+       {
+          <div class="menu">
+             <button class="menu-button" @onclick="@( () => SetView( ViewState.Casino ) )">Sin.o</button>
+             <button class="menu-button" @onclick="@( () => SetView( ViewState.Invest ) )">Invest.o</button>
+             <button class="menu-button" @onclick="@( () => OnQuitClick() )">QUIT</button>
+          </div>
+       }
+       else if ( _currentView == ViewState.Casino )
+       {
+          <CasinoMenu OnNavigate="@( new CasinoMenu.NavigateDelegate( HandleNavigation ) )"/>
+          <button class="back-button" @onclick="@( () => SetView( ViewState.Main ) )">Back</button>
+       }
+       else if ( _currentView == ViewState.Invest )
+       {
+          <InvestMenu/>
+          <button class="back-button" @onclick="@( () => SetView( ViewState.Main ) )">Back</button>
+       }
+       else if ( _currentView == ViewState.CoinFlip )
+       {
+          <CoinFlip/>
+          <button class="back-button" @onclick="@( () => SetView( ViewState.Casino ) )">Back to Casino</button>
+       }
+    </div>
 </root>
 
 @code
@@ -45,24 +45,69 @@
     private enum ViewState { Main, Casino, Invest, CoinFlip }
     private ViewState _currentView = ViewState.Main;
 
+    // --- ANIMATION VARIABLES ---
+    private double _displayMoney = 0;   // The visual number that "rolls"
+    private double _targetMoney = 0;    // The actual real value we are aiming for
+    private bool _initialized = false;
+
+    public static Sinvest Instance { get; private set; }
+    protected override void OnAwake() => Instance = this;
+
+    protected override void OnUpdate()
+    {
+        // 1. Initial setup: Grab the starting value from the cloud
+        if (!_initialized)
+        {
+            var stat = Sandbox.Services.Stats.LocalPlayer.Get("money");
+            _targetMoney = stat.Value;
+            _displayMoney = _targetMoney; 
+            _initialized = true;
+            StateHasChanged();
+        }
+
+        // 2. Animation logic: If display isn't at target, move it closer
+        if ( Math.Abs(_displayMoney - _targetMoney) > 0.1 )
+        {
+            // Lerp creates the "slow down as it gets closer" effect
+            // 8.0f is the speed; increase it for faster counting
+            _displayMoney = MathX.Lerp( _displayMoney, _targetMoney, RealTime.Delta * 8.0f );
+            
+            StateHasChanged();
+        }
+        else if (_displayMoney != _targetMoney)
+        {
+            // Snap to target if we are close enough to stop the math
+            _displayMoney = _targetMoney;
+            StateHasChanged();
+        }
+    }
+
     /// <summary>
-    /// Handles the logic when a game is selected from the CasinoMenu
+    /// The primary way to change money. 
+    /// Updates the Target immediately, causing the UI to start animating.
     /// </summary>
+    public void Transaction(double amount)
+    {
+        // Update the target value (UI will notice this in OnUpdate)
+        _targetMoney += amount;
+
+        // Push to s&box cloud services for permanent saving
+        Sandbox.Services.Stats.Increment("money", amount);
+    }
+
+    // Handlers for navigation
     private void HandleNavigation(string gameName)
     {
-	    if (gameName == "Coin Flip")
-	    {
-		    SetView(ViewState.CoinFlip);
-	    }
+        if (gameName == "Coin Flip") SetView(ViewState.CoinFlip);
     }
 
     private void SetView(ViewState view)
     {
         _currentView = view;
-        StateHasChanged(); // Essential for manual delegate updates
+        StateHasChanged();
     }
 
-    // ===== PUBLIC API =====
+    // Public UI controls
     public void Open() => SetMenuState(true);
     public void Close() => SetMenuState(false);
     
@@ -91,34 +136,7 @@
             if (open) _cachedController.WishVelocity = Vector3.Zero;
         }
     }
-    
-    /// <summary>
-    /// Fetches the current money stat for the local player
-    /// </summary>
-    private double _localMoneyCache = -1;
 
-    private double GetPlayerMoney()
-    {
-	    var stat = Sandbox.Services.Stats.LocalPlayer.Get("money");
-    
-	    // If this is the first run, or the cloud value changed, update our cache
-	    if (_localMoneyCache == -1 || stat.Value != _localMoneyCache)
-	    {
-		    _localMoneyCache = stat.Value;
-	    }
-
-	    return _localMoneyCache;
-    }
-    
-    public static Sinvest Instance { get; private set; }
-    protected override void OnAwake() => Instance = this;
-
-    public void RefreshStats() => StateHasChanged();
-
-    // Call this whenever the player performs an action that changes money
-    public void AddMoney(double amount)
-    {
-	    Sandbox.Services.Stats.Increment("money", amount);
-	    StateHasChanged(); // Force the UI to refresh the numbers
-    }
+    // Keep this helper for any other components that need the raw number
+    private double GetPlayerMoney() => _targetMoney;
 }

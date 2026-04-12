@@ -65,13 +65,14 @@
 	    // 3. Update the Service AND the UI Message
 	    if (IsWin)
 	    {
-		    Sandbox.Services.Stats.Increment("money", amount);
-		    ResultMessage = $"YOU WON ${amount}!"; // Re-added this
+		    // This updates the HUD instantly and the cloud simultaneously
+		    Sinvest.Instance?.Transaction(amount);
+		    ResultMessage = $"YOU WON ${amount}!";
 	    }
 	    else
 	    {
-		    Sandbox.Services.Stats.Increment("money", -amount);
-		    ResultMessage = $"YOU LOST ${amount}!"; // Re-added this
+		    Sinvest.Instance?.Transaction(-amount);
+		    ResultMessage = $"YOU LOST ${amount}!";
 	    }
 
 	    // 4. Tell the UI to rebuild
