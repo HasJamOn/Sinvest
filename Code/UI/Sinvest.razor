@@ -6,13 +6,24 @@
 
 <root class="@(_isOpen ? "" : "hidden")">
     <div class="hud">
-       
-          <div class="menu">
-	          <button class="menu-button" @onclick="@(() => OnQuitClick())">
-		          QUIT
-	          </button>
-          </div>
-
+        @if (_currentView == ViewState.Main)
+        {
+            <div class="menu">
+                <button class="menu-button" @onclick="@(() => SetView(ViewState.Casino))">Sin.o</button>
+                <button class="menu-button" @onclick="@(() => SetView(ViewState.Invest))">Invest.o</button>
+                <button class="menu-button" @onclick="@(() => OnQuitClick())">QUIT</button>
+            </div>
+        }
+        else if (_currentView == ViewState.Casino)
+        {
+            <CasinoMenu></CasinoMenu>
+            <button class="back-button" @onclick="@(() => SetView(ViewState.Main))">Back</button>
+        }
+        else if (_currentView == ViewState.Invest)
+        {
+            <InvestMenu></InvestMenu>
+            <button class="back-button" @onclick="@(() => SetView(ViewState.Main))">Back</button>
+        }
     </div>
 </root>
 
@@ -21,64 +32,43 @@
     private bool _isOpen = false;
     private PlayerController _cachedController;
 
-    // ===== PUBLIC API (required for InteractComputer) =====
-    public void Open()
+    private enum ViewState { Main, Casino, Invest }
+    private ViewState _currentView = ViewState.Main;
+
+    private void SetView(ViewState view)
     {
-       SetMenuState(true);
+        _currentView = view;
+        StateHasChanged(); // Ensure the UI refreshes to show the new component
     }
 
-    public void Close()
-    {
-       SetMenuState(false);
-    }
-
-    public void Toggle()
-    {
-       SetMenuState(!_isOpen);
-    }
-
-    // ===== INTERNAL LOGIC =====
+    // ===== PUBLIC API (Keep these as they are) =====
+    public void Open() => SetMenuState(true);
+    public void Close() => SetMenuState(false);
+    
     private void OnQuitClick()
     {
-	    Log.Info( "Quit button was physically pressed!" );
-	    SetMenuState( false );
+        SetMenuState(false); 
+        _currentView = ViewState.Main; // Reset for next time
     }
 
     private void SetMenuState(bool open)
     {
-	    _isOpen = open;
+        _isOpen = open;
+        Panel.SetClass("hidden", !open);
+        Mouse.Visibility = open ? MouseVisibility.Visible : MouseVisibility.Auto;
+        Panel.AcceptsFocus = open;
+        
+        if (open) Panel.Focus();
 
-	    // 1. Visually show/hide
-	    Panel.SetClass("hidden", !open);
-       
-	    // 2. Handle Mouse Lock and Visibility
-	    Mouse.Visibility = open ? MouseVisibility.Visible : MouseVisibility.Auto;
-       
-	    // 3. IMPORTANT: Tell the UI to let the mouse interact with this panel
-	    // This allows buttons to register @onclick events.
-	    Panel.AcceptsFocus = open;
-       
-	    // Focus the panel so it starts receiving input immediately
-	    if ( open ) Panel.Focus();
+        // Handle Player Controller Locking [cite: 13, 14, 15]
+        if (open && _cachedController == null)
+            _cachedController = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
 
-	    if (open && _cachedController == null)
-		    _cachedController = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
-
-	    if (_cachedController != null)
-	    {
-		    _cachedController.UseLookControls = !open;
-		    _cachedController.UseInputControls = !open;
-
-		    if (open)
-		    {
-			    _cachedController.WishVelocity = Vector3.Zero;
-			    var body = _cachedController.Body;
-			    if (body.IsValid())
-			    {
-				    body.Velocity = Vector3.Zero;
-				    body.AngularVelocity = Vector3.Zero;
-			    }
-		    }
-	    }
+        if (_cachedController != null)
+        {
+            _cachedController.UseLookControls = !open;
+            _cachedController.UseInputControls = !open;
+            if (open) _cachedController.WishVelocity = Vector3.Zero;
+        }
     }
 }

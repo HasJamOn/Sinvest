@@ -28,7 +28,7 @@ Sinvest
     pointer-events: all;
   }
 
-  .menu-button {
+  .menu-button, .back-button {
     min-height: 44px;
     min-width: 100px;
     padding: 0.75rem 1.2rem;
@@ -39,12 +39,12 @@ Sinvest
     color: white;
     pointer-events: all;
     cursor: pointer;
-    transition: background-color 0.05s; /* Adds a snappy feel to the color change */
+    transition: background-color 0.05s;
 
     &:hover {
       background-color: #0066ff;
     }
-    
+
     &:active {
       background-color: #ff0000;
     }
