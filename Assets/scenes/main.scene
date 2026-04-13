@@ -711,7 +711,7 @@
                   "__guid": "cd470d29-f77a-48bc-bd2f-45439d96b672",
                   "__enabled": true,
                   "Flags": 0,
-                  "MyStringValue": "[E]Start Flipper",
+                  "MyStringValue": "[E]Start Flipper 2D",
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
@@ -873,13 +873,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "7a171ef3-48f1-433c-b09b-02469dbf3b37"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },
