@@ -2,15 +2,61 @@
 @using Sandbox.UI;
 @inherits Panel
 @namespace Sandbox
-@attribute [StyleSheet] // This tells s&box to look for Flipper2D.scss
 
 <root>
 	<div class="flipper-container">
-		<h1>2D Flipper</h1>
-        
+	<h1>2D Flipper</h1>
+	
 		<div class="game-canvas">
-			@* Your physics objects or 2D logic will go here *@
+			<div class="paddle" style="left: @(PaddlePos.x / 800f * 100)%; top: @(PaddlePos.y / 600f * 100)%; width: @(PanWidth / 800f * 100)%;"></div>
 			<label>GAME AREA: 800x600</label>
 		</div>
 	</div>
 </root>
+
+@code {
+	// Section 4A: Equipment Variables
+	private float PanWidth = 150f;
+	private Vector2 PaddlePos = new Vector2( 400f, 500f );
+	private float PanRotation = 0f;
+
+	// Boundaries (relative to the game-canvas)
+	private float MinY = 450f; // 600 - 150
+	private float MaxY = 550f; // 600 - 50
+
+	protected override void OnAfterTreeRender(bool firstTime)
+	{
+		if (firstTime)
+		{
+			// Start the paddle in the middle-bottom
+			PaddlePos = new Vector2(400, 500);
+		}
+	}
+
+	protected override void OnMouseMove(MousePanelEvent e)
+	{
+		base.OnMouseMove(e);
+
+		var canvas = Children.SelectMany( x => x.Children ).FirstOrDefault( x => x.HasClass( "game-canvas" ) );
+		if ( canvas == null || canvas.Box.Rect.Width == 0 ) return;
+
+		// 1. Get mouse position as a fraction of the current visual canvas (0.0 to 1.0)
+		float fractionX = canvas.MousePosition.x / canvas.Box.Rect.Width;
+		float fractionY = canvas.MousePosition.y / canvas.Box.Rect.Height;
+
+		// 2. Map that fraction to our strict Logical Game Resolution (800x600)
+		float logicalX = fractionX * 800f;
+		float logicalY = fractionY * 600f;
+
+		// 3. Clamp using our logical coordinates, not screen pixels
+		float halfWidth = PanWidth / 2f;
+    
+		PaddlePos.x = logicalX.Clamp( halfWidth, 800f - halfWidth );
+		PaddlePos.y = logicalY.Clamp( 450f, 550f );
+
+		StateHasChanged();
+	}
+
+	// Helper to convert screen pixels to UI units
+	private Vector2 ScreenToLocal(Vector2 screenPos) => MousePosition; 
+}
