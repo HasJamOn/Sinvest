@@ -17,21 +17,12 @@
 @code {
 	// Section 4A: Equipment Variables
 	private float PanWidth = 150f;
-	private Vector2 PaddlePos = new Vector2( 400f, 500f );
+	private Vector2 PaddlePos = new Vector2( 400f, 400f );
 	private float PanRotation = 0f;
 
 	// Boundaries (relative to the game-canvas)
 	private float MinY = 450f; // 600 - 150
 	private float MaxY = 550f; // 600 - 50
-
-	protected override void OnAfterTreeRender(bool firstTime)
-	{
-		if (firstTime)
-		{
-			// Start the paddle in the middle-bottom
-			PaddlePos = new Vector2(400, 500);
-		}
-	}
 
 	protected override void OnMouseMove(MousePanelEvent e)
 	{
@@ -40,19 +31,19 @@
 		var canvas = Children.SelectMany( x => x.Children ).FirstOrDefault( x => x.HasClass( "game-canvas" ) );
 		if ( canvas == null || canvas.Box.Rect.Width == 0 ) return;
 
-		// 1. Get mouse position as a fraction of the current visual canvas (0.0 to 1.0)
 		float fractionX = canvas.MousePosition.x / canvas.Box.Rect.Width;
 		float fractionY = canvas.MousePosition.y / canvas.Box.Rect.Height;
 
-		// 2. Map that fraction to our strict Logical Game Resolution (800x600)
 		float logicalX = fractionX * 800f;
 		float logicalY = fractionY * 600f;
 
-		// 3. Clamp using our logical coordinates, not screen pixels
 		float halfWidth = PanWidth / 2f;
-    
+        
 		PaddlePos.x = logicalX.Clamp( halfWidth, 800f - halfWidth );
-		PaddlePos.y = logicalY.Clamp( 450f, 550f );
+
+		// 2. New Action Zone: Clamped between 350 and 450
+		// This keeps the paddle in the bottom third but leaves ~150px of plate space below
+		PaddlePos.y = logicalY.Clamp( 350f, 450f );
 
 		StateHasChanged();
 	}
