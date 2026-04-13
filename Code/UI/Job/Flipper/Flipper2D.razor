@@ -8,46 +8,121 @@
 	<h1>2D Flipper</h1>
 	
 		<div class="game-canvas">
-			<div class="paddle" style="left: @(PaddlePos.x / 800f * 100)%; top: @(PaddlePos.y / 600f * 100)%; width: @(PanWidth / 800f * 100)%;"></div>
+			<div class="paddle" 
+			     style="left: @(PaddlePos.x / 800f * 100)%; 
+            top: @(PaddlePos.y / 600f * 100)%; 
+            width: @(PanWidth / 800f * 100)%; 
+            transform: translate(-50%, -50%) rotate(@(PanRotation)deg);">
+			</div>
 			<label>GAME AREA: 800x600</label>
 		</div>
 	</div>
 </root>
 
 @code {
-	// Section 4A: Equipment Variables
-	private float PanWidth = 150f;
-	private Vector2 PaddlePos = new Vector2( 400f, 400f );
-	private float PanRotation = 0f;
+    // --- Section 4A: Equipment Variables ---
+    private float PanWidth = 150f;
+    private Vector2 PaddlePos = new Vector2(400f, 400f);
+    private bool IsRotating = false;
+    private float PanRotation = 0f;
+    private float TargetRotation = 0f;
+    private float RotationSpeed = 5.0f;
+    
+    // Smooths out the "Lean" based on movement speed
+    private float SmoothedVelocityX = 0f;
+    private Vector2 LastMousePos;
 
-	// Boundaries (relative to the game-canvas)
-	private float MinY = 450f; // 600 - 150
-	private float MaxY = 550f; // 600 - 50
+    // --- Section 4B: Product Variables (The Patty) ---
+    private Vector2 PattyPos = new Vector2(400f, 100f);
+    private Vector2 PattyVelocity = Vector2.Zero;
+    private float Gravity = 800f;
 
-	protected override void OnMouseMove(MousePanelEvent e)
-	{
-		base.OnMouseMove(e);
+    // --- Core Game Loop ---
+    public override void Tick()
+    {
+        base.Tick();
 
-		var canvas = Children.SelectMany( x => x.Children ).FirstOrDefault( x => x.HasClass( "game-canvas" ) );
-		if ( canvas == null || canvas.Box.Rect.Width == 0 ) return;
+        // 1. Patty Physics (Gravity and Movement)
+        PattyVelocity.y += Gravity * Time.Delta;
+        PattyPos += PattyVelocity * Time.Delta;
 
-		float fractionX = canvas.MousePosition.x / canvas.Box.Rect.Width;
-		float fractionY = canvas.MousePosition.y / canvas.Box.Rect.Height;
+        // 2. Smooth the Velocity Decay
+        // This ensures the lean doesn't "snap" back, but settles
+        SmoothedVelocityX = MathX.Lerp(SmoothedVelocityX, 0f, 8f * Time.Delta);
 
-		float logicalX = fractionX * 800f;
-		float logicalY = fractionY * 600f;
+        // 3. Calculate Final Target Rotation
+        // Increased idle lean multiplier (2.5f) and clamp (25deg)
+        float idleTilt = (SmoothedVelocityX * 2.5f).Clamp(-25f, 25f);
+        float finalTarget = IsRotating ? TargetRotation : idleTilt;
 
-		float halfWidth = PanWidth / 2f;
-        
-		PaddlePos.x = logicalX.Clamp( halfWidth, 800f - halfWidth );
+        // 4. Apply smooth Lerp to the actual PanRotation
+        // 25f provides a snappy, responsive connection to the mouse
+        PanRotation = MathX.Lerp(PanRotation, finalTarget, 25f * Time.Delta);
 
-		// 2. New Action Zone: Clamped between 350 and 450
-		// This keeps the paddle in the bottom third but leaves ~150px of plate space below
-		PaddlePos.y = logicalY.Clamp( 350f, 450f );
+        // 5. Force UI to update every frame for smooth movement
+        StateHasChanged();
 
-		StateHasChanged();
-	}
+        // 6. Simple Loop Reset (Patty falls off bottom)
+        if (PattyPos.y > 600f)
+        {
+           PattyPos = new Vector2(400f, 0f);
+           PattyVelocity = Vector2.Zero;
+        }
+    }
 
-	// Helper to convert screen pixels to UI units
-	private Vector2 ScreenToLocal(Vector2 screenPos) => MousePosition; 
+    // --- Input Handling ---
+    protected override void OnMouseDown(MousePanelEvent e)
+    {
+        base.OnMouseDown(e);
+        if (e.Button == "mouseleft") 
+        {
+            IsRotating = true;
+            // Set target to current rotation to prevent "teleporting" the tilt
+            TargetRotation = PanRotation; 
+        }
+    }
+
+    protected override void OnMouseUp(MousePanelEvent e)
+    {
+        base.OnMouseUp(e);
+        if (e.Button == "mouseleft")
+        {
+            IsRotating = false;
+            // TargetRotation will naturally reset to 0 in the next frame
+        }
+    }
+
+    protected override void OnMouseMove(MousePanelEvent e)
+    {
+        base.OnMouseMove(e);
+
+        // Find the canvas to calculate relative mouse position
+        var canvas = Children.SelectMany(x => x.Children).FirstOrDefault(x => x.HasClass("game-canvas"));
+        if (canvas == null || canvas.Box.Rect.Width <= 0) return;
+
+        // 1. Manually calculate mouse position relative to canvas
+        float localX = Mouse.Position.x - canvas.Box.Rect.Left;
+        float localY = Mouse.Position.y - canvas.Box.Rect.Top;
+
+        // 2. Map to our Logical 800x600 Resolution
+        float fractionX = localX / canvas.Box.Rect.Width;
+        float fractionY = localY / canvas.Box.Rect.Height;
+
+        // 3. Update Paddle Position with Clamps
+        float halfWidth = PanWidth / 2f;
+        PaddlePos.x = (fractionX * 800f).Clamp(halfWidth, 800f - halfWidth);
+        PaddlePos.y = (fractionY * 600f).Clamp(350f, 450f);
+
+        // 4. Update Velocity and Rotation Delta
+        float rawDeltaX = Mouse.Position.x - LastMousePos.x;
+        SmoothedVelocityX = rawDeltaX; 
+
+        if (IsRotating)
+        {
+           TargetRotation += rawDeltaX * (RotationSpeed * 0.15f);
+           TargetRotation = TargetRotation.Clamp(-45f, 45f);
+        }
+
+        LastMousePos = Mouse.Position;
+    }
 }
