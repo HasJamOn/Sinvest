@@ -72,8 +72,13 @@
     {
         if (IsFlipping) return;
 
-        // 1. Setup & calculate outcome immediately
-        if (!float.TryParse(BetAmount, out float amount)) amount = 0;
+        // 1. Setup & validate amount
+        if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
+        
+        // --- NEW: Deduct the bet amount immediately ---
+        GameHUD.Instance?.Transaction(-amount);
+
+        // Calculate outcome immediately (hidden from player)
         var roll = Game.Random.Int(1, 2);
         var result = (roll == 1) ? Side.Heads : Side.Tails;
         
@@ -83,45 +88,37 @@
         StateHasChanged();
 
         // 2. The Controlled Spin Loop
-        int totalFlips = 12; // Number of half-rotations
-        float currentSpeed = 0.05f; // Fast initial spin
+        int totalFlips = 12; 
+        float currentSpeed = 0.05f;
 
         for (int i = 0; i < totalFlips; i++)
         {
-            // SQUISH (Hide)
             SpinSpeed = currentSpeed;
             IsSquished = true;
             StateHasChanged();
-            await GameTask.DelaySeconds(currentSpeed); // Wait for transition to hit 0 width
+            await GameTask.DelaySeconds(currentSpeed);
 
-            // SWAP IMAGE (While invisible)
             DisplaySide = (DisplaySide == Side.Heads) ? Side.Tails : Side.Heads;
 
-            // EXPAND (Reveal)
             IsSquished = false;
             StateHasChanged();
-            await GameTask.DelaySeconds(currentSpeed); // Wait for transition to hit full width
+            await GameTask.DelaySeconds(currentSpeed);
 
-            // Gradually slow down the flipping speed after a few spins
-            if (i > 4) 
-            {
-                currentSpeed += 0.02f; 
-            }
+            if (i > 4) currentSpeed += 0.02f; 
         }
 
         // 3. Final Targeted Settle
-        // One last squish to guarantee we land on the pre-calculated result face
-        SpinSpeed = currentSpeed + 0.05f; // Slow dramatic final turn
+        SpinSpeed = currentSpeed + 0.05f;
         IsSquished = true;
         StateHasChanged();
         await GameTask.DelaySeconds(SpinSpeed);
 
-        DisplaySide = result; // Force the target face
+        DisplaySide = result;
         IsSquished = false;
-        FlipAnimClass = "settling"; // Trigger the CSS scale bounce
+        FlipAnimClass = "settling";
         StateHasChanged();
 
-        await GameTask.DelaySeconds(0.6f); // Wait for the settle bounce
+        await GameTask.DelaySeconds(0.6f);
 
         // 4. Logic Resolution
         LastFlip = result.ToString();
@@ -130,12 +127,15 @@
 
         if (IsWin)
         {
-	        GameHUD.Instance?.Transaction(amount);
+            // --- UPDATED: Reward is 2x the bet (Initial bet + Winnings) ---
+            // Since we already took away 'amount', adding 'amount * 2' 
+            // results in a net gain of exactly the bet amount.
+            GameHUD.Instance?.Transaction(amount * 2);
             ResultMessage = $"YOU WON ${amount}!";
         }
         else
         {
-	        GameHUD.Instance?.Transaction(-amount);
+            // We already deducted the money, so we just show the message
             ResultMessage = $"YOU LOST ${amount}!";
         }
 
