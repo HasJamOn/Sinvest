@@ -1,34 +1,50 @@
 @using Sandbox;
 @using Sandbox.UI;
+@using System;
 @inherits Panel
 @namespace Sandbox
 
 <root>
-	<div class="flipper-container">
-	<h1>2D Flipper</h1>
-	
-		<div class="game-canvas">
-			<div class="paddle" 
-			     style="left: @(PaddlePos.x / 800f * 100)%; 
-            top: @(PaddlePos.y / 600f * 100)%; 
-            width: @(PanWidth / 800f * 100)%; 
-            transform: translate(-50%, -50%) rotate(@(PanRotation)deg);">
-			</div>
-			<label>GAME AREA: 800x600</label>
-		</div>
-	</div>
+    <div class="flipper-container">
+        <h1>Flipper Simulator</h1>
+        
+        <div class="game-canvas">
+            
+            <div class="action-zone" 
+                 style="top: @((ActionZoneY - PlayHeight / 2f) / 600f * 100)%; 
+                        height: @(PlayHeight / 600f * 100)%;">
+                
+                <div class="paddle" 
+                     style="left: @(PaddlePos.x / 800f * 100)%; 
+                            top: @(((PaddlePos.y - (ActionZoneY - PlayHeight / 2f)) / PlayHeight) * 100)%; 
+                            width: @(PanWidth / 800f * 100)%; 
+                            transform: translate(-50%, -50%) rotate(@(PanRotation)deg);">
+                </div>
+            </div>
+
+            <div class="patty" 
+                 style="left: @(PattyPos.x / 800f * 100)%; 
+                        top: @(PattyPos.y / 600f * 100)%;">
+            </div>
+
+            <label class="canvas-label">GAME AREA: 800x600</label>
+        </div>
+    </div>
 </root>
 
 @code {
-    // --- Section 4A: Equipment Variables ---
+    // --- Section 4A: Equipment & Zone Variables ---
     private float PanWidth = 150f;
     private Vector2 PaddlePos = new Vector2(400f, 400f);
+    
+    private float ActionZoneY = 400f; 
+    private float PlayHeight = 100f;  
+    
     private bool IsRotating = false;
     private float PanRotation = 0f;
     private float TargetRotation = 0f;
     private float RotationSpeed = 5.0f;
     
-    // Smooths out the "Lean" based on movement speed
     private float SmoothedVelocityX = 0f;
     private Vector2 LastMousePos;
 
@@ -37,47 +53,59 @@
     private Vector2 PattyVelocity = Vector2.Zero;
     private float Gravity = 800f;
 
-    // --- Core Game Loop ---
     public override void Tick()
     {
         base.Tick();
 
-        // 1. Patty Physics (Gravity and Movement)
+        // 1. Patty Physics
         PattyVelocity.y += Gravity * Time.Delta;
         PattyPos += PattyVelocity * Time.Delta;
 
-        // 2. Smooth the Velocity Decay
-        // This ensures the lean doesn't "snap" back, but settles
+        // 2. Smooth Rotation Transition
         SmoothedVelocityX = MathX.Lerp(SmoothedVelocityX, 0f, 8f * Time.Delta);
-
-        // 3. Calculate Final Target Rotation
-        // Increased idle lean multiplier (2.5f) and clamp (25deg)
         float idleTilt = (SmoothedVelocityX * 2.5f).Clamp(-25f, 25f);
         float finalTarget = IsRotating ? TargetRotation : idleTilt;
-
-        // 4. Apply smooth Lerp to the actual PanRotation
-        // 25f provides a snappy, responsive connection to the mouse
         PanRotation = MathX.Lerp(PanRotation, finalTarget, 25f * Time.Delta);
 
-        // 5. Force UI to update every frame for smooth movement
-        StateHasChanged();
-
-        // 6. Simple Loop Reset (Patty falls off bottom)
+        // 3. Simple Loop Reset
         if (PattyPos.y > 600f)
         {
            PattyPos = new Vector2(400f, 0f);
            PattyVelocity = Vector2.Zero;
         }
+
+        StateHasChanged();
+        
+        // --- Collision Logic ---
+
+		// 1. Check if Patty is falling AND is vertically near the paddle
+        if ( PattyVelocity.y > 0 && 
+             Math.Abs( PattyPos.y - PaddlePos.y ) < 15f ) // 15f is the hit-buffer
+        {
+	        // 2. Check if Patty is horizontally within the PanWidth
+	        float distanceX = Math.Abs( PattyPos.x - PaddlePos.x );
+	        if ( distanceX < ( PanWidth / 2f ) )
+	        {
+		        // BOUNCE! Reverse Y velocity and give it a boost
+		        // We multiply by -0.8f to lose a bit of energy (bounciness)
+		        PattyVelocity.y *= -0.8f;
+
+		        // Add a "kick" based on the paddle's rotation
+		        // If the pan is tilted left, the patty shoots left
+		        PattyVelocity.x += PanRotation * 10f;
+
+		        // Prevent the patty from getting stuck inside the paddle
+		        PattyPos.y = PaddlePos.y - 16f; 
+	        }
+        }
     }
 
-    // --- Input Handling ---
     protected override void OnMouseDown(MousePanelEvent e)
     {
         base.OnMouseDown(e);
         if (e.Button == "mouseleft") 
         {
             IsRotating = true;
-            // Set target to current rotation to prevent "teleporting" the tilt
             TargetRotation = PanRotation; 
         }
     }
@@ -85,35 +113,25 @@
     protected override void OnMouseUp(MousePanelEvent e)
     {
         base.OnMouseUp(e);
-        if (e.Button == "mouseleft")
-        {
-            IsRotating = false;
-            // TargetRotation will naturally reset to 0 in the next frame
-        }
+        if (e.Button == "mouseleft") IsRotating = false;
     }
 
     protected override void OnMouseMove(MousePanelEvent e)
     {
         base.OnMouseMove(e);
 
-        // Find the canvas to calculate relative mouse position
         var canvas = Children.SelectMany(x => x.Children).FirstOrDefault(x => x.HasClass("game-canvas"));
         if (canvas == null || canvas.Box.Rect.Width <= 0) return;
 
-        // 1. Manually calculate mouse position relative to canvas
         float localX = Mouse.Position.x - canvas.Box.Rect.Left;
         float localY = Mouse.Position.y - canvas.Box.Rect.Top;
 
-        // 2. Map to our Logical 800x600 Resolution
         float fractionX = localX / canvas.Box.Rect.Width;
         float fractionY = localY / canvas.Box.Rect.Height;
 
-        // 3. Update Paddle Position with Clamps
-        float halfWidth = PanWidth / 2f;
-        PaddlePos.x = (fractionX * 800f).Clamp(halfWidth, 800f - halfWidth);
-        PaddlePos.y = (fractionY * 600f).Clamp(350f, 450f);
+        PaddlePos.x = (fractionX * 800f).Clamp(PanWidth/2f, 800f - (PanWidth/2f));
+        PaddlePos.y = (fractionY * 600f).Clamp(ActionZoneY - PlayHeight/2f, ActionZoneY + PlayHeight/2f);
 
-        // 4. Update Velocity and Rotation Delta
         float rawDeltaX = Mouse.Position.x - LastMousePos.x;
         SmoothedVelocityX = rawDeltaX; 
 
