@@ -79,10 +79,12 @@ CoinFlip {
 
     /* Default state: fully visible */
     transform: scaleX(1);
-    /* Note: 'transition' property is managed by Razor inline styling to sync with C# timing */
+
+    /* Ensure it scales from the center for a proper flip effect */
+    transform-origin: center;
 
     &.squished {
-      /* When C# applies this class, the transition squishes it to an invisible line */
+      /* The transition style added in Razor will handle the 'how long' part */
       transform: scaleX(0);
     }
 

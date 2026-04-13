@@ -61,6 +61,33 @@
     private bool _initialized = false;
 
     protected override void OnAwake() => Instance = this;
+    
+    protected override void OnUpdate()
+    {
+	    // 1. Initial setup: Grab the starting value from the cloud stats
+	    if (!_initialized)
+	    {
+		    var stat = Sandbox.Services.Stats.LocalPlayer.Get("money");
+		    _targetMoney = stat.Value;
+		    _displayMoney = _targetMoney; 
+		    _initialized = true;
+		    StateHasChanged();
+	    }
+
+	    // 2. Animation logic: Lerp display money toward target money
+	    if ( Math.Abs(_displayMoney - _targetMoney) > 0.1 )
+	    {
+		    // 8.0f is the speed; higher = faster count 
+		    _displayMoney = MathX.Lerp( _displayMoney, _targetMoney, RealTime.Delta * 8.0f );
+		    StateHasChanged();
+	    }
+	    else if (_displayMoney != _targetMoney)
+	    {
+		    // Snap to target to finish the animation
+		    _displayMoney = _targetMoney;
+		    StateHasChanged();
+	    }
+    }
 
     public void SetView<T>(bool saveToHistory = true) where T : Panel, new()
     {
@@ -153,7 +180,7 @@
 
     public void Transaction(double amount)
     {
-        _targetMoney += amount;
-        Sandbox.Services.Stats.Increment("money", amount);
+	    _targetMoney += amount;
+	    Sandbox.Services.Stats.Increment("money", amount);
     }
 }
