@@ -10,12 +10,9 @@ Flipper2D {
   pointer-events: all;
 
   .flipper-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
     font-family: 'Poppins', sans-serif;
 
     h1 {
@@ -27,40 +24,32 @@ Flipper2D {
   }
 
   .game-canvas {
-    width: 800px;
-    height: 600px;
-    background: #000;
-    position: relative;
-    overflow: hidden;
-    border: 4px solid #333;
+    width: 800px; height: 600px;
+    background: #000; position: relative;
+    overflow: hidden; border: 4px solid #333;
     cursor: auto;
   }
 
   .action-zone {
-    position: absolute;
-    width: 100%;
+    position: absolute; width: 100%;
     background-color: rgba(255, 255, 255, 0.03);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    pointer-events: all;
-    cursor: none;
+    pointer-events: all; cursor: none;
+    z-index: 5;
   }
 
   .paddle {
-    position: absolute;
-    height: 20px;
-    background: linear-gradient(to bottom, #fff, #ccc);
-    border-radius: 10px;
+    position: absolute; height: 16px;
+    background: linear-gradient(to bottom, #fff, #bbb);
+    border-radius: 8px; z-index: 10;
   }
 
   .patty {
     position: absolute;
-    width: 40px;
-    height: 40px;
-    background: #8b4513; // Meat brown
-    border-radius: 50%;
+    width: 60px; height: 12px; // Side-on profile
+    background: #5d2e0a; border-radius: 6px;
     transform: translate(-50%, -50%);
-    pointer-events: none;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.4);
+    pointer-events: none; z-index: 15;
   }
 
   .canvas-label {

@@ -9,7 +9,6 @@
         <h1>Flipper Simulator</h1>
         
         <div class="game-canvas">
-            
             <div class="action-zone" 
                  style="top: @((ActionZoneY - PlayHeight / 2f) / 600f * 100)%; 
                         height: @(PlayHeight / 600f * 100)%;">
@@ -24,7 +23,8 @@
 
             <div class="patty" 
                  style="left: @(PattyPos.x / 800f * 100)%; 
-                        top: @(PattyPos.y / 600f * 100)%;">
+                        top: @(PattyPos.y / 600f * 100)%;
+                        transform: translate(-50%, -50%) rotate(@(PattyRotation)deg);">
             </div>
 
             <label class="canvas-label">GAME AREA: 800x600</label>
@@ -33,114 +33,136 @@
 </root>
 
 @code {
-    // --- Section 4A: Equipment & Zone Variables ---
+    // --- Equipment Variables ---
     private float PanWidth = 150f;
     private Vector2 PaddlePos = new Vector2(400f, 400f);
-    
     private float ActionZoneY = 400f; 
     private float PlayHeight = 100f;  
     
+    private float LastPaddleY;
+    private float PaddleVelocityY;
     private bool IsRotating = false;
     private float PanRotation = 0f;
     private float TargetRotation = 0f;
     private float RotationSpeed = 5.0f;
-    
     private float SmoothedVelocityX = 0f;
     private Vector2 LastMousePos;
 
-    // --- Section 4B: Product Variables (The Patty) ---
+    // --- Patty Physics Variables ---
     private Vector2 PattyPos = new Vector2(400f, 100f);
     private Vector2 PattyVelocity = Vector2.Zero;
+    private float PattyRotation = 0f;
+    private float PattyAngularVelocity = 0f; 
     private float Gravity = 800f;
+    private float PattyWidth = 60f; // Total width of the patty
 
     public override void Tick()
     {
         base.Tick();
 
-        // 1. Patty Physics
+        PaddleVelocityY = (PaddlePos.y - LastPaddleY) / Time.Delta;
+        LastPaddleY = PaddlePos.y;
+
         PattyVelocity.y += Gravity * Time.Delta;
         PattyPos += PattyVelocity * Time.Delta;
 
-        // 2. Smooth Rotation Transition
+        PattyRotation += PattyAngularVelocity * Time.Delta;
+        PattyAngularVelocity = MathX.Lerp(PattyAngularVelocity, 0f, 0.5f * Time.Delta);
+
         SmoothedVelocityX = MathX.Lerp(SmoothedVelocityX, 0f, 8f * Time.Delta);
         float idleTilt = (SmoothedVelocityX * 2.5f).Clamp(-25f, 25f);
         float finalTarget = IsRotating ? TargetRotation : idleTilt;
         PanRotation = MathX.Lerp(PanRotation, finalTarget, 25f * Time.Delta);
 
-        // 3. Simple Loop Reset
+        CheckCollision();
+
         if (PattyPos.y > 600f)
         {
            PattyPos = new Vector2(400f, 0f);
            PattyVelocity = Vector2.Zero;
+           PattyAngularVelocity = 0f;
+           PattyRotation = 0f;
         }
 
         StateHasChanged();
-        
-        // --- Collision Logic ---
+    }
 
-		// 1. Check if Patty is falling AND is vertically near the paddle
-        if ( PattyVelocity.y > 0 && 
-             Math.Abs( PattyPos.y - PaddlePos.y ) < 15f ) // 15f is the hit-buffer
+    private void CheckCollision()
+    {
+        if (PattyVelocity.y <= 0) return;
+
+        // 1. Calculate the position of the two "Contact Points" (Left and Right Tips)
+        float rad = PattyRotation * (float)(Math.PI / 180.0);
+        float cos = (float)Math.Cos(rad);
+        float sin = (float)Math.Sin(rad);
+        float halfW = PattyWidth / 2f;
+
+        Vector2 leftTip = PattyPos + new Vector2(-cos * halfW, -sin * halfW);
+        Vector2 rightTip = PattyPos + new Vector2(cos * halfW, sin * halfW);
+
+        bool leftHit = IsPointHittingPan(leftTip);
+        bool rightHit = IsPointHittingPan(rightTip);
+
+        if (leftHit || rightHit)
         {
-	        // 2. Check if Patty is horizontally within the PanWidth
-	        float distanceX = Math.Abs( PattyPos.x - PaddlePos.x );
-	        if ( distanceX < ( PanWidth / 2f ) )
-	        {
-		        // BOUNCE! Reverse Y velocity and give it a boost
-		        // We multiply by -0.8f to lose a bit of energy (bounciness)
-		        PattyVelocity.y *= -0.8f;
+            // B. CALCULATE TORQUE (Spin)
+            // If only Left hits, it spins clockwise. If Right hits, counter-clockwise.
+            float torque = 0f;
+            if (leftHit && !rightHit) torque = 25f;
+            if (rightHit && !leftHit) torque = -25f;
+            
+            // Influence of Pan Rotation and Slide
+            torque += (PanRotation * 0.8f) + (SmoothedVelocityX * 0.5f);
+            
+            PattyAngularVelocity += torque * 15f;
 
-		        // Add a "kick" based on the paddle's rotation
-		        // If the pan is tilted left, the patty shoots left
-		        PattyVelocity.x += PanRotation * 10f;
+            // C. CALCULATE BOUNCE
+            float launchBoost = 0f;
+            if (PaddleVelocityY < 0) launchBoost = Math.Abs(PaddleVelocityY) * 0.7f;
 
-		        // Prevent the patty from getting stuck inside the paddle
-		        PattyPos.y = PaddlePos.y - 16f; 
-	        }
+            PattyVelocity.y = (PattyVelocity.y * -0.4f) - launchBoost;
+            PattyVelocity.x += (PanRotation * 3f) + (SmoothedVelocityX * 1.5f);
+
+            // Prevent sticking by snapping the patty Y based on which tip hit
+            float collisionY = leftHit ? leftTip.y : rightTip.y;
+            PattyPos.y -= (collisionY - PaddlePos.y) + 10f;
         }
     }
 
+    private bool IsPointHittingPan(Vector2 point)
+    {
+        // Is the point vertically aligned with the pan?
+        bool nearY = Math.Abs(point.y - PaddlePos.y) < 15f;
+        
+        // Is the point horizontally within the pan width?
+        bool insideX = Math.Abs(point.x - PaddlePos.x) < (PanWidth / 2f);
+        
+        return nearY && insideX;
+    }
+
+    // Input handlers remain the same...
     protected override void OnMouseDown(MousePanelEvent e)
     {
         base.OnMouseDown(e);
-        if (e.Button == "mouseleft") 
-        {
-            IsRotating = true;
-            TargetRotation = PanRotation; 
-        }
+        if (e.Button == "mouseleft") { IsRotating = true; TargetRotation = PanRotation; }
     }
-
     protected override void OnMouseUp(MousePanelEvent e)
     {
         base.OnMouseUp(e);
         if (e.Button == "mouseleft") IsRotating = false;
     }
-
     protected override void OnMouseMove(MousePanelEvent e)
     {
         base.OnMouseMove(e);
-
         var canvas = Children.SelectMany(x => x.Children).FirstOrDefault(x => x.HasClass("game-canvas"));
         if (canvas == null || canvas.Box.Rect.Width <= 0) return;
-
-        float localX = Mouse.Position.x - canvas.Box.Rect.Left;
-        float localY = Mouse.Position.y - canvas.Box.Rect.Top;
-
-        float fractionX = localX / canvas.Box.Rect.Width;
-        float fractionY = localY / canvas.Box.Rect.Height;
-
+        float fractionX = (Mouse.Position.x - canvas.Box.Rect.Left) / canvas.Box.Rect.Width;
+        float fractionY = (Mouse.Position.y - canvas.Box.Rect.Top) / canvas.Box.Rect.Height;
         PaddlePos.x = (fractionX * 800f).Clamp(PanWidth/2f, 800f - (PanWidth/2f));
         PaddlePos.y = (fractionY * 600f).Clamp(ActionZoneY - PlayHeight/2f, ActionZoneY + PlayHeight/2f);
-
         float rawDeltaX = Mouse.Position.x - LastMousePos.x;
         SmoothedVelocityX = rawDeltaX; 
-
-        if (IsRotating)
-        {
-           TargetRotation += rawDeltaX * (RotationSpeed * 0.15f);
-           TargetRotation = TargetRotation.Clamp(-45f, 45f);
-        }
-
+        if (IsRotating) { TargetRotation += rawDeltaX * (RotationSpeed * 0.15f); TargetRotation = TargetRotation.Clamp(-45f, 45f); }
         LastMousePos = Mouse.Position;
     }
 }
