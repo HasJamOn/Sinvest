@@ -1,0 +1,159 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root class="@( _isOpen ? "" : "hidden" )">
+    <div class="stat-header">
+       <label class="money-label">Cash: $@_displayMoney.ToString("N0")</label>
+    </div>
+
+    <div class="hud-content">
+	    @if ( _activeViewPanel == null )
+	    {
+		    <div class="menu">
+			    <button class="menu-button" @onclick="@( () => SetView<CasinoMenu>() )">Sin.o</button>
+			    <button class="menu-button" @onclick="@( () => SetView<InvestMenu>() )">Invest.o</button>
+			    <button class="menu-button" @onclick="@( () => SetMenuState(false) )">CLOSE</button>
+		    </div>
+	    }
+	    else 
+	    {
+		    @* LEAVE THIS EMPTY! 
+              The C# AddChild will put the Flipper2D / CasinoMenu here.
+           *@
+           
+		    @* By putting the button in its own conditional at the bottom, 
+              we can force it to re-render after the child is added.
+           *@
+	    }
+
+	    @if ( _activeViewPanel != null )
+	    {
+		    <button class="back-button" @onclick="@( () => GoBack() )">
+			    @if ( _history.Count > 0 )
+			    {
+				    <span>Back</span>
+			    }
+			    else
+			    {
+				    @* If there is no history, this button will close the UI, so 'Exit' is more accurate *@
+				    <span>Exit</span>
+			    }
+		    </button>
+	    }
+    </div>
+</root>
+
+@code
+{
+    public static GameHUD Instance { get; private set; }
+    private Panel _activeViewPanel;
+    private Stack<Type> _history = new Stack<Type>();
+
+    // --- State Variables ---
+    private bool _isOpen = false;
+    private double _displayMoney = 0;
+    private double _targetMoney = 0;
+    private bool _initialized = false;
+
+    protected override void OnAwake() => Instance = this;
+
+    public void SetView<T>(bool saveToHistory = true) where T : Panel, new()
+    {
+        if (saveToHistory && _activeViewPanel != null)
+        {
+            _history.Push(_activeViewPanel.GetType());
+        }
+
+        CreateViewByType(typeof(T));
+    }
+
+    public void GoBack()
+    {
+	    if (_history.Count > 0)
+	    {
+		    var previousType = _history.Pop();
+		    CreateViewByType(previousType);
+	    }
+	    else
+	    {
+		    // Close the entire HUD if we are at the root of the interaction
+		    SetMenuState(false);
+	    }
+    }
+
+    private void CreateViewByType(Type t)
+    {
+        _activeViewPanel?.Delete();
+        
+        var contentArea = Panel.Descendants.OfType<Panel>().FirstOrDefault(x => x.HasClass("hud-content"));
+        if (contentArea == null) return;
+
+        // Use a switch to call the generic AddChild<T> which s&box prefers
+        _activeViewPanel = t.Name switch
+        {
+            
+            nameof(InvestMenu) => contentArea.AddChild<InvestMenu>(),
+            nameof(CasinoMenu) => contentArea.AddChild<CasinoMenu>(),
+            //Casino Games
+            nameof(CoinFlip)   => contentArea.AddChild<CoinFlip>(),
+            //JOBS
+            nameof(Flipper2D)  => contentArea.AddChild<Flipper2D>(),
+            _ => null
+        };
+
+        StateHasChanged();
+    }
+
+    public void ClearView()
+    {
+        _activeViewPanel?.Delete();
+        _activeViewPanel = null;
+        _history.Clear();
+        StateHasChanged();
+    }
+
+    public void Open() => SetMenuState(true);
+
+    public void SetMenuState(bool open)
+    {
+        _isOpen = open;
+        if (!open) ClearView();
+
+        Panel.SetClass("hidden", !open);
+        Mouse.Visibility = open ? MouseVisibility.Visible : MouseVisibility.Auto;
+        
+        var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
+        if (player != null)
+        {
+            player.UseLookControls = !open;
+            player.UseInputControls = !open;
+            if (open) player.WishVelocity = Vector3.Zero;
+        }
+    }
+    
+    /// <summary>
+    /// bypasses the main menu.
+    /// </summary>
+    public void OpenInteraction<T>() where T : Panel, new()
+    {
+	    // Clear any previous navigation history for a clean start
+	    _history.Clear(); 
+    
+	    // Set the state to open
+	    SetMenuState(true);
+    
+	    // Use our bridge method to create the view
+	    CreateViewByType(typeof(T));
+    }
+
+    public void Transaction(double amount)
+    {
+        _targetMoney += amount;
+        Sandbox.Services.Stats.Increment("money", amount);
+    }
+}

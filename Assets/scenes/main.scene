@@ -36,8 +36,8 @@
           "ZIndex": 100
         },
         {
-          "__type": "Sandbox.Sinvest",
-          "__guid": "58f204af-2dd7-43aa-b3d6-90eaee9bcb51",
+          "__type": "Sandbox.GameHUD",
+          "__guid": "637b6966-d2b6-432d-a76e-6206ba351e44",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
@@ -401,9 +401,9 @@
           "OnComponentUpdate": null,
           "UI": {
             "_type": "component",
-            "component_id": "58f204af-2dd7-43aa-b3d6-90eaee9bcb51",
+            "component_id": "637b6966-d2b6-432d-a76e-6206ba351e44",
             "go": "13806133-9487-492a-8025-c28e49d2e216",
-            "component_type": "Sinvest"
+            "component_type": "GameHUD"
           }
         }
       ],
@@ -663,6 +663,18 @@
               "OverrideMassCenter": false,
               "RigidbodyFlags": 0,
               "StartAsleep": false
+            },
+            {
+              "__type": "InteractFlipper2D",
+              "__guid": "45ee46b5-c73a-45e6-9449-c0cfdf48e0c1",
+              "__enabled": true,
+              "Flags": 0,
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
             }
           ],
           "Children": [

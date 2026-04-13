@@ -1,0 +1,16 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@namespace Sandbox
+@attribute [StyleSheet] // This tells s&box to look for Flipper2D.scss
+
+<root>
+	<div class="flipper-container">
+		<h1>2D Flipper</h1>
+        
+		<div class="game-canvas">
+			@* Your physics objects or 2D logic will go here *@
+			<label>GAME AREA: 800x600</label>
+		</div>
+	</div>
+</root>

@@ -5,14 +5,16 @@
 
 <root>
 	<div class="casino-grid">
-		<button class="game-card" @onclick="@(() => OnGameClick("Coin Flip"))">
+		@* Explicitly calling Coin Flip *@
+		<button class="game-card" @onclick="@(() => Navigate<CoinFlip>())">
 			<label class="title">Coin Flip</label>
 		</button>
 
+		@* Placeholders for future games/jobs *@
 		@for (int i = 0; i < 5; i++)
 		{
-			<button class="game-card unnamed" @onclick="@(() => OnGameClick("Unnamed"))">
-				<label class="title">Unnamed</label>
+			<button class="game-card unnamed">
+				<label class="title">Coming Soon</label>
 			</button>
 		}
 	</div>
@@ -20,17 +22,9 @@
 
 @code
 {
-	// Define a delegate at the top of your code block
-	public delegate void NavigateDelegate(string gameName);
-
-	// Use the delegate as the property
-	[Property] public NavigateDelegate OnNavigate { get; set; }
-
-	private void OnGameClick(string gameName)
+	private void Navigate<T>() where T : Panel, new()
 	{
-		Log.Info($"Attempting to launch: {gameName}");
-       
-		// Use the standard C# null-conditional invocation
-		OnNavigate?.Invoke(gameName);
+		// Talk directly to the HUD instance we created earlier
+		GameHUD.Instance?.SetView<T>();
 	}
 }

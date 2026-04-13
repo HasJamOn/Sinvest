@@ -130,12 +130,12 @@
 
         if (IsWin)
         {
-            Sinvest.Instance?.Transaction(amount);
+	        GameHUD.Instance?.Transaction(amount);
             ResultMessage = $"YOU WON ${amount}!";
         }
         else
         {
-            Sinvest.Instance?.Transaction(-amount);
+	        GameHUD.Instance?.Transaction(-amount);
             ResultMessage = $"YOU LOST ${amount}!";
         }
 
