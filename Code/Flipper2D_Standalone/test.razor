@@ -1,0 +1,26 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root>
+	<div class="title">@MyStringValue</div>
+    
+	<div class="controls">
+		<button class="exit-button" onclick=@OnExitClicked>EXIT GAME</button>
+	</div>
+</root>
+
+@code
+{
+	[Property, TextArea] public string MyStringValue { get; set; } = "Hello World!";
+
+	void OnExitClicked()
+	{
+		// 'GameObject' refers to the UI object.
+		// 'Root' refers to the very top of the spawned prefab.
+		GameObject.Root.Destroy();
+	}
+
+	protected override int BuildHash() => System.HashCode.Combine( MyStringValue );
+}

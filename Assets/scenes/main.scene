@@ -19,7 +19,7 @@
       "Components": [
         {
           "__type": "Sandbox.ScreenPanel",
-          "__guid": "db4fde2a-f890-4ccd-ab34-e5e4a71a34a3",
+          "__guid": "320ee6e2-6d2f-4149-b256-f67d4493da10",
           "__enabled": true,
           "Flags": 0,
           "AutoScreenScale": true,
@@ -669,6 +669,10 @@
               "__guid": "45ee46b5-c73a-45e6-9449-c0cfdf48e0c1",
               "__enabled": true,
               "Flags": 0,
+              "FlipperPrefab": {
+                "_type": "gameobject",
+                "prefab": "prefabflipper2d.prefab"
+              },
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -885,13 +889,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "7a171ef3-48f1-433c-b09b-02469dbf3b37"
         }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

@@ -1,0 +1,24 @@
+root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 1. This prevents the empty space of the UI from blocking the mouse */
+  pointer-events: none;
+}
+
+.title {
+  pointer-events: none; /* Text shouldn't block clicks either */
+}
+
+.controls {
+  /* 2. This RE-ENABLES clicking for the button area specifically */
+  pointer-events: all;
+}
+
+.exit-button {
+  pointer-events: all;
+  cursor: pointer; /* This will show you if the UI 'sees' the mouse */
+}
