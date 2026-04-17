@@ -76,7 +76,7 @@
         if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
         
         // --- NEW: Deduct the bet amount immediately ---
-        GameHUD.Instance?.Transaction(-amount);
+        ComputerHUD.Instance?.Transaction(-amount);
 
         // Calculate outcome immediately (hidden from player)
         var roll = Game.Random.Int(1, 2);
@@ -130,7 +130,7 @@
             // --- UPDATED: Reward is 2x the bet (Initial bet + Winnings) ---
             // Since we already took away 'amount', adding 'amount * 2' 
             // results in a net gain of exactly the bet amount.
-            GameHUD.Instance?.Transaction(amount * 2);
+            ComputerHUD.Instance?.Transaction(amount * 2);
             ResultMessage = $"YOU WON ${amount}!";
         }
         else

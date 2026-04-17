@@ -3,7 +3,7 @@
     "__guid": "e4472b9f-d5ef-4a2e-a7f0-7f290b05dac2",
     "__version": 2,
     "Flags": 0,
-    "Name": "prefabflipper2d",
+    "Name": "flipper2d",
     "Position": "0,0,0",
     "Rotation": "0,0,0,1",
     "Scale": "1,1,1",
@@ -115,8 +115,8 @@
             "ZIndex": 100
           },
           {
-            "__type": "Sandbox.test",
-            "__guid": "040a95be-420e-4917-96b9-bc3765fd98e9",
+            "__type": "Sandbox.temp",
+            "__guid": "71860b0e-2d6c-4c33-bfc4-d2e2b0849562",
             "__enabled": true,
             "Flags": 0,
             "MyStringValue": "Hello World!",

@@ -49,7 +49,7 @@
 
 @code
 {
-    public static GameHUD Instance { get; private set; }
+    public static ComputerHUD Instance { get; private set; }
     private Panel _activeViewPanel;
     private Stack<Type> _history = new Stack<Type>();
 
@@ -60,6 +60,29 @@
     private bool _initialized = false;
 
     protected override void OnAwake() => Instance = this;
+    
+    public void CloseAndDestroy()
+    {
+	    // 1. Restore player movement and mouse
+	    SetMenuState(false);
+
+	    // 2. Clear the static reference so other scripts don't try to call it
+	    if (Instance == this) Instance = null;
+
+	    // 3. Destroy the entire hierarchy
+	    GameObject.Root.Destroy();
+    }
+    
+    protected override void OnDestroy()
+    {
+	    // Fail-safe: if the UI is destroyed, ensure the player is unlocked
+	    if ( _isOpen )
+	    {
+		    SetMenuState( false );
+	    }
+
+	    if ( Instance == this ) Instance = null;
+    }
     
     protected override void OnUpdate()
     {
@@ -105,21 +128,16 @@
 		    var previousType = _history.Pop();
 		    CreateViewByType(previousType);
 	    }
-	    else
+	    else if (_activeViewPanel != null)
 	    {
-		    // If there's no history, we aren't in a sub-menu anymore.
-		    // Clear the view to return to the main selection (Sin.o / Invest.o)
+		    // We are in a sub-menu (like Casino), return to Main Menu
 		    ClearView();
 	    }
-    }
-
-    public void CloseAndDestroy()
-    {
-	    // Clean up player state
-	    SetMenuState(false);
-    
-	    // Kill the whole prefab
-	    GameObject.Root.Destroy();
+	    else
+	    {
+		    // We are already at the Main Menu, so "Back" should just Close
+		    CloseAndDestroy();
+	    }
     }
 
     private void CreateViewByType(Type t)
@@ -137,8 +155,6 @@
             nameof(CasinoMenu) => contentArea.AddChild<CasinoMenu>(),
             //Casino Games
             nameof(CoinFlip)   => contentArea.AddChild<CoinFlip>(),
-            //JOBS
-            nameof(Flipper2D)  => contentArea.AddChild<Flipper2D>(),
             _ => null
         };
 
