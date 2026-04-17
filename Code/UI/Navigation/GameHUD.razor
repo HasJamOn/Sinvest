@@ -6,7 +6,7 @@
 @inherits PanelComponent
 @namespace Sandbox
 
-<root class="@( _isOpen ? "" : "hidden" )">
+<root>
     <div class="stat-header">
        <label class="money-label">Cash: $@_displayMoney.ToString("N0")</label>
     </div>
@@ -17,7 +17,7 @@
 		    <div class="menu">
 			    <button class="menu-button" @onclick="@( () => SetView<CasinoMenu>() )">Sin.o</button>
 			    <button class="menu-button" @onclick="@( () => SetView<InvestMenu>() )">Invest.o</button>
-			    <button class="menu-button" @onclick="@( () => SetMenuState(false) )">CLOSE</button>
+			    <button class="menu-button" @onclick="@CloseAndDestroy">CLOSE</button>
 		    </div>
 	    }
 	    else 
@@ -33,15 +33,14 @@
 
 	    @if ( _activeViewPanel != null )
 	    {
-		    <button class="back-button" @onclick="@( () => GoBack() )">
+		    <button class="back-button" @onclick="@GoBack">
 			    @if ( _history.Count > 0 )
 			    {
 				    <span>Back</span>
 			    }
 			    else
 			    {
-				    @* If there is no history, this button will close the UI, so 'Exit' is more accurate *@
-				    <span>Exit</span>
+				    <span>Exit to Menu</span>
 			    }
 		    </button>
 	    }
@@ -108,9 +107,19 @@
 	    }
 	    else
 	    {
-		    // Close the entire HUD if we are at the root of the interaction
-		    SetMenuState(false);
+		    // If there's no history, we aren't in a sub-menu anymore.
+		    // Clear the view to return to the main selection (Sin.o / Invest.o)
+		    ClearView();
 	    }
+    }
+
+    public void CloseAndDestroy()
+    {
+	    // Clean up player state
+	    SetMenuState(false);
+    
+	    // Kill the whole prefab
+	    GameObject.Root.Destroy();
     }
 
     private void CreateViewByType(Type t)

@@ -3,7 +3,7 @@
     "__guid": "e4472b9f-d5ef-4a2e-a7f0-7f290b05dac2",
     "__version": 2,
     "Flags": 0,
-    "Name": "PrefabFlipper2D",
+    "Name": "prefabflipper2d",
     "Position": "0,0,0",
     "Rotation": "0,0,0,1",
     "Scale": "1,1,1",
@@ -200,7 +200,7 @@
             "Orthographic": true,
             "OrthographicHeight": 720,
             "PostProcessAnchor": null,
-            "Priority": 1,
+            "Priority": 2,
             "RenderExcludeTags": "",
             "RenderTags": "",
             "RenderTexture": null,
@@ -227,7 +227,28 @@
         ],
         "Children": []
       }
-    ]
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": false,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
+      }
+    },
+    "__variables": []
   },
   "ResourceVersion": 2,
   "ShowInMenu": false,

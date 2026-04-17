@@ -1,9 +1,9 @@
 using Sandbox;
 using System.Linq;
 
-public sealed class InteractFlipper2D : Component, Component.IPressable
+public sealed class UIPopupTrigger : Component, Component.IPressable
 {
-    [Property] public GameObject FlipperPrefab { get; set; }
+    [Property] public GameObject PopupPrefab { get; set; }
     
     /// <summary>
     /// Reference to the spawned game so we can track when it's closed
@@ -12,10 +12,10 @@ public sealed class InteractFlipper2D : Component, Component.IPressable
 
     bool Component.IPressable.Press( Component.IPressable.Event e )
     {
-        if ( FlipperPrefab == null || _activeInstance.IsValid() ) return false;
+        if ( PopupPrefab == null || _activeInstance.IsValid() ) return false;
 
         // 1. Spawn the Flipper2D Prefab
-        _activeInstance = FlipperPrefab.Clone();
+        _activeInstance = PopupPrefab.Clone();
         _activeInstance.Transform.Position = new Vector3( 5000, 0, 0 );
 
         // 2. Suppress Player Input (Inspired by GameHUD logic)
