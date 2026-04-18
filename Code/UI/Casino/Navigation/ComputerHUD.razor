@@ -8,9 +8,15 @@
 
 <root>
 	<div class="stat-header">
-		<div class="stat-group">
-			<label class="money-label">Cash: $@_displayMoney.ToString("N0")</label>
-			<label class="shares-label">Shares: @_displayShares.ToString("N0")</label>
+		<div class="stat-box money">
+			<img src="ui/casino/navigation/sincash.png" class="stat-icon" />
+			<span class="label">CASH</span>
+			<span class="value">$@_displayMoney.ToString("N0")</span>
+		</div>
+		<div class="stat-box shares">
+			<img src="ui/casino/navigation/fundino_icon.png" class="stat-icon" />
+			<span class="label">SHARES</span>
+			<span class="value">@_displayShares.ToString("N0")</span>
 		</div>
 	</div>
 
@@ -18,14 +24,20 @@
 	    @if ( _activeViewPanel == null )
 	    {
 		    <div class="menu">
-			    <button class="menu-button" @onclick="@( () => SetView<CasinoMenu>() )">Sincash.ino</button>
-    
+			    <button class="app-icon sincash" @onclick="@( () => SetView<CasinoMenu>() )">
+				    <img src="ui/casino/navigation/sincash.png" />
+				    <label>Sincash.ino</label>
+			    </button>
+
 			    <button class="app-icon" @onclick=@( () => SetView<InvestMenu>() )>
 				    <img src="ui/casino/navigation/fundino_icon.png" />
 				    <label>Fund.ino</label>
 			    </button>
-    
-			    <button class="menu-button" @onclick="@CloseAndDestroy">CLOSE</button>
+
+			    <button class="app-icon sincash" @onclick="@CloseAndDestroy">
+				    <img src="ui/casino/navigation/sinvest.png" />
+				    <label>Shutdown SinvestOS</label>
+			    </button>
 		    </div>
 	    }
 	    else 

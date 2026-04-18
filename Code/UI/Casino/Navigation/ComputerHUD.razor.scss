@@ -18,33 +18,54 @@ ComputerHUD {
 
   .stat-header {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 12px 24px;
-    background-color: rgba(0, 0, 0, 0.75);
-    border-radius: 8px;
-    border-right: 4px solid #4caf50; // Switched to right-side accent
+    top: 30px;
+    right: 30px;
     display: flex;
     flex-direction: column;
-    align-items: flex-end; // Align text to the right
-    gap: 2px;
+    gap: 12px;
+    align-items: flex-end;
 
-    .money-label {
-      font-family: Poppins;
-      font-size: 26px; // Slightly larger for emphasis
-      color: white;
-      font-weight: 900;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    }
+    .stat-box {
+      background-color: rgba(20, 22, 28, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 8px 16px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      min-width: 260px;
 
-    .shares-label {
-      font-family: Poppins;
-      font-size: 14px;
-      color: #00ff88; // Fund.ino Green accent
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.9;
+      &.money {
+        border-left: 4px solid #4caf50;
+      }
+
+      &.shares {
+        border-left: 4px solid #00ff88;
+      }
+
+      .stat-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        margin-right: 12px;
+      }
+
+      .label {
+        font-size: 14px;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.9);
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        flex-grow: 1;
+      }
+
+      .value {
+        font-family: "Roboto Mono", "Courier New", monospace;
+        font-size: 24px;
+        color: #ffffff;
+        font-weight: 800;
+        text-align: right;
+      }
     }
   }
 
@@ -117,12 +138,17 @@ ComputerHUD {
       transform: scale(1.1);
 
       img {
+        // Default Blue Glow
         filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 102, 255, 0.8));
       }
     }
 
-    &:active {
-      transform: scale(0.95);
+    // Modifier for Sincash
+    &.sincash:hover {
+      img {
+        // Red Glow
+        filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 68, 68, 0.8));
+      }
     }
   }
 
