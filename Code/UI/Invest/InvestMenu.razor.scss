@@ -53,6 +53,39 @@ InvestMenu {
     align-items: center;
     padding: 10px 0 10px;
 
+    .range-picker {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      width: 100%;
+      margin-bottom: 12px;
+
+      button {
+        flex: 1;
+        padding: 6px 0;
+        font-size: 10px;
+        font-weight: 800;
+        color: $color-text-dim !important;
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.1s ease;
+
+        &.active {
+          color: $color-accent !important;
+          background-color: rgba(0, 255, 136, 0.08);
+          border-color: rgba(0, 255, 136, 0.3);
+          box-shadow: 0 0 10px rgba($color-accent, 0.1);
+        }
+
+        &:hover:not(.active) {
+          background-color: rgba(255, 255, 255, 0.08);
+          color: $color-text !important;
+        }
+      }
+    }
+
     .price-display {
       display: flex;
       flex-direction: column;
@@ -74,22 +107,61 @@ InvestMenu {
       }
     }
 
-    .graph-window-placeholder {
-      width: 100%;
-      height: 120px;
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .graph-line {
+      pointer-events: none;
+      z-index: 4;
 
-      label {
-        font-size: 10px;
-        color: rgba(255, 255, 255, 0.2) !important;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+      // High-intensity glow for the "connected" feel
+      box-shadow: 0 0 4px rgba($color-accent, 0.6);
+
+      // Slight opacity to make it look like a CRT beam
+      opacity: 0.8;
+    }
+
+    .graph-window {
+      width: 100%;
+      height: 180px;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba($color-accent, 0.05);
+
+      // Subtle grid background for the "Terminal" look
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        opacity: 0.03;
+        // Use 0.5% instead of 1px to satisfy the compiler
+        background-image:
+                linear-gradient(rgba(255,255,255,1) 0.5%, transparent 0.5%),
+                linear-gradient(90deg, rgba(255,255,255,1) 0.5%, transparent 0.5%);
+        background-size: 20px 20px;
+        pointer-events: none;
+      }
+
+      .graph-painter {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        padding: 15px 0; // Prevent dots from touching top/bottom borders
+
+        .graph-dot {
+          width: 4px;
+          height: 4px;
+          background-color: $color-accent;
+          border-radius: 100%;
+          pointer-events: none;
+          z-index: 5;
+
+          // Overlapping glow to simulate a continuous line
+          box-shadow: 0 0 6px rgba($color-accent, 0.9),
+          0 0 12px rgba($color-accent, 0.3);
+
+          transition: all 0.2s ease-out;
+        }
       }
     }
   }

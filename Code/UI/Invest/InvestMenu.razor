@@ -25,8 +25,18 @@
               <label>GLOBAL ASSET PRICE (UTC)</label>
           </div>
 
-          <div class="graph-window-placeholder">
-              <label>MARKET VISUALIZATION OFFLINE</label>
+          <div class="range-picker">
+	          @foreach ( var range in TimeRanges.Keys )
+	          {
+		          <button class="@(CurrentRange == range ? "active" : "")" 
+		                  @onclick="@(() => SetRange(range))">
+			          @range
+		          </button>
+	          }
+          </div>
+
+          <div class="graph-window">
+	          <MarketGraph @ref="GraphCanvas" class="graph-painter" />
           </div>
        </div>
 
@@ -56,13 +66,90 @@
 </root>
 
 @code {
+    private MarketGraph GraphCanvas;
     private bool IsProcessing = false;
+    private double LastPrice;
+    private string CurrentRange = "1D";
+
+    // Map UI labels to total minutes to look back
+    private readonly Dictionary<string, int> TimeRanges = new()
+    {
+        { "1D", 60 * 24 },
+        { "5D", 60 * 24 * 5 },
+        { "1M", 60 * 24 * 30 },
+        { "6M", 60 * 24 * 180 },
+        { "YTD", 0 }, // Calculated dynamically
+        { "1Y", 60 * 24 * 365 },
+        { "5Y", 60 * 24 * 365 * 5 },
+        { "MAX", 60 * 24 * 365 * 10 }
+    };
 
     private bool CanAfford => ComputerHUD.Instance != null && 
                               ComputerHUD.Instance.CurrentMoney >= MarketService.CurrentPrice;
 
     private bool CanSell => ComputerHUD.Instance != null && 
                             ComputerHUD.Instance.CurrentShares >= 1;
+
+    protected override void OnAfterTreeRender(bool firstTime)
+    {
+        if (firstTime)
+        {
+            RefreshGraph();
+        }
+    }
+
+    public override void Tick()
+    {
+        // Auto-refresh graph if the global price ticks while the menu is open
+        if (MarketService.CurrentPrice != LastPrice)
+        {
+            LastPrice = MarketService.CurrentPrice;
+            RefreshGraph();
+        }
+    }
+
+    private void SetRange(string range)
+    {
+        if (CurrentRange == range) return;
+        CurrentRange = range;
+        RefreshGraph();
+    }
+
+    private void RefreshGraph()
+    {
+        if (GraphCanvas == null) return;
+
+        var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
+        if (system == null) return;
+
+        List<double> data = new();
+        var now = DateTime.UtcNow;
+        int resolution = 60; // Fixed dot count for consistent performance
+
+        // Determine lookback window
+        int totalMinutes = TimeRanges.ContainsKey(CurrentRange) ? TimeRanges[CurrentRange] : 1440;
+        
+        if (CurrentRange == "YTD")
+        {
+            var yearStart = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            totalMinutes = (int)(now - yearStart).TotalMinutes;
+        }
+
+        // Spread the 60 dots evenly across the chosen time window
+        int step = Math.Max(1, totalMinutes / resolution);
+
+        for (int i = 0; i < resolution; i++)
+        {
+            var time = now.AddMinutes(-(i * step));
+            int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+            data.Add(MarketServerSystem.CalculatePrice(time, seed, false));
+        }
+
+        data.Reverse(); // Chronological order: Left to Right
+
+        GraphCanvas.History = data;
+        GraphCanvas.UpdateGraph();
+    }
 
     private async void DoTrade(int amount)
     {
@@ -73,6 +160,7 @@
     
         double totalCost = MarketService.CurrentPrice * amount;
 
+        // Validation for selling
         if (amount < 0 && (ComputerHUD.Instance?.CurrentShares ?? 0) < Math.Abs(amount)) 
         {
            IsProcessing = false;
@@ -80,8 +168,10 @@
            return;
         }
 
+        // Execute transaction on HUD instance
         ComputerHUD.Instance?.Transaction(-totalCost, (double)amount);
     
+        // Short delay to simulate network latency/feedback
         await GameTask.Delay(100); 
         IsProcessing = false;
         StateHasChanged();
@@ -89,6 +179,7 @@
 
     protected override int BuildHash()
     {
-        return $"{MarketService.CurrentPrice}_{IsProcessing}_{ComputerHUD.Instance?.CurrentMoney}".GetHashCode();
+        // UI rebuilds if price, status, or balance changes
+        return HashCode.Combine(MarketService.CurrentPrice, IsProcessing, ComputerHUD.Instance?.CurrentMoney, CurrentRange);
     }
 }
