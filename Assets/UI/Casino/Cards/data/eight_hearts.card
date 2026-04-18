@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Eight of Hearts",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_hearts_08.png",
+  "CardSuit": 0,
+  "CardRank": 6,
+  "CardID": 6
+}

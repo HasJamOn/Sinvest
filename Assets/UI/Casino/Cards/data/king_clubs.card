@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "King of Clubs",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_clubs_K.png",
+  "CardSuit": 2,
+  "CardRank": 11,
+  "CardID": 37
+}

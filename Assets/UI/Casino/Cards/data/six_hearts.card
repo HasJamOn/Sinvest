@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Six of Hearts",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_hearts_06.png",
+  "CardSuit": 0,
+  "CardRank": 4,
+  "CardID": 4
+}

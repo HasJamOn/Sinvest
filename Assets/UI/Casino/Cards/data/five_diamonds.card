@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Five of Diamonds",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_diamonds_05.png",
+  "CardSuit": 1,
+  "CardRank": 3,
+  "CardID": 16
+}

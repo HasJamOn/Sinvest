@@ -6,8 +6,8 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Main Camera",
-      "Position": "-300,0,100",
-      "Rotation": "0,0,0,1",
+      "Position": "-107.555809,-22.2388992,64.0412598",
+      "Rotation": "-0.04105464,0.0922101438,0.404659688,0.908879697",
       "Scale": "1,1,1",
       "Tags": "",
       "Enabled": true,
@@ -25,7 +25,7 @@
           "BackgroundColor": "0.33333,0.46275,0.52157,1",
           "ClearFlags": "All",
           "EnablePostProcessing": true,
-          "FieldOfView": 60,
+          "FieldOfView": 90,
           "FovAxis": "Horizontal",
           "IsMainCamera": true,
           "OnComponentDestroy": null,
@@ -38,7 +38,7 @@
           "OrthographicHeight": 1204,
           "PostProcessAnchor": null,
           "Priority": 1,
-          "RenderExcludeTags": "",
+          "RenderExcludeTags": "viewer",
           "RenderTags": "",
           "RenderTexture": null,
           "TargetEye": "None",
@@ -350,7 +350,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "Pan",
-          "Position": "12.0493279,-0.408660889,26.1329174",
+          "Position": "12.049427,-0.412124634,24.9595356",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "",
@@ -547,8 +547,8 @@
               "__version": 2,
               "Flags": 0,
               "Name": "Patty",
-              "Position": "-10.7109184,0.361839294,5.26192856",
-              "Rotation": "0,0,0,1",
+              "Position": "-10.7205315,0.352813721,4.47236633",
+              "Rotation": "8.91940144E-05,-0.000335988792,0.000148983847,0.99999994",
               "Scale": "0.200000003,0.200000003,0.200000003",
               "Tags": "",
               "Enabled": true,
@@ -842,6 +842,11 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "8b600274-27b4-4a2b-b2b0-4e07733ca107"
+        }
+      },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       }

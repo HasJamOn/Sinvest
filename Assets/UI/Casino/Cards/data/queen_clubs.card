@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Queen of Clubs",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_clubs_Q.png",
+  "CardSuit": 2,
+  "CardRank": 10,
+  "CardID": 36
+}

@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Four of Spades",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_spades_04.png",
+  "CardSuit": 3,
+  "CardRank": 2,
+  "CardID": 41
+}

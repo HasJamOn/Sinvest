@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Ace of Clubs",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_clubs_A.png",
+  "CardSuit": 2,
+  "CardRank": 12,
+  "CardID": 38
+}

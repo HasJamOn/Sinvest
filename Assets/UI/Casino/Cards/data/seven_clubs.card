@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Seven of Clubs",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_clubs_07.png",
+  "CardSuit": 2,
+  "CardRank": 5,
+  "CardID": 31
+}

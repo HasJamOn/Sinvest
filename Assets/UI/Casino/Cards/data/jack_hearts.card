@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Jack of Hearts",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_hearts_J.png",
+  "CardSuit": 0,
+  "CardRank": 9,
+  "CardID": 9
+}

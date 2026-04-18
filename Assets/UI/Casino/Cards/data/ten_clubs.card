@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Ten of Clubs",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_clubs_10.png",
+  "CardSuit": 2,
+  "CardRank": 8,
+  "CardID": 34
+}

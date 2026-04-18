@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "King of Spades",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_spades_K.png",
+  "CardSuit": 3,
+  "CardRank": 11,
+  "CardID": 50
+}

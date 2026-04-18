@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Ten of Spades",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_spades_10.png",
+  "CardSuit": 3,
+  "CardRank": 8,
+  "CardID": 47
+}

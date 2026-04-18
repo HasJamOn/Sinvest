@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Two of Clubs",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_clubs_02.png",
+  "CardSuit": 2,
+  "CardRank": 0,
+  "CardID": 26
+}

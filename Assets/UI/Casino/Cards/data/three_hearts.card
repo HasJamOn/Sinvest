@@ -1,0 +1,8 @@
+{
+  "__type": "Sandbox.UI.Casino.Games.Cards.CardResource",
+  "CardName": "Three of Hearts",
+  "CardImage": "UI/Casino/Cards/art/Cards_large/card_hearts_03.png",
+  "CardSuit": 0,
+  "CardRank": 1,
+  "CardID": 1
+}
