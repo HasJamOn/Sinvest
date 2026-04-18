@@ -8,18 +8,16 @@ public sealed class UIPopupTrigger : Component, Component.IPressable
 
 	bool Component.IPressable.Press( Component.IPressable.Event e )
 	{
-		// Don't spawn if one is already open
 		if ( PopupPrefab == null || _activeInstance.IsValid() ) return false;
 
-		// 1. Create the runtime clone (This fixes the serialization error)
+		// 1. Create the runtime clone
 		_activeInstance = PopupPrefab.Clone();
         
-		// Optional: Move it out of the way if it has physical components
-		_activeInstance.Transform.Position = new Vector3( 5000, 0, 0 );
+		// 2. Set the position (Fixed: WorldPosition is a direct property of GameObject)
+		_activeInstance.WorldPosition = new Vector3( 5000, 0, 0 );
 
-		// 2. Get the HUD component and initialize it
-		// Note: Using your class name 'ComputerHUD'
-		var hud = _activeInstance.GetComponent<ComputerHUD>(true);
+		// 3. Get the HUD component and initialize it
+		var hud = _activeInstance.Components.Get<ComputerHUD>(true);
 		if ( hud != null )
 		{
 			hud.Open(); 

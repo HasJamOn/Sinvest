@@ -72,69 +72,77 @@
     
     private bool _initialized = false;
 
+    // Helper properties for sub-menus
+    public double CurrentMoney => _targetMoney;
+    public double CurrentShares => _targetShares;
+
     protected override void OnAwake() => Instance = this;
     
     public void CloseAndDestroy()
     {
-	    // 1. Restore player movement and mouse
-	    SetMenuState(false);
-
-	    // 2. Clear the static reference so other scripts don't try to call it
-	    if (Instance == this) Instance = null;
-
-	    // 3. Destroy the entire hierarchy
-	    GameObject.Root.Destroy();
+        SetMenuState(false);
+        if (Instance == this) Instance = null;
+        GameObject.Root.Destroy();
     }
     
     protected override void OnDestroy()
     {
-	    // Fail-safe: if the UI is destroyed, ensure the player is unlocked
-	    if ( _isOpen )
-	    {
-		    SetMenuState( false );
-	    }
-
-	    if ( Instance == this ) Instance = null;
+        if ( _isOpen ) SetMenuState( false );
+        if ( Instance == this ) Instance = null;
     }
     
     protected override void OnUpdate()
     {
-	    if (!_initialized)
-	    {
-		    var moneyStat = Sandbox.Services.Stats.LocalPlayer.Get("money");
-		    var sharesStat = Sandbox.Services.Stats.LocalPlayer.Get("fundino_shares");
+        if (!_initialized)
+        {
+           // Initial fetch from cloud stats
+           var moneyStat = Sandbox.Services.Stats.LocalPlayer.Get("money");
+           var sharesStat = Sandbox.Services.Stats.LocalPlayer.Get("fundino_shares");
        
-		    _targetMoney = moneyStat.Value;
-		    _displayMoney = _targetMoney; 
+           _targetMoney = moneyStat.Value;
+           _displayMoney = _targetMoney; 
 
-		    _targetShares = sharesStat.Value;
-		    _displayShares = _targetShares;
+           _targetShares = sharesStat.Value;
+           _displayShares = _targetShares;
 
-		    _initialized = true;
-	    }
+           _initialized = true;
+        }
 
-	    // Money Animation
-	    if ( Math.Abs(_displayMoney - _targetMoney) > 0.1 )
-	    {
-		    _displayMoney = MathX.Lerp( _displayMoney, _targetMoney, RealTime.Delta * 8.0f );
-		    StateHasChanged();
-	    }
-	    else if (_displayMoney != _targetMoney)
-	    {
-		    _displayMoney = _targetMoney;
-		    StateHasChanged();
-	    }
+        // --- Money Animation ---
+        if ( Math.Abs(_displayMoney - _targetMoney) > 0.1 )
+        {
+           _displayMoney = MathX.Lerp( _displayMoney, _targetMoney, RealTime.Delta * 8.0f );
+           StateHasChanged();
+        }
+        else if (_displayMoney != _targetMoney)
+        {
+           _displayMoney = _targetMoney;
+           StateHasChanged();
+        }
 
-	    // Shares Animation (New)
-	    if ( Math.Abs(_displayShares - _targetShares) > 0.1 )
+        // --- Shares Animation ---
+        if ( Math.Abs(_displayShares - _targetShares) > 0.1 )
+        {
+           _displayShares = MathX.Lerp( _displayShares, _targetShares, RealTime.Delta * 8.0f );
+           StateHasChanged();
+        }
+        else if (_displayShares != _targetShares)
+        {
+           _displayShares = _targetShares;
+           StateHasChanged();
+        }
+    }
+
+    public void Transaction(double moneyAmount, double sharesAmount = 0)
+    {
+	    _targetMoney += moneyAmount;
+	    _targetShares += sharesAmount;
+
+	    var eco = Scene.GetAllComponents<EconomyManager>().FirstOrDefault();
+	    if (eco != null)
 	    {
-		    _displayShares = MathX.Lerp( _displayShares, _targetShares, RealTime.Delta * 8.0f );
-		    StateHasChanged();
-	    }
-	    else if (_displayShares != _targetShares)
-	    {
-		    _displayShares = _targetShares;
-		    StateHasChanged();
+		    // Just call it directly
+		    eco.CommitTransaction(moneyAmount, sharesAmount);
 	    }
     }
 
@@ -150,21 +158,19 @@
 
     public void GoBack()
     {
-	    if (_history.Count > 0)
-	    {
-		    var previousType = _history.Pop();
-		    CreateViewByType(previousType);
-	    }
-	    else if (_activeViewPanel != null)
-	    {
-		    // We are in a sub-menu (like Casino), return to Main Menu
-		    ClearView();
-	    }
-	    else
-	    {
-		    // We are already at the Main Menu, so "Back" should just Close
-		    CloseAndDestroy();
-	    }
+        if (_history.Count > 0)
+        {
+           var previousType = _history.Pop();
+           CreateViewByType(previousType);
+        }
+        else if (_activeViewPanel != null)
+        {
+           ClearView();
+        }
+        else
+        {
+           CloseAndDestroy();
+        }
     }
 
     private void CreateViewByType(Type t)
@@ -174,13 +180,10 @@
         var contentArea = Panel.Descendants.OfType<Panel>().FirstOrDefault(x => x.HasClass("hud-content"));
         if (contentArea == null) return;
 
-        // Use a switch to call the generic AddChild<T> which s&box prefers
         _activeViewPanel = t.Name switch
         {
-            
             nameof(InvestMenu) => contentArea.AddChild<InvestMenu>(),
             nameof(CasinoMenu) => contentArea.AddChild<CasinoMenu>(),
-            //Casino Games
             nameof(CoinFlip)   => contentArea.AddChild<CoinFlip>(),
             _ => null
         };
@@ -215,43 +218,10 @@
         }
     }
     
-    /// <summary>
-    /// bypasses the main menu.
-    /// </summary>
     public void OpenInteraction<T>() where T : Panel, new()
     {
-	    // Clear any previous navigation history for a clean start
-	    _history.Clear(); 
-    
-	    // Set the state to open
-	    SetMenuState(true);
-    
-	    // Use our bridge method to create the view
-	    CreateViewByType(typeof(T));
+        _history.Clear(); 
+        SetMenuState(true);
+        CreateViewByType(typeof(T));
     }
-
-    public void Transaction(double moneyAmount, double sharesAmount = 0)
-    {
-	    // 1. Handle Money
-	    if (moneyAmount != 0)
-	    {
-		    var mStat = Sandbox.Services.Stats.LocalPlayer.Get("money");
-		    _targetMoney = mStat.Value + moneyAmount;
-		    Sandbox.Services.Stats.Increment("money", moneyAmount);
-	    }
-
-	    // 2. Handle Shares (New)
-	    if (sharesAmount != 0)
-	    {
-		    var sStat = Sandbox.Services.Stats.LocalPlayer.Get("fundino_shares");
-		    _targetShares = sStat.Value + sharesAmount;
-		    Sandbox.Services.Stats.Increment("fundino_shares", sharesAmount);
-	    }
-
-	    // 3. Save to Cloud
-	    _ = Sandbox.Services.Stats.FlushAsync();
-    }
-
-// Helper property for your InvestMenu and other sub-menus to use
-    public double CurrentMoney => _targetMoney;
 }

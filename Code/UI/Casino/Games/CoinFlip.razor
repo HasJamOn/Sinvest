@@ -14,9 +14,9 @@
        </div>
 
        <div class="coin-wrapper">
-	       <img class="coin-img @SquishClass @FlipAnimClass" 
-	            src="@CoinImageSrc" 
-	            style="transition: transform @(SpinSpeed)s ease-in-out;" />
+           <img class="coin-img @SquishClass @FlipAnimClass" 
+                src="@CoinImageSrc" 
+                style="transition: transform @(SpinSpeed)s ease-in-out;" />
        </div>
 
        <div class="selection-indicator">
@@ -29,7 +29,9 @@
           <TextEntry Value:bind="@BetAmount" Numeric="@true" />
        </div>
 
-       <button class="play-btn @(IsFlipping ? "flipping" : "")" @onclick="@PlayGame">FLIP COIN</button>
+       <button class="play-btn @(IsFlipping || !CanAfford ? "disabled" : "")" @onclick="@PlayGame">
+           @(IsFlipping ? "FLIPPING..." : "FLIP COIN")
+       </button>
 
        @if (!string.IsNullOrEmpty(ResultMessage))
        {
@@ -52,7 +54,6 @@
     private bool IsWin = false;
     private bool IsFlipping = false;
     
-    // Animation States
     private string FlipAnimClass = "";
     private bool IsSquished = false;
     private string SquishClass => IsSquished ? "squished" : "";
@@ -60,6 +61,11 @@
     
     private Side DisplaySide = Side.Heads; 
     private string CoinImageSrc => $"/ui/casino/coinflip/coin_{DisplaySide.ToString().ToLower()}.png";
+
+    // New Helper for the UI
+    private bool CanAfford => float.TryParse(BetAmount, out float amount) && 
+                              ComputerHUD.Instance != null && 
+                              ComputerHUD.Instance.CurrentMoney >= amount;
 
     private void SetSide(Side side)
     {
@@ -72,22 +78,28 @@
     {
         if (IsFlipping) return;
 
-        // 1. Setup & validate amount
+        // 1. Validation
         if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
         
-        // --- NEW: Deduct the bet amount immediately ---
-        ComputerHUD.Instance?.Transaction(-amount);
+        // Final check against the HUD's current balance
+        if (ComputerHUD.Instance == null || ComputerHUD.Instance.CurrentMoney < amount)
+        {
+            ResultMessage = "INSUFFICIENT FUNDS!";
+            return;
+        }
 
-        // Calculate outcome immediately (hidden from player)
-        var roll = Game.Random.Int(1, 2);
-        var result = (roll == 1) ? Side.Heads : Side.Tails;
+        // 2. Immediate Deduction
+        ComputerHUD.Instance.Transaction(-amount);
+
+        // Pre-calculate result
+        var result = Game.Random.Int(0, 1) == 0 ? Side.Heads : Side.Tails;
         
         IsFlipping = true;
         ResultMessage = "";
         FlipAnimClass = "";
         StateHasChanged();
 
-        // 2. The Controlled Spin Loop
+        // 3. Animation Loop
         int totalFlips = 12; 
         float currentSpeed = 0.05f;
 
@@ -107,7 +119,7 @@
             if (i > 4) currentSpeed += 0.02f; 
         }
 
-        // 3. Final Targeted Settle
+        // 4. Settle
         SpinSpeed = currentSpeed + 0.05f;
         IsSquished = true;
         StateHasChanged();
@@ -120,22 +132,19 @@
 
         await GameTask.DelaySeconds(0.6f);
 
-        // 4. Logic Resolution
+        // 5. Resolution
         LastFlip = result.ToString();
         IsWin = (SelectedSide == result);
         IsFlipping = false;
 
         if (IsWin)
         {
-            // --- UPDATED: Reward is 2x the bet (Initial bet + Winnings) ---
-            // Since we already took away 'amount', adding 'amount * 2' 
-            // results in a net gain of exactly the bet amount.
-            ComputerHUD.Instance?.Transaction(amount * 2);
+            // Refund initial bet + pay out winnings (2x total)
+            ComputerHUD.Instance.Transaction(amount * 2);
             ResultMessage = $"YOU WON ${amount}!";
         }
         else
         {
-            // We already deducted the money, so we just show the message
             ResultMessage = $"YOU LOST ${amount}!";
         }
 
@@ -144,17 +153,14 @@
 
     protected override int BuildHash()
     {
-	    var hash = new HashCode();
-	    hash.Add(SelectedSide);
-	    hash.Add(BetAmount);
-	    hash.Add(LastFlip);
-	    hash.Add(ResultMessage);
-	    hash.Add(IsFlipping);
-	    hash.Add(FlipAnimClass);
-	    hash.Add(DisplaySide);
-	    hash.Add(IsSquished);
-	    hash.Add(SpinSpeed);
-	    return hash.ToHashCode();
+        return HashCode.Combine(
+           SelectedSide, 
+           BetAmount, 
+           IsFlipping, 
+           DisplaySide, 
+           IsSquished, 
+           ComputerHUD.Instance?.CurrentMoney, // Re-renders if balance changes
+           ResultMessage
+        );
     }
-    
 }
