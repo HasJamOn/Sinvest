@@ -820,6 +820,37 @@
           "Children": []
         }
       ]
+    },
+    {
+      "__guid": "1c1835fd-4814-40f1-91f5-c64973992f52",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "MarketServiceSystem",
+      "Position": "221.727142,-119.48996,36.9234009",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.MarketServerSystem",
+          "__guid": "0329758e-aa04-4533-aa2c-732cd590c395",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {

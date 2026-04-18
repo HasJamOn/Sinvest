@@ -1,7 +1,9 @@
 @using Sandbox;
 @using Sandbox.UI;
-@using Sandbox.Services;
 @using System;
+@using System.Linq;
+@using System.Collections.Generic;
+
 @inherits Panel
 @namespace Sandbox
 
@@ -18,8 +20,14 @@
     else
     {
        <div class="price-hero">
-          <h1>$@MarketService.CurrentPrice.ToString("N2")</h1>
-          <label>GLOBAL ASSET PRICE (UTC)</label>
+          <div class="price-display">
+              <h1>$@MarketService.CurrentPrice.ToString("N2")</h1>
+              <label>GLOBAL ASSET PRICE (UTC)</label>
+          </div>
+
+          <div class="graph-window-placeholder">
+              <label>MARKET VISUALIZATION OFFLINE</label>
+          </div>
        </div>
 
        <div class="stats-row">
@@ -48,47 +56,23 @@
 </root>
 
 @code {
-    private TimeSince _lastSync = 0;
     private bool IsProcessing = false;
 
-    // Logic tied directly to the HUD Instance
     private bool CanAfford => ComputerHUD.Instance != null && 
                               ComputerHUD.Instance.CurrentMoney >= MarketService.CurrentPrice;
 
     private bool CanSell => ComputerHUD.Instance != null && 
                             ComputerHUD.Instance.CurrentShares >= 1;
 
-    protected override void OnAfterTreeRender( bool firstTime )
-    {
-       if ( !firstTime ) return;
-       
-       // MarketService.Sync handles the global price, HUD handles the local player stats
-       _ = MarketService.Sync();
-    }
-
-    public override void Tick()
-    {
-       // Keep the market price fresh
-       if ( _lastSync > 15f ) 
-       {
-          _ = MarketService.Sync();
-          _lastSync = 0;
-       }
-    }
-
     private async void DoTrade(int amount)
     {
-        if (IsProcessing) return;
+        if (IsProcessing || !MarketService.IsReady) return;
 
         IsProcessing = true;
         StateHasChanged();
-
-        // 1. Await without a try-catch to satisfy the sbox whitelist
-        await MarketService.Sync();
     
         double totalCost = MarketService.CurrentPrice * amount;
 
-        // 2. Final logic check before committing
         if (amount < 0 && (ComputerHUD.Instance?.CurrentShares ?? 0) < Math.Abs(amount)) 
         {
            IsProcessing = false;
@@ -96,10 +80,8 @@
            return;
         }
 
-        // 3. Update the HUD (which handles the UI animation and the EconomyManager cloud save)
         ComputerHUD.Instance?.Transaction(-totalCost, (double)amount);
     
-        // 4. Artificial delay to prevent button spamming
         await GameTask.Delay(100); 
         IsProcessing = false;
         StateHasChanged();
@@ -107,14 +89,6 @@
 
     protected override int BuildHash()
     {
-        // Adding CurrentShares and CurrentMoney here is CRITICAL.
-        // It tells the UI to re-render when those values change in the HUD.
-        return HashCode.Combine(
-           MarketService.CurrentPrice, 
-           MarketService.IsReady, 
-           IsProcessing,
-           ComputerHUD.Instance?.CurrentMoney,
-           ComputerHUD.Instance?.CurrentShares
-        );
+        return $"{MarketService.CurrentPrice}_{IsProcessing}_{ComputerHUD.Instance?.CurrentMoney}".GetHashCode();
     }
 }
