@@ -70,15 +70,15 @@
     private bool IsProcessing = false;
     private double LastPrice;
     private string CurrentRange = "1D";
+    private bool Initialized = false; // Track if we've successfully drawn the first time
 
-    // Map UI labels to total minutes to look back
     private readonly Dictionary<string, int> TimeRanges = new()
     {
         { "1D", 60 * 24 },
         { "5D", 60 * 24 * 5 },
         { "1M", 60 * 24 * 30 },
         { "6M", 60 * 24 * 180 },
-        { "YTD", 0 }, // Calculated dynamically
+        { "YTD", 0 },
         { "1Y", 60 * 24 * 365 },
         { "5Y", 60 * 24 * 365 * 5 },
         { "MAX", 60 * 24 * 365 * 10 }
@@ -90,21 +90,50 @@
     private bool CanSell => ComputerHUD.Instance != null && 
                             ComputerHUD.Instance.CurrentShares >= 1;
 
-    protected override void OnAfterTreeRender(bool firstTime)
+    protected override void OnAfterTreeRender( bool firstTime )
     {
-        if (firstTime)
+        if ( firstTime )
         {
-            RefreshGraph();
+           if ( MarketService.PriceHistory.Count < 2 )
+           {
+              PreFillHistory();
+           }
+           
+           // We attempt a refresh, but Tick will handle the fallback if Width is 0
+           RefreshGraph();
+        }
+    }
+    
+    private void PreFillHistory()
+    {
+        var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
+        if (system == null) return;
+
+        var now = DateTime.UtcNow;
+        for (int i = 59; i >= 0; i--)
+        {
+           var time = now.AddMinutes(-i);
+           int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+           double price = MarketServerSystem.CalculatePrice(time, seed, false);
+           MarketService.UpdatePrice(price);
         }
     }
 
     public override void Tick()
     {
-        // Auto-refresh graph if the global price ticks while the menu is open
-        if (MarketService.CurrentPrice != LastPrice)
+        // FAIL-SAFE: If we haven't successfully drawn yet (due to 0-width layout),
+        // keep trying until the panel has dimensions.
+        if ( !Initialized && GraphCanvas != null && GraphCanvas.Box.Rect.Width > 0 )
         {
-            LastPrice = MarketService.CurrentPrice;
             RefreshGraph();
+            return; 
+        }
+
+        if ( MarketService.CurrentPrice != LastPrice )
+        {
+           LastPrice = MarketService.CurrentPrice;
+           RefreshGraph();
+           StateHasChanged();
         }
     }
 
@@ -117,36 +146,46 @@
 
     private void RefreshGraph()
     {
-        if (GraphCanvas == null) return;
+        if ( GraphCanvas == null ) return;
+
+        // If layout isn't ready, don't mark as Initialized, just exit and wait for Tick
+        if ( GraphCanvas.Box.Rect.Width <= 0 ) return;
+
+        // Once we pass this point, we have dimensions!
+        Initialized = true;
+
+        if ( CurrentRange == "1D" )
+        {
+            GraphCanvas.History = MarketService.PriceHistory.ToList();
+            GraphCanvas.UpdateGraph();
+            return;
+        }
 
         var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
         if (system == null) return;
 
         List<double> data = new();
         var now = DateTime.UtcNow;
-        int resolution = 60; // Fixed dot count for consistent performance
+        int resolution = 60; 
 
-        // Determine lookback window
-        int totalMinutes = TimeRanges.ContainsKey(CurrentRange) ? TimeRanges[CurrentRange] : 1440;
+        int totalMinutes = TimeRanges.ContainsKey( CurrentRange ) ? TimeRanges[CurrentRange] : 1440;
         
-        if (CurrentRange == "YTD")
+        if ( CurrentRange == "YTD" )
         {
-            var yearStart = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var yearStart = new DateTime( now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc );
             totalMinutes = (int)(now - yearStart).TotalMinutes;
         }
 
-        // Spread the 60 dots evenly across the chosen time window
-        int step = Math.Max(1, totalMinutes / resolution);
+        int step = Math.Max( 1, totalMinutes / resolution );
 
-        for (int i = 0; i < resolution; i++)
+        for ( int i = 0; i < resolution; i++ )
         {
-            var time = now.AddMinutes(-(i * step));
-            int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
-            data.Add(MarketServerSystem.CalculatePrice(time, seed, false));
+            var time = now.AddMinutes( -(i * step) );
+            int seed = MarketServerSystem.GetSeedAtTime( time, system.CurrentSeed, system.CurrentEraStart );
+            data.Add( MarketServerSystem.CalculatePrice( time, seed, false ) );
         }
 
-        data.Reverse(); // Chronological order: Left to Right
-
+        data.Reverse(); 
         GraphCanvas.History = data;
         GraphCanvas.UpdateGraph();
     }
@@ -154,13 +193,10 @@
     private async void DoTrade(int amount)
     {
         if (IsProcessing || !MarketService.IsReady) return;
-
         IsProcessing = true;
         StateHasChanged();
     
         double totalCost = MarketService.CurrentPrice * amount;
-
-        // Validation for selling
         if (amount < 0 && (ComputerHUD.Instance?.CurrentShares ?? 0) < Math.Abs(amount)) 
         {
            IsProcessing = false;
@@ -168,10 +204,7 @@
            return;
         }
 
-        // Execute transaction on HUD instance
         ComputerHUD.Instance?.Transaction(-totalCost, (double)amount);
-    
-        // Short delay to simulate network latency/feedback
         await GameTask.Delay(100); 
         IsProcessing = false;
         StateHasChanged();
@@ -179,7 +212,6 @@
 
     protected override int BuildHash()
     {
-        // UI rebuilds if price, status, or balance changes
         return HashCode.Combine(MarketService.CurrentPrice, IsProcessing, ComputerHUD.Instance?.CurrentMoney, CurrentRange);
     }
 }

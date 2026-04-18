@@ -27,18 +27,14 @@ public static class MarketService
 	/// </summary>
 	public static void UpdatePrice( double newPrice )
 	{
-		// Don't add to history if the price hasn't changed
-		if ( CurrentPrice == newPrice && PriceHistory.Count > 0 ) 
+		// Use a small epsilon for double comparison to avoid floating point noise
+		if ( Math.Abs( CurrentPrice - newPrice ) < 0.001 && PriceHistory.Count > 0 ) 
 			return;
 
 		CurrentPrice = newPrice;
-        
 		PriceHistory.Add( newPrice );
 
-		// Keep the history buffer at a fixed size of 100 points
 		if ( PriceHistory.Count > 100 ) 
-		{
 			PriceHistory.RemoveAt( 0 );
-		}
 	}
 }

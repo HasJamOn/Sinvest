@@ -29,11 +29,15 @@ public sealed class MarketServerSystem : Component
 
     protected override void OnUpdate()
     {
-        if ( IsProxy ) 
-        {
-            MarketService.UpdatePrice( SyncedPrice );
-            return;
-        }
+	    if ( IsProxy ) 
+	    {
+		    // Only update if the networked price changed
+		    if ( MarketService.CurrentPrice != SyncedPrice )
+		    {
+			    MarketService.UpdatePrice( SyncedPrice );
+		    }
+		    return;
+	    }
 
         if ( _nextSync )
         {
