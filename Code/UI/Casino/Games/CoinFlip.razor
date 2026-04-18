@@ -35,10 +35,15 @@
 
        @if (!string.IsNullOrEmpty(ResultMessage))
        {
-          <div class="result-display">
-             <label class="flip-result">The coin landed on: @LastFlip</label>
-             <label class="outcome @(IsWin ? "win" : "loss")">@ResultMessage</label>
-          </div>
+	       <div class="result-display">
+		       @if (!IsError)
+		       {
+			       <label class="flip-result">The coin landed on: @LastFlip</label>
+		       }
+		       <label class="outcome @(IsWin ? "win" : "loss") @(IsError ? "error" : "")">
+			       @ResultMessage
+		       </label>
+	       </div>
        }
     </div>
 </root>
@@ -53,6 +58,8 @@
     private string ResultMessage = "";
     private bool IsWin = false;
     private bool IsFlipping = false;
+    
+    private bool IsError = false;
     
     private string FlipAnimClass = "";
     private bool IsSquished = false;
@@ -76,17 +83,18 @@
 
     private async void PlayGame()
     {
-        if (IsFlipping) return;
+	    if (IsFlipping) return;
+	    IsError = false; // Reset error state
 
-        // 1. Validation
-        if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
-        
-        // Final check against the HUD's current balance
-        if (ComputerHUD.Instance == null || ComputerHUD.Instance.CurrentMoney < amount)
-        {
-            ResultMessage = "INSUFFICIENT FUNDS!";
-            return;
-        }
+	    if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
+    
+	    if (ComputerHUD.Instance == null || ComputerHUD.Instance.CurrentMoney < amount)
+	    {
+		    IsError = true;
+		    ResultMessage = "INSUFFICIENT FUNDS!";
+		    StateHasChanged();
+		    return;
+	    }
 
         // 2. Immediate Deduction
         ComputerHUD.Instance.Transaction(-amount);
