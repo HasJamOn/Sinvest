@@ -107,15 +107,22 @@ InvestMenu {
       }
     }
 
+    // Lines and Dots are children of the painter
     .graph-line {
       pointer-events: none;
       z-index: 4;
-
-      // High-intensity glow for the "connected" feel
       box-shadow: 0 0 4px rgba($color-accent, 0.6);
-
-      // Slight opacity to make it look like a CRT beam
       opacity: 0.8;
+    }
+
+    .graph-dot {
+      width: 4px;
+      height: 4px;
+      background-color: $color-accent;
+      border-radius: 100%;
+      pointer-events: none;
+      z-index: 5;
+      box-shadow: 0 0 6px rgba($color-accent, 0.9), 0 0 12px rgba($color-accent, 0.3);
     }
 
     .graph-window {
@@ -128,13 +135,11 @@ InvestMenu {
       overflow: hidden;
       border: 1px solid rgba($color-accent, 0.05);
 
-      // Subtle grid background for the "Terminal" look
       &::before {
         content: "";
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
         opacity: 0.03;
-        // Use 0.5% instead of 1px to satisfy the compiler
         background-image:
                 linear-gradient(rgba(255,255,255,1) 0.5%, transparent 0.5%),
                 linear-gradient(90deg, rgba(255,255,255,1) 0.5%, transparent 0.5%);
@@ -143,25 +148,13 @@ InvestMenu {
       }
 
       .graph-painter {
-        width: 100%;
+        min-width: 100%; // Force it to fill the window
         height: 100%;
         position: relative;
-        padding: 15px 0; // Prevent dots from touching top/bottom borders
-
-        .graph-dot {
-          width: 4px;
-          height: 4px;
-          background-color: $color-accent;
-          border-radius: 100%;
-          pointer-events: none;
-          z-index: 5;
-
-          // Overlapping glow to simulate a continuous line
-          box-shadow: 0 0 6px rgba($color-accent, 0.9),
-          0 0 12px rgba($color-accent, 0.3);
-
-          transition: all 0.2s ease-out;
-        }
+        padding: 0;
+        margin: 0;
+        // This ensures the lines we draw aren't cut off by the painter's own bounds
+        overflow: visible;
       }
     }
   }
