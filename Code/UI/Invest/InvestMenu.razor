@@ -1,19 +1,139 @@
 @using Sandbox;
 @using Sandbox.UI;
+@using Sandbox.Services;
+@using System;
+@using System.Threading.Tasks;
 @inherits Panel
 @namespace Sandbox
 
 <root>
-	<div class="title">@MyStringValue</div>
+    <div class="header">
+       <label>FUND.INO INDEX</label>
+       <div class="status @(MarketService.IsReady ? "online" : "offline")"></div>
+    </div>
+
+    @if ( !MarketService.IsReady )
+    {
+       <div class="loading">SYNCING WITH B4BLOCK.ORG...</div>
+    }
+    else
+    {
+       <div class="price-hero">
+          <h1>$@MarketService.CurrentPrice.ToString("N2")</h1>
+          <label>GLOBAL ASSET PRICE (UTC)</label>
+       </div>
+
+       <div class="stats-row">
+          <div class="stat">
+             <label>SHARES</label>
+             <span>@_shares.ToString("N0")</span>
+          </div>
+          <div class="stat">
+             <label>EQUITY</label>
+             <span>$@((_shares * MarketService.CurrentPrice).ToString("N2"))</span>
+          </div>
+       </div>
+
+       <div class="actions">
+	       <button class="buy @(!CanAfford || IsProcessing ? "disabled" : "")" 
+	               @onclick="@( () => DoTrade(1) )">
+		       BUY 1 SBOX
+	       </button>
+
+	       <button class="sell @(!CanSell || IsProcessing ? "disabled" : "")" 
+	               @onclick="@( () => DoTrade(-1) )">
+		       SELL 1 SBOX
+	       </button>
+       </div>
+    }
 </root>
 
-@code
-{
+@code {
+    private double _shares;
+    private TimeSince _lastSync = 0;
+    private bool IsProcessing = false;
+    private bool CanAfford => ComputerHUD.Instance != null && 
+                              ComputerHUD.Instance.CurrentMoney >= MarketService.CurrentPrice;
+    private bool CanSell => _shares >= 1;
 
-	[Property, TextArea] public string MyStringValue { get; set; } = "Hello World!";
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+       if ( !firstTime ) return;
+       
+       // Load initial shares
+       _shares = Stats.LocalPlayer.Get( "fundino_shares" ).Value;
+       _ = MarketService.Sync();
+    }
 
-	/// <summary>
-	/// the hash determines if the system should be rebuilt. If it changes, it will be rebuilt
-	/// </summary>
-	protected override int BuildHash() => System.HashCode.Combine( MyStringValue );
+    public override void Tick()
+    {
+       if ( _lastSync > 15f ) 
+       {
+          _ = MarketService.Sync();
+          _lastSync = 0;
+       }
+    }
+
+    private async Task DoTrade(int amount)
+    {
+	    if (IsProcessing) return;
+
+	    Log.Info($"[Invest] Button Clicked! Amount: {amount}"); 
+
+	    IsProcessing = true;
+	    StateHasChanged();
+
+	    try 
+	    {
+		    // 1. Refresh market data
+		    await MarketService.Sync();
+		    double totalCost = MarketService.CurrentPrice * amount;
+
+		    // 2. Logic Check: Allow buying always, but check shares for selling
+		    if (amount < 0 && _shares < Math.Abs((double)amount)) 
+		    {
+			    Log.Warning("[Invest] Not enough shares to sell!");
+			    return;
+		    }
+
+		    // 3. Execution
+		    _shares += amount;
+        
+		    // Push the transaction to the HUD controller
+		    if (ComputerHUD.Instance != null)
+		    {
+			    ComputerHUD.Instance?.Transaction(-totalCost, (double)amount);
+		    }
+		    else
+		    {
+			    Log.Error("[Invest] ComputerHUD.Instance is NULL!");
+		    }
+
+		    // 4. Persistence
+		    Sandbox.Services.Stats.Increment("fundino_shares", (double)amount);
+		    await Sandbox.Services.Stats.FlushAsync();
+        
+		    Log.Info("[Invest] Trade Successful");
+	    }
+	    catch (System.Exception e)
+	    {
+		    Log.Error($"[Invest] Trade Failed: {e.Message}");
+	    }
+	    finally 
+	    {
+		    IsProcessing = false;
+		    StateHasChanged();
+	    }
+    }
+    
+    protected override int BuildHash()
+    {
+	    return HashCode.Combine(
+		    _shares, 
+		    MarketService.CurrentPrice, 
+		    MarketService.IsReady, 
+		    IsProcessing,
+		    ComputerHUD.Instance?.CurrentMoney
+	    );
+    }
 }

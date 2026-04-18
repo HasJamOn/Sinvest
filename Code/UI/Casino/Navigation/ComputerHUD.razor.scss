@@ -1,12 +1,9 @@
-ComputerHUD
-{
+ComputerHUD {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-
-  /* Centers the .hud container in the middle of the screen */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -14,8 +11,7 @@ ComputerHUD
   z-index: 1000;
   pointer-events: all;
 
-  &.hidden
-  {
+  &.hidden {
     display: none;
     pointer-events: none;
   }
@@ -24,92 +20,148 @@ ComputerHUD
     position: absolute;
     top: 20px;
     right: 20px;
-    padding: 10px 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 5px;
-    border-left: 4px solid #4caf50; // Green for money
+    padding: 12px 24px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 8px;
+    border-right: 4px solid #4caf50; // Switched to right-side accent
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; // Align text to the right
+    gap: 2px;
 
     .money-label {
       font-family: Poppins;
-      font-size: 24px;
+      font-size: 26px; // Slightly larger for emphasis
       color: white;
-      font-weight: bold;
+      font-weight: 900;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
-  }
 
-  .hud {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    /* Adds consistent space between the Game Card and the Back Button */
-    gap: 24px;
-    pointer-events: all;
-
-    /* Optional: ensures the hud doesn't shrink weirdly */
-    min-width: 450px;
+    .shares-label {
+      font-family: Poppins;
+      font-size: 14px;
+      color: #00ff88; // Fund.ino Green accent
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.9;
+    }
   }
 
   .hud-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    
     justify-content: center;
-    height: auto;
-    width: auto;
-
     gap: 20px;
-    pointer-events: none; // Let clicks pass through empty space
+    pointer-events: none;
+
+    /* --- Updated Menu Container --- */
+    .menu {
+      display: flex;
+      flex-direction: row;      // Allow icons to sit side-by-side
+      flex-wrap: wrap;         // Wrap to next line if space runs out
+      align-items: center;
+      justify-content: center;
+      gap: 32px;               // Generous space between apps
+      padding: 40px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
+      backdrop-filter: blur(12px); // Modern "Glass" effect
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      pointer-events: all;
+    }
 
     & > Panel {
       order: 1;
-      pointer-events: all; // Ensure the game window catches clicks
+      pointer-events: all;
     }
 
     .back-button {
       order: 2;
-      pointer-events: all; // Ensure the button catches clicks
+      pointer-events: all;
     }
   }
 
-  /* Combined button styles for consistency */
+  /* --- New App Icon Styling --- */
+  .app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 110px;
+    height: 130px;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+
+    img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+      margin-bottom: 10px;
+      transition: filter 0.2s ease;
+    }
+
+    label {
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+
+      img {
+        filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 102, 255, 0.8));
+      }
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  /* Standard Menu Buttons (Sincash.ino, Close) */
   .menu-button, .back-button {
-    min-height: 44px;
-    min-width: 180px; /* Slightly wider for a more "menu" feel */
-    padding: 12px 24px;
+    min-height: 48px;
+    min-width: 200px;
+    padding: 12px 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #0044aa;
     color: white;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: bold;
     text-transform: uppercase;
+    font-size: 16px;
     pointer-events: all;
     cursor: pointer;
     transition: all 0.1s ease-out;
 
     &:hover {
       background-color: #0066ff;
-      transform: scale(1.02);
+      transform: scale(1.03);
     }
 
     &:active {
       background-color: #ff0000;
-      transform: scale(0.95);
+      transform: scale(0.96);
     }
   }
 
-  /* Specific style for the back button to make it look secondary */
   .back-button {
-    background-color: rgba(0, 0, 0, 0.4);
-    border: 1px solid #0044aa;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 
     &:hover {
       background-color: #ff4444;
-      border-color: #ff6666;
+      border-color: #ff8888;
     }
   }
 }
