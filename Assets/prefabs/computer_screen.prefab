@@ -376,6 +376,56 @@
           }
         ],
         "Children": []
+      },
+      {
+        "__guid": "36040969-efb6-4d81-8916-745497082338",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "CoinTest",
+        "Position": "-22.0514908,-245.180832,156.93988",
+        "Rotation": "-0.707106829,1.37678782E-07,0.707106769,1.37678782E-07",
+        "Scale": "10000,10000,10000",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "04d81953-8500-413e-a5be-ea8e1a28d2a9",
+            "__enabled": true,
+            "Flags": 0,
+            "BodyGroups": 18446744073709551615,
+            "CreateAttachments": false,
+            "LodOverride": null,
+            "MaterialGroup": null,
+            "MaterialOverride": null,
+            "Materials": {
+              "indexed": {
+                "0": "ui/casino/coinflip/coin.vmat"
+              }
+            },
+            "Model": "ui/casino/coinflip/coin.vmdl",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": []
       }
     ],
     "__properties": {
