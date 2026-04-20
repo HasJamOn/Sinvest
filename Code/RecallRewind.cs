@@ -20,7 +20,8 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 	[Property, Group( "Leash" ), ShowIf( nameof( LeashObject ), null )] 
 	public Rotation LeashRotation { get; set; } = Rotation.Identity;
 	
-	[Property, Group( "Leash" )] public Vector3 BoxSize { get; set; } = new Vector3( 200, 200, 200 );
+	[Property, Group( "Leash" )]
+	public Vector3 BoxSize { get; set; } = 100f;
 
 	private Transform _originTransform;
 	private Rigidbody _rb;
@@ -29,27 +30,21 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 	private bool _isAwake;
 	private float _rewindStartedTime;
 
-	// --- LOGIC HELPERS ---
-
 	private Vector3 GetEffectiveLeashPos() => LeashObject.IsValid() ? LeashObject.WorldPosition : LeashPosition;
 
 	private Rotation GetEffectiveLeashRot()
 	{
 		if ( LeashObject.IsValid() ) return LeashObject.WorldRotation;
-		// Neutralize object rotation to keep manual leash world-aligned by default
 		return WorldRotation.Inverse * LeashRotation;
 	}
 
 	private BBox GetLeashBounds()
 	{
-		// Anchored to bottom (Z scales up), X and Y centered
 		return new BBox( 
 			new Vector3( -BoxSize.x * 0.5f, -BoxSize.y * 0.5f, 0 ), 
 			new Vector3( BoxSize.x * 0.5f, BoxSize.y * 0.5f, BoxSize.z ) 
 		);
 	}
-
-	// --- COMPONENT LIFECYCLE ---
 
 	protected override void OnStart()
 	{
@@ -57,7 +52,6 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		_rb = Components.Get<Rigidbody>();
 		_timer = WaitBeforeRewind;
 
-		// If no leash is set, default it to our starting position
 		if ( !LeashObject.IsValid() && LeashPosition == Vector3.Zero )
 		{
 			LeashPosition = WorldPosition;
@@ -79,7 +73,6 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 			return;
 		}
 
-		// Calculate local-space check for the rotated leash
 		Vector3 relativePos = WorldPosition - GetEffectiveLeashPos();
 		Vector3 localPos = GetEffectiveLeashRot().Inverse * relativePos;
 		BBox localCheck = GetLeashBounds();
@@ -99,7 +92,6 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 	{
 		if ( _isAwake || _isRewinding ) return;
 
-		// Wake up when touched
 		_isAwake = true;
 		if ( _rb.IsValid() )
 		{
@@ -107,16 +99,12 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		}
 	}
 
-	// --- REWIND CORE ---
-
 	private void StartRecall()
 	{
 		_isRewinding = true;
 		_rewindStartedTime = Time.Now;
 
 		GameObject.Tags.Add( "rewinding" );
-		
-		// Reset solid tag to force collision update if needed
 		GameObject.Tags.Remove( "solid" );
 		GameObject.Tags.Add( "solid" );
 
@@ -142,13 +130,7 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		if ( dist > 5.0f )
 		{
 			Vector3 dir = (_originTransform.Position - WorldPosition).Normal;
-			float pullSpeed = 250.0f; 
-			
-			if ( _rb.IsValid() )
-			{
-				_rb.Velocity = dir * pullSpeed;
-			}
-			
+			if ( _rb.IsValid() ) _rb.Velocity = dir * 250.0f;
 			WorldRotation = Rotation.Lerp( WorldRotation, _originTransform.Rotation, Time.Delta * 5.0f );
 		}
 		else
@@ -170,7 +152,6 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		_isRewinding = false;
 		_isAwake = false;
 		_timer = WaitBeforeRewind;
-
 		GameObject.Tags.Remove( "rewinding" );
 
 		if ( _rb.IsValid() )
@@ -180,8 +161,6 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 			_rb.PhysicsBody.GravityEnabled = false;
 		}
 	}
-
-	// --- EDITOR VISUALS ---
 
 	protected override void DrawGizmos()
 	{
@@ -193,10 +172,8 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		using ( Gizmo.Scope( "leash_volume", new Transform( center, rot ) ) )
 		{
 			BBox localBounds = GetLeashBounds();
-			
 			Gizmo.Draw.Color = _isAwake ? Color.Orange : Color.Cyan.WithAlpha( 0.2f );
 			Gizmo.Draw.SolidBox( localBounds );
-			
 			Gizmo.Draw.Color = _isAwake ? Color.Orange : Color.Cyan;
 			Gizmo.Draw.LineBBox( localBounds );
 		}
