@@ -1,5 +1,6 @@
 using Sandbox;
 using System;
+using System.Linq;
 
 namespace Sandbox;
 
@@ -9,12 +10,17 @@ namespace Sandbox;
 public sealed class RecallRewind : Component, Component.ICollisionListener
 {
 	[Property, Group( "Timings" )] public float WaitBeforeRewind { get; set; } = 5.0f;
-	[Property, Group( "Timings" )] public float RewindFlightTime { get; set; } = 2.0f;
 	[Property, Group( "Timings" )] public float MaxRewindDuration { get; set; } = 3.5f;
 
-	[Property, Group( "Leash" )] public Vector3 LeashPosition { get; set; }
+	[Property, Group( "Leash" )] public GameObject LeashObject { get; set; }
+
+	[Property, Group( "Leash" ), ShowIf( nameof( LeashObject ), null )] 
+	public Vector3 LeashPosition { get; set; }
+	
+	[Property, Group( "Leash" ), ShowIf( nameof( LeashObject ), null )] 
+	public Rotation LeashRotation { get; set; } = Rotation.Identity;
+	
 	[Property, Group( "Leash" )] public Vector3 BoxSize { get; set; } = new Vector3( 200, 200, 200 );
-	[Property, Group( "Leash" )] public bool UseObjectStartAsLeashCenter { get; set; } = true;
 
 	private Transform _originTransform;
 	private Rigidbody _rb;
@@ -23,13 +29,36 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 	private bool _isAwake;
 	private float _rewindStartedTime;
 
+	// --- LOGIC HELPERS ---
+
+	private Vector3 GetEffectiveLeashPos() => LeashObject.IsValid() ? LeashObject.WorldPosition : LeashPosition;
+
+	private Rotation GetEffectiveLeashRot()
+	{
+		if ( LeashObject.IsValid() ) return LeashObject.WorldRotation;
+		// Neutralize object rotation to keep manual leash world-aligned by default
+		return WorldRotation.Inverse * LeashRotation;
+	}
+
+	private BBox GetLeashBounds()
+	{
+		// Anchored to bottom (Z scales up), X and Y centered
+		return new BBox( 
+			new Vector3( -BoxSize.x * 0.5f, -BoxSize.y * 0.5f, 0 ), 
+			new Vector3( BoxSize.x * 0.5f, BoxSize.y * 0.5f, BoxSize.z ) 
+		);
+	}
+
+	// --- COMPONENT LIFECYCLE ---
+
 	protected override void OnStart()
 	{
 		_originTransform = WorldTransform;
 		_rb = Components.Get<Rigidbody>();
 		_timer = WaitBeforeRewind;
 
-		if ( UseObjectStartAsLeashCenter && LeashPosition == Vector3.Zero )
+		// If no leash is set, default it to our starting position
+		if ( !LeashObject.IsValid() && LeashPosition == Vector3.Zero )
 		{
 			LeashPosition = WorldPosition;
 		}
@@ -50,8 +79,12 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 			return;
 		}
 
-		var leashBounds = BBox.FromPositionAndSize( LeashPosition, BoxSize );
-		if ( !leashBounds.Contains( WorldPosition ) )
+		// Calculate local-space check for the rotated leash
+		Vector3 relativePos = WorldPosition - GetEffectiveLeashPos();
+		Vector3 localPos = GetEffectiveLeashRot().Inverse * relativePos;
+		BBox localCheck = GetLeashBounds();
+
+		if ( !localCheck.Contains( localPos ) )
 		{
 			_timer -= Time.Delta;
 			if ( _timer <= 0 ) StartRecall();
@@ -74,17 +107,18 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		}
 	}
 
+	// --- REWIND CORE ---
+
 	private void StartRecall()
 	{
 		_isRewinding = true;
 		_rewindStartedTime = Time.Now;
 
-		// This is the tag you created in Project Settings
 		GameObject.Tags.Add( "rewinding" );
-		// We remove 'solid' briefly to reset interactions, 
-		// but the physics engine handles the actual wall-blocking via the Tag Matrix
-		GameObject.Tags.Remove( "solid" ); 
-		GameObject.Tags.Add( "solid" ); 
+		
+		// Reset solid tag to force collision update if needed
+		GameObject.Tags.Remove( "solid" );
+		GameObject.Tags.Add( "solid" );
 
 		if ( _rb.IsValid() )
 		{
@@ -97,7 +131,6 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 	{
 		float elapsed = Time.Now - _rewindStartedTime;
 
-		// TELEPORT FALLBACK
 		if ( elapsed >= MaxRewindDuration )
 		{
 			FinishRewind( true );
@@ -108,12 +141,14 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 
 		if ( dist > 5.0f )
 		{
-			// PHYSICALLY PULL HOME
-			// Using velocity makes the object stop at walls naturally
 			Vector3 dir = (_originTransform.Position - WorldPosition).Normal;
 			float pullSpeed = 250.0f; 
 			
-			_rb.Velocity = dir * pullSpeed;
+			if ( _rb.IsValid() )
+			{
+				_rb.Velocity = dir * pullSpeed;
+			}
+			
 			WorldRotation = Rotation.Lerp( WorldRotation, _originTransform.Rotation, Time.Delta * 5.0f );
 		}
 		else
@@ -124,7 +159,6 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 
 	private void FinishRecallSuccess()
 	{
-		// Snap to exact original spot for perfection
 		WorldTransform = _originTransform;
 		FinishRewind( false );
 	}
@@ -147,12 +181,27 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		}
 	}
 
+	// --- EDITOR VISUALS ---
+
 	protected override void DrawGizmos()
 	{
 		if ( !Gizmo.IsSelected ) return;
-		var bounds = BBox.FromPositionAndSize( LeashPosition, BoxSize );
-		Gizmo.Draw.Color = _isAwake ? Color.Orange : Color.Cyan.WithAlpha( 0.2f );
-		Gizmo.Draw.SolidBox( bounds );
-		Gizmo.Draw.LineBBox( bounds );
+
+		Vector3 center = GetEffectiveLeashPos();
+		Rotation rot = GetEffectiveLeashRot();
+
+		using ( Gizmo.Scope( "leash_volume", new Transform( center, rot ) ) )
+		{
+			BBox localBounds = GetLeashBounds();
+			
+			Gizmo.Draw.Color = _isAwake ? Color.Orange : Color.Cyan.WithAlpha( 0.2f );
+			Gizmo.Draw.SolidBox( localBounds );
+			
+			Gizmo.Draw.Color = _isAwake ? Color.Orange : Color.Cyan;
+			Gizmo.Draw.LineBBox( localBounds );
+		}
+
+		Gizmo.Draw.Color = Color.White.WithAlpha( 0.3f );
+		Gizmo.Draw.Line( center, WorldPosition );
 	}
 }
