@@ -675,14 +675,17 @@
                 },
                 {
                   "__type": "Sandbox.RecallRewind",
-                  "__guid": "f2fb42f0-c152-48d6-9f01-dd89c8752a98",
+                  "__guid": "321f2e39-cd51-482f-a85b-d6117067b4a8",
                   "__enabled": true,
                   "Flags": 0,
-                  "BoxSize": "100,100.200005,107.090027",
-                  "LeashObject": null,
-                  "LeashPosition": "-15.7099266,-29.1699257,-25.7601528",
-                  "LeashRotation": "0,0,0,1",
-                  "MaxRewindDuration": 3,
+                  "Area": {
+                    "_type": "component",
+                    "component_id": "9d01a165-2d69-472c-a58b-f4336b34ebab",
+                    "go": "d2cda751-1714-4924-930e-ecadc7005c04",
+                    "component_type": "RecallArea"
+                  },
+                  "GhostRadius": 50,
+                  "MaxRewindDuration": 3.5,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
@@ -698,7 +701,7 @@
                   "__version": 2,
                   "Flags": 0,
                   "Name": "trashcan02doorgib_lod01",
-                  "Position": "25.6199341,3.81643677,-7.59840393",
+                  "Position": "28.6433163,2.8347168,-7.59840393",
                   "Rotation": "0,0,0.382683456,0.923879564",
                   "Scale": "1,1,1",
                   "Tags": "",
@@ -912,14 +915,17 @@
                 },
                 {
                   "__type": "Sandbox.RecallRewind",
-                  "__guid": "fb9b1f06-20cc-4de2-839d-c43986aeb191",
+                  "__guid": "d51c8d1c-6b07-4a0b-a7e8-5c3eda70c3d3",
                   "__enabled": true,
                   "Flags": 0,
-                  "BoxSize": "200,200,200",
-                  "LeashObject": null,
-                  "LeashPosition": "0,0,0",
-                  "LeashRotation": "0,0,0,1",
-                  "MaxRewindDuration": 3,
+                  "Area": {
+                    "_type": "component",
+                    "component_id": "9d01a165-2d69-472c-a58b-f4336b34ebab",
+                    "go": "d2cda751-1714-4924-930e-ecadc7005c04",
+                    "component_type": "RecallArea"
+                  },
+                  "GhostRadius": 50,
+                  "MaxRewindDuration": 3.5,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
@@ -938,7 +944,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "arrow",
-          "Position": "58.5918121,-161.445663,19.5213318",
+          "Position": "55.8401794,-142.482651,19.5214539",
           "Rotation": "0.35355401,-0.612373471,0.353552848,0.612371743",
           "Scale": "1,1,1",
           "Tags": "",
@@ -1058,14 +1064,17 @@
             },
             {
               "__type": "Sandbox.RecallRewind",
-              "__guid": "b831dee9-94de-47ce-b94e-d7c084e6427a",
+              "__guid": "09e77ec1-6fbb-4f5b-9f9e-e6ae4f8d381b",
               "__enabled": true,
               "Flags": 0,
-              "BoxSize": "100,100,100",
-              "LeashObject": null,
-              "LeashPosition": "-45.7398949,0,29.6200371",
-              "LeashRotation": "0,0,0,1",
-              "MaxRewindDuration": 3,
+              "Area": {
+                "_type": "component",
+                "component_id": "9d01a165-2d69-472c-a58b-f4336b34ebab",
+                "go": "d2cda751-1714-4924-930e-ecadc7005c04",
+                "component_type": "RecallArea"
+              },
+              "GhostRadius": 50,
+              "MaxRewindDuration": 3.5,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1078,6 +1087,38 @@
           "Children": []
         }
       ]
+    },
+    {
+      "__guid": "d2cda751-1714-4924-930e-ecadc7005c04",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Alley_RecallArea",
+      "Position": "95.4477463,-336.815216,210.027908",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.RecallArea",
+          "__guid": "9d01a165-2d69-472c-a58b-f4336b34ebab",
+          "__enabled": true,
+          "Flags": 0,
+          "BoxSize": "178.279816,100,100",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {

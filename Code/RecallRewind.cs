@@ -1,5 +1,6 @@
 using Sandbox;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sandbox;
@@ -12,54 +13,69 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 	[Property, Group( "Timings" )] public float WaitBeforeRewind { get; set; } = 5.0f;
 	[Property, Group( "Timings" )] public float MaxRewindDuration { get; set; } = 3.5f;
 
-	[Property, Group( "Leash" )] public GameObject LeashObject { get; set; }
+	[Property, Group( "Setup" )] public RecallArea Area { get; set; }
+	[Property, Group( "Setup" )] public float GhostRadius { get; set; } = 50.0f;
 
-	[Property, Group( "Leash" ), ShowIf( nameof( LeashObject ), null )] 
-	public Vector3 LeashPosition { get; set; }
-	
-	[Property, Group( "Leash" ), ShowIf( nameof( LeashObject ), null )] 
-	public Rotation LeashRotation { get; set; } = Rotation.Identity;
-	
-	[Property, Group( "Leash" )]
-	public Vector3 BoxSize { get; set; } = 100f;
+	private struct TransformSnapshot
+	{
+		public GameObject Obj;
+		public Vector3 LocalPosition;
+		public Rotation LocalRotation;
+		public Rigidbody Rb;
+		public Collider Col;
+	}
 
-	private Transform _originTransform;
-	private Rigidbody _rb;
+	private List<TransformSnapshot> _snapshots = new();
+	private Rigidbody _mainRb;
 	private float _timer;
 	private bool _isRewinding;
 	private bool _isAwake;
 	private float _rewindStartedTime;
-
-	private Vector3 GetEffectiveLeashPos() => LeashObject.IsValid() ? LeashObject.WorldPosition : LeashPosition;
-
-	private Rotation GetEffectiveLeashRot()
-	{
-		if ( LeashObject.IsValid() ) return LeashObject.WorldRotation;
-		return WorldRotation.Inverse * LeashRotation;
-	}
-
-	private BBox GetLeashBounds()
-	{
-		return new BBox( 
-			new Vector3( -BoxSize.x * 0.5f, -BoxSize.y * 0.5f, 0 ), 
-			new Vector3( BoxSize.x * 0.5f, BoxSize.y * 0.5f, BoxSize.z ) 
-		);
-	}
+	private Vector3 _worldOriginPos;
+	private Rotation _worldOriginRot;
 
 	protected override void OnStart()
 	{
-		_originTransform = WorldTransform;
-		_rb = Components.Get<Rigidbody>();
+		_mainRb = Components.Get<Rigidbody>();
 		_timer = WaitBeforeRewind;
 
-		if ( !LeashObject.IsValid() && LeashPosition == Vector3.Zero )
-		{
-			LeashPosition = WorldPosition;
-		}
+		_worldOriginPos = WorldPosition;
+		_worldOriginRot = WorldRotation;
 
-		if ( _rb.IsValid() )
+		RecordHierarchy();
+		
+		// Apply the family tag immediately so they never hit each other
+		ApplyFamilyTags();
+		
+		// Start frozen
+		SetPhysicsState( false );
+	}
+
+	private void RecordHierarchy()
+	{
+		_snapshots.Clear();
+		var descendants = GameObject.GetAllObjects( true );
+		foreach ( var obj in descendants )
 		{
-			_rb.PhysicsBody.GravityEnabled = false;
+			_snapshots.Add( new TransformSnapshot
+			{
+				Obj = obj,
+				LocalPosition = obj.LocalPosition,
+				LocalRotation = obj.LocalRotation,
+				Rb = obj.Components.Get<Rigidbody>(),
+				Col = obj.Components.Get<Collider>()
+			} );
+		}
+	}
+
+	private void ApplyFamilyTags()
+	{
+		foreach ( var s in _snapshots )
+		{
+			if ( !s.Obj.IsValid() ) continue;
+			// By adding this tag to everyone, and setting the project to ignore 
+			// recall_family vs recall_family, they will never collide with each other.
+			s.Obj.Tags.Add( "recall_family" );
 		}
 	}
 
@@ -73,11 +89,9 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 			return;
 		}
 
-		Vector3 relativePos = WorldPosition - GetEffectiveLeashPos();
-		Vector3 localPos = GetEffectiveLeashRot().Inverse * relativePos;
-		BBox localCheck = GetLeashBounds();
+		if ( !Area.IsValid() ) return;
 
-		if ( !localCheck.Contains( localPos ) )
+		if ( !Area.GetWorldBounds().Contains( WorldPosition ) )
 		{
 			_timer -= Time.Delta;
 			if ( _timer <= 0 ) StartRecall();
@@ -93,99 +107,92 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		if ( _isAwake || _isRewinding ) return;
 
 		_isAwake = true;
-		if ( _rb.IsValid() )
-		{
-			_rb.PhysicsBody.GravityEnabled = true;
-		}
+		SetPhysicsState( true );
 	}
 
 	private void StartRecall()
 	{
 		_isRewinding = true;
 		_rewindStartedTime = Time.Now;
-
-		GameObject.Tags.Add( "rewinding" );
-		GameObject.Tags.Remove( "solid" );
-		GameObject.Tags.Add( "solid" );
-
-		if ( _rb.IsValid() )
-		{
-			_rb.PhysicsBody.GravityEnabled = false;
-			_rb.PhysicsBody.AutoSleep = false;
-		}
+		SetPhysicsState( false );
 	}
 
 	private void ProcessRewind()
 	{
 		float elapsed = Time.Now - _rewindStartedTime;
+		float t = elapsed / MaxRewindDuration;
+		float distToHome = WorldPosition.Distance( _worldOriginPos );
 
-		if ( elapsed >= MaxRewindDuration )
+		if ( t >= 1.0f || distToHome < 1.0f )
 		{
-			FinishRewind( true );
+			FinishRewind();
 			return;
 		}
 
-		float dist = WorldPosition.Distance( _originTransform.Position );
+		// FEATHERED AREA LOGIC:
+		// If we are within the GhostRadius of our home, disable colliders 
+		// so we don't bounce off the floor or nearby objects while snapping into place.
+		bool shouldBeGhost = distToHome < GhostRadius;
+		UpdateGhostState( shouldBeGhost );
 
-		if ( dist > 5.0f )
+		// Move Root
+		WorldPosition = Vector3.Lerp( WorldPosition, _worldOriginPos, Time.Delta * 5.0f );
+		WorldRotation = Rotation.Lerp( WorldRotation, _worldOriginRot, Time.Delta * 5.0f );
+
+		// Reassemble Children
+		foreach ( var snapshot in _snapshots )
 		{
-			Vector3 dir = (_originTransform.Position - WorldPosition).Normal;
-			if ( _rb.IsValid() ) _rb.Velocity = dir * 250.0f;
-			
-			// We use WorldRotation here; children should follow by parent-child transform rules
-			WorldRotation = Rotation.Lerp( WorldRotation, _originTransform.Rotation, Time.Delta * 5.0f );
-		}
-		else
-		{
-			FinishRecallSuccess();
+			if ( !snapshot.Obj.IsValid() || snapshot.Obj == GameObject ) continue;
+			snapshot.Obj.LocalPosition = Vector3.Lerp( snapshot.Obj.LocalPosition, snapshot.LocalPosition, Time.Delta * 8.0f );
+			snapshot.Obj.LocalRotation = Rotation.Lerp( snapshot.Obj.LocalRotation, snapshot.LocalRotation, Time.Delta * 8.0f );
 		}
 	}
 
-	private void FinishRecallSuccess()
+	private void UpdateGhostState( bool ghost )
 	{
-		FinishRewind( true );
+		foreach ( var s in _snapshots )
+		{
+			if ( s.Col.IsValid() ) s.Col.Enabled = !ghost;
+		}
 	}
 
-	private void FinishRewind( bool teleport )
+	private void FinishRewind()
 	{
-		if ( teleport )
+		WorldPosition = _worldOriginPos;
+		WorldRotation = _worldOriginRot;
+
+		foreach ( var snapshot in _snapshots )
 		{
-			// Teleport the parent; children will follow the parent's new coordinate space
-			WorldTransform = _originTransform;
+			if ( !snapshot.Obj.IsValid() ) continue;
+			snapshot.Obj.LocalPosition = snapshot.LocalPosition;
+			snapshot.Obj.LocalRotation = snapshot.LocalRotation;
 		}
 
 		_isRewinding = false;
 		_isAwake = false;
 		_timer = WaitBeforeRewind;
-		GameObject.Tags.Remove( "rewinding" );
-
-		if ( _rb.IsValid() )
-		{
-			// Resetting physics body forces an update across the hierarchy
-			_rb.PhysicsBody.Velocity = Vector3.Zero;
-			_rb.PhysicsBody.AngularVelocity = Vector3.Zero;
-			_rb.PhysicsBody.ClearForces();
-			_rb.PhysicsBody.GravityEnabled = false;
-		}
+		
+		// Ensure colliders come back on so we can be pushed again
+		UpdateGhostState( false );
+		SetPhysicsState( false );
 	}
 
-	protected override void DrawGizmos()
+	private void SetPhysicsState( bool active )
 	{
-		if ( !Gizmo.IsSelected ) return;
-
-		Vector3 center = GetEffectiveLeashPos();
-		Rotation rot = GetEffectiveLeashRot();
-
-		using ( Gizmo.Scope( "leash_volume", new Transform( center, rot ) ) )
+		foreach ( var snapshot in _snapshots )
 		{
-			BBox localBounds = GetLeashBounds();
-			Gizmo.Draw.Color = _isAwake ? Color.Orange : Color.Cyan.WithAlpha( 0.2f );
-			Gizmo.Draw.SolidBox( localBounds );
-			Gizmo.Draw.Color = _isAwake ? Color.Orange : Color.Cyan;
-			Gizmo.Draw.LineBBox( localBounds );
+			if ( !snapshot.Rb.IsValid() ) continue;
+			
+			snapshot.Rb.MotionEnabled = active;
+			snapshot.Rb.PhysicsBody.GravityEnabled = active;
+			
+			if ( !active )
+			{
+				snapshot.Rb.Velocity = Vector3.Zero;
+				snapshot.Rb.AngularVelocity = Vector3.Zero;
+				snapshot.Rb.PhysicsBody.ClearForces();
+			}
 		}
-
-		Gizmo.Draw.Color = Color.White.WithAlpha( 0.3f );
-		Gizmo.Draw.Line( center, WorldPosition );
 	}
+	
 }
