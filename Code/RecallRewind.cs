@@ -131,6 +131,8 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 		{
 			Vector3 dir = (_originTransform.Position - WorldPosition).Normal;
 			if ( _rb.IsValid() ) _rb.Velocity = dir * 250.0f;
+			
+			// We use WorldRotation here; children should follow by parent-child transform rules
 			WorldRotation = Rotation.Lerp( WorldRotation, _originTransform.Rotation, Time.Delta * 5.0f );
 		}
 		else
@@ -141,13 +143,16 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 
 	private void FinishRecallSuccess()
 	{
-		WorldTransform = _originTransform;
-		FinishRewind( false );
+		FinishRewind( true );
 	}
 
 	private void FinishRewind( bool teleport )
 	{
-		if ( teleport ) WorldTransform = _originTransform;
+		if ( teleport )
+		{
+			// Teleport the parent; children will follow the parent's new coordinate space
+			WorldTransform = _originTransform;
+		}
 
 		_isRewinding = false;
 		_isAwake = false;
@@ -156,8 +161,10 @@ public sealed class RecallRewind : Component, Component.ICollisionListener
 
 		if ( _rb.IsValid() )
 		{
-			_rb.Velocity = Vector3.Zero;
-			_rb.AngularVelocity = Vector3.Zero;
+			// Resetting physics body forces an update across the hierarchy
+			_rb.PhysicsBody.Velocity = Vector3.Zero;
+			_rb.PhysicsBody.AngularVelocity = Vector3.Zero;
+			_rb.PhysicsBody.ClearForces();
 			_rb.PhysicsBody.GravityEnabled = false;
 		}
 	}
