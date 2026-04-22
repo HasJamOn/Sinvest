@@ -2536,12 +2536,12 @@
                   "__enabled": true,
                   "Flags": 0,
                   "AnimationGraph": null,
-                  "BodyGroups": 69,
+                  "BodyGroups": 341,
                   "BoneMergeTarget": null,
                   "CreateAttachments": false,
                   "CreateBoneObjects": true,
                   "LodOverride": null,
-                  "MaterialGroup": "default",
+                  "MaterialGroup": null,
                   "MaterialOverride": null,
                   "Materials": {
                     "indexed": {
@@ -4431,7 +4431,7 @@
                   ]
                 },
                 {
-                  "__guid": "1f9d58b7-7cd4-41d0-bd3d-d825de5ba080",
+                  "__guid": "9e965d42-8fdd-4ceb-ae4c-8379c3e22000",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4448,7 +4448,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "2ed23d40-5065-4bb9-b1f0-6a62b2cf7130",
+                      "__guid": "8d1f0b5a-3460-4f41-8795-53a0138668f4",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -4500,7 +4500,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "cd27bab6-9a01-456c-999e-55dee86217fb",
+                  "__guid": "49404818-266c-4d6d-b341-c2a5f8daed64",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -4517,7 +4517,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "e8ccf3fc-d88a-4a29-a779-d5e79be3f94d",
+                      "__guid": "9a2befb9-2b78-4770-9caa-1c70971f788a",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -4569,7 +4569,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "e947a5d1-2326-4085-b857-162115dd0179",
+                  "__guid": "e98f84d6-33bf-45fc-8214-5e53ab7aa9c5",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -4586,7 +4586,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "6647150d-95d9-430b-9ea4-d1cab48a28a1",
+                      "__guid": "15689db9-3041-4cb2-9e97-e7e54388245c",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -4638,7 +4638,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "6c034104-a41e-4cf8-a629-69886ed113ca",
+                  "__guid": "4d4f3bf5-62e9-4341-bd2b-e6d71f5d3e04",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -4655,7 +4655,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "0d1a2638-1770-400a-b83b-3958c5807c1c",
+                      "__guid": "733eae8b-1b3f-4208-aa39-39068e805fde",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -4999,6 +4999,31 @@
                   "OnComponentStart": null,
                   "OnComponentUpdate": null,
                   "WaitBeforeRewind": 5
+                },
+                {
+                  "__type": "Sandbox.ModelCollider",
+                  "__guid": "20e5b9c4-bfbf-43e7-bbbb-7a63359fbaa2",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "ColliderFlags": 0,
+                  "Elasticity": null,
+                  "Friction": null,
+                  "IsTrigger": false,
+                  "Model": "models/props/trim_sheets/desk/wooden_desk/wooden_desk_02.vmdl",
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "OnObjectTriggerEnter": null,
+                  "OnObjectTriggerExit": null,
+                  "OnTriggerEnter": null,
+                  "OnTriggerExit": null,
+                  "RollingResistance": null,
+                  "Static": false,
+                  "Surface": null,
+                  "SurfaceVelocity": "0,0,0"
                 }
               ],
               "Children": []
@@ -5038,132 +5063,6 @@
           "Children": []
         }
       ]
-    },
-    {
-      "__guid": "2ab34167-0940-445d-aaec-0a59905255ee",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "wooden_door_frame_single_01b",
-      "Position": "331.449158,-128.683533,0",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sandbox.Prop",
-          "__guid": "079a5df0-5200-41f4-b54a-89c7c27beed0",
-          "__enabled": true,
-          "Flags": 0,
-          "BodyGroups": 18446744073709551615,
-          "Health": 0,
-          "IsStatic": false,
-          "MaterialGroup": null,
-          "Model": "models/props/trim_sheets/doors/wooden_door_frame/wooden_door_frame_single_01b.vmdl",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OnPropBreak": null,
-          "OnPropTakeDamage": null,
-          "StartAsleep": false,
-          "Tint": "1,1,1,1"
-        },
-        {
-          "__type": "Sandbox.ModelRenderer",
-          "__guid": "8a96ba41-7df2-4cbd-8e41-cbe124eee649",
-          "__enabled": true,
-          "Flags": 0,
-          "BodyGroups": 18446744073709551615,
-          "CreateAttachments": false,
-          "LodOverride": null,
-          "MaterialGroup": null,
-          "MaterialOverride": null,
-          "Materials": null,
-          "Model": "models/props/trim_sheets/doors/wooden_door_frame/wooden_door_frame_single_01b.vmdl",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "RenderOptions": {
-            "GameLayer": true,
-            "OverlayLayer": false,
-            "BloomLayer": false,
-            "AfterUILayer": false
-          },
-          "RenderType": "On",
-          "Tint": "1,1,1,1"
-        },
-        {
-          "__type": "Sandbox.ModelCollider",
-          "__guid": "b1a88e65-d10c-4033-ae2c-e9d33370b099",
-          "__enabled": true,
-          "Flags": 0,
-          "ColliderFlags": 0,
-          "Elasticity": null,
-          "Friction": null,
-          "IsTrigger": false,
-          "Model": "models/props/trim_sheets/doors/wooden_door_frame/wooden_door_frame_single_01b.vmdl",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OnObjectTriggerEnter": null,
-          "OnObjectTriggerExit": null,
-          "OnTriggerEnter": null,
-          "OnTriggerExit": null,
-          "RollingResistance": null,
-          "Static": false,
-          "Surface": null,
-          "SurfaceVelocity": "0,0,0"
-        },
-        {
-          "__type": "Sandbox.Rigidbody",
-          "__guid": "7b7faa58-7b5e-42ae-a9f7-af12890c29a4",
-          "__enabled": true,
-          "Flags": 0,
-          "AngularDamping": 0,
-          "EnableImpactDamage": true,
-          "EnhancedCcd": false,
-          "Gravity": true,
-          "GravityScale": 1,
-          "ImpactDamage": 0,
-          "LinearDamping": 0,
-          "Locking": {
-            "X": false,
-            "Y": false,
-            "Z": false,
-            "Pitch": false,
-            "Yaw": false,
-            "Roll": false
-          },
-          "MassCenterOverride": "0,0,0",
-          "MassOverride": 0,
-          "MinImpactDamageSpeed": 500,
-          "MotionEnabled": true,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OverrideMassCenter": false,
-          "RigidbodyFlags": 0,
-          "StartAsleep": false
-        }
-      ],
-      "Children": []
     }
   ],
   "SceneProperties": {
@@ -5188,6 +5087,11 @@
     "GameObjectSystems": {
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
+      },
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "09635b83-6455-41b6-b533-e91faeb11caf"
+        }
       }
     }
   },
@@ -5207,7 +5111,6 @@
     "facepunch.trash_pile_c_05#37530",
     "facepunch.trash_pile_c_cigs_01#37375",
     "facepunch.wooden_desk_02#143440",
-    "facepunch.wooden_door_frame_single_01b#107474",
     "fpopium.vent_c#184572"
   ],
   "__version": 3
