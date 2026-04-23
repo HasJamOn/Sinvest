@@ -10139,37 +10139,6 @@
         }
       ],
       "Children": []
-    },
-    {
-      "__guid": "a47a6509-92b3-461c-9975-8816106f2405",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "debugger",
-      "Position": "-47.3488007,38.0943909,18.4085846",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "SitChairDebugger",
-          "__guid": "ee3594a0-3bb8-4bda-8bb3-ff379d0dadad",
-          "__enabled": true,
-          "Flags": 0,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null
-        }
-      ],
-      "Children": []
     }
   ],
   "SceneProperties": {
