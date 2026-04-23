@@ -1,22 +1,18 @@
 // ─────────────────────────────────────────────────────────
-// Design Tokens
+// Design Tokens (Classic GTK + Original Accents)
 // ─────────────────────────────────────────────────────────
 
-$hud-bg:            rgba(0, 0, 0, 0.6);
-$panel-bg:          rgba(20, 22, 28, 0.98);
-$panel-border:      rgba(255, 255, 255, 0.15);
+$gtk-bg:            #d4d0c8;
+$gtk-highlight:     #ffffff;
+$gtk-shadow:        #808080;
+$gtk-dark-shadow:   #404040;
+$gtk-blue:          #000080;
+$gtk-text:          #000000;
 
 $accent-money:      #4caf50;
 $accent-shares:     #00ff88;
 
-$btn-primary:       #0044aa;
-$btn-hover:         #0066ff;
-$btn-active:        #ff0000;
-$btn-danger:        #ff4444;
-$btn-danger-border: #ff8888;
-
-$stat-radius:       6px;
-$menu-radius:       16px;
+$stat-radius:       0px;
 $menu-padding:      40px;
 $menu-gap:          32px;
 
@@ -32,24 +28,48 @@ $btn-min-height:    48px;
 // Mixins
 // ─────────────────────────────────────────────────────────
 
-@mixin btn-base {
+@mixin bevel-out {
+  background-color: $gtk-bg;
+  border-top: 2px solid $gtk-highlight;
+  border-left: 2px solid $gtk-highlight;
+  border-right: 2px solid $gtk-dark-shadow;
+  border-bottom: 2px solid $gtk-dark-shadow;
+  outline: 1px solid $gtk-shadow;
+}
+
+@mixin bevel-in {
+  background-color: #ffffff;
+  border-top: 2px solid $gtk-shadow;
+  border-left: 2px solid $gtk-shadow;
+  border-right: 2px solid $gtk-highlight;
+  border-bottom: 2px solid $gtk-highlight;
+}
+
+@mixin btn-gtk-base {
   min-height: $btn-min-height;
   min-width: $btn-min-width;
   padding: 12px 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: $stat-radius;
+  font-family: "MS Sans Serif", Arial, sans-serif;
   font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
-  color: white;
+  color: $gtk-text;
   cursor: pointer;
   pointer-events: all;
-  transition: all 0.1s ease-out;
+  @include bevel-out;
+  transition: transform 0.1s ease-out;
 
   &:hover  { transform: scale(1.03); }
-  &:active { background-color: $btn-active; transform: scale(0.96); }
+  &:active {
+    border-top: 2px solid $gtk-dark-shadow;
+    border-left: 2px solid $gtk-dark-shadow;
+    border-right: 2px solid $gtk-highlight;
+    border-bottom: 2px solid $gtk-highlight;
+    transform: scale(0.96);
+  }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -58,10 +78,7 @@ $btn-min-height:    48px;
 
 ComputerHUD {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,7 +91,7 @@ ComputerHUD {
     pointer-events: none;
   }
 
-  // --- Stat Header (top-right corner) ---
+  // --- Stat Header ---
   .stat-header {
     position: absolute;
     top: 30px;
@@ -85,9 +102,7 @@ ComputerHUD {
     align-items: flex-end;
 
     .stat-box {
-      background-color: $panel-bg;
-      border: 1px solid $panel-border;
-      border-radius: $stat-radius;
+      @include bevel-out;
       padding: 8px 16px;
       display: flex;
       flex-direction: row;
@@ -100,8 +115,8 @@ ComputerHUD {
       .stat-icon {
         width: 32px;
         height: 32px;
-        object-fit: contain;
         margin-right: 12px;
+        image-rendering: pixelated;
       }
 
       .label {
@@ -110,20 +125,22 @@ ComputerHUD {
         font-weight: 900;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.9);
+        color: $gtk-text;
       }
 
       .value {
+        @include bevel-in;
         font-family: "Roboto Mono", "Courier New", monospace;
         font-size: 24px;
         font-weight: 800;
-        color: #ffffff;
+        color: #000;
+        padding: 4px 8px;
         text-align: right;
       }
     }
   }
 
-  // --- HUD Content (centered area) ---
+  // --- HUD Content ---
   .hud-content {
     display: flex;
     flex-direction: column;
@@ -137,23 +154,21 @@ ComputerHUD {
       pointer-events: all;
     }
 
-    // --- App Grid ---
     .menu {
+      @include bevel-out;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
       gap: $menu-gap;
       padding: $menu-padding;
-      background-color: $hud-bg;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: $menu-radius;
-      backdrop-filter: blur(12px);
+      background-color: $gtk-bg;
       pointer-events: all;
+      box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.4);
     }
   }
 
-  // --- App Icons ---
+  // --- App Icons (With Original Glow Effects) ---
   .app-icon {
     display: flex;
     flex-direction: column;
@@ -170,44 +185,51 @@ ComputerHUD {
       height: $icon-size;
       object-fit: contain;
       margin-bottom: 10px;
-      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+      filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.5));
       transition: filter 0.2s ease;
+      image-rendering: pixelated;
     }
 
     label {
       font-size: 15px;
       font-weight: 600;
-      color: white;
+      color: $gtk-text;
       text-align: center;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
       pointer-events: none;
     }
 
     &:hover {
       transform: scale(1.1);
+      // Original Blue Glow
       img { filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 102, 255, 0.8)); }
+      label { background-color: $gtk-blue; color: white; }
     }
 
-    &.sincash:hover img {
-      filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 68, 68, 0.8));
+    &.sincash:hover {
+      // Original Red Glow
+      img { filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 68, 68, 0.8)); }
+      label { background-color: #ff4444; color: white; }
     }
   }
 
   // --- Buttons ---
   .menu-button {
-    @include btn-base;
-    background-color: $btn-primary;
-    &:hover { background-color: $btn-hover; }
+    @include btn-gtk-base;
+    background-color: #0044aa;
+    color: white;
+
+    &:hover { background-color: #0066ff; }
+    &:active { background-color: #ff0000; }
   }
 
   .back-button {
-    @include btn-base;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    @include btn-gtk-base;
+    background-color: $gtk-bg;
 
     &:hover {
-      background-color: $btn-danger;
-      border-color: $btn-danger-border;
+      background-color: #ff4444;
+      color: white;
+      border-color: #ff8888;
     }
   }
 }

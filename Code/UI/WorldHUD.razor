@@ -6,24 +6,27 @@
 @namespace Sandbox
 
 <root class="@(IsVisible ? "visible" : "")">
-    @if ( ActiveObject.IsValid() )
-    {
-        <div class="panel">
-            <div class="header">
-                <i class="icon">@CurrentIcon</i>
-                <div class="name">@CurrentTitle</div>
-            </div>
+	@if ( ActiveObject.IsValid() && !string.IsNullOrEmpty(CurrentTitle) )
+	{
+		<div class="panel">
+			<div class="header">
+				@if ( !string.IsNullOrEmpty(CurrentIcon) )
+				{
+					<i class="icon">@CurrentIcon</i>
+				}
+				<div class="name">@CurrentTitle</div>
+			</div>
 
-            <div class="divider"></div>
+			<div class="divider"></div>
 
-            <div class="actions">
-                <div class="action">
-                    <label class="key">@CurrentKey</label>
-                    <span class="text">@CurrentAction</span>
-                </div>
-            </div>
-        </div>
-    }
+			<div class="actions">
+				<div class="action">
+					<label class="key">@CurrentKey</label>
+					<span class="text">@CurrentAction</span>
+				</div>
+			</div>
+		</div>
+	}
 </root>
 
 @code
