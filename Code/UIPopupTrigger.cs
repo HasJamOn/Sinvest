@@ -12,27 +12,27 @@ public sealed class UIPopupTrigger : Component
     [Property, Feature( "Tooltip" )] public string TooltipDescription { get; set; } = "Open Computer";
     [Property, Feature( "Tooltip" )] public string ToolTipKey { get; set; } = "Enter";
 
-    private GameObject _activeInstance;
+    /// <summary>
+    /// Static reference to the currently open popup instance across the game.
+    /// </summary>
+    public static GameObject ActiveInstance { get; private set; }
 
     protected override void OnUpdate()
     {
-	    if ( Input.Pressed( "sinvestos" ) )
-	    {
-		    // Find the local player
-		    var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
+        if ( Input.Pressed( "sinvestos" ) )
+        {
+           var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
         
-		    if ( player != null )
-		    {
-			    // Search ancestors for the sitting interface
-			    var sittingInterface = player.Components.Get<ISitTarget>( FindMode.EverythingInAncestors );
+           if ( player != null )
+           {
+              var sittingInterface = player.Components.Get<ISitTarget>( FindMode.EverythingInAncestors );
 
-			    // FIX: Use != null instead of .IsValid() for interfaces
-			    if ( sittingInterface != null && IsPlayerLookingAtMe() )
-			    {
-				    TogglePopup();
-			    }
-		    }
-	    }
+              if ( sittingInterface != null && IsPlayerLookingAtMe() )
+              {
+                 TogglePopup();
+              }
+           }
+        }
     }
 
     private bool IsPlayerLookingAtMe()
@@ -47,13 +47,14 @@ public sealed class UIPopupTrigger : Component
 
     private void TogglePopup()
     {
-        if ( PopupPrefab == null || _activeInstance.IsValid() )
+        // Don't open a new one if an instance already exists
+        if ( PopupPrefab == null || ActiveInstance.IsValid() )
             return;
 
-        _activeInstance = PopupPrefab.Clone();
-        _activeInstance.WorldPosition = new Vector3( 5000, 0, 0 );
+        ActiveInstance = PopupPrefab.Clone();
+        ActiveInstance.WorldPosition = new Vector3( 5000, 0, 0 );
 
-        var hud = _activeInstance.Components.Get<ComputerHUD>( true );
+        var hud = ActiveInstance.Components.Get<ComputerHUD>( true );
         if ( hud != null )
         {
             hud.Open();
@@ -62,7 +63,11 @@ public sealed class UIPopupTrigger : Component
 
     protected override void OnDestroy()
     {
-        if ( _activeInstance.IsValid() )
-            _activeInstance.Destroy();
+        // Ensure we clear the static reference if this specific trigger created it
+        if ( ActiveInstance.IsValid() )
+        {
+            ActiveInstance.Destroy();
+            ActiveInstance = null;
+        }
     }
 }

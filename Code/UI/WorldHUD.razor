@@ -6,7 +6,6 @@
 @namespace Sandbox
 
 <root class="@(IsVisible ? "visible" : "")">
-    @* We only render the interior if we actually have data to show *@
     @if ( ActiveObject.IsValid() )
     {
         <div class="panel">
@@ -29,19 +28,21 @@
 
 @code
 {
-    private GameObject _activeObject;
     private BaseChair _foundChair;
     private UIPopupTrigger _foundTrigger;
     private TimeSince _timeSinceLastHit;
 
-    // Helper to track what we are actually looking at
-    GameObject ActiveObject => (_foundChair?.GameObject ?? _foundTrigger?.GameObject);
+    GameObject ActiveObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject;
     
-    bool IsVisible => ActiveObject.IsValid() && _timeSinceLastHit < 0.1f && !(Player?.WantsHideHud ?? false);
+    // Logic update: Tooltips only show if NO computer popup is currently active
+    bool IsVisible => ActiveObject.IsValid() 
+                      && _timeSinceLastHit < 0.1f 
+                      && !(Player?.WantsHideHud ?? false)
+                      && !UIPopupTrigger.ActiveInstance.IsValid();
 
-    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? "";
-    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? "";
-    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? "";
+    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? string.Empty;
+    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? string.Empty;
+    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? string.Empty;
     string CurrentKey => _foundChair != null ? Input.GetButtonOrigin( "use" ).ToUpper() : _foundTrigger?.ToolTipKey?.ToUpper();
 
     protected override void OnUpdate()
@@ -58,20 +59,17 @@
         {
             bool isSitting = controller.Mode is SitMoveMode;
             
-            // Check for components
             var chair = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>() : null;
             var trigger = isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
 
-            if ( chair != null || trigger != null )
+            if ( chair.IsValid() || trigger.IsValid() )
             {
-                // Only update if we found something new or are refreshing the same thing
                 _foundChair = chair;
                 _foundTrigger = trigger;
                 _timeSinceLastHit = 0;
             }
         }
 
-        // If the timer expires, clear the references so BuildHash triggers a "disappear"
         if ( _timeSinceLastHit > 0.15f )
         {
             _foundChair = null;
@@ -85,12 +83,13 @@
 
     protected override int BuildHash() 
     {
-        // This hash is now strictly tied to the GameObject's Identity.
-        // If the ID changes, the UI refreshes. If it's null, it clears.
+        // Adding ActiveInstance to the hash ensures the UI re-renders 
+        // the moment a computer is opened or closed.
         return System.HashCode.Combine( 
             ActiveObject?.Id, 
             IsVisible,
-            CurrentTitle 
+            CurrentTitle,
+            UIPopupTrigger.ActiveInstance.IsValid()
         );
     }
 }

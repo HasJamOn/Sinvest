@@ -1,3 +1,61 @@
+// ─────────────────────────────────────────────────────────
+// Design Tokens
+// ─────────────────────────────────────────────────────────
+
+$hud-bg:            rgba(0, 0, 0, 0.6);
+$panel-bg:          rgba(20, 22, 28, 0.98);
+$panel-border:      rgba(255, 255, 255, 0.15);
+
+$accent-money:      #4caf50;
+$accent-shares:     #00ff88;
+
+$btn-primary:       #0044aa;
+$btn-hover:         #0066ff;
+$btn-active:        #ff0000;
+$btn-danger:        #ff4444;
+$btn-danger-border: #ff8888;
+
+$stat-radius:       6px;
+$menu-radius:       16px;
+$menu-padding:      40px;
+$menu-gap:          32px;
+
+$icon-size:         72px;
+$icon-cell-w:       110px;
+$icon-cell-h:       130px;
+
+$stat-min-width:    260px;
+$btn-min-width:     200px;
+$btn-min-height:    48px;
+
+// ─────────────────────────────────────────────────────────
+// Mixins
+// ─────────────────────────────────────────────────────────
+
+@mixin btn-base {
+  min-height: $btn-min-height;
+  min-width: $btn-min-width;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $stat-radius;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.1s ease-out;
+
+  &:hover  { transform: scale(1.03); }
+  &:active { background-color: $btn-active; transform: scale(0.96); }
+}
+
+// ─────────────────────────────────────────────────────────
+// Root Component
+// ─────────────────────────────────────────────────────────
+
 ComputerHUD {
   position: absolute;
   top: 0;
@@ -6,8 +64,8 @@ ComputerHUD {
   bottom: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
   pointer-events: all;
 
@@ -16,6 +74,7 @@ ComputerHUD {
     pointer-events: none;
   }
 
+  // --- Stat Header (top-right corner) ---
   .stat-header {
     position: absolute;
     top: 30px;
@@ -26,22 +85,17 @@ ComputerHUD {
     align-items: flex-end;
 
     .stat-box {
-      background-color: rgba(20, 22, 28, 0.98);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
+      background-color: $panel-bg;
+      border: 1px solid $panel-border;
+      border-radius: $stat-radius;
       padding: 8px 16px;
       display: flex;
       flex-direction: row;
       align-items: center;
-      min-width: 260px;
+      min-width: $stat-min-width;
 
-      &.money {
-        border-left: 4px solid #4caf50;
-      }
-
-      &.shares {
-        border-left: 4px solid #00ff88;
-      }
+      &.money  { border-left: 4px solid $accent-money; }
+      &.shares { border-left: 4px solid $accent-shares; }
 
       .stat-icon {
         width: 32px;
@@ -51,24 +105,25 @@ ComputerHUD {
       }
 
       .label {
+        flex-grow: 1;
         font-size: 14px;
         font-weight: 900;
-        color: rgba(255, 255, 255, 0.9);
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        flex-grow: 1;
+        color: rgba(255, 255, 255, 0.9);
       }
 
       .value {
         font-family: "Roboto Mono", "Courier New", monospace;
         font-size: 24px;
-        color: #ffffff;
         font-weight: 800;
+        color: #ffffff;
         text-align: right;
       }
     }
   }
 
+  // --- HUD Content (centered area) ---
   .hud-content {
     display: flex;
     flex-direction: column;
@@ -77,58 +132,52 @@ ComputerHUD {
     gap: 20px;
     pointer-events: none;
 
-    /* --- Updated Menu Container --- */
+    & > Panel,
+    .back-button {
+      pointer-events: all;
+    }
+
+    // --- App Grid ---
     .menu {
       display: flex;
-      flex-direction: row;      // Allow icons to sit side-by-side
-      flex-wrap: wrap;         // Wrap to next line if space runs out
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 32px;               // Generous space between apps
-      padding: 40px;
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 16px;
-      backdrop-filter: blur(12px); // Modern "Glass" effect
+      gap: $menu-gap;
+      padding: $menu-padding;
+      background-color: $hud-bg;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      pointer-events: all;
-    }
-
-    & > Panel {
-      order: 1;
-      pointer-events: all;
-    }
-
-    .back-button {
-      order: 2;
+      border-radius: $menu-radius;
+      backdrop-filter: blur(12px);
       pointer-events: all;
     }
   }
 
-  /* --- New App Icon Styling --- */
+  // --- App Icons ---
   .app-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 110px;
-    height: 130px;
+    width: $icon-cell-w;
+    height: $icon-cell-h;
     background: none;
     cursor: pointer;
     transition: transform 0.1s ease;
 
     img {
-      width: 72px;
-      height: 72px;
+      width: $icon-size;
+      height: $icon-size;
       object-fit: contain;
-      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
       margin-bottom: 10px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
       transition: filter 0.2s ease;
     }
 
     label {
-      color: white;
       font-size: 15px;
       font-weight: 600;
+      color: white;
       text-align: center;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
       pointer-events: none;
@@ -136,58 +185,29 @@ ComputerHUD {
 
     &:hover {
       transform: scale(1.1);
-
-      img {
-        // Default Blue Glow
-        filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 102, 255, 0.8));
-      }
+      img { filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 102, 255, 0.8)); }
     }
 
-    // Modifier for Sincash
-    &.sincash:hover {
-      img {
-        // Red Glow
-        filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 68, 68, 0.8));
-      }
+    &.sincash:hover img {
+      filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 68, 68, 0.8));
     }
   }
 
-  /* Standard Menu Buttons (Sincash.ino, Close) */
-  .menu-button, .back-button {
-    min-height: 48px;
-    min-width: 200px;
-    padding: 12px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #0044aa;
-    color: white;
-    border-radius: 6px;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 16px;
-    pointer-events: all;
-    cursor: pointer;
-    transition: all 0.1s ease-out;
-
-    &:hover {
-      background-color: #0066ff;
-      transform: scale(1.03);
-    }
-
-    &:active {
-      background-color: #ff0000;
-      transform: scale(0.96);
-    }
+  // --- Buttons ---
+  .menu-button {
+    @include btn-base;
+    background-color: $btn-primary;
+    &:hover { background-color: $btn-hover; }
   }
 
   .back-button {
+    @include btn-base;
     background-color: rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.2);
 
     &:hover {
-      background-color: #ff4444;
-      border-color: #ff8888;
+      background-color: $btn-danger;
+      border-color: $btn-danger-border;
     }
   }
 }
