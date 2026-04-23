@@ -1,98 +1,96 @@
 @using Sandbox;
 @using Sandbox.UI;
 @using Sandbox.Movement;
+@using System.Linq;
 @inherits PanelComponent
 @namespace Sandbox
 
-@if ( Player.IsValid() && Player.WantsHideHud )
-    return;
+<root class="@(IsVisible ? "visible" : "")">
+    @* We only render the interior if we actually have data to show *@
+    @if ( ActiveObject.IsValid() )
+    {
+        <div class="panel">
+            <div class="header">
+                <i class="icon">@CurrentIcon</i>
+                <div class="name">@CurrentTitle</div>
+            </div>
 
-@if ( !HasAnyAction )
-    return;
+            <div class="divider"></div>
 
-<root>
-    <div class="panel">
-        <div class="header">
-            <i class="icon">@CurrentIcon</i>
-            <div class="name">@CurrentTitle</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="actions">
-            <div class="action">
-                @* Use 'use' bind for chairs, and the custom ToolTipKey for the computer *@
-                <label class="key">@( _foundChair != null ? Input.GetButtonOrigin( "use" ).ToUpper() : _foundTrigger?.ToolTipKey.ToUpper() )</label>
-                <span class="text">@CurrentAction</span>
+            <div class="actions">
+                <div class="action">
+                    <label class="key">@CurrentKey</label>
+                    <span class="text">@CurrentAction</span>
+                </div>
             </div>
         </div>
-    </div>
+    }
 </root>
 
 @code
 {
+    private GameObject _activeObject;
     private BaseChair _foundChair;
     private UIPopupTrigger _foundTrigger;
     private TimeSince _timeSinceLastHit;
 
-    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle;
-    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon;
-    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription;
+    // Helper to track what we are actually looking at
+    GameObject ActiveObject => (_foundChair?.GameObject ?? _foundTrigger?.GameObject);
+    
+    bool IsVisible => ActiveObject.IsValid() && _timeSinceLastHit < 0.1f && !(Player?.WantsHideHud ?? false);
 
-    bool HasAnyAction => (_foundChair != null || _foundTrigger != null) && _timeSinceLastHit < 0.1f;
+    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? "";
+    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? "";
+    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? "";
+    string CurrentKey => _foundChair != null ? Input.GetButtonOrigin( "use" ).ToUpper() : _foundTrigger?.ToolTipKey?.ToUpper();
 
     protected override void OnUpdate()
     {
-        // 1. Find the local controller (using the same logic that worked in the debugger)
         var controller = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
         if ( controller == null ) return;
 
-        // 2. Identify state based on the debugger's success
-        bool isSitting = controller.Mode is SitMoveMode;
-
         var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
-        
-        // Trace logic: We remove "trigger" filter so we can actually hit the Computer's UIPopupTrigger
         var tr = Scene.Trace.Ray( ray, 150f )
                     .WithoutTags( "player" ) 
                     .Run();
-        
-        _foundChair = null;
-        _foundTrigger = null;
 
-        if ( tr.Hit && tr.GameObject != null )
+        if ( tr.Hit && tr.GameObject.IsValid() )
         {
-            if ( isSitting )
-            {
-                // While sitting, only look for the computer trigger
-                _foundTrigger = tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>();
-            }
-            else
-            {
-                // While standing, only look for chairs
-                _foundChair = tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>();
-            }
+            bool isSitting = controller.Mode is SitMoveMode;
+            
+            // Check for components
+            var chair = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>() : null;
+            var trigger = isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
 
-            if ( _foundChair != null || _foundTrigger != null )
+            if ( chair != null || trigger != null )
             {
+                // Only update if we found something new or are refreshing the same thing
+                _foundChair = chair;
+                _foundTrigger = trigger;
                 _timeSinceLastHit = 0;
             }
         }
 
-        SetClass( "visible", HasAnyAction );
+        // If the timer expires, clear the references so BuildHash triggers a "disappear"
+        if ( _timeSinceLastHit > 0.15f )
+        {
+            _foundChair = null;
+            _foundTrigger = null;
+        }
+
+        SetClass( "visible", IsVisible );
     }
 
     Player Player => Player.FindLocalPlayer();
 
     protected override int BuildHash() 
     {
-        var controller = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
+        // This hash is now strictly tied to the GameObject's Identity.
+        // If the ID changes, the UI refreshes. If it's null, it clears.
         return System.HashCode.Combine( 
-            CurrentTitle, 
-            CurrentAction, 
-            _foundTrigger?.ToolTipKey, 
-            Player?.WantsHideHud,
-            (controller?.Mode is SitMoveMode) // Force UI refresh when sitting state changes
+            ActiveObject?.Id, 
+            IsVisible,
+            CurrentTitle 
         );
     }
 }
