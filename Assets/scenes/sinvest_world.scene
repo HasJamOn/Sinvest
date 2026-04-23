@@ -4974,8 +4974,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -4984,6 +5000,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -5126,8 +5150,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -5144,6 +5184,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -5286,8 +5334,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -5304,6 +5368,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -5446,8 +5518,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -5464,6 +5552,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -5606,8 +5702,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -5624,6 +5736,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -5766,8 +5886,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -5784,6 +5920,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -5926,8 +6070,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -5944,6 +6104,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -6086,8 +6254,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -6104,6 +6288,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -6238,8 +6430,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -6256,6 +6464,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -6390,8 +6606,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -6408,6 +6640,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -6542,8 +6782,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -6560,6 +6816,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -6694,8 +6958,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -6712,6 +6992,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -6846,8 +7134,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -6864,6 +7168,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -6998,8 +7310,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -7016,6 +7344,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -7150,8 +7486,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -7168,6 +7520,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -7302,8 +7662,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -7320,6 +7696,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -7462,8 +7846,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -7480,6 +7880,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -7622,8 +8030,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -7640,6 +8064,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -7782,8 +8214,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -7800,6 +8248,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -7942,8 +8398,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -7960,6 +8432,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -8094,8 +8574,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -8112,6 +8608,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -8246,8 +8750,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -8264,6 +8784,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -8398,8 +8926,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -8416,6 +8960,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -8550,8 +9102,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -8568,6 +9136,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -8710,8 +9286,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -8728,6 +9320,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -8870,8 +9470,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -8888,6 +9504,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -9030,8 +9654,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -9048,6 +9688,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -9190,8 +9838,24 @@
                       "Type": "Component",
                       "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
                     },
+                    "Property": "TooltipDescription",
+                    "Value": "Open Computer"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   },
                   {
                     "Target": {
@@ -9208,6 +9872,14 @@
                     },
                     "Property": "ToolTipKey",
                     "Value": "Enter"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "eb3636d1-3244-49a8-b369-62aff19a43c7"
+                    },
+                    "Property": "TooltipTitle",
+                    "Value": "PC Station"
                   }
                 ],
                 "MovedObjects": []
@@ -9456,6 +10128,37 @@
         {
           "__type": "Sandbox.WorldHUD",
           "__guid": "cd52feb8-3c34-404f-8327-3c0033b18312",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "a47a6509-92b3-461c-9975-8816106f2405",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "debugger",
+      "Position": "-47.3488007,38.0943909,18.4085846",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "SitChairDebugger",
+          "__guid": "ee3594a0-3bb8-4bda-8bb3-ff379d0dadad",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
