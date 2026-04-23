@@ -1,0 +1,93 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+@if ( Player.IsValid() && Player.WantsHideHud )
+    return;
+
+@if ( !HasAnyAction )
+    return;
+
+<root>
+    <div class="panel">
+       <div class="header" style="display: flex; align-items: center; gap: 8px;">
+          @if ( !string.IsNullOrEmpty( Info?.TooltipIcon ) )
+          {
+             <i class="icon">@Info.TooltipIcon</i>
+          }
+          <div class="name">@Info?.TooltipTitle</div>
+       </div>
+
+       @if ( !string.IsNullOrEmpty( Info?.TooltipDescription ) )
+       {
+          <div class="description">@Info.TooltipDescription</div>
+       }
+
+       <div class="divider"></div>
+
+       <div class="actions">
+          <div class="action">
+             <label class="key">@Input.GetButtonOrigin( "use" ).ToUpper()</label>
+             <span class="text">Sit Down</span>
+          </div>
+       </div>
+    </div>
+</root>
+
+@code
+{
+    private BaseChair _hoveredChair;
+    private TimeSince _timeSinceLastHit;
+
+    // This logic prevents the HUD from flickering
+    BaseChair CurrentChair
+    {
+       get
+       {
+          if ( Scene?.Camera == null ) return null;
+
+          var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
+          var tr = Scene.Trace.Ray( ray, 200f )
+            .WithoutTags( "player", "trigger" )
+            .Run();
+            
+          if ( tr.Hit && tr.GameObject.IsValid() )
+          {
+             var chair = tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>();
+             if ( chair.IsValid() )
+             {
+                _hoveredChair = chair;
+                _timeSinceLastHit = 0; // Reset the "memory" timer
+                return _hoveredChair;
+             }
+          }
+
+          // If we hit nothing, wait 0.1 seconds before actually hiding the HUD
+          // This smooths out the "flicker" when looking through gaps in the mesh
+          if ( _timeSinceLastHit < 0.1f )
+          {
+             return _hoveredChair;
+          }
+
+          _hoveredChair = null;
+          return null;
+       }
+    }
+
+    Player Player => Player.FindLocalPlayer();
+    BaseChair Info => CurrentChair;
+    bool HasAnyAction => Info is not null;
+
+    protected override void OnUpdate()
+    {
+       SetClass( "visible", CurrentChair is not null );
+    }
+
+    protected override int BuildHash() => System.HashCode.Combine( 
+       Info?.TooltipTitle, 
+       Info?.TooltipDescription, 
+       Info?.TooltipIcon,
+       Player?.WantsHideHud 
+    );
+}
