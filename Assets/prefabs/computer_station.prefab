@@ -780,7 +780,10 @@
                 "PopupPrefab": {
                   "_type": "gameobject",
                   "prefab": "prefabs/computer_screen.prefab"
-                }
+                },
+                "TooltipDescription": "Access the SinvestOS network",
+                "TooltipIcon": "computer",
+                "TooltipTitle": "Terminal"
               }
             ],
             "Children": [
@@ -1454,7 +1457,10 @@
                 "PopupPrefab": {
                   "_type": "gameobject",
                   "prefab": "prefabs/computer_screen.prefab"
-                }
+                },
+                "TooltipDescription": "Open Computer",
+                "TooltipIcon": "computer",
+                "TooltipTitle": "Computer"
               }
             ],
             "Children": [
@@ -1681,7 +1687,7 @@
             },
             "SitHeight": 0,
             "SitPose": "ChairCrossed",
-            "TooltipDescription": "",
+            "TooltipDescription": "Sit Down",
             "TooltipIcon": "airline_seat_recline_normal",
             "TooltipTitle": "Sit",
             "YawRange": "-120,120"
@@ -1996,7 +2002,7 @@
             },
             "SitHeight": 0,
             "SitPose": "Chair",
-            "TooltipDescription": "",
+            "TooltipDescription": "Sit Down",
             "TooltipIcon": "airline_seat_recline_normal",
             "TooltipTitle": "Sit",
             "YawRange": "-120,120"

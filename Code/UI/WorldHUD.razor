@@ -11,25 +11,18 @@
 
 <root>
     <div class="panel">
-       <div class="header" style="display: flex; align-items: center; gap: 8px;">
-          @if ( !string.IsNullOrEmpty( Info?.TooltipIcon ) )
-          {
-             <i class="icon">@Info.TooltipIcon</i>
-          }
-          <div class="name">@Info?.TooltipTitle</div>
+       <div class="header">
+          <i class="icon">@CurrentIcon</i>
+          <div class="name">@CurrentTitle</div>
        </div>
-
-       @if ( !string.IsNullOrEmpty( Info?.TooltipDescription ) )
-       {
-          <div class="description">@Info.TooltipDescription</div>
-       }
 
        <div class="divider"></div>
 
        <div class="actions">
           <div class="action">
-             <label class="key">@Input.GetButtonOrigin( "use" ).ToUpper()</label>
-             <span class="text">Sit Down</span>
+             @* Logic: If chair, get the bound key for "use". If trigger, show the raw string. *@
+             <label class="key">@( _foundChair != null ? Input.GetButtonOrigin( "use" ).ToUpper() : _foundTrigger?.ToolTipKey.ToUpper() )</label>
+             <span class="text">@CurrentAction</span>
           </div>
        </div>
     </div>
@@ -37,57 +30,40 @@
 
 @code
 {
-    private BaseChair _hoveredChair;
+    private BaseChair _foundChair;
+    private UIPopupTrigger _foundTrigger;
     private TimeSince _timeSinceLastHit;
 
-    // This logic prevents the HUD from flickering
-    BaseChair CurrentChair
-    {
-       get
-       {
-          if ( Scene?.Camera == null ) return null;
+    // Visuals
+    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle;
+    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon;
+    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription;
 
-          var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
-          var tr = Scene.Trace.Ray( ray, 200f )
-            .WithoutTags( "player", "trigger" )
-            .Run();
-            
-          if ( tr.Hit && tr.GameObject.IsValid() )
-          {
-             var chair = tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>();
-             if ( chair.IsValid() )
-             {
-                _hoveredChair = chair;
-                _timeSinceLastHit = 0; // Reset the "memory" timer
-                return _hoveredChair;
-             }
-          }
-
-          // If we hit nothing, wait 0.1 seconds before actually hiding the HUD
-          // This smooths out the "flicker" when looking through gaps in the mesh
-          if ( _timeSinceLastHit < 0.1f )
-          {
-             return _hoveredChair;
-          }
-
-          _hoveredChair = null;
-          return null;
-       }
-    }
-
-    Player Player => Player.FindLocalPlayer();
-    BaseChair Info => CurrentChair;
-    bool HasAnyAction => Info is not null;
+    bool HasAnyAction => (_foundChair.IsValid() || _foundTrigger.IsValid()) && _timeSinceLastHit < 0.1f;
 
     protected override void OnUpdate()
     {
-       SetClass( "visible", CurrentChair is not null );
+        var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
+        var tr = Scene.Trace.Ray( ray, 150f ).WithoutTags( "player", "trigger" ).Run();
+        
+        if ( tr.Hit && tr.GameObject.IsValid() )
+        {
+            var chair = tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>();
+            var trigger = tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>();
+
+            if ( chair.IsValid() || trigger.IsValid() )
+            {
+                _foundChair = chair;
+                _foundTrigger = trigger;
+                _timeSinceLastHit = 0;
+            }
+        }
+
+        SetClass( "visible", HasAnyAction );
     }
 
-    protected override int BuildHash() => System.HashCode.Combine( 
-       Info?.TooltipTitle, 
-       Info?.TooltipDescription, 
-       Info?.TooltipIcon,
-       Player?.WantsHideHud 
-    );
+    Player Player => Player.FindLocalPlayer();
+
+    // Include the ToolTipKey in the hash so if you change it in the inspector, the UI refreshes
+    protected override int BuildHash() => System.HashCode.Combine( CurrentTitle, CurrentAction, _foundTrigger?.ToolTipKey, Player?.WantsHideHud );
 }
