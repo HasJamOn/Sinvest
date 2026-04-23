@@ -1,36 +1,56 @@
 using Sandbox;
 using System.Linq;
 
-public sealed class UIPopupTrigger : Component, Component.IPressable
+public sealed class UIPopupTrigger : Component
 {
 	[Property] public GameObject PopupPrefab { get; set; }
+	[Property] public float MaxInteractionDistance { get; set; } = 100f;
+    
 	private GameObject _activeInstance;
 
-	bool Component.IPressable.Press( Component.IPressable.Event e )
+	protected override void OnUpdate()
 	{
-		if ( PopupPrefab == null || _activeInstance.IsValid() ) return false;
+		// 1. Check if the custom action "sinvestos" was pressed
+		if ( Input.Pressed( "sinvestos" ) )
+		{
+			// 2. Only proceed if we are looking at this specific object
+			if ( IsPlayerLookingAtMe() )
+			{
+				TogglePopup();
+			}
+		}
+	}
 
-		// 1. Create the runtime clone
+	private bool IsPlayerLookingAtMe()
+	{
+		// Trace from the player's camera/eyes forward
+		var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
+		var tr = Scene.Trace.Ray( ray, MaxInteractionDistance )
+			.WithTag( "solid" ) // Ensure your computer/collider has the 'solid' tag
+			.Run();
+
+		// Check if the trace hit this GameObject or any of its children
+		return tr.Hit && (tr.GameObject == GameObject || tr.GameObject.IsDescendant( GameObject ));
+	}
+
+	private void TogglePopup()
+	{
+		if ( PopupPrefab == null || _activeInstance.IsValid() ) 
+			return;
+
 		_activeInstance = PopupPrefab.Clone();
-        
-		// 2. Set the position (Fixed: WorldPosition is a direct property of GameObject)
 		_activeInstance.WorldPosition = new Vector3( 5000, 0, 0 );
 
-		// 3. Get the HUD component and initialize it
-		var hud = _activeInstance.Components.Get<ComputerHUD>(true);
+		var hud = _activeInstance.Components.Get<ComputerHUD>( true );
 		if ( hud != null )
 		{
 			hud.Open(); 
 		}
-
-		return true;
 	}
 
-	bool Component.IPressable.CanPress( Component.IPressable.Event e ) => !_activeInstance.IsValid();
-    
-	// Stub methods for IPressable
-	void Component.IPressable.Release( Component.IPressable.Event e ) { }
-	void Component.IPressable.Hover( Component.IPressable.Event e ) { }
-	void Component.IPressable.Blur( Component.IPressable.Event e ) { }
-	void Component.IPressable.Look( Component.IPressable.Event e ) { }
+	protected override void OnDestroy()
+	{
+		if ( _activeInstance.IsValid() )
+			_activeInstance.Destroy();
+	}
 }

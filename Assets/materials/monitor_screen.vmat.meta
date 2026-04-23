@@ -1,0 +1,23 @@
+{
+  "publish": {
+    "Enabled": false,
+    "ProjectConfig": {
+      "Title": "Monitor Screen",
+      "Type": "material",
+      "Org": "local",
+      "Ident": "monitorscreen",
+      "Schema": 0,
+      "IncludeSourceFiles": false,
+      "Resources": null,
+      "PackageReferences": null,
+      "EditorReferences": [
+        "mdlresrc.rtx_pctower#11534"
+      ],
+      "Mounts": null,
+      "IsStandaloneOnly": false,
+      "Metadata": {
+        "SingleAssetSource": "materials/monitor_screen.vmat"
+      }
+    }
+  }
+}

@@ -475,12 +475,12 @@
             "Children": []
           },
           {
-            "__guid": "eb78fe8c-4c5a-4e99-ad4e-21864ee669a2",
+            "__guid": "1f6c63a3-bb3c-491a-9304-13dab4f4f56f",
             "__version": 2,
             "Flags": 0,
-            "Name": "monitor",
-            "Position": "-48.6677551,5.24171114,16.8123379",
-            "Rotation": "0,0,0.130527079,0.991444767",
+            "Name": "rtx_pctower",
+            "Position": "-34.7911644,-35.0363617,25.0692101",
+            "Rotation": "0,0,0.500000477,-0.866024792",
             "Scale": "2.5,2.5,2.5",
             "Tags": "",
             "Enabled": true,
@@ -492,14 +492,14 @@
             "Components": [
               {
                 "__type": "Sandbox.Prop",
-                "__guid": "812156f2-41ba-46ec-a894-aa030eb81e4a",
+                "__guid": "f10f3f20-abdb-4cbb-9380-c34efa201576",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
                 "Health": 0,
                 "IsStatic": false,
                 "MaterialGroup": null,
-                "Model": "models/old-computer/monitor.vmdl",
+                "Model": "models/ports/portalrtx/props/bts/rtx_pctower.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -513,7 +513,7 @@
               },
               {
                 "__type": "Sandbox.ModelRenderer",
-                "__guid": "357948c8-201c-431e-8804-825a75265548",
+                "__guid": "5bb4173b-ef8c-4763-9e3a-f849a0c94498",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
@@ -522,7 +522,7 @@
                 "MaterialGroup": null,
                 "MaterialOverride": null,
                 "Materials": null,
-                "Model": "models/old-computer/monitor.vmdl",
+                "Model": "models/ports/portalrtx/props/bts/rtx_pctower.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -540,14 +540,14 @@
               },
               {
                 "__type": "Sandbox.ModelCollider",
-                "__guid": "7f023089-2261-4722-81ec-49a12338d1b7",
+                "__guid": "b7fc28c4-78f5-49c3-8416-9f94f5c62f1a",
                 "__enabled": true,
                 "Flags": 0,
                 "ColliderFlags": 0,
                 "Elasticity": null,
                 "Friction": null,
                 "IsTrigger": false,
-                "Model": "models/old-computer/monitor.vmdl",
+                "Model": "models/ports/portalrtx/props/bts/rtx_pctower.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -565,7 +565,7 @@
               },
               {
                 "__type": "Sandbox.Rigidbody",
-                "__guid": "a59e75f1-12d8-430a-9a03-6d65175728a7",
+                "__guid": "b7861fde-dfa1-46db-bf42-53c12f2456bc",
                 "__enabled": true,
                 "Flags": 0,
                 "AngularDamping": 0,
@@ -598,24 +598,8 @@
                 "StartAsleep": false
               },
               {
-                "__type": "UIPopupTrigger",
-                "__guid": "78eb859e-1080-401f-a498-625bf5c83525",
-                "__enabled": true,
-                "Flags": 0,
-                "OnComponentDestroy": null,
-                "OnComponentDisabled": null,
-                "OnComponentEnabled": null,
-                "OnComponentFixedUpdate": null,
-                "OnComponentStart": null,
-                "OnComponentUpdate": null,
-                "PopupPrefab": {
-                  "_type": "gameobject",
-                  "prefab": "prefabs/computer_screen.prefab"
-                }
-              },
-              {
                 "__type": "Sandbox.RecallRewind",
-                "__guid": "b80391b2-8e62-4072-b3ee-5391fe42b077",
+                "__guid": "70fa5f89-bb58-44b2-a5d2-fa17d2dc4e51",
                 "__enabled": true,
                 "Flags": 0,
                 "Area": {
@@ -638,12 +622,12 @@
             "Children": []
           },
           {
-            "__guid": "b380db43-15e9-464e-9ac8-796f518c0f1a",
+            "__guid": "649f46e1-cb16-4155-a3f2-7147cd42aca2",
             "__version": 2,
             "Flags": 0,
-            "Name": "computer",
-            "Position": "-30.6045551,-32.4294357,25.3662529",
-            "Rotation": "0,0,0.258818656,0.965925872",
+            "Name": "monitor",
+            "Position": "-47.0461845,8.67040348,0.312061161",
+            "Rotation": "0,0,0.130525798,0.991444588",
             "Scale": "2.5,2.5,2.5",
             "Tags": "",
             "Enabled": true,
@@ -655,14 +639,14 @@
             "Components": [
               {
                 "__type": "Sandbox.Prop",
-                "__guid": "63ff1a99-3ee6-4df3-968c-d7a63d87ae8e",
+                "__guid": "0a558102-91ae-496c-94d1-9651892612c5",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
-                "Health": 0,
+                "Health": 1,
                 "IsStatic": false,
                 "MaterialGroup": null,
-                "Model": "models/old-computer/computer.vmdl",
+                "Model": "models/props_lab/server_08.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -676,7 +660,7 @@
               },
               {
                 "__type": "Sandbox.ModelRenderer",
-                "__guid": "0e007ccf-c027-48f9-8b9b-01053384f7cd",
+                "__guid": "15368298-f887-47ad-b0cd-a01a8d39c1d8",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
@@ -685,7 +669,7 @@
                 "MaterialGroup": null,
                 "MaterialOverride": null,
                 "Materials": null,
-                "Model": "models/old-computer/computer.vmdl",
+                "Model": "models/props_lab/server_08.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -703,14 +687,14 @@
               },
               {
                 "__type": "Sandbox.ModelCollider",
-                "__guid": "38c16e4e-ffcf-41f2-957a-8ec15b47e3a1",
+                "__guid": "428ed8aa-e60b-4662-a667-389b4fdecb2d",
                 "__enabled": true,
                 "Flags": 0,
                 "ColliderFlags": 0,
                 "Elasticity": null,
                 "Friction": null,
                 "IsTrigger": false,
-                "Model": "models/old-computer/computer.vmdl",
+                "Model": "models/props_lab/server_08.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -728,7 +712,7 @@
               },
               {
                 "__type": "Sandbox.Rigidbody",
-                "__guid": "8e08eeae-711e-45a6-b6f7-4a529e8d3d16",
+                "__guid": "251863d4-a5d8-4341-b115-8d5091a65947",
                 "__enabled": true,
                 "Flags": 0,
                 "AngularDamping": 0,
@@ -762,7 +746,7 @@
               },
               {
                 "__type": "Sandbox.RecallRewind",
-                "__guid": "aa3846c6-969f-4c1d-ad58-a5a2bae9a57a",
+                "__guid": "8861fb69-22e6-423b-9e75-d77c40cf250e",
                 "__enabled": true,
                 "Flags": 0,
                 "Area": {
@@ -780,9 +764,76 @@
                 "OnComponentStart": null,
                 "OnComponentUpdate": null,
                 "WaitBeforeRewind": 5
+              },
+              {
+                "__type": "UIPopupTrigger",
+                "__guid": "3933bd3a-228c-4ad5-8641-c2d5c6f58bcb",
+                "__enabled": true,
+                "Flags": 0,
+                "MaxInteractionDistance": 100,
+                "OnComponentDestroy": null,
+                "OnComponentDisabled": null,
+                "OnComponentEnabled": null,
+                "OnComponentFixedUpdate": null,
+                "OnComponentStart": null,
+                "OnComponentUpdate": null,
+                "PopupPrefab": {
+                  "_type": "gameobject",
+                  "prefab": "prefabs/computer_screen.prefab"
+                }
               }
             ],
-            "Children": []
+            "Children": [
+              {
+                "__guid": "d499e1c0-0637-4b76-bca1-837fbd578156",
+                "__version": 2,
+                "Flags": 0,
+                "Name": "Decal",
+                "Position": "8.43230057,0.151332378,9.56680107",
+                "Rotation": "8.24758217E-09,6.93834977E-07,-1.00000024,-1.07288361E-06",
+                "Scale": "0.400000006,0.400000006,0.400000006",
+                "Tags": "",
+                "Enabled": true,
+                "NetworkMode": 2,
+                "NetworkFlags": 0,
+                "NetworkOrphaned": 0,
+                "NetworkTransmit": true,
+                "OwnerTransfer": 1,
+                "Components": [
+                  {
+                    "__type": "Sandbox.Decal",
+                    "__guid": "e30d12e2-721b-47f3-b474-2f86d01ce72a",
+                    "__enabled": true,
+                    "Flags": 0,
+                    "__version": 3,
+                    "AttenuationAngle": 1,
+                    "ColorMix": 1,
+                    "ColorTint": "1,1,1,1",
+                    "Decals": [
+                      "monitor_screen.decal"
+                    ],
+                    "Depth": 8,
+                    "LifeTime": 0,
+                    "Looped": false,
+                    "OnComponentDestroy": null,
+                    "OnComponentDisabled": null,
+                    "OnComponentEnabled": null,
+                    "OnComponentFixedUpdate": null,
+                    "OnComponentStart": null,
+                    "OnComponentUpdate": null,
+                    "Parallax": 1,
+                    "Rotation": 0,
+                    "Scale": 1,
+                    "SequenceId": 0,
+                    "SheetSequence": false,
+                    "Size": "1.89999914,1.39999962",
+                    "SortLayer": 0,
+                    "Transient": false
+                  }
+                ],
+                "Children": []
+              }
+            ]
           }
         ]
       },
@@ -1098,12 +1149,12 @@
             "Children": []
           },
           {
-            "__guid": "fba01bcb-a038-4875-b8fd-5c8a4d4ba404",
+            "__guid": "b56b2a94-8dd7-40b4-80e7-250fdc885e86",
             "__version": 2,
             "Flags": 0,
-            "Name": "monitor",
-            "Position": "-48.6677246,14.2074118,16.8123379",
-            "Rotation": "0,0,-0.130526841,0.991444826",
+            "Name": "rtx_pctower",
+            "Position": "-32.7834129,-33.1545715,25.0692101",
+            "Rotation": "0,0,-0.608761847,0.793352842",
             "Scale": "2.5,2.5,2.5",
             "Tags": "",
             "Enabled": true,
@@ -1115,14 +1166,14 @@
             "Components": [
               {
                 "__type": "Sandbox.Prop",
-                "__guid": "ae928e03-1c71-4d3f-b2b1-8614ad0bfedf",
+                "__guid": "e9b208ee-ac05-45d6-989d-491fc3f528f2",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
                 "Health": 0,
                 "IsStatic": false,
                 "MaterialGroup": null,
-                "Model": "models/old-computer/monitor.vmdl",
+                "Model": "models/ports/portalrtx/props/bts/rtx_pctower.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -1136,7 +1187,7 @@
               },
               {
                 "__type": "Sandbox.ModelRenderer",
-                "__guid": "19e1f7ae-4a30-4ac1-a1fb-03b12c022440",
+                "__guid": "0ff3ba67-bb05-4083-bf61-76dd6a8ce440",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
@@ -1145,7 +1196,7 @@
                 "MaterialGroup": null,
                 "MaterialOverride": null,
                 "Materials": null,
-                "Model": "models/old-computer/monitor.vmdl",
+                "Model": "models/ports/portalrtx/props/bts/rtx_pctower.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -1163,14 +1214,14 @@
               },
               {
                 "__type": "Sandbox.ModelCollider",
-                "__guid": "740347a3-0574-445b-8fec-b27c6c19b305",
+                "__guid": "ce4ea3d6-9760-4c24-ad29-63e182391ce6",
                 "__enabled": true,
                 "Flags": 0,
                 "ColliderFlags": 0,
                 "Elasticity": null,
                 "Friction": null,
                 "IsTrigger": false,
-                "Model": "models/old-computer/monitor.vmdl",
+                "Model": "models/ports/portalrtx/props/bts/rtx_pctower.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -1188,7 +1239,7 @@
               },
               {
                 "__type": "Sandbox.Rigidbody",
-                "__guid": "991facb7-43be-4681-9dd4-1615e5a48e0b",
+                "__guid": "c9c6f749-2d01-4396-8743-f7607ded59ca",
                 "__enabled": true,
                 "Flags": 0,
                 "AngularDamping": 0,
@@ -1221,24 +1272,8 @@
                 "StartAsleep": false
               },
               {
-                "__type": "UIPopupTrigger",
-                "__guid": "e7f16b77-dba7-4517-b217-6c5d7fabb526",
-                "__enabled": true,
-                "Flags": 0,
-                "OnComponentDestroy": null,
-                "OnComponentDisabled": null,
-                "OnComponentEnabled": null,
-                "OnComponentFixedUpdate": null,
-                "OnComponentStart": null,
-                "OnComponentUpdate": null,
-                "PopupPrefab": {
-                  "_type": "gameobject",
-                  "prefab": "prefabs/computer_screen.prefab"
-                }
-              },
-              {
                 "__type": "Sandbox.RecallRewind",
-                "__guid": "b622996b-4d46-42ec-ad4a-ee095e770150",
+                "__guid": "aaf8e327-62bd-4e71-8823-893e5d7b4ce1",
                 "__enabled": true,
                 "Flags": 0,
                 "Area": {
@@ -1261,12 +1296,12 @@
             "Children": []
           },
           {
-            "__guid": "a15f1d4f-0ec6-4473-aea3-75f172d821e4",
+            "__guid": "240337c6-2d66-482a-932c-e001baf532a7",
             "__version": 2,
             "Flags": 0,
-            "Name": "computer",
-            "Position": "-30.6045551,-32.4294357,25.3662529",
-            "Rotation": "0,0,0.130525827,0.991444886",
+            "Name": "monitor",
+            "Position": "-50.0912857,14.7615061,0.312070757",
+            "Rotation": "0,0,-0.130526632,0.991444588",
             "Scale": "2.5,2.5,2.5",
             "Tags": "",
             "Enabled": true,
@@ -1278,14 +1313,14 @@
             "Components": [
               {
                 "__type": "Sandbox.Prop",
-                "__guid": "205f273d-1420-4265-9525-4a9d46710f53",
+                "__guid": "87b97b77-db23-44d8-96eb-f62c5b40c9a4",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
-                "Health": 0,
+                "Health": 1,
                 "IsStatic": false,
                 "MaterialGroup": null,
-                "Model": "models/old-computer/computer.vmdl",
+                "Model": "models/props_lab/server_08.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -1299,7 +1334,7 @@
               },
               {
                 "__type": "Sandbox.ModelRenderer",
-                "__guid": "26b5c011-8248-454a-829b-417b1ad57794",
+                "__guid": "04d67750-0b40-4954-b0b6-cd4c82f749d6",
                 "__enabled": true,
                 "Flags": 0,
                 "BodyGroups": 18446744073709551615,
@@ -1308,7 +1343,7 @@
                 "MaterialGroup": null,
                 "MaterialOverride": null,
                 "Materials": null,
-                "Model": "models/old-computer/computer.vmdl",
+                "Model": "models/props_lab/server_08.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -1326,14 +1361,14 @@
               },
               {
                 "__type": "Sandbox.ModelCollider",
-                "__guid": "78244240-1031-4bb2-a87e-4cf3faee2ce1",
+                "__guid": "481f8c87-115c-4690-9ddb-f959ec03bc99",
                 "__enabled": true,
                 "Flags": 0,
                 "ColliderFlags": 0,
                 "Elasticity": null,
                 "Friction": null,
                 "IsTrigger": false,
-                "Model": "models/old-computer/computer.vmdl",
+                "Model": "models/props_lab/server_08.vmdl",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -1351,7 +1386,7 @@
               },
               {
                 "__type": "Sandbox.Rigidbody",
-                "__guid": "a8c8bb2c-812f-45c1-9a99-a8064344d4e4",
+                "__guid": "2df2b67e-6c5a-472c-9f88-5ec6f358096e",
                 "__enabled": true,
                 "Flags": 0,
                 "AngularDamping": 0,
@@ -1385,7 +1420,7 @@
               },
               {
                 "__type": "Sandbox.RecallRewind",
-                "__guid": "88610249-86ed-4874-9a54-ed0da8381b4d",
+                "__guid": "8724d9ee-e46e-4c9a-88a5-46c9b5a9e374",
                 "__enabled": true,
                 "Flags": 0,
                 "Area": {
@@ -1403,9 +1438,76 @@
                 "OnComponentStart": null,
                 "OnComponentUpdate": null,
                 "WaitBeforeRewind": 5
+              },
+              {
+                "__type": "UIPopupTrigger",
+                "__guid": "eb3636d1-3244-49a8-b369-62aff19a43c7",
+                "__enabled": true,
+                "Flags": 0,
+                "MaxInteractionDistance": 100,
+                "OnComponentDestroy": null,
+                "OnComponentDisabled": null,
+                "OnComponentEnabled": null,
+                "OnComponentFixedUpdate": null,
+                "OnComponentStart": null,
+                "OnComponentUpdate": null,
+                "PopupPrefab": {
+                  "_type": "gameobject",
+                  "prefab": "prefabs/computer_screen.prefab"
+                }
               }
             ],
-            "Children": []
+            "Children": [
+              {
+                "__guid": "e122b40e-4d9a-406c-82eb-7adbe411e9f7",
+                "__version": 2,
+                "Flags": 0,
+                "Name": "Decal",
+                "Position": "8.43230057,0.151332378,9.56680107",
+                "Rotation": "8.24758217E-09,6.93834977E-07,-1.00000024,-1.07288361E-06",
+                "Scale": "0.400000006,0.400000006,0.400000006",
+                "Tags": "",
+                "Enabled": true,
+                "NetworkMode": 2,
+                "NetworkFlags": 0,
+                "NetworkOrphaned": 0,
+                "NetworkTransmit": true,
+                "OwnerTransfer": 1,
+                "Components": [
+                  {
+                    "__type": "Sandbox.Decal",
+                    "__guid": "1ec4913b-35ec-4616-a0d0-aa606b3ff0e9",
+                    "__enabled": true,
+                    "Flags": 0,
+                    "__version": 3,
+                    "AttenuationAngle": 1,
+                    "ColorMix": 1,
+                    "ColorTint": "1,1,1,1",
+                    "Decals": [
+                      "monitor_screen.decal"
+                    ],
+                    "Depth": 8,
+                    "LifeTime": 0,
+                    "Looped": false,
+                    "OnComponentDestroy": null,
+                    "OnComponentDisabled": null,
+                    "OnComponentEnabled": null,
+                    "OnComponentFixedUpdate": null,
+                    "OnComponentStart": null,
+                    "OnComponentUpdate": null,
+                    "Parallax": 1,
+                    "Rotation": 0,
+                    "Scale": 1,
+                    "SequenceId": 0,
+                    "SheetSequence": false,
+                    "Size": "1.89999914,1.39999962",
+                    "SortLayer": 0,
+                    "Transient": false
+                  }
+                ],
+                "Children": []
+              }
+            ]
           }
         ]
       },
@@ -1531,8 +1633,62 @@
             "SurfaceVelocity": "0,0,0"
           },
           {
+            "__type": "Sandbox.RecallRewind",
+            "__guid": "ce5ddcd8-0079-4acb-98ef-83304a382b3f",
+            "__enabled": true,
+            "Flags": 0,
+            "Area": {
+              "_type": "component",
+              "component_id": "0defa770-a898-4460-8feb-e1f14f6b9869",
+              "go": "20c7122a-9e6f-4cd6-b6eb-9f7b41f4adff",
+              "component_type": "RecallArea"
+            },
+            "GhostRadius": 50,
+            "MaxRewindDuration": 3.5,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "WaitBeforeRewind": 5
+          },
+          {
+            "__type": "Sandbox.BaseChair",
+            "__guid": "6f6f4f6d-89ca-4142-9515-cd0662a5e106",
+            "__enabled": true,
+            "Flags": 0,
+            "ExitPoints": [
+              {
+                "_type": "gameobject",
+                "go": "a1a18df2-29a8-4583-8b68-dbf693cb5160"
+              }
+            ],
+            "EyePosition": {
+              "_type": "gameobject",
+              "go": "617caaf4-ff2c-4ebb-9261-16708a37bfb5"
+            },
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "PitchRange": "-90,70",
+            "SeatPosition": {
+              "_type": "gameobject",
+              "go": "f3404923-ac84-49a8-9b0e-2e9330f19272"
+            },
+            "SitHeight": 0,
+            "SitPose": "ChairCrossed",
+            "TooltipDescription": "",
+            "TooltipIcon": "airline_seat_recline_normal",
+            "TooltipTitle": "Sit",
+            "YawRange": "-120,120"
+          },
+          {
             "__type": "Sandbox.Rigidbody",
-            "__guid": "f7ac07c9-9d26-4962-bff5-237625134011",
+            "__guid": "2786836b-1964-4672-9849-04dfab2c3133",
             "__enabled": true,
             "Flags": 0,
             "AngularDamping": 0,
@@ -1563,30 +1719,110 @@
             "OverrideMassCenter": false,
             "RigidbodyFlags": 0,
             "StartAsleep": false
-          },
-          {
-            "__type": "Sandbox.RecallRewind",
-            "__guid": "ce5ddcd8-0079-4acb-98ef-83304a382b3f",
-            "__enabled": true,
-            "Flags": 0,
-            "Area": {
-              "_type": "component",
-              "component_id": "0defa770-a898-4460-8feb-e1f14f6b9869",
-              "go": "20c7122a-9e6f-4cd6-b6eb-9f7b41f4adff",
-              "component_type": "RecallArea"
-            },
-            "GhostRadius": 50,
-            "MaxRewindDuration": 3.5,
-            "OnComponentDestroy": null,
-            "OnComponentDisabled": null,
-            "OnComponentEnabled": null,
-            "OnComponentFixedUpdate": null,
-            "OnComponentStart": null,
-            "OnComponentUpdate": null,
-            "WaitBeforeRewind": 5
           }
         ],
-        "Children": []
+        "Children": [
+          {
+            "__guid": "a1a18df2-29a8-4583-8b68-dbf693cb5160",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "exit",
+            "Position": "-9.94241428,-27.0339069,11.6007395",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [],
+            "Children": []
+          },
+          {
+            "__guid": "f3404923-ac84-49a8-9b0e-2e9330f19272",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "sit",
+            "Position": "3.06630802,-0.718000054,8.25987434",
+            "Rotation": "0,0,-0.130526334,0.991444945",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [],
+            "Children": []
+          },
+          {
+            "__guid": "617caaf4-ff2c-4ebb-9261-16708a37bfb5",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "eye",
+            "Position": "0,0,50.5715561",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [],
+            "Children": [
+              {
+                "__guid": "dcf6fb0e-a2da-4447-8282-d6b8f99ba021",
+                "__version": 2,
+                "Flags": 0,
+                "Name": "collider",
+                "Position": "0,0,0",
+                "Rotation": "-0.00326419482,0.00186207856,-0.865938723,-0.500136077",
+                "Scale": "1,1,1",
+                "Tags": "",
+                "Enabled": true,
+                "NetworkMode": 2,
+                "NetworkFlags": 0,
+                "NetworkOrphaned": 0,
+                "NetworkTransmit": true,
+                "OwnerTransfer": 1,
+                "Components": [
+                  {
+                    "__type": "Sandbox.SphereCollider",
+                    "__guid": "ce823ca6-47f9-43a3-9729-547495137a73",
+                    "__enabled": true,
+                    "Flags": 0,
+                    "Center": "0,0,0",
+                    "ColliderFlags": "IgnoreTraces, IgnoreMass",
+                    "Elasticity": null,
+                    "Friction": null,
+                    "IsTrigger": false,
+                    "OnComponentDestroy": null,
+                    "OnComponentDisabled": null,
+                    "OnComponentEnabled": null,
+                    "OnComponentFixedUpdate": null,
+                    "OnComponentStart": null,
+                    "OnComponentUpdate": null,
+                    "OnObjectTriggerEnter": null,
+                    "OnObjectTriggerExit": null,
+                    "OnTriggerEnter": null,
+                    "OnTriggerExit": null,
+                    "Radius": 8,
+                    "RollingResistance": null,
+                    "Static": false,
+                    "Surface": null,
+                    "SurfaceVelocity": "0,0,0"
+                  }
+                ],
+                "Children": []
+              }
+            ]
+          }
+        ]
       },
       {
         "__guid": "c810eddb-9892-4001-bd34-05b142e6b5d1",
@@ -1731,9 +1967,156 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "WaitBeforeRewind": 5
+          },
+          {
+            "__type": "Sandbox.BaseChair",
+            "__guid": "c130b45a-c0a4-4b14-a247-e9d36cb3b3b9",
+            "__enabled": true,
+            "Flags": 0,
+            "ExitPoints": [
+              {
+                "_type": "gameobject",
+                "go": "28f9d81c-346b-4401-a0f9-cc75b7ecda53"
+              }
+            ],
+            "EyePosition": {
+              "_type": "gameobject",
+              "go": "d247281e-3a4c-49c6-bc1b-5ad1f8428b30"
+            },
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "PitchRange": "-90,70",
+            "SeatPosition": {
+              "_type": "gameobject",
+              "go": "5dcb5400-9377-43d1-9507-a3d96aeb1847"
+            },
+            "SitHeight": 0,
+            "SitPose": "Chair",
+            "TooltipDescription": "",
+            "TooltipIcon": "airline_seat_recline_normal",
+            "TooltipTitle": "Sit",
+            "YawRange": "-120,120"
+          },
+          {
+            "__type": "PreventChairToChair",
+            "__guid": "a155dfda-83a3-4581-9983-ae15fb7f82df",
+            "__enabled": true,
+            "Flags": 0,
+            "ChairComponent": null,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
           }
         ],
-        "Children": []
+        "Children": [
+          {
+            "__guid": "d247281e-3a4c-49c6-bc1b-5ad1f8428b30",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "eye",
+            "Position": "-3.35527515,-3.9046452,58.3809509",
+            "Rotation": "0,0,-0.965925694,0.258819133",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [],
+            "Children": [
+              {
+                "__guid": "75806807-4083-42c2-a38a-7f69b483d4ce",
+                "__version": 2,
+                "Flags": 0,
+                "Name": "collider",
+                "Position": "0,0,5.70714474E-06",
+                "Rotation": "-0.00362482248,-0.000991445733,-0.965960801,0.258661479",
+                "Scale": "1,1,1",
+                "Tags": "",
+                "Enabled": true,
+                "NetworkMode": 2,
+                "NetworkFlags": 0,
+                "NetworkOrphaned": 0,
+                "NetworkTransmit": true,
+                "OwnerTransfer": 1,
+                "Components": [
+                  {
+                    "__type": "Sandbox.SphereCollider",
+                    "__guid": "6d10ea1e-4e01-4924-91c9-319e17dba93b",
+                    "__enabled": true,
+                    "Flags": 0,
+                    "Center": "0,0,0",
+                    "ColliderFlags": "IgnoreTraces, IgnoreMass",
+                    "Elasticity": null,
+                    "Friction": null,
+                    "IsTrigger": false,
+                    "OnComponentDestroy": null,
+                    "OnComponentDisabled": null,
+                    "OnComponentEnabled": null,
+                    "OnComponentFixedUpdate": null,
+                    "OnComponentStart": null,
+                    "OnComponentUpdate": null,
+                    "OnObjectTriggerEnter": null,
+                    "OnObjectTriggerExit": null,
+                    "OnTriggerEnter": null,
+                    "OnTriggerExit": null,
+                    "Radius": 8,
+                    "RollingResistance": null,
+                    "Static": false,
+                    "Surface": null,
+                    "SurfaceVelocity": "0,0,0"
+                  }
+                ],
+                "Children": []
+              }
+            ]
+          },
+          {
+            "__guid": "5dcb5400-9377-43d1-9507-a3d96aeb1847",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "sit",
+            "Position": "1.78255594,-1.97405672,10.6742516",
+            "Rotation": "0,0,-8.94069672E-08,-1.00000012",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [],
+            "Children": []
+          },
+          {
+            "__guid": "28f9d81c-346b-4401-a0f9-cc75b7ecda53",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "exit",
+            "Position": "-5.59992409,22.2779465,11.6007175",
+            "Rotation": "0,0,-0.965925694,0.258819133",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [],
+            "Children": []
+          }
+        ]
       }
     ],
     "__properties": {
@@ -1764,12 +2147,12 @@
   "MenuIcon": null,
   "DontBreakAsTemplate": false,
   "__references": [
+    "alyx.server_08#30851",
     "boggy.computer_mouse#127481",
     "boggy.office_chair#127479",
     "facepunch.office_desk#149879",
     "luke.office_keyboard#22877",
-    "progressprogram.computer#80268",
-    "progressprogram.monitor#80267"
+    "mdlresrc.rtx_pctower#11534"
   ],
   "__version": 2
 }

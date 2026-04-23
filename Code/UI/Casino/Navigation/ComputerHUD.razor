@@ -92,9 +92,35 @@
     
     public void CloseAndDestroy()
     {
-        SetMenuState(false);
-        if (Instance == this) Instance = null;
-        GameObject.Root.Destroy();
+	    var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
+    
+	    if ( player.IsValid() )
+	    {
+		    // 1. Identify the chair
+		    var chair = player.GameObject.Parent?.Components.GetInAncestors<BaseChair>();
+        
+		    if ( chair.IsValid() )
+		    {
+			    // 2. Tell the chair to eject us normally
+			    chair.AskToLeave( player );
+
+			    // 3. FORCE RESTORE (The Safety Net)
+			    // If the chair script fails to re-enable these, we do it here.
+			    player.GameObject.SetParent( null ); // Ensure we aren't parented to the chair anymore
+			    player.Body.Enabled = true;
+			    player.ColliderObject.Enabled = true;
+		    }
+
+		    // 4. Restore Input
+		    player.UseLookControls = true;
+		    player.UseInputControls = true;
+	    }
+
+	    SetMenuState( false );
+    
+	    // 5. Cleanup
+	    if ( Instance == this ) Instance = null;
+	    GameObject.Root.Destroy();
     }
     
     protected override void OnDestroy()
