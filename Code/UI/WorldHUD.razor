@@ -33,9 +33,10 @@
 {
     private BaseChair _foundChair;
     private UIPopupTrigger _foundTrigger;
+    private SteamGameCase _foundCase;
     private TimeSince _timeSinceLastHit;
 
-    GameObject ActiveObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject;
+    GameObject ActiveObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject ?? _foundCase?.GameObject;
     
     // Logic update: Tooltips only show if NO computer popup is currently active
     bool IsVisible => ActiveObject.IsValid() 
@@ -43,9 +44,9 @@
                       && !(Player?.WantsHideHud ?? false)
                       && !UIPopupTrigger.ActiveInstance.IsValid();
 
-    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? string.Empty;
-    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? string.Empty;
-    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? string.Empty;
+    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? _foundCase?.TooltipTitle ?? string.Empty;
+    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? _foundCase?.TooltipIcon ?? string.Empty;
+    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? _foundCase?.TooltipDescription ?? string.Empty;
     string CurrentKey => _foundChair != null ? Input.GetButtonOrigin( "use" ).ToUpper() : _foundTrigger?.ToolTipKey?.ToUpper();
 
     protected override void OnUpdate()
@@ -60,17 +61,25 @@
 
         if ( tr.Hit && tr.GameObject.IsValid() )
         {
-            bool isSitting = controller.Mode is SitMoveMode;
-            
-            var chair = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>() : null;
-            var trigger = isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
+	        bool isSitting = controller.Mode is SitMoveMode;
+    
+	        var chair = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>() : null;
+	        var trigger = isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
+	        // Add this line:
+	        var sCase = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<SteamGameCase>() : null;
 
-            if ( chair.IsValid() || trigger.IsValid() )
-            {
-                _foundChair = chair;
-                _foundTrigger = trigger;
-                _timeSinceLastHit = 0;
-            }
+	        if ( chair.IsValid() || trigger.IsValid() || sCase.IsValid() )
+	        {
+		        _foundChair = chair;
+		        _foundTrigger = trigger;
+		        _foundCase = sCase; // Set the found case
+		        _timeSinceLastHit = 0;
+	        }
+        }
+        
+        if ( _foundCase.IsValid() && Input.Pressed( "use" ) )
+        {
+	        _ = _foundCase.Shuffle();
         }
 
         if ( _timeSinceLastHit > 0.15f )

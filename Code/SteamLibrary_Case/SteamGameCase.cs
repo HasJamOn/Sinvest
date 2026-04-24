@@ -1,61 +1,58 @@
 using Sandbox;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
+// We add the [Icon] attribute so it looks nice in the editor
+[Icon( "library_books" )]
 public sealed class SteamGameCase : Component
 {
-    [Property, Group( "Steam Settings" ), Description( "The Steam AppID of the game (e.g., 4000 for Garry's Mod)" )]
-    public long AppId { get; set; } = 4000;
+    [Property, Group( "Settings" )] public long AppId { get; set; } = 4000;
+    [Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
 
-    [Property, Group( "References" ), Description( "The ModelRenderer that will receive the textures." )]
-    public ModelRenderer TargetRenderer { get; set; }
+    // Properties for the Tooltip UI to read
+    [Property, Group( "Tooltip" )] public string TooltipTitle { get; set; } = "Steam Game Case";
+    [Property, Group( "Tooltip" )] public string TooltipIcon { get; set; } = "videogame_asset";
+    [Property, Group( "Tooltip" )] public string TooltipDescription { get; set; } = "Shuffle Game";
+
+    private List<long> _randomAppIds = new() { 4000, 240, 10, 70, 440, 570, 620, 250820, 218230 };
 
     protected override void OnStart()
     {
-        // Safety check to ensure the user assigned the renderer in the inspector
-        if ( TargetRenderer == null )
-        {
-            Log.Error( $"[SteamGameCase] TargetRenderer is not assigned on {GameObject.Name}!" );
-            return;
-        }
-
-        // Fire and forget the async loading task
-        _ = LoadSteamTexturesAsync();
+        _ = LoadSteamTexturesAsync( AppId );
     }
 
-    private async Task LoadSteamTexturesAsync()
+    protected override void OnUpdate()
     {
-        // 1. Construct the Steam CDN URLs
-        // library_600x900.jpg is the standard vertical box art format
-        string coverUrl = $"https://steamcdn-a.akamaihd.net/steam/apps/{AppId}/library_600x900.jpg";
-        string backgroundUrl = $"https://steamcdn-a.akamaihd.net/steam/apps/{AppId}/library_hero.jpg";
+        // We don't need a trace here anymore! 
+        // The Tooltip Razor component handles the tracing globally.
+        // We just check if the player presses E.
+        
+        // Note: You might want a check here to ensure the player is 
+        // actually looking at THIS object before shuffling.
+    }
 
-        Log.Info( $"[SteamGameCase] Fetching textures for AppID: {AppId}..." );
+    public async Task Shuffle()
+    {
+        var newId = Random.Shared.FromList( _randomAppIds );
+        await LoadSteamTexturesAsync( newId );
+    }
 
-        // 2. Fetch textures from the web
-        // Texture.LoadAsync handles the HTTP request and engine-side texture creation
+    private async Task LoadSteamTexturesAsync( long id )
+    {
+        string coverUrl = $"https://steamcdn-a.akamaihd.net/steam/apps/{id}/library_600x900.jpg";
+        string backgroundUrl = $"https://steamcdn-a.akamaihd.net/steam/apps/{id}/library_hero.jpg";
+
         var coverTex = await Texture.LoadAsync( coverUrl );
         var bgTex = await Texture.LoadAsync( backgroundUrl );
 
-        // 3. Final Safety Checks
-        // Check if the component or its SceneObject was destroyed during the await
-        if ( !this.IsValid || TargetRenderer == null || TargetRenderer.SceneObject == null )
-            return;
+        if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
 
-        if ( coverTex == null )
-        {
-            Log.Warning( $"[SteamGameCase] Failed to load cover art for AppID: {AppId}. Check if AppID is valid." );
-            return;
-        }
-
-        // 4. Apply textures to the SceneObject Attributes
-        // "CoverArt" and "BackArt" must match the 'Name' field in your Shader Graph Texture 2D nodes
         TargetRenderer.SceneObject.Attributes.Set( "CoverArt", coverTex );
+        TargetRenderer.SceneObject.Attributes.Set( "BackArt", bgTex );
         
-        if ( bgTex != null )
-        {
-            TargetRenderer.SceneObject.Attributes.Set( "BackArt", bgTex );
-        }
-
-        Log.Info( $"[SteamGameCase] Successfully applied textures for {AppId}" );
+        // Update the tooltip title to show the current App ID
+        TooltipTitle = $"Game Case (ID: {id})";
     }
 }
