@@ -6430,6 +6430,7 @@
                   "OnComponentFixedUpdate": null,
                   "OnComponentStart": null,
                   "OnComponentUpdate": null,
+                  "OnStartMode": "ClassicRandom",
                   "TargetRenderer": {
                     "_type": "component",
                     "component_id": "c6880c5f-7222-45d3-b067-f221d435ef16",

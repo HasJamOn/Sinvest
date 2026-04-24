@@ -6,24 +6,55 @@ using System.Threading.Tasks;
 
 public sealed class SteamGameCase : Component
 {
+    // Define our dropdown options
+    public enum StartBehavior
+    {
+        ClassicRandom, // Flip between GMod and s&box
+        InstantShuffle // Fetch a random genre pool and pick one immediately
+    }
+
     [Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
     
+    [Property, Group( "Settings" )] public StartBehavior OnStartMode { get; set; } = StartBehavior.ClassicRandom;
+
     [Property, Group( "Tooltip" )] public string TooltipTitle { get; set; } = "Steam Game Case";
     [Property, Group( "Tooltip" )] public string TooltipIcon { get; set; } = "videogame_asset";
     [Property, Group( "Tooltip" )] public string TooltipDescription { get; set; } = "Press E to Shuffle";
 
-    // UPDATED: Use a Dictionary to store the AppID (Key) and Game Name (Value)
     private Dictionary<long, string> _appIdPool = new();
     private bool _isBusy = false;
 
     protected override void OnStart()
     {
-       if ( Game.Random.Int( 0, 1 ) == 0 )
-          _ = LoadSteamAssets( 4000, "Garry's Mod" );
+       if ( OnStartMode == StartBehavior.ClassicRandom )
+       {
+          if ( Game.Random.Int( 0, 1 ) == 0 )
+             _ = LoadSteamAssets( 4000, "Garry's Mod" );
+          else
+             _ = LoadSteamAssets( 590830, "s&box" );
+          
+          // Just refresh the pool in the background
+          _ = RefreshAppPool();
+       }
        else
-          _ = LoadSteamAssets( 590830, "s&box" );
-    
-       _ = RefreshAppPool();
+       {
+          // Load gmod as a temp visual while we fetch the random pool
+          _ = LoadSteamAssets( 4000, "Garry's Mod" );
+          _ = InitialRandomPull();
+       }
+    }
+
+    private async Task InitialRandomPull()
+    {
+        // Fetch the pool first
+        await RefreshAppPool();
+        
+        // Once pool is ready, trigger the first shuffle
+        if ( _appIdPool.Count > 0 )
+        {
+            _isBusy = false; // Ensure we aren't locked
+            await Shuffle();
+        }
     }
 
     public async Task Shuffle()
@@ -37,13 +68,11 @@ public sealed class SteamGameCase : Component
 
        if ( _appIdPool.Count > 0 )
        {
-          // UPDATED: Pick a random Key (ID) from the dictionary keys
           var keys = new List<long>( _appIdPool.Keys );
           var randomId = Game.Random.FromList( keys );
           var gameName = _appIdPool[randomId];
 
           _appIdPool.Remove( randomId );
-          
           await LoadSteamAssets( randomId, gameName );
        }
     }
@@ -67,15 +96,11 @@ public sealed class SteamGameCase : Component
        {
           if ( long.TryParse( entry.Key, out var id ) )
           {
-             // UPDATED: Extract the "name" property for this entry
              var name = entry.Value?["name"]?.ToString() ?? "Unknown Game";
-
              if ( !_appIdPool.ContainsKey( id ) )
                 _appIdPool.Add( id, name );
           }
        }
-
-       Log.Info( $"[SteamGameCase] Refreshed pool with {randomGenre} games. Total: {_appIdPool.Count}" );
     }
 
     private async Task LoadSteamAssets( long appId, string title )
@@ -100,8 +125,6 @@ public sealed class SteamGameCase : Component
        {
           TargetRenderer.SceneObject.Attributes.Set( "CoverArt", coverTex );
           TargetRenderer.SceneObject.Attributes.Set( "BackArt", heroTex );
-       
-          // SUCCESS: Now the tooltip will show the actual game name!
           TooltipTitle = title;
        }
 
