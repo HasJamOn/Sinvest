@@ -19,40 +19,47 @@
     }
     else
     {
-	    <div class="price-hero">
-		    <div class="range-picker">
-			    @foreach (var range in TimeRanges.Keys)
-			    {
-				    <button class="@(CurrentRange == range ? "active" : "")" 
-				            @onclick="@( () => SetRange(range) )">
-					    @range
-				    </button>
-			    }
-		    </div>
+        <div class="price-hero">
+            <div class="range-picker">
+                @foreach (var range in TimeRanges.Keys)
+                {
+                    <button class="@(CurrentRange == range ? "active" : "")" 
+                            @onclick="@( () => SetRange(range) )">
+                        @range
+                    </button>
+                }
+            </div>
 
-		    <div class="chart-container">
-			    <div class="graph-window">
-				    <MarketGraph @ref="GraphCanvas" class="graph-painter" />
-			    </div>
+            <div class="chart-container">
+                <div class="graph-window">
+                    <MarketGraph @ref="GraphCanvas" class="graph-painter" />
+                </div>
 
-			    <div class="y-axis">
-				    @foreach (var price in YAxisLabels)
-				    {
-					    <div class="y-label">@price.ToString("N0")</div>
-				    }
-				    <div class="current-price-tag" style="bottom: @(CurrentPricePercent)%">
-					    @MarketService.CurrentPrice.ToString("N2")
-				    </div>
-			    </div>
-		    </div>
+                <div class="y-axis">
+                    @foreach (var price in YAxisLabels)
+                    {
+                        <div class="y-label">@price.ToString("N0")</div>
+                    }
 
-		    <div class="graph-labels">
-			    @foreach( var label in XAxisLabels )
-			    {
-				    <span>@label</span>
-			    }
-		    </div>
-	    </div>
+                    <%--
+                        Use top + translateY(-50%) instead of bottom so the math
+                        is identical to MapPriceToY (which returns a distance from
+                        the top).  CurrentPricePixelY is already clamped so the
+                        tag never clips under the header or footer of the y-axis.
+                    --%>
+                    <div class="current-price-tag" style="top: @(CurrentPricePixelY)px">
+                        @MarketService.CurrentPrice.ToString("N2")
+                    </div>
+                </div>
+            </div>
+
+            <div class="graph-labels">
+                @foreach( var label in XAxisLabels )
+                {
+                    <span>@label</span>
+                }
+            </div>
+        </div>
 
        <div class="market-data-strip">
            <div class="data-point">
@@ -111,25 +118,33 @@
     private MarketGraph GraphCanvas;
     private bool IsProcessing = false;
     private double LastPrice;
-    private double PreviousPrice; // Added
+    private double PreviousPrice;
     private string CurrentRange = "1D";
-    private bool Initialized = false; 
     private List<string> XAxisLabels = new();
     private List<double> YAxisLabels = new();
-    private float CurrentPricePercent = 0;
 
-    private double PriceDelta => MarketService.CurrentPrice - PreviousPrice; // Added
+    // Pixel distance from the top of the y-axis panel.
+    // Calculated via GraphCanvas.GetCurrentPriceY() so it uses the exact same
+    // coordinate transform as the drawn line — guaranteed pixel-perfect.
+    private float CurrentPricePixelY = 0f;
+
+    // Half-height of the current-price-tag in pixels.
+    // Clamp the tag so it never clips outside the y-axis bounds.
+    // Increase if your font/padding makes the tag taller.
+    private const float TagHalfHeight = 9f;
+
+    private double PriceDelta => MarketService.CurrentPrice - PreviousPrice;
 
     private readonly Dictionary<string, int> TimeRanges = new()
     {
-        { "1D", 60 * 24 },
-        { "5D", 60 * 24 * 5 },
-        { "1M", 60 * 24 * 30 },
-        { "6M", 60 * 24 * 180 },
-        { "YTD", 0 },
-        { "1Y", 60 * 24 * 365 },
-        { "5Y", 60 * 24 * 365 * 5 },
-        { "MAX", 60 * 24 * 365 * 10 }
+        { "1D",  60 * 24              },
+        { "5D",  60 * 24 * 5         },
+        { "1M",  60 * 24 * 30        },
+        { "6M",  60 * 24 * 180       },
+        { "YTD", 0                    },
+        { "1Y",  60 * 24 * 365       },
+        { "5Y",  60 * 24 * 365 * 5   },
+        { "MAX", 60 * 24 * 365 * 10  }
     };
 
     private bool CanAfford => SinvestOS.Instance != null && 
@@ -140,28 +155,51 @@
     
     private string FormatValue(double value)
     {
-        double absValue = Math.Abs(value);
-        if (absValue >= 1000000) return (value / 1000000D).ToString("0.##") + "M";
-        if (absValue >= 1000) return (value / 1000D).ToString("0.#") + "K";
+        double abs = Math.Abs(value);
+        if (abs >= 1_000_000) return (value / 1_000_000D).ToString("0.##") + "M";
+        if (abs >= 1_000)     return (value / 1_000D).ToString("0.#") + "K";
         return value.ToString("N2");
     }
 
+    // -------------------------------------------------------------------------
+    // LIFECYCLE
+    // -------------------------------------------------------------------------
+
     protected override void OnAfterTreeRender( bool firstTime )
     {
-        if ( firstTime )
-        {
-           // Initialize both so delta starts at exactly 0.00
-           LastPrice = MarketService.CurrentPrice;
-           PreviousPrice = MarketService.CurrentPrice; 
+        if ( !firstTime ) return;
 
-           if ( MarketService.PriceHistory.Count < 2 )
-           {
-              PreFillHistory();
-           }
-           RefreshGraph();
-        }
+        LastPrice     = MarketService.CurrentPrice;
+        PreviousPrice = MarketService.CurrentPrice;
+
+        if ( MarketService.PriceHistory.Count < 2 )
+            PreFillHistory();
+
+        // RequestUpdate() handles the zero-rect race internally:
+        //   • If the panel has a valid rect already  → draws immediately.
+        //   • If the rect is still (0,0,0,0)         → sets a flag so OnLayout
+        //     draws on the first frame the engine computes dimensions.
+        // No Task.Delay needed.
+        RefreshGraph();
     }
-    
+
+    public override void Tick()
+    {
+        // Only act when the live price changes; RefreshGraph() handles
+        // both the graph redraw and the price-tag repositioning.
+        if ( MarketService.CurrentPrice == LastPrice ) return;
+
+        PreviousPrice = LastPrice;
+        LastPrice     = MarketService.CurrentPrice;
+
+        RefreshGraph();
+        StateHasChanged();
+    }
+
+    // -------------------------------------------------------------------------
+    // DATA & GRAPH
+    // -------------------------------------------------------------------------
+
     private void PreFillHistory()
     {
         var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
@@ -170,29 +208,10 @@
         var now = DateTime.UtcNow;
         for (int i = 59; i >= 0; i--)
         {
-           var time = now.AddMinutes(-i);
-           int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
-           double price = MarketServerSystem.CalculatePrice(time, seed, false);
-           MarketService.UpdatePrice(price);
-        }
-    }
-
-    public override void Tick()
-    {
-        if ( !Initialized && GraphCanvas != null && GraphCanvas.Box.Rect.Width > 0 )
-        {
-            RefreshGraph();
-            return; 
-        }
-
-        if ( MarketService.CurrentPrice != LastPrice )
-        {
-           // Capture the old price before updating the current one
-           PreviousPrice = LastPrice; 
-           LastPrice = MarketService.CurrentPrice;
-           
-           RefreshGraph();
-           StateHasChanged();
+            var time  = now.AddMinutes(-i);
+            int seed  = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+            double px = MarketServerSystem.CalculatePrice(time, seed, false);
+            MarketService.UpdatePrice(px);
         }
     }
 
@@ -205,108 +224,116 @@
 
     private void RefreshGraph()
     {
-	    if (GraphCanvas == null || GraphCanvas.Box.Rect.Width <= 0) return;
-	    Initialized = true;
+        if (GraphCanvas == null) return;
 
-	    var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
-	    if (system == null) return;
+        var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
+        if (system == null) return;
 
-	    List<double> data = new();
-	    XAxisLabels.Clear();
-	    var now = DateTime.UtcNow;
-	    int resolution = 60; // How many points to draw
-	    int labelCount = 6;  // How many text labels to show at the bottom
+        // --- 1. Build price data ---
+        var data = new List<double>();
+        XAxisLabels.Clear();
 
-	    int totalMinutes = TimeRanges.ContainsKey(CurrentRange) ? TimeRanges[CurrentRange] : 1440;
-        
-	    if (CurrentRange == "YTD")
-	    {
-		    var yearStart = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		    totalMinutes = (int)(now - yearStart).TotalMinutes;
-	    }
+        var now        = DateTime.UtcNow;
+        int resolution = 60;
+        int labelCount = 6;
 
-	    int step = Math.Max(1, totalMinutes / resolution);
+        int totalMinutes = TimeRanges.ContainsKey(CurrentRange) ? TimeRanges[CurrentRange] : 1440;
 
-	    // 1. Generate Price Data
-	    for (int i = 0; i < resolution; i++)
-	    {
-		    var time = now.AddMinutes(-(i * step));
-		    int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
-		    data.Add(MarketServerSystem.CalculatePrice(time, seed, false));
-	    }
-	    data.Reverse();
-	    GraphCanvas.History = data;
-	    GraphCanvas.UpdateGraph();
+        if (CurrentRange == "YTD")
+        {
+            var yearStart = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            totalMinutes  = (int)(now - yearStart).TotalMinutes;
+        }
 
-	    // 2. Generate Time Labels
-	    for (int i = 0; i < labelCount; i++)
-	    {
-		    // Calculate time for this specific label position (from left to right)
-		    float percentage = (float)i / (labelCount - 1);
-		    var labelTime = now.AddMinutes(-(totalMinutes * (1 - percentage)));
-		    XAxisLabels.Add(GetLabelForRange(labelTime, CurrentRange));
-	    }
-	    if (data.Count > 0)
-	    {
-		    double min = data.Min();
-		    double max = data.Max();
-		    double range = max - min;
+        int step = Math.Max(1, totalMinutes / resolution);
 
-		    // Handle flat price to avoid division by zero
-		    if (range <= 0)
-		    {
-			    range = MarketService.CurrentPrice * 0.1; 
-			    if (range <= 0) range = 1.0; 
-		    }
+        for (int i = 0; i < resolution; i++)
+        {
+            var time = now.AddMinutes(-(i * step));
+            int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+            data.Add(MarketServerSystem.CalculatePrice(time, seed, false));
+        }
+        data.Reverse();
 
-		    // 1. Calculate View Bounds with buffer
-		    double viewMin = min - (range * 0.1);
-		    double viewMax = max + (range * 0.1);
-		    double viewRange = viewMax - viewMin;
+        // --- 2. X-Axis labels ---
+        for (int i = 0; i < labelCount; i++)
+        {
+            float   pct       = (float)i / (labelCount - 1);
+            var     labelTime = now.AddMinutes(-(totalMinutes * (1 - pct)));
+            XAxisLabels.Add(GetLabelForRange(labelTime, CurrentRange));
+        }
 
-		    // 2. Pass data to Graph
-		    // Since MinVal/MaxVal don't exist, ensure your MarketGraph 
-		    // internal logic uses viewMin/viewMax for its drawing calculations.
-		    GraphCanvas.History = data;
-		    GraphCanvas.UpdateGraph();
+        // --- 3. Determine view window (price bounds + buffer) ---
+        if (data.Count == 0) { StateHasChanged(); return; }
 
-		    // 3. Generate Y-Axis Labels
-		    YAxisLabels.Clear();
-		    int priceSteps = 5;
-		    for (int i = 0; i < priceSteps; i++)
-		    {
-			    YAxisLabels.Add(viewMax - (viewRange * (i / (float)(priceSteps - 1))));
-		    }
+        double dataMin  = data.Min();
+        double dataMax  = data.Max();
+        double dataRange = dataMax - dataMin;
 
-		    // 4. Calculate Current Price Tag Position
-		    // Removed the '%' symbol which was causing the "Expression expected" error
-		    if (viewRange > 0)
-		    {
-			    CurrentPricePercent = (float)(((MarketService.CurrentPrice - viewMin) / viewRange) * 100f);
-		    }
-		    else
-		    {
-			    CurrentPricePercent = 50f; 
-		    }
+        if (dataRange <= 0)
+        {
+            dataRange = MarketService.CurrentPrice * 0.1;
+            if (dataRange <= 0) dataRange = 1.0;
+        }
 
-		    CurrentPricePercent = Math.Clamp(CurrentPricePercent, 2f, 98f); 
-	    }
+        // 40% buffer on each side — this keeps the line visually centred and
+        // provides headroom so the line never touches the panel edge.
+        double buffer  = dataRange * 0.4;
+        double viewMin = dataMin - buffer;
+        double viewMax = dataMax + buffer;
+
+        // --- 4. Push data & bounds to the graph panel ---
+        GraphCanvas.MinVal  = (float)viewMin;
+        GraphCanvas.MaxVal  = (float)viewMax;
+        GraphCanvas.History = data;
+        // RequestUpdate uses the stored rect if available, or defers to OnLayout.
+        GraphCanvas.RequestUpdate();
+
+        // --- 5. Y-Axis labels ---
+        //
+        // We generate them across viewMin..viewMax in the same order the
+        // y-axis renders them: top label = viewMax, bottom label = viewMin.
+        // The y-axis uses justify-content: space-between + padding: 10px 0,
+        // so label[0] sits at VerticalPadding px from the top.
+        // MapPriceToY(viewMax) also returns VerticalPadding → aligned ✓
+        YAxisLabels.Clear();
+        int priceSteps = 5;
+        double viewRange = viewMax - viewMin;
+        for (int i = 0; i < priceSteps; i++)
+        {
+            YAxisLabels.Add(viewMax - viewRange * (i / (float)(priceSteps - 1)));
+        }
+
+        // --- 6. Current-price-tag pixel position ---
+        //
+        // We ask the graph for the Y pixel that corresponds to the live price.
+        // This uses the exact same MapPriceToY() math as the drawn line, so
+        // the tag and the line tip are always on the same horizontal scanline.
+        float rawY = GraphCanvas.GetCurrentPriceY((float)MarketService.CurrentPrice);
+
+        // Clamp so the tag label never overflows the top or bottom of the panel.
+        float maxY = GraphCanvas.LastKnownRect.Height > 0
+            ? GraphCanvas.LastKnownRect.Height - TagHalfHeight
+            : 220f - TagHalfHeight;
+        CurrentPricePixelY = Math.Clamp(rawY, TagHalfHeight, maxY);
+
+        StateHasChanged();
     }
     
     private string GetLabelForRange(DateTime dt, string range)
     {
-	    return range switch
-	    {
-		    "1D" => dt.ToString("HH:mm"),
-		    "5D" => dt.ToString("MM/dd HH:mm"), // Shows date + time for clarity
-		    "1M" => dt.ToString("MMM dd"),
-		    "6M" => dt.ToString("MMM"),
-		    "YTD" => dt.ToString("MMM"),
-		    "1Y" => dt.ToString("MMM yy"),
-		    "5Y" => dt.ToString("yyyy"),
-		    "MAX" => dt.ToString("yyyy"),
-		    _ => dt.ToString("HH:mm")
-	    };
+        return range switch
+        {
+            "1D"  => dt.ToString("HH:mm"),
+            "5D"  => dt.ToString("MM/dd HH:mm"),
+            "1M"  => dt.ToString("MMM dd"),
+            "6M"  => dt.ToString("MMM"),
+            "YTD" => dt.ToString("MMM"),
+            "1Y"  => dt.ToString("MMM yy"),
+            "5Y"  => dt.ToString("yyyy"),
+            "MAX" => dt.ToString("yyyy"),
+            _     => dt.ToString("HH:mm")
+        };
     }
 
     private async void DoTrade(int amount)
@@ -316,11 +343,11 @@
         StateHasChanged();
     
         double totalCost = MarketService.CurrentPrice * amount;
-        if (amount < 0 && (SinvestOS.Instance?.CurrentShares ?? 0) < Math.Abs(amount)) 
+        if (amount < 0 && (SinvestOS.Instance?.CurrentShares ?? 0) < Math.Abs(amount))
         {
-           IsProcessing = false;
-           StateHasChanged();
-           return;
+            IsProcessing = false;
+            StateHasChanged();
+            return;
         }
 
         SinvestOS.Instance?.Transaction(-totalCost, (double)amount);
@@ -331,6 +358,11 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine(MarketService.CurrentPrice, IsProcessing, SinvestOS.Instance?.CurrentMoney, CurrentRange);
+        return HashCode.Combine(
+            MarketService.CurrentPrice,
+            IsProcessing,
+            SinvestOS.Instance?.CurrentMoney,
+            CurrentRange
+        );
     }
 }

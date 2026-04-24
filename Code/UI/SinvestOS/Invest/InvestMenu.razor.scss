@@ -1,5 +1,18 @@
 @import "../_base.scss";
 
+// ============================================================================
+// LAYOUT CONSTANTS — mirror these in MarketGraph.cs as properties.
+//
+//   $graph-h-padding  ↔  GraphCanvas.HorizontalPadding = 0f
+//   $graph-v-padding  ↔  GraphCanvas.VerticalPadding   = 10f
+//   $y-axis-width     ↔  used in .graph-labels margin-right
+//
+// If you change any of these values you MUST update the matching C# constant.
+// ============================================================================
+$graph-h-padding : 0px;    // horizontal inset for graph line start/end
+$graph-v-padding : 10px;   // vertical inset — matches y-axis padding-top/bottom
+$y-axis-width    : 65px;
+
 InvestMenu {
   display: flex;
   flex-direction: column;
@@ -43,28 +56,6 @@ InvestMenu {
     flex-direction: column;
     padding: 0;
 
-    .price-display {
-      @include bevel-in;
-      background-color: #000;
-      padding: 10px;
-      margin-bottom: 12px;
-      align-items: center;
-
-      h1 {
-        font-family: "Roboto Mono", monospace;
-        font-size: 48px;
-        font-weight: 900;
-        color: #00ff00 !important;
-        margin: 0;
-      }
-
-      label {
-        font-size: 10px;
-        color: #008800 !important;
-        font-weight: bold;
-      }
-    }
-
     .range-picker {
       display: flex;
       gap: 2px;
@@ -89,7 +80,6 @@ InvestMenu {
       }
     }
 
-    // New Container for Y-Axis alignment
     .chart-container {
       display: flex;
       flex-direction: row;
@@ -100,35 +90,41 @@ InvestMenu {
       overflow: hidden;
     }
 
+    // -------------------------------------------------------------------------
+    // .graph-window
+    // The flex-grow: 1 child that holds the absolute-positioned painter.
+    // Left/right margins create breathing room between the panel border and the
+    // drawn line.  C# $graph-h-padding is 0 here because the padding is
+    // structural (provided by this margin), not drawn-coordinate padding.
+    // -------------------------------------------------------------------------
     .graph-window {
       flex-grow: 1;
       position: relative;
       overflow: hidden;
-      /* s&box panels are flex by default, but we'll be explicit */
       display: flex;
+
+      // Visual breathing room.  Increase to push the line away from the edges.
+      // If you increase this, add the same value to GraphCanvas.HorizontalPadding.
+      margin-left: 15px;
+      margin-right: 15px;
 
       &::before {
         content: "";
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 0; left: 0; right: 0; bottom: 0;
         opacity: 0.1;
         background-image:
-                linear-gradient(#00ff00 10%, transparent 50%),
-                linear-gradient(90deg, #00ff00 10%, transparent 50%);
+          linear-gradient(#00ff00 10%, transparent 50%),
+          linear-gradient(90deg, #00ff00 10%, transparent 50%);
         background-size: 25px 25px;
         pointer-events: none;
         z-index: 2;
       }
 
       .graph-painter {
-        /* Absolute position ensures it sticks to the corners of .graph-window */
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
+        top: 0; left: 0;
+        width: 83%;
         height: 100%;
         pointer-events: none;
         z-index: 5;
@@ -141,15 +137,29 @@ InvestMenu {
       }
     }
 
+    // -------------------------------------------------------------------------
+    // .y-axis
+    //
+    // padding-top / padding-bottom MUST equal $graph-v-padding (10px).
+    // This ensures label[0] (viewMax) sits at the same pixel row as the
+    // graph line at viewMax, and label[last] (viewMin) aligns with the bottom.
+    //
+    // The .current-price-tag uses `top` (set inline by C#) + translateY(-50%)
+    // so its centre line always matches the corresponding graph scanline.
+    // -------------------------------------------------------------------------
     .y-axis {
-      width: 65px;
+      width: $y-axis-width;
       height: 100%;
       border-left: 1px solid rgba(0, 255, 0, 0.1);
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 10px 0;
+
+      // Keep these equal to $graph-v-padding or y-labels will drift.
+      padding-top:    $graph-v-padding;
+      padding-bottom: $graph-v-padding;
+
       background-color: #050505;
 
       .y-label {
@@ -170,8 +180,11 @@ InvestMenu {
         font-weight: bold;
         padding: 2px 4px;
         z-index: 20;
-        transform: translateY(50%); // Centering point
-        transition: bottom 0.2s ease-out;
+
+        // `top` is set dynamically in pixels by C# (CurrentPricePixelY).
+        // translateY(-50%) centres the tag on that pixel row.
+        transform: translateY(-50%);
+        transition: top 0.2s ease-out;
 
         &::before {
           content: "";
@@ -186,20 +199,40 @@ InvestMenu {
       }
     }
 
+    // -------------------------------------------------------------------------
+    // .graph-labels  (X-axis time labels)
+    //
+    // margin-left aligns the labels container with the left edge of .graph-window
+    // (accounting for .graph-window's own margin-left: 15px).
+    //
+    // margin-right accounts for .y-axis width so labels don't extend under it.
+    //
+    // padding-left/right match $graph-h-padding so the first and last labels
+    // sit directly above the first and last graph data points.
+    // With $graph-h-padding = 0 the labels span the full container width.
+    // -------------------------------------------------------------------------
     .graph-labels {
       display: flex;
       justify-content: space-between;
-      padding: 6px 8px;
+      padding-top: 6px;
+      padding-bottom: 6px;
       background-color: #000;
       border-top: 1px solid $gtk-shadow;
-      // Offset for the Y-axis width to keep labels under the graph area
-      margin-right: 65px;
+
+      // Horizontal alignment — mirrors .graph-window margins + $graph-h-padding
+      margin-left:  15px;              // same as .graph-window margin-left
+      margin-right: $y-axis-width;    // exclude the y-axis column (single declaration)
+
+      // Mirror C# HorizontalPadding so first/last labels sit above line endpoints
+      padding-left:  $graph-h-padding;
+      padding-right: $graph-h-padding;
 
       span {
         font-family: "Roboto Mono", monospace;
         font-size: 9px;
         color: #008800;
         text-transform: uppercase;
+        // Zero width + flex-centering lets intermediate labels float freely
         width: 0;
         display: flex;
         justify-content: center;
@@ -207,7 +240,7 @@ InvestMenu {
       }
 
       span:first-child { justify-content: flex-start; width: auto; }
-      span:last-child { justify-content: flex-end; width: auto; }
+      span:last-child  { justify-content: flex-end;   width: auto; }
     }
   }
 
@@ -278,8 +311,8 @@ InvestMenu {
           font-weight: bold;
           font-size: 11px;
 
-          &.up { color: #007800 !important; }
-          &.down { color: #950000 !important; }
+          &.up      { color: #007800 !important; }
+          &.down    { color: #950000 !important; }
           &.neutral { color: $gtk-shadow !important; opacity: 0.6; }
         }
 
