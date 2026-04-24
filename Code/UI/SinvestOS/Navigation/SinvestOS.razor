@@ -61,7 +61,8 @@
 				}
 				else
 				{
-					<span>Exit to Menu</span>
+					@* Use the new helper method here *@
+					<span>Exit @GetActiveAppName()</span>
 				}
 			</button>
 		}
@@ -90,6 +91,22 @@
     public double CurrentShares => _targetShares;
 
     protected override void OnAwake() => Instance = this;
+    
+    private string GetActiveAppName()
+    {
+	    if (_activeViewPanel == null) return "";
+
+	    // Get the type name of the current panel
+	    var typeName = _activeViewPanel.GetType().Name;
+
+	    return typeName switch
+	    {
+		    nameof(CasinoMenu) => "Sincash.ino",
+		    nameof(InvestMenu) => "Fund.ino",
+		    nameof(CoinFlip)   => "Coin Flip",
+		    _ => "to Menu" // Fallback
+	    };
+    }
     
     public void CloseAndDestroy()
     {
