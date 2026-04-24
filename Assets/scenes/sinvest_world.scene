@@ -5129,7 +5129,7 @@
                   ]
                 },
                 {
-                  "__guid": "a829e475-2f24-4316-956b-a374e37b4f7a",
+                  "__guid": "b54f4e5c-bfdd-466d-95a9-b0c13a2e6c45",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -5146,7 +5146,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "474d78af-cca8-4121-9ff3-bd884a0b7c88",
+                      "__guid": "9b68af90-6bac-49ac-a3ef-273b64a60d6e",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5198,7 +5198,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "de3adea2-7ecc-4676-9e22-c1ecb557ed0b",
+                  "__guid": "f3948e50-9938-468f-8133-f5cbdb90bd0d",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5215,7 +5215,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "5b9add45-8e5f-4034-b78b-1c7e8c9bd53e",
+                      "__guid": "d311a9a9-69b4-408f-8ef7-3e45622c5ca6",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5267,7 +5267,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "0505184f-49b5-429a-9930-5dac29f196b6",
+                  "__guid": "d197228c-e784-4d94-accb-59491a040f7a",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5284,7 +5284,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "18e30d04-fa5c-48fd-878e-b7efec4cb626",
+                      "__guid": "ea85069c-84eb-4225-905d-95191d4df3c4",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5336,7 +5336,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "28dba68b-a066-47a0-bed8-81b6f3d52e6c",
+                  "__guid": "0f70d0de-9a2a-4cbe-a3af-15fa90029c92",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5353,7 +5353,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "9c49237f-8e87-4d96-937d-7b1f679f28c0",
+                      "__guid": "24cd03d5-7981-4fc0-9f4b-0669c8dd5632",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -11801,6 +11801,71 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "89e2a00a-f95f-4c34-bde5-785b3b7cc6d9",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "SteamGameCase",
+      "Position": "149.851425,-12.7585583,48.5879745",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "SteamGameCase",
+          "__guid": "c19cae89-b318-4401-ba6b-02bb5f844e66",
+          "__enabled": true,
+          "Flags": 0,
+          "AppId": 292030,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "TargetRenderer": {
+            "_type": "component",
+            "component_id": "c6880c5f-7222-45d3-b067-f221d435ef16",
+            "go": "89e2a00a-f95f-4c34-bde5-785b3b7cc6d9",
+            "component_type": "ModelRenderer"
+          }
+        },
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "c6880c5f-7222-45d3-b067-f221d435ef16",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": "steamlibrary_case/steamgamecase.vmat",
+          "Materials": null,
+          "Model": null,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
         }
       ],
       "Children": []
