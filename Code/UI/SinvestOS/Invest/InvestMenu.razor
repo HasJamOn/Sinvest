@@ -26,58 +26,69 @@
           </div>
 
           <div class="range-picker">
-	          @foreach ( var range in TimeRanges.Keys )
-	          {
-		          <button class="@(CurrentRange == range ? "active" : "")" 
-		                  @onclick="@(() => SetRange(range))">
-			          @range
-		          </button>
-	          }
+              @foreach ( var range in TimeRanges.Keys )
+              {
+                 <button class="@(CurrentRange == range ? "active" : "")" 
+                         @onclick="@(() => SetRange(range))">
+                    @range
+                 </button>
+              }
           </div>
 
           <div class="graph-window">
-	          <MarketGraph @ref="GraphCanvas" class="graph-painter" />
+              <MarketGraph @ref="GraphCanvas" class="graph-painter" />
           </div>
        </div>
 
        <div class="market-data-strip">
-	       <div class="data-point">
-		       <span class="label">HOLDINGS</span>
-		       <span class="value">@FormatValue(SinvestOS.Instance?.CurrentShares ?? 0) UNITS</span>
-	       </div>
+           <div class="data-point">
+              <span class="label">HOLDINGS</span>
+              <span class="value">@FormatValue(SinvestOS.Instance?.CurrentShares ?? 0) UNITS</span>
+           </div>
     
-	       <div class="divider"></div>
+           <div class="divider"></div>
 
-	       <div class="data-point">
-		       <span class="label">EQUITY</span>
-		       <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * MarketService.CurrentPrice)</span>
-	       </div>
+           <div class="data-point">
+              <span class="label">EQUITY</span>
+              <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * MarketService.CurrentPrice)</span>
+           </div>
 
-	       <div class="divider"></div>
+           <div class="divider"></div>
 
-	       <div class="data-point">
-		       <span class="label">BUY POWER</span>
-		       <span class="value">$@FormatValue(SinvestOS.Instance?.CurrentMoney ?? 0)</span>
-	       </div>
+           <div class="data-point">
+              <span class="label">BUY POWER</span>
+              <span class="value">$@FormatValue(SinvestOS.Instance?.CurrentMoney ?? 0)</span>
+           </div>
        </div>
 
        <div class="actions-container">
-	       <div class="cost-preview">
-		       <span>TRANSACTION COST:</span>
-		       <span class="price">$@MarketService.CurrentPrice.ToString("N2") / UNIT</span>
-	       </div>
+           <div class="cost-preview">
+              <span>TRANSACTION COST:</span>
+              
+              <div class="delta-group">
+                 <span class="arrow @(PriceDelta > 0 ? "up" : (PriceDelta < 0 ? "down" : "neutral"))">
+                    @(PriceDelta > 0 ? "▲" : (PriceDelta < 0 ? "▼" : "•"))
+                 </span>
 
-	       <div class="actions">
-		       <button class="buy @(!CanAfford || IsProcessing ? "disabled" : "")" 
-		               @onclick="@( () => DoTrade(1) )">
-			       BUY 1 SBOX
-		       </button>
+                 <span class="delta-value @(PriceDelta > 0 ? "up" : (PriceDelta < 0 ? "down" : "neutral"))">
+                    $@Math.Abs(PriceDelta).ToString("N2")
+                 </span>
 
-		       <button class="sell @(!CanSell || IsProcessing ? "disabled" : "")" 
-		               @onclick="@( () => DoTrade(-1) )">
-			       SELL 1 SBOX
-		       </button>
-	       </div>
+                 <span class="price">$@MarketService.CurrentPrice.ToString("N2") / UNIT</span>
+              </div>
+           </div>
+
+           <div class="actions">
+              <button class="buy @(!CanAfford || IsProcessing ? "disabled" : "")" 
+                      @onclick="@( () => DoTrade(1) )">
+                 BUY 1 SBOX
+              </button>
+
+              <button class="sell @(!CanSell || IsProcessing ? "disabled" : "")" 
+                      @onclick="@( () => DoTrade(-1) )">
+                 SELL 1 SBOX
+              </button>
+           </div>
        </div>
     }
 </root>
@@ -86,8 +97,11 @@
     private MarketGraph GraphCanvas;
     private bool IsProcessing = false;
     private double LastPrice;
+    private double PreviousPrice; // Added
     private string CurrentRange = "1D";
-    private bool Initialized = false; // Track if we've successfully drawn the first time
+    private bool Initialized = false; 
+
+    private double PriceDelta => MarketService.CurrentPrice - PreviousPrice; // Added
 
     private readonly Dictionary<string, int> TimeRanges = new()
     {
@@ -109,30 +123,24 @@
     
     private string FormatValue(double value)
     {
-	    double absValue = Math.Abs(value);
-    
-	    // Millions
-	    if (absValue >= 1000000)
-		    return (value / 1000000D).ToString("0.##") + "M";
-    
-	    // Thousands
-	    if (absValue >= 1000)
-		    return (value / 1000D).ToString("0.#") + "K";
-
-	    // Standard (with 2 decimals for financial precision)
-	    return value.ToString("N2");
+        double absValue = Math.Abs(value);
+        if (absValue >= 1000000) return (value / 1000000D).ToString("0.##") + "M";
+        if (absValue >= 1000) return (value / 1000D).ToString("0.#") + "K";
+        return value.ToString("N2");
     }
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
         if ( firstTime )
         {
+           // Initialize both so delta starts at exactly 0.00
+           LastPrice = MarketService.CurrentPrice;
+           PreviousPrice = MarketService.CurrentPrice; 
+
            if ( MarketService.PriceHistory.Count < 2 )
            {
               PreFillHistory();
            }
-           
-           // We attempt a refresh, but Tick will handle the fallback if Width is 0
            RefreshGraph();
         }
     }
@@ -154,8 +162,6 @@
 
     public override void Tick()
     {
-        // FAIL-SAFE: If we haven't successfully drawn yet (due to 0-width layout),
-        // keep trying until the panel has dimensions.
         if ( !Initialized && GraphCanvas != null && GraphCanvas.Box.Rect.Width > 0 )
         {
             RefreshGraph();
@@ -164,7 +170,10 @@
 
         if ( MarketService.CurrentPrice != LastPrice )
         {
+           // Capture the old price before updating the current one
+           PreviousPrice = LastPrice; 
            LastPrice = MarketService.CurrentPrice;
+           
            RefreshGraph();
            StateHasChanged();
         }
@@ -180,11 +189,8 @@
     private void RefreshGraph()
     {
         if ( GraphCanvas == null ) return;
-
-        // If layout isn't ready, don't mark as Initialized, just exit and wait for Tick
         if ( GraphCanvas.Box.Rect.Width <= 0 ) return;
 
-        // Once we pass this point, we have dimensions!
         Initialized = true;
 
         if ( CurrentRange == "1D" )
