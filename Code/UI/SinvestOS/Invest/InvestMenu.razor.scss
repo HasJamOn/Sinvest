@@ -89,18 +89,31 @@ InvestMenu {
       }
     }
 
-    .graph-window {
-      @include bevel-in;
+    // New Container for Y-Axis alignment
+    .chart-container {
+      display: flex;
+      flex-direction: row;
+      height: 220px;
       width: 100%;
-      height: 200px;
+      @include bevel-in;
       background-color: #000d00;
+      overflow: hidden;
+    }
+
+    .graph-window {
+      flex-grow: 1;
       position: relative;
       overflow: hidden;
+      /* s&box panels are flex by default, but we'll be explicit */
+      display: flex;
 
       &::before {
         content: "";
         position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         opacity: 0.1;
         background-image:
                 linear-gradient(#00ff00 10%, transparent 50%),
@@ -110,28 +123,94 @@ InvestMenu {
         z-index: 2;
       }
 
-      .graph-line {
-        background-color: #00ff00;
-        z-index: 10;
+      .graph-painter {
+        /* Absolute position ensures it sticks to the corners of .graph-window */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
+        z-index: 5;
+
+        .graph-line {
+          background-color: #00ff00;
+          height: 2px;
+          z-index: 10;
+        }
       }
     }
 
-    .graph-painter {
-      width: 100%;
+    .y-axis {
+      width: 65px;
       height: 100%;
+      border-left: 1px solid rgba(0, 255, 0, 0.1);
+      position: relative;
       display: flex;
-      pointer-events: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px 0;
+      background-color: #050505;
 
-      .graph-line {
-        background-color: #00ff00;
-        height: 2px;
-        z-index: 10;
+      .y-label {
+        font-family: "Roboto Mono", monospace;
+        font-size: 9px;
+        color: #006600;
+        text-align: right;
+        padding-right: 6px;
       }
+
+      .current-price-tag {
+        position: absolute;
+        right: 0;
+        background-color: #00ff00;
+        color: #000;
+        font-family: "Roboto Mono", monospace;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 2px 4px;
+        z-index: 20;
+        transform: translateY(50%); // Centering point
+        transition: bottom 0.2s ease-out;
+
+        &::before {
+          content: "";
+          position: absolute;
+          left: -6px;
+          top: 50%;
+          transform: translateY(-50%);
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          border-right: 6px solid #00ff00;
+        }
+      }
+    }
+
+    .graph-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 8px;
+      background-color: #000;
+      border-top: 1px solid $gtk-shadow;
+      // Offset for the Y-axis width to keep labels under the graph area
+      margin-right: 65px;
+
+      span {
+        font-family: "Roboto Mono", monospace;
+        font-size: 9px;
+        color: #008800;
+        text-transform: uppercase;
+        width: 0;
+        display: flex;
+        justify-content: center;
+        white-space: nowrap;
+      }
+
+      span:first-child { justify-content: flex-start; width: auto; }
+      span:last-child { justify-content: flex-end; width: auto; }
     }
   }
 
-  // --- REPLACED STATS-ROW WITH MINIMALIST STRIP ---
   .market-data-strip {
     @include bevel-in;
     background-color: $gtk-bg;
@@ -161,7 +240,6 @@ InvestMenu {
       }
     }
 
-    // Vertical etched divider
     .divider {
       width: 2px;
       height: 30px;
@@ -179,10 +257,9 @@ InvestMenu {
     .cost-preview {
       display: flex;
       justify-content: space-between;
-      align-items: center; // Vertically align items
+      align-items: center;
       padding: 0 4px;
 
-      // Use > span to only target the "TRANSACTION COST:" label
       > span {
         font-family: "MS Sans Serif", Arial;
         font-size: 10px;
@@ -196,7 +273,6 @@ InvestMenu {
         align-items: center;
         gap: 6px;
 
-        // Isolate the color logic to only these specific elements
         .arrow, .delta-value {
           font-family: "Roboto Mono", monospace;
           font-weight: bold;
@@ -214,7 +290,7 @@ InvestMenu {
           font-family: monospace;
           font-size: 11px;
           padding-left: 6px;
-          border-left: 1px solid rgba(0, 0, 0, 0.2); // Subtle divider before the total unit price
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
         }
       }
     }

@@ -19,26 +19,40 @@
     }
     else
     {
-       <div class="price-hero">
-          <div class="price-display">
-              <h1>$@MarketService.CurrentPrice.ToString("N2")</h1>
-              <label>GLOBAL ASSET PRICE (UTC)</label>
-          </div>
+	    <div class="price-hero">
+		    <div class="range-picker">
+			    @foreach (var range in TimeRanges.Keys)
+			    {
+				    <button class="@(CurrentRange == range ? "active" : "")" 
+				            @onclick="@( () => SetRange(range) )">
+					    @range
+				    </button>
+			    }
+		    </div>
 
-          <div class="range-picker">
-              @foreach ( var range in TimeRanges.Keys )
-              {
-                 <button class="@(CurrentRange == range ? "active" : "")" 
-                         @onclick="@(() => SetRange(range))">
-                    @range
-                 </button>
-              }
-          </div>
+		    <div class="chart-container">
+			    <div class="graph-window">
+				    <MarketGraph @ref="GraphCanvas" class="graph-painter" />
+			    </div>
 
-          <div class="graph-window">
-              <MarketGraph @ref="GraphCanvas" class="graph-painter" />
-          </div>
-       </div>
+			    <div class="y-axis">
+				    @foreach (var price in YAxisLabels)
+				    {
+					    <div class="y-label">@price.ToString("N0")</div>
+				    }
+				    <div class="current-price-tag" style="bottom: @(CurrentPricePercent)%">
+					    @MarketService.CurrentPrice.ToString("N2")
+				    </div>
+			    </div>
+		    </div>
+
+		    <div class="graph-labels">
+			    @foreach( var label in XAxisLabels )
+			    {
+				    <span>@label</span>
+			    }
+		    </div>
+	    </div>
 
        <div class="market-data-strip">
            <div class="data-point">
@@ -100,6 +114,9 @@
     private double PreviousPrice; // Added
     private string CurrentRange = "1D";
     private bool Initialized = false; 
+    private List<string> XAxisLabels = new();
+    private List<double> YAxisLabels = new();
+    private float CurrentPricePercent = 0;
 
     private double PriceDelta => MarketService.CurrentPrice - PreviousPrice; // Added
 
@@ -188,45 +205,108 @@
 
     private void RefreshGraph()
     {
-        if ( GraphCanvas == null ) return;
-        if ( GraphCanvas.Box.Rect.Width <= 0 ) return;
+	    if (GraphCanvas == null || GraphCanvas.Box.Rect.Width <= 0) return;
+	    Initialized = true;
 
-        Initialized = true;
+	    var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
+	    if (system == null) return;
 
-        if ( CurrentRange == "1D" )
-        {
-            GraphCanvas.History = MarketService.PriceHistory.ToList();
-            GraphCanvas.UpdateGraph();
-            return;
-        }
+	    List<double> data = new();
+	    XAxisLabels.Clear();
+	    var now = DateTime.UtcNow;
+	    int resolution = 60; // How many points to draw
+	    int labelCount = 6;  // How many text labels to show at the bottom
 
-        var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
-        if (system == null) return;
-
-        List<double> data = new();
-        var now = DateTime.UtcNow;
-        int resolution = 60; 
-
-        int totalMinutes = TimeRanges.ContainsKey( CurrentRange ) ? TimeRanges[CurrentRange] : 1440;
+	    int totalMinutes = TimeRanges.ContainsKey(CurrentRange) ? TimeRanges[CurrentRange] : 1440;
         
-        if ( CurrentRange == "YTD" )
-        {
-            var yearStart = new DateTime( now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc );
-            totalMinutes = (int)(now - yearStart).TotalMinutes;
-        }
+	    if (CurrentRange == "YTD")
+	    {
+		    var yearStart = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		    totalMinutes = (int)(now - yearStart).TotalMinutes;
+	    }
 
-        int step = Math.Max( 1, totalMinutes / resolution );
+	    int step = Math.Max(1, totalMinutes / resolution);
 
-        for ( int i = 0; i < resolution; i++ )
-        {
-            var time = now.AddMinutes( -(i * step) );
-            int seed = MarketServerSystem.GetSeedAtTime( time, system.CurrentSeed, system.CurrentEraStart );
-            data.Add( MarketServerSystem.CalculatePrice( time, seed, false ) );
-        }
+	    // 1. Generate Price Data
+	    for (int i = 0; i < resolution; i++)
+	    {
+		    var time = now.AddMinutes(-(i * step));
+		    int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+		    data.Add(MarketServerSystem.CalculatePrice(time, seed, false));
+	    }
+	    data.Reverse();
+	    GraphCanvas.History = data;
+	    GraphCanvas.UpdateGraph();
 
-        data.Reverse(); 
-        GraphCanvas.History = data;
-        GraphCanvas.UpdateGraph();
+	    // 2. Generate Time Labels
+	    for (int i = 0; i < labelCount; i++)
+	    {
+		    // Calculate time for this specific label position (from left to right)
+		    float percentage = (float)i / (labelCount - 1);
+		    var labelTime = now.AddMinutes(-(totalMinutes * (1 - percentage)));
+		    XAxisLabels.Add(GetLabelForRange(labelTime, CurrentRange));
+	    }
+	    if (data.Count > 0)
+	    {
+		    double min = data.Min();
+		    double max = data.Max();
+		    double range = max - min;
+
+		    // Handle flat price to avoid division by zero
+		    if (range <= 0)
+		    {
+			    range = MarketService.CurrentPrice * 0.1; 
+			    if (range <= 0) range = 1.0; 
+		    }
+
+		    // 1. Calculate View Bounds with buffer
+		    double viewMin = min - (range * 0.1);
+		    double viewMax = max + (range * 0.1);
+		    double viewRange = viewMax - viewMin;
+
+		    // 2. Pass data to Graph
+		    // Since MinVal/MaxVal don't exist, ensure your MarketGraph 
+		    // internal logic uses viewMin/viewMax for its drawing calculations.
+		    GraphCanvas.History = data;
+		    GraphCanvas.UpdateGraph();
+
+		    // 3. Generate Y-Axis Labels
+		    YAxisLabels.Clear();
+		    int priceSteps = 5;
+		    for (int i = 0; i < priceSteps; i++)
+		    {
+			    YAxisLabels.Add(viewMax - (viewRange * (i / (float)(priceSteps - 1))));
+		    }
+
+		    // 4. Calculate Current Price Tag Position
+		    // Removed the '%' symbol which was causing the "Expression expected" error
+		    if (viewRange > 0)
+		    {
+			    CurrentPricePercent = (float)(((MarketService.CurrentPrice - viewMin) / viewRange) * 100f);
+		    }
+		    else
+		    {
+			    CurrentPricePercent = 50f; 
+		    }
+
+		    CurrentPricePercent = Math.Clamp(CurrentPricePercent, 2f, 98f); 
+	    }
+    }
+    
+    private string GetLabelForRange(DateTime dt, string range)
+    {
+	    return range switch
+	    {
+		    "1D" => dt.ToString("HH:mm"),
+		    "5D" => dt.ToString("MM/dd HH:mm"), // Shows date + time for clarity
+		    "1M" => dt.ToString("MMM dd"),
+		    "6M" => dt.ToString("MMM"),
+		    "YTD" => dt.ToString("MMM"),
+		    "1Y" => dt.ToString("MMM yy"),
+		    "5Y" => dt.ToString("yyyy"),
+		    "MAX" => dt.ToString("yyyy"),
+		    _ => dt.ToString("HH:mm")
+	    };
     }
 
     private async void DoTrade(int amount)
