@@ -40,27 +40,44 @@
           </div>
        </div>
 
-       <div class="stats-row">
-          <div class="stat">
-             <label>SHARES</label>
-             <span>@(SinvestOS.Instance?.CurrentShares.ToString("N0") ?? "0")</span>
-          </div>
-          <div class="stat">
-             <label>EQUITY</label>
-             <span>$@(((SinvestOS.Instance?.CurrentShares ?? 0) * MarketService.CurrentPrice).ToString("N2"))</span>
-          </div>
+       <div class="market-data-strip">
+	       <div class="data-point">
+		       <span class="label">HOLDINGS</span>
+		       <span class="value">@FormatValue(SinvestOS.Instance?.CurrentShares ?? 0) UNITS</span>
+	       </div>
+    
+	       <div class="divider"></div>
+
+	       <div class="data-point">
+		       <span class="label">EQUITY</span>
+		       <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * MarketService.CurrentPrice)</span>
+	       </div>
+
+	       <div class="divider"></div>
+
+	       <div class="data-point">
+		       <span class="label">BUY POWER</span>
+		       <span class="value">$@FormatValue(SinvestOS.Instance?.CurrentMoney ?? 0)</span>
+	       </div>
        </div>
 
-       <div class="actions">
-           <button class="buy @(!CanAfford || IsProcessing ? "disabled" : "")" 
-                   @onclick="@( () => DoTrade(1) )">
-              BUY 1 SBOX
-           </button>
+       <div class="actions-container">
+	       <div class="cost-preview">
+		       <span>TRANSACTION COST:</span>
+		       <span class="price">$@MarketService.CurrentPrice.ToString("N2") / UNIT</span>
+	       </div>
 
-           <button class="sell @(!CanSell || IsProcessing ? "disabled" : "")" 
-                   @onclick="@( () => DoTrade(-1) )">
-              SELL 1 SBOX
-           </button>
+	       <div class="actions">
+		       <button class="buy @(!CanAfford || IsProcessing ? "disabled" : "")" 
+		               @onclick="@( () => DoTrade(1) )">
+			       BUY 1 SBOX
+		       </button>
+
+		       <button class="sell @(!CanSell || IsProcessing ? "disabled" : "")" 
+		               @onclick="@( () => DoTrade(-1) )">
+			       SELL 1 SBOX
+		       </button>
+	       </div>
        </div>
     }
 </root>
@@ -89,6 +106,22 @@
 
     private bool CanSell => SinvestOS.Instance != null && 
                             SinvestOS.Instance.CurrentShares >= 1;
+    
+    private string FormatValue(double value)
+    {
+	    double absValue = Math.Abs(value);
+    
+	    // Millions
+	    if (absValue >= 1000000)
+		    return (value / 1000000D).ToString("0.##") + "M";
+    
+	    // Thousands
+	    if (absValue >= 1000)
+		    return (value / 1000D).ToString("0.#") + "K";
+
+	    // Standard (with 2 decimals for financial precision)
+	    return value.ToString("N2");
+    }
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
