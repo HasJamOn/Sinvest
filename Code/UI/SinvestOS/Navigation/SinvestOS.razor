@@ -20,51 +20,52 @@
 		</div>
 	</div>
 
-    <div class="hud-content">
-	    @if ( _activeViewPanel == null )
-	    {
-		    <div class="menu">
-			    <button class="app-icon sincash" @onclick="@( () => SetView<CasinoMenu>() )">
-				    <img src="ui/casino/navigation/sincash.png" />
-				    <label>Sincash.ino</label>
-			    </button>
+	<div class="hud-content">
+		@if ( _activeViewPanel == null )
+		{
+			<div class="menu">
+				<button class="app-icon sincash" @onclick="@( () => SetView<CasinoMenu>() )">
+					<img src="ui/casino/navigation/sincash.png" />
+					<label>Sincash.ino</label>
+				</button>
 
-			    <button class="app-icon" @onclick=@( () => SetView<InvestMenu>() )>
-				    <img src="ui/casino/navigation/fundino_icon.png" />
-				    <label>Fund.ino</label>
-			    </button>
+				<button class="app-icon" @onclick=@( () => SetView<InvestMenu>() )>
+					<img src="ui/casino/navigation/fundino_icon.png" />
+					<label>Fund.ino</label>
+				</button>
 
-			    <button class="app-icon sincash" @onclick="@CloseAndDestroy">
-				    <img src="ui/casino/navigation/sinvest.png" />
-				    <label>Shutdown SinvestOS</label>
-			    </button>
-		    </div>
-	    }
-	    else 
-	    {
-		    @* LEAVE THIS EMPTY! 
+				<button class="app-icon sincash" @onclick="@CloseAndDestroy">
+					<img src="ui/casino/navigation/sinvest.png" />
+					<label>Shutdown SinvestOS</label>
+				</button>
+			</div>
+		}
+		else 
+		{
+			@* LEAVE THIS EMPTY! 
               The C# AddChild will put the Flipper2D / CasinoMenu here.
            *@
            
-		    @* By putting the button in its own conditional at the bottom, 
+			@* By putting the button in its own conditional at the bottom, 
               we can force it to re-render after the child is added.
            *@
-	    }
-
-	    @if ( _activeViewPanel != null )
-	    {
-		    <button class="back-button" @onclick="@GoBack">
-			    @if ( _history.Count > 0 )
-			    {
-				    <span>Back</span>
-			    }
-			    else
-			    {
-				    <span>Exit to Menu</span>
-			    }
-		    </button>
-	    }
-    </div>
+		}
+	</div>
+	<div class="navigation_menu">
+		@if ( _activeViewPanel != null )
+		{
+			<button class="back-button" @onclick="@GoBack">
+				@if ( _history.Count > 0 )
+				{
+					<span>Back</span>
+				}
+				else
+				{
+					<span>Exit to Menu</span>
+				}
+			</button>
+		}
+	</div>
 </root>
 
 @code

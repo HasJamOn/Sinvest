@@ -7,7 +7,7 @@ CoinFlip {
   justify-content: center;
   pointer-events: all;
   width: 100%;
-  height: 100%;
+  height: auto;
 
   .coinflip-card {
     @include bevel-out; // Turns it into a solid 90s window
