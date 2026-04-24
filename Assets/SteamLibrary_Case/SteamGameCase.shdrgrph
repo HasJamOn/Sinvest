@@ -27,10 +27,10 @@
       "DefaultMetalness": 0,
       "DefaultAmbientOcclusion": 1,
       "Identifier": "0",
-      "Position": "204,-180",
+      "Position": "636,-300",
       "HandleOffsets": {},
       "Albedo": {
-        "Identifier": "1",
+        "Identifier": "4",
         "Output": "Result"
       }
     },
@@ -64,7 +64,155 @@
         }
       },
       "Identifier": "1",
-      "Position": "-60,-180",
+      "Position": "-192,-180",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "TextureSampler",
+      "Image": null,
+      "Sampler": {
+        "Filter": "Aniso",
+        "AddressU": "Wrap",
+        "AddressV": "Wrap"
+      },
+      "UI": {
+        "Name": "BackArt",
+        "IsAttribute": true,
+        "Default": "1,1,1,1",
+        "Extension": "Color",
+        "CustomExtension": null,
+        "ShowExtension": true,
+        "Processor": "None",
+        "ColorSpace": "Srgb",
+        "ImageFormat": "DXT5",
+        "SrgbRead": true,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": "",
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "2",
+      "Position": "-180,12",
+      "HandleOffsets": {},
+      "Coords": {
+        "Identifier": "8",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "WorldNormal",
+      "Identifier": "3",
+      "Position": "-336,-324",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Lerp",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Fraction": 0.5,
+      "Identifier": "4",
+      "Position": "408,-348",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "1",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "2",
+        "Output": "Result"
+      },
+      "C": {
+        "Identifier": "6",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "SplitVector",
+      "Identifier": "5",
+      "Position": "-132,-336",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "3",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Step",
+      "DefaultInput": 0,
+      "DefaultEdge": 0.9,
+      "Identifier": "6",
+      "Position": "144,-312",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "5",
+        "Output": "Z"
+      }
+    },
+    {
+      "_class": "SwizzleVector",
+      "RedOut": "Red",
+      "GreenOut": "Green",
+      "BlueOut": "Blue",
+      "AlphaOut": "Alpha",
+      "Identifier": "7",
+      "Position": "-432,-12",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "10",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 1,
+      "DefaultB": 1,
+      "Identifier": "8",
+      "Position": "-396,72",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "7",
+        "Output": "Output"
+      },
+      "B": {
+        "Identifier": "9",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Float2",
+      "Min": "0,0",
+      "Max": "1,1",
+      "Value": "1,1.5",
+      "Name": "",
+      "IsAttribute": false,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "9",
+      "Position": "-600,156",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "TextureCoord",
+      "UseSecondaryCoord": false,
+      "Tiling": "1,1",
+      "Identifier": "10",
+      "Position": "-660,-12",
       "HandleOffsets": {}
     }
   ]

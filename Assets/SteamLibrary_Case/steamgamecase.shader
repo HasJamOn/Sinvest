@@ -77,6 +77,7 @@ PS
 		
 	SamplerState g_sSampler0 < Filter( ANISO ); AddressU( WRAP ); AddressV( WRAP ); >;
 	Texture2D g_tCoverArt < Attribute( "CoverArt" ); >;
+	Texture2D g_tBackArt < Attribute( "BackArt" ); >;
 	
 	float4 MainPs( PixelInput i ) : SV_Target0
 	{
@@ -93,8 +94,16 @@ PS
 		m.Transmission = 0;
 		
 		float4 l_0 = Tex2DS( g_tCoverArt, g_sSampler0, i.vTextureCoords.xy );
+		float2 l_1 = i.vTextureCoords.xy * float2( 1, 1 );
+		float4 l_2 = float4( l_1, 0, 0 ).xyzw;
+		float2 l_3 = float2( 1, 1.5 );
+		float4 l_4 = l_2 * float4( l_3, 0, 0 );
+		float4 l_5 = Tex2DS( g_tBackArt, g_sSampler0, l_4.xy );
+		float l_6 = i.vNormalWs.z;
+		float l_7 = step( 0.9, l_6 );
+		float4 l_8 = lerp( l_0, l_5, l_7 );
 		
-		m.Albedo = l_0.xyz;
+		m.Albedo = l_8.xyz;
 		m.Opacity = 1;
 		m.Roughness = 1;
 		m.Metalness = 0;
