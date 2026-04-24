@@ -3,17 +3,44 @@
 CasinoMenu {
   display: flex;
   flex-direction: column;
+  align-items: center; // Ensure header and grid stay centered
   width: 100%;
   max-width: 900px;
-  @include bevel-out; // Makes the whole menu look like a window
+  @include bevel-out;
   padding: 20px;
   background-color: $gtk-bg;
+
+  .menu-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px; // Space between logo and games
+    padding-bottom: 10px;
+    border-bottom: 2px solid $gtk-shadow; // Divider line
+    width: 100%;
+
+    .menu-logo {
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+      margin-bottom: 8px;
+    }
+
+    .menu-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: $gtk-text;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  }
 
   .casino-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
+    width: 100%;
   }
 
   .game-card {

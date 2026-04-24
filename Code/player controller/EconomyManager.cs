@@ -8,6 +8,7 @@ public sealed class EconomyManager : Component
 {
 	// Allows ComputerHUD to find this component easily
 	public static EconomyManager Instance { get; private set; }
+	public double CurrentSharePrice => MarketService.CurrentPrice;
 
 	protected override void OnAwake()
 	{

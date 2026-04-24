@@ -12,30 +12,68 @@ SinvestOS {
 
   &.hidden { display: none; pointer-events: none;}
 
-  .stat-header {
+  .system-stats-bar {
+    @include bevel-out; // One large container instead of many small ones
     position: absolute;
-    top: 30px; right: 30px;
+    top: 20px;
+    right: 60px;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    padding: 4px; // Small padding for the "tray" look
+    gap: 4px;
 
-    .stat-box {
-      @include bevel-out;
-      padding: 8px 16px;
+    .stat-segment {
       display: flex;
       align-items: center;
-      min-width: 260px;
-      &.money  { border-left: 4px solid $accent-money; }
-      &.shares { border-left: 4px solid $accent-shares; }
+      padding: 6px 12px;
+      gap: 10px;
 
-      .stat-icon { width: 32px; height: 32px; margin-right: 12px; }
-      .label { flex-grow: 1; font-size: 14px; font-weight: 900; }
-      .value {
-        @include bevel-in;
-        font-family: monospace;
-        font-size: 24px;
-        padding: 4px 8px;
+      .mini-icon {
+        width: 24px;
+        height: 24px;
+        image-rendering: pixelated;
       }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+
+        .label {
+          font-family: "MS Sans Serif", Arial;
+          font-size: 10px;
+          font-weight: bold;
+          color: $gtk-shadow; // Dimmer text for the label
+          margin-bottom: -2px;
+        }
+
+        .value {
+          font-family: monospace;
+          font-size: 18px;
+          font-weight: bold;
+          color: $gtk-text;
+        }
+
+        .value-row {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+
+          .valuation {
+            font-family: monospace;
+            font-size: 11px;
+            color: $accent-money; // Use the green accent for the money value
+          }
+        }
+      }
+    }
+
+    // Vertical etch line between stats
+    .divider {
+      width: 2px;
+      height: 32px;
+      border-left: 1px solid $gtk-shadow;
+      border-right: 1px solid $gtk-highlight;
+      margin: 0 4px;
     }
   }
 

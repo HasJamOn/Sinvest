@@ -7,16 +7,26 @@
 @namespace Sandbox
 
 <root>
-	<div class="stat-header">
-		<div class="stat-box money">
-			<img src="ui/casino/navigation/sincash.png" class="stat-icon" />
-			<span class="label">CASH</span>
-			<span class="value">$@_displayMoney.ToString("N0")</span>
+	<div class="system-stats-bar">
+		<div class="stat-segment">
+			<img src="ui/casino/navigation/sincash.png" class="mini-icon" />
+			<div class="content">
+				<span class="label">CASH</span>
+				<span class="value">$@FormatValue(_displayMoney)</span>
+			</div>
 		</div>
-		<div class="stat-box shares">
-			<img src="ui/casino/navigation/fundino_icon.png" class="stat-icon" />
-			<span class="label">SHARES</span>
-			<span class="value">@_displayShares.ToString("N0")</span>
+
+		<div class="divider"></div>
+
+		<div class="stat-segment">
+			<img src="ui/casino/navigation/fundino_icon.png" class="mini-icon" />
+			<div class="content">
+				<span class="label">SHARES</span>
+				<div class="value-row">
+					<span class="value">@FormatValue(_displayShares)</span>
+					<span class="valuation">[$@FormatValue(_displayShares * GetSharePrice())]</span>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -106,6 +116,25 @@
 		    nameof(CoinFlip)   => "Coin Flip",
 		    _ => "to Menu" // Fallback
 	    };
+    }
+    
+    private string FormatValue(double value)
+    {
+	    // Absolute value for the check, but preserve sign for display if needed
+	    double absValue = Math.Abs(value);
+    
+	    if (absValue >= 1000000)
+		    return (value / 1000000D).ToString("0.##") + "M";
+	    if (absValue >= 1000)
+		    return (value / 1000D).ToString("0.#") + "K";
+
+	    return value.ToString("N0");
+    }
+
+    private double GetSharePrice()
+    {
+	    // Direct link to your MarketService
+	    return MarketService.CurrentPrice;
     }
     
     public void CloseAndDestroy()

@@ -4,6 +4,11 @@
 @namespace Sandbox
 
 <root>
+	<div class="menu-header">
+		<img src="ui/casino/navigation/sincash.png" class="menu-logo" />
+		<label class="menu-title">Sincash.ino - Games</label>
+	</div>
+
 	<div class="casino-grid">
 		@* Explicitly calling Coin Flip *@
 		<button class="game-card" @onclick="@(() => Navigate<CoinFlip>())">
