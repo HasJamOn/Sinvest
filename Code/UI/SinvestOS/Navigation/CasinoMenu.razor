@@ -25,6 +25,6 @@
 	private void Navigate<T>() where T : Panel, new()
 	{
 		// Talk directly to the HUD instance we created earlier
-		ComputerHUD.Instance?.SetView<T>();
+		SinvestOS.Instance?.SetView<T>();
 	}
 }

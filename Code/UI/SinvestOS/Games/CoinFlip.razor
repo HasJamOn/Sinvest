@@ -36,13 +36,25 @@
        @if (!string.IsNullOrEmpty(ResultMessage))
        {
 	       <div class="result-display">
-		       @if (!IsError)
+		       @if (IsFlipping)
 		       {
-			       <label class="flip-result">The coin landed on: @LastFlip</label>
+			       <label class="outcome">Wait for it...</label>
 		       }
-		       <label class="outcome @(IsWin ? "win" : "loss") @(IsError ? "error" : "")">
-			       @ResultMessage
-		       </label>
+		       else if (!string.IsNullOrEmpty(ResultMessage))
+		       {
+			       @if (!IsError && !string.IsNullOrEmpty(LastFlip))
+			       {
+				       <label class="flip-result">The coin landed on @LastFlip</label>
+			       }
+      
+			       <label class="outcome @(IsWin ? "win" : "loss") @(IsError ? "error" : "")">
+				       @ResultMessage
+			       </label>
+		       }
+		       else
+		       {
+			       <label class="flip-result">Ready to flip</label>
+		       }
 	       </div>
        }
     </div>
@@ -71,8 +83,8 @@
 
     // New Helper for the UI
     private bool CanAfford => float.TryParse(BetAmount, out float amount) && 
-                              ComputerHUD.Instance != null && 
-                              ComputerHUD.Instance.CurrentMoney >= amount;
+                              SinvestOS.Instance != null && 
+                              SinvestOS.Instance.CurrentMoney >= amount;
 
     private void SetSide(Side side)
     {
@@ -88,7 +100,7 @@
 
 	    if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
     
-	    if (ComputerHUD.Instance == null || ComputerHUD.Instance.CurrentMoney < amount)
+	    if (SinvestOS.Instance == null || SinvestOS.Instance.CurrentMoney < amount)
 	    {
 		    IsError = true;
 		    ResultMessage = "INSUFFICIENT FUNDS!";
@@ -97,7 +109,7 @@
 	    }
 
         // 2. Immediate Deduction
-        ComputerHUD.Instance.Transaction(-amount);
+        SinvestOS.Instance.Transaction(-amount);
 
         // Pre-calculate result
         var result = Game.Random.Int(0, 1) == 0 ? Side.Heads : Side.Tails;
@@ -148,7 +160,7 @@
         if (IsWin)
         {
             // Refund initial bet + pay out winnings (2x total)
-            ComputerHUD.Instance.Transaction(amount * 2);
+            SinvestOS.Instance.Transaction(amount * 2);
             ResultMessage = $"YOU WON ${amount}!";
         }
         else
@@ -167,7 +179,7 @@
            IsFlipping, 
            DisplaySide, 
            IsSquished, 
-           ComputerHUD.Instance?.CurrentMoney, // Re-renders if balance changes
+           SinvestOS.Instance?.CurrentMoney, // Re-renders if balance changes
            ResultMessage
         );
     }

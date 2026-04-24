@@ -1,0 +1,186 @@
+@import "../_base.scss";
+
+InvestMenu {
+  display: flex;
+  flex-direction: column;
+  width: 550px;
+  @include bevel-out; // Turns the menu into a solid window
+  padding: 16px;
+  margin: auto;
+  pointer-events: all;
+  color: $gtk-text;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    margin-bottom: 12px;
+    background-color: $gtk-blue; // Title bar color
+
+    label {
+      font-weight: bold;
+      font-size: 13px;
+      color: white !important;
+      letter-spacing: 1px;
+    }
+
+    .status {
+      width: 10px;
+      height: 10px;
+      background-color: #800000;
+      border: 1px solid $gtk-highlight;
+
+      &.online {
+        background-color: #00ff00;
+        box-shadow: 0 0 5px #00ff00;
+      }
+    }
+  }
+
+  .price-hero {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+
+    .price-display {
+      @include bevel-in; // Sunken display area
+      background-color: #000;
+      padding: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+
+      h1 {
+        font-family: "Roboto Mono", monospace;
+        font-size: 48px;
+        font-weight: 900;
+        color: #00ff00 !important; // Green Phosphor look
+        margin: 0;
+      }
+
+      label {
+        font-size: 10px;
+        color: #008800 !important;
+        font-weight: bold;
+      }
+    }
+
+    .range-picker {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 8px;
+
+      button {
+        flex: 1;
+        @include btn-gtk-base;
+        min-height: 24px;
+        min-width: 0;
+        padding: 4px;
+        font-size: 11px;
+        text-transform: none;
+
+        &.active {
+          background-color: #eee;
+          border-top: 2px solid $gtk-dark-shadow;
+          border-left: 2px solid $gtk-dark-shadow;
+          border-right: 2px solid $gtk-highlight;
+          border-bottom: 2px solid $gtk-highlight;
+        }
+      }
+    }
+
+    .graph-window {
+      @include bevel-in;
+      width: 100%;
+      height: 200px;
+      background-color: #000d00; // Deep green tint
+      position: relative;
+      overflow: hidden;
+
+      // Retro Grid Overlay
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        opacity: 0.1;
+        background-image:
+                linear-gradient(#00ff00 1px, transparent 1px),
+                linear-gradient(90deg, #00ff00 1px, transparent 1px);
+        background-size: 25px 25px;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .graph-line {
+        background-color: #00ff00;
+        z-index: 10;
+        pointer-events: none;
+      }
+    }
+    .graph-painter {
+      width: 100%;
+      height: 100%;
+      display: flex; // Ensure it has a layout context
+      pointer-events: none;
+
+      .graph-line {
+        background-color: #00ff00; // GTK Green
+        height: 2px;
+        z-index: 10;
+      }
+    }
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+
+    .stat {
+      flex: 1;
+      @include bevel-in;
+      background-color: #fff;
+      padding: 8px;
+
+      label {
+        font-size: 10px;
+        font-weight: bold;
+        color: $gtk-shadow;
+      }
+
+      span {
+        font-family: monospace;
+        font-size: 20px;
+        font-weight: bold;
+        color: #000;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+
+    button {
+      @include btn-gtk-base;
+      flex: 1;
+      height: 48px;
+
+      &.buy {
+        background-color: #c0c0c0;
+        border-left: 4px solid $accent-money; // Visual cue for buying
+      }
+
+      &.sell {
+        background-color: #c0c0c0;
+        border-left: 4px solid #ff4444;
+      }
+
+      &.disabled {
+        opacity: 0.5;
+        color: $gtk-shadow;
+        pointer-events: none;
+      }
+    }
+  }
+}

@@ -43,11 +43,11 @@
        <div class="stats-row">
           <div class="stat">
              <label>SHARES</label>
-             <span>@(ComputerHUD.Instance?.CurrentShares.ToString("N0") ?? "0")</span>
+             <span>@(SinvestOS.Instance?.CurrentShares.ToString("N0") ?? "0")</span>
           </div>
           <div class="stat">
              <label>EQUITY</label>
-             <span>$@(((ComputerHUD.Instance?.CurrentShares ?? 0) * MarketService.CurrentPrice).ToString("N2"))</span>
+             <span>$@(((SinvestOS.Instance?.CurrentShares ?? 0) * MarketService.CurrentPrice).ToString("N2"))</span>
           </div>
        </div>
 
@@ -84,11 +84,11 @@
         { "MAX", 60 * 24 * 365 * 10 }
     };
 
-    private bool CanAfford => ComputerHUD.Instance != null && 
-                              ComputerHUD.Instance.CurrentMoney >= MarketService.CurrentPrice;
+    private bool CanAfford => SinvestOS.Instance != null && 
+                              SinvestOS.Instance.CurrentMoney >= MarketService.CurrentPrice;
 
-    private bool CanSell => ComputerHUD.Instance != null && 
-                            ComputerHUD.Instance.CurrentShares >= 1;
+    private bool CanSell => SinvestOS.Instance != null && 
+                            SinvestOS.Instance.CurrentShares >= 1;
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
@@ -197,14 +197,14 @@
         StateHasChanged();
     
         double totalCost = MarketService.CurrentPrice * amount;
-        if (amount < 0 && (ComputerHUD.Instance?.CurrentShares ?? 0) < Math.Abs(amount)) 
+        if (amount < 0 && (SinvestOS.Instance?.CurrentShares ?? 0) < Math.Abs(amount)) 
         {
            IsProcessing = false;
            StateHasChanged();
            return;
         }
 
-        ComputerHUD.Instance?.Transaction(-totalCost, (double)amount);
+        SinvestOS.Instance?.Transaction(-totalCost, (double)amount);
         await GameTask.Delay(100); 
         IsProcessing = false;
         StateHasChanged();
@@ -212,6 +212,6 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine(MarketService.CurrentPrice, IsProcessing, ComputerHUD.Instance?.CurrentMoney, CurrentRange);
+        return HashCode.Combine(MarketService.CurrentPrice, IsProcessing, SinvestOS.Instance?.CurrentMoney, CurrentRange);
     }
 }

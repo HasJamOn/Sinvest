@@ -1,0 +1,179 @@
+@import "../_base.scss";
+
+CoinFlip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  width: 100%;
+  height: 100%;
+
+  .coinflip-card {
+    @include bevel-out; // Turns it into a solid 90s window
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 500px;
+    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.3); // Heavy retro shadow
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: 900;
+    color: $gtk-blue; // Classic Title Bar Blue
+    text-transform: uppercase;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  /* --- Side Selection --- */
+  .button-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+
+    .side-btn {
+      @include btn-gtk-base;
+      flex: 1;
+      font-size: 14px;
+      min-width: 0; // Allow flex to shrink
+
+      &.active {
+        // Pressed-in look for the active toggle
+        background-color: #eee;
+        border-top: 2px solid $gtk-dark-shadow;
+        border-left: 2px solid $gtk-dark-shadow;
+        border-right: 2px solid $gtk-highlight;
+        border-bottom: 2px solid $gtk-highlight;
+        color: $gtk-blue;
+      }
+    }
+  }
+
+  /* --- The Coin Visual --- */
+  .coin-wrapper {
+    @include bevel-in; // Coin sits in a recessed area
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #c0c0c0;
+    margin: 10px 0;
+  }
+
+  .coin-img {
+    width: 120px;
+    height: 120px;
+    image-rendering: pixelated; // Keep the retro feel
+    transform-origin: center;
+
+    &.squished { transform: scaleX(0); }
+    &.settling { animation: coin-land 0.4s ease-out; }
+  }
+
+  /* --- Input & Info --- */
+  .selection-indicator {
+    font-family: "MS Sans Serif", Arial;
+    font-size: 14px;
+    color: $gtk-text;
+
+    .highlight {
+      font-weight: bold;
+      color: $gtk-blue;
+      text-decoration: underline;
+    }
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+      color: $gtk-text;
+    }
+
+    TextEntry {
+      @include bevel-in;
+      flex: 1;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 18px;
+      color: black;
+
+      &:focus {
+        outline: 1px dotted #000; // Classic focus ring
+      }
+    }
+  }
+
+  /* --- Action Button --- */
+  .play-btn {
+    @include btn-gtk-base;
+    width: 100%;
+    background-color: $gtk-bg;
+    font-size: 20px;
+
+    &:hover { background-color: #e0e0e0; }
+
+    &.flipping {
+      opacity: 0.7;
+      color: $gtk-shadow;
+      pointer-events: none;
+    }
+  }
+
+  /* --- Results --- */
+  .result-display {
+    @include bevel-in;
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    min-height: 70px; // Prevent the window from jumping when text appears
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #c0c0c0; // Slightly darker gray to look like a sub-panel
+
+    .flip-result {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: $gtk-shadow;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+
+    .outcome {
+      font-family: "MS Sans Serif", Arial, sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-align: center;
+
+      &.win {
+        color: #008000; // Classic solid green
+      }
+
+      &.loss {
+        color: #800000; // Classic solid maroon
+      }
+
+      &.error {
+        color: #000;
+        background-color: #ffff00; // Yellow warning highlight
+        padding: 2px 8px;
+        border: 1px solid #000;
+      }
+    }
+  }
+}

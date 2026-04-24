@@ -1,0 +1,83 @@
+@import "../_base.scss";
+
+SinvestOS {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: all;
+
+  &.hidden { display: none; pointer-events: none;}
+
+  .stat-header {
+    position: absolute;
+    top: 30px; right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .stat-box {
+      @include bevel-out;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      min-width: 260px;
+      &.money  { border-left: 4px solid $accent-money; }
+      &.shares { border-left: 4px solid $accent-shares; }
+
+      .stat-icon { width: 32px; height: 32px; margin-right: 12px; }
+      .label { flex-grow: 1; font-size: 14px; font-weight: 900; }
+      .value {
+        @include bevel-in;
+        font-family: monospace;
+        font-size: 24px;
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  .hud-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    pointer-events: none;
+    .menu, .app-icon, .back-button, CasinoMenu {
+      pointer-events: all;
+    }
+  }
+
+  // Classic Desktop Menu
+  .menu {
+    @include bevel-out;
+    display: flex;
+    gap: 32px;
+    padding: 40px;
+    box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.4);
+  }
+
+  .app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: $icon-cell-w;
+    background: none;
+
+    img { width: $icon-size; image-rendering: pixelated; }
+    label { font-size: 15px; color: $gtk-text; padding: 2px 4px; }
+
+    &:hover {
+      img { filter: brightness(1.2) drop-shadow(0 0 10px $gtk-blue); }
+      label { background-color: $gtk-blue; color: white; }
+    }
+  }
+
+  .back-button {
+    @include btn-gtk-base;
+    margin-top: 20px;
+    &:hover { background-color: #ff4444; color: white; }
+  }
+}

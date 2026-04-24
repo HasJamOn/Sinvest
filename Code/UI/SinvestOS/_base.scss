@@ -1,0 +1,56 @@
+﻿// Design Tokens
+$gtk-bg:            #d4d0c8;
+$gtk-highlight:     #ffffff;
+$gtk-shadow:        #808080;
+$gtk-dark-shadow:   #404040;
+$gtk-blue:          #000080;
+$gtk-text:          #000000;
+
+$accent-money:      #4caf50;
+$accent-shares:     #00ff88;
+
+$stat-radius:       0px;
+$icon-size:         72px;
+$icon-cell-w:       110px;
+$icon-cell-h:       130px;
+
+// Mixins
+@mixin bevel-out {
+  background-color: $gtk-bg;
+  border-top: 2px solid $gtk-highlight;
+  border-left: 2px solid $gtk-highlight;
+  border-right: 2px solid $gtk-dark-shadow;
+  border-bottom: 2px solid $gtk-dark-shadow;
+  outline: 1px solid $gtk-shadow;
+}
+
+@mixin bevel-in {
+  background-color: #ffffff;
+  border-top: 2px solid $gtk-shadow;
+  border-left: 2px solid $gtk-shadow;
+  border-right: 2px solid $gtk-highlight;
+  border-bottom: 2px solid $gtk-highlight;
+}
+
+@mixin btn-gtk-base {
+  min-height: 48px;
+  min-width: 200px;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: $gtk-text;
+  @include bevel-out;
+
+  &:hover  { transform: scale(1.02); }
+  &:active {
+    border-top: 2px solid $gtk-dark-shadow;
+    border-left: 2px solid $gtk-dark-shadow;
+    border-right: 2px solid $gtk-highlight;
+    border-bottom: 2px solid $gtk-highlight;
+  }
+}

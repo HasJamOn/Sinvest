@@ -54,7 +54,7 @@ public sealed class UIPopupTrigger : Component
         ActiveInstance = PopupPrefab.Clone();
         ActiveInstance.WorldPosition = new Vector3( 5000, 0, 0 );
 
-        var hud = ActiveInstance.Components.Get<ComputerHUD>( true );
+        var hud = ActiveInstance.Components.Get<SinvestOS>( true );
         if ( hud != null )
         {
             hud.Open();
