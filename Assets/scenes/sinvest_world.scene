@@ -5129,7 +5129,7 @@
                   ]
                 },
                 {
-                  "__guid": "65d00e86-3236-48ad-bed7-bd7d4106b44c",
+                  "__guid": "9a47cb21-cd02-404d-a6f8-3336978ad014",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -5146,7 +5146,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "5b34bc72-27a9-4652-b7cc-2e3b2d7ffd92",
+                      "__guid": "e9ab06c4-2f8a-4655-9ea7-dc99631d65b1",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5198,7 +5198,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "57e2288e-2438-4b22-b89d-20e7e888fb46",
+                  "__guid": "4f5a0c8b-a182-46e2-873c-f88a2f861a2a",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5215,7 +5215,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "3464091a-7ceb-4023-bba2-ac22b77acced",
+                      "__guid": "bac5262a-97ab-41c7-a822-f15805da0446",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5267,7 +5267,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "81bc62e3-c0a0-40e1-b524-baeedc762cce",
+                  "__guid": "d8740a48-5f35-49eb-a4cb-47b8fd4a421b",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5284,7 +5284,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "95501f89-51e8-45a1-9eb0-3ec00dde4921",
+                      "__guid": "a08e5be2-782c-452f-92c3-b0180b942a1c",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5336,7 +5336,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "14378010-286c-4115-90de-fcdf1473204c",
+                  "__guid": "e4d816eb-05f7-448a-8f1c-6ae48748c223",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5353,7 +5353,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "03209619-6547-4477-ad29-0bab54c8cefa",
+                      "__guid": "f326532e-7adf-45e9-8be0-ed2637eaf418",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -6256,14 +6256,14 @@
                   "__guid": "c19cae89-b318-4401-ba6b-02bb5f844e66",
                   "__enabled": true,
                   "Flags": 0,
-                  "MaxReadyGames": 20,
+                  "MaxHistory": 30,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
                   "OnComponentFixedUpdate": null,
                   "OnComponentStart": null,
                   "OnComponentUpdate": null,
-                  "ShuffleCooldown": 2.5,
+                  "OnStartMode": "ClassicRandom",
                   "TargetRenderer": {
                     "_type": "component",
                     "component_id": "c6880c5f-7222-45d3-b067-f221d435ef16",
@@ -11808,13 +11808,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1ff7db61-0293-4529-be2b-9f606b7c33ea"
         }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

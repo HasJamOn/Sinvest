@@ -19,6 +19,8 @@ public sealed class SteamGameCase : Component
 
     [Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
     [Property, Group( "Settings" )] public StartBehavior OnStartMode { get; set; } = StartBehavior.ClassicRandom;
+    
+    [Property, Group( "Settings" )] public int MaxHistory { get; set; } = 30;
 
     [Property, Group( "Tooltip" )] public string TooltipTitle { get; set; } = "Steam Game Case";
     [Property, Group( "Tooltip" )] public string TooltipIcon { get; set; } = "videogame_asset";
@@ -36,7 +38,6 @@ public sealed class SteamGameCase : Component
     // --- HISTORY SYSTEM (Fallback) ---
     private List<LoadedGame> _historyPool = new();
     private int _historyIndex = 0;
-    private const int MaxHistory = 10;
 
     protected override void OnStart()
     {
@@ -48,67 +49,83 @@ public sealed class SteamGameCase : Component
 
     private async Task InitializeSystem()
     {
-        if ( OnStartMode == StartBehavior.ClassicRandom )
-        {
-            var gmod = await LoadGameData( 4000, "Garry's Mod" );
-            if ( gmod != null ) 
-            {
-                ApplyToRenderer( gmod );
-                AddToHistory( gmod );
-            }
-            
-            await RefreshAppPool();
-            _ = FillBuffer();
-        }
-        else
-        {
-            await RefreshAppPool();
-            await FillBuffer();
-            Shuffle(); 
-        }
+	    // s&box AppID: 590830
+	    if ( OnStartMode == StartBehavior.ClassicRandom )
+	    {
+		    // 1. Load GMod (The classic fallback)
+		    var gmod = await LoadGameData( 4000, "Garry's Mod" );
+		    if ( gmod != null ) 
+		    {
+			    ApplyToRenderer( gmod );
+			    AddToHistory( gmod );
+		    }
+
+		    // 2. Load s&box into the pool immediately
+		    var sbox = await LoadGameData( 590830, "s&box" );
+		    if ( sbox != null ) AddToHistory( sbox );
+        
+		    await RefreshAppPool();
+		    _ = FillBuffer();
+	    }
+	    else
+	    {
+		    // For InstantShuffle, we'll try to get s&box in there first 
+		    // before the random SteamSpy clutter fills the buffer
+		    var sbox = await LoadGameData( 590830, "s&box" );
+		    if ( sbox != null ) 
+		    {
+			    _readyBuffer.Enqueue( sbox );
+			    AddToHistory( sbox );
+		    }
+
+		    await RefreshAppPool();
+		    await FillBuffer();
+		    Shuffle(); 
+	    }
     }
 
     public void Shuffle()
     {
-        // 1. PRIORITIZE FRESH BUFFER
-        if ( _readyBuffer.Count > 0 )
-        {
-            var game = _readyBuffer.Dequeue();
-            ApplyToRenderer( game );
-            _ = FillBuffer(); // Refill background
-            return;
-        }
+	    // 1. Try the fresh buffer first
+	    if ( _readyBuffer.Count > 0 )
+	    {
+		    var game = _readyBuffer.Dequeue();
+		    ApplyToRenderer( game );
+		    _ = FillBuffer(); // Keep the factory moving
+		    return;
+	    }
 
-        // 2. FALLBACK TO HISTORY CYCLING
-        if ( _historyPool.Count > 0 )
-        {
-            Log.Info( $"[SteamGameCase] Buffer empty, cycling history index: {_historyIndex}" );
-            
-            var cachedGame = _historyPool[_historyIndex];
-            ApplyToRenderer( cachedGame );
+	    // 2. Fallback to cycling through the last 30 games
+	    if ( _historyPool.Count > 0 )
+	    {
+		    // Cycle through history (Oldest -> Newest)
+		    var cachedGame = _historyPool[_historyIndex];
+		    ApplyToRenderer( cachedGame );
 
-            // Cycle oldest to newest
-            _historyIndex = ( _historyIndex + 1 ) % _historyPool.Count;
-            return;
-        }
+		    _historyIndex = ( _historyIndex + 1 ) % _historyPool.Count;
+        
+		    Log.Info( $"[SteamGameCase] Buffer empty. Cycling history ({_historyIndex}/{_historyPool.Count})" );
+		    return;
+	    }
 
-        Log.Warning( "Shuffle pressed: Buffer empty and no history available yet." );
+	    Log.Warning( "Shuffle pressed: No games loaded yet!" );
     }
 
     private void AddToHistory( LoadedGame game )
     {
-        // Don't add the same game twice in a row
-        if ( _historyPool.Any( x => x.AppId == game.AppId ) ) return;
+	    // Don't add the same game twice
+	    if ( _historyPool.Any( x => x.AppId == game.AppId ) ) return;
 
-        _historyPool.Add( game );
+	    _historyPool.Add( game );
 
-        if ( _historyPool.Count > MaxHistory )
-        {
-            _historyPool.RemoveAt( 0 ); // Remove oldest
-        }
+	    // Trim pool if it exceeds your defined MaxHistory
+	    if ( _historyPool.Count > MaxHistory )
+	    {
+		    _historyPool.RemoveAt( 0 ); // Remove the oldest item
+	    }
 
-        // Reset history index to 0 so we always cycle from oldest to newest
-        _historyIndex = 0;
+	    // Reset cycle index whenever we get fresh data
+	    _historyIndex = 0;
     }
 
     private void ApplyToRenderer( LoadedGame game )
