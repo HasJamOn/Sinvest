@@ -82,6 +82,32 @@
 @code
 {
     public static SinvestOS Instance { get; private set; }
+    /* --- INSPECTOR SETTINGS --- */
+    /* --- Global Sounds --- */
+    [Property, Group("Audio"), ResourceType("sound")] 
+    public string ClickSound { get; set; } = "sounds/ui/click.sound";
+    
+	/* --- CoinFlip Sounds --- */
+    [Property, Group("Audio"), ResourceType("sound")] 
+    public string CoinSpinSound { get; set; } = "sounds/ui/coin_spin.sound";
+
+    [Property, Group("Audio"), ResourceType("sound")] 
+    public string WinSound { get; set; } = "sounds/ui/win.sound";
+
+    [Property, Group("Audio"), ResourceType("sound")] 
+    public string LoseSound { get; set; } = "sounds/ui/lose.sound";
+
+    // Global listener that uses the property above
+    protected override void OnEnabled()
+    {
+	    if ( Panel == null ) return;
+
+	    Panel.AddEventListener( "onmousedown", () => 
+	    {
+		    // Use the string from the inspector
+		    Sound.Play( ClickSound );
+	    } );
+    }
     private Panel _activeViewPanel;
     private Stack<Type> _history = new Stack<Type>();
 

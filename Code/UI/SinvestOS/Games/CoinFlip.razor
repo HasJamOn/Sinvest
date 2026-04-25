@@ -125,8 +125,14 @@
 
         for (int i = 0; i < totalFlips; i++)
         {
-            SpinSpeed = currentSpeed;
-            IsSquished = true;
+	        // Play the spin sound from the OS settings
+	        if ( !string.IsNullOrEmpty( SinvestOS.Instance?.CoinSpinSound ) )
+	        {
+		        Sound.Play( SinvestOS.Instance.CoinSpinSound );
+	        }
+
+	        SpinSpeed = currentSpeed;
+	        IsSquished = true;
             StateHasChanged();
             await GameTask.DelaySeconds(currentSpeed);
 
@@ -159,13 +165,19 @@
 
         if (IsWin)
         {
-            // Refund initial bet + pay out winnings (2x total)
-            SinvestOS.Instance.Transaction(amount * 2);
-            ResultMessage = $"YOU WON ${amount}!";
+	        // Refund initial bet + pay out winnings (2x total)
+	        SinvestOS.Instance.Transaction(amount * 2);
+	        ResultMessage = $"YOU WON ${amount}!";
+            
+	        if ( !string.IsNullOrEmpty( SinvestOS.Instance?.WinSound ) )
+		        Sound.Play( SinvestOS.Instance.WinSound );
         }
         else
         {
-            ResultMessage = $"YOU LOST ${amount}!";
+	        ResultMessage = $"YOU LOST ${amount}!";
+            
+	        if ( !string.IsNullOrEmpty( SinvestOS.Instance?.LoseSound ) )
+		        Sound.Play( SinvestOS.Instance.LoseSound );
         }
 
         StateHasChanged();
