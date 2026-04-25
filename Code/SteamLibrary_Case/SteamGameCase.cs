@@ -3,132 +3,244 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Linq;
+
+public class LoadedGame
+{
+    public string Title;
+    public Texture Cover;
+    public Texture Hero;
+    public long AppId; // Added to track uniqueness in history
+}
 
 public sealed class SteamGameCase : Component
 {
-    // Define our dropdown options
-    public enum StartBehavior
-    {
-        ClassicRandom, // Flip between GMod and s&box
-        InstantShuffle // Fetch a random genre pool and pick one immediately
-    }
+    public enum StartBehavior { ClassicRandom, InstantShuffle }
 
     [Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
-    
     [Property, Group( "Settings" )] public StartBehavior OnStartMode { get; set; } = StartBehavior.ClassicRandom;
 
     [Property, Group( "Tooltip" )] public string TooltipTitle { get; set; } = "Steam Game Case";
     [Property, Group( "Tooltip" )] public string TooltipIcon { get; set; } = "videogame_asset";
     [Property, Group( "Tooltip" )] public string TooltipDescription { get; set; } = "Press E to Shuffle";
-
+           
     private Dictionary<long, string> _appIdPool = new();
-    private bool _isBusy = false;
+    private LinkedList<(long Id, string Name)> _processingQueue = new();
+    private List<int> _bootstrapIds = new();
+
+    // --- BUFFER SYSTEM ---
+    private Queue<LoadedGame> _readyBuffer = new();
+    private int _bufferTargetSize = 20;
+    private bool _isRefilling = false;
+
+    // --- HISTORY SYSTEM (Fallback) ---
+    private List<LoadedGame> _historyPool = new();
+    private int _historyIndex = 0;
+    private const int MaxHistory = 10;
 
     protected override void OnStart()
     {
-       if ( OnStartMode == StartBehavior.ClassicRandom )
-       {
-          if ( Game.Random.Int( 0, 1 ) == 0 )
-             _ = LoadSteamAssets( 4000, "Garry's Mod" );
-          else
-             _ = LoadSteamAssets( 590830, "s&box" );
-          
-          // Just refresh the pool in the background
-          _ = RefreshAppPool();
-       }
-       else
-       {
-          // Load gmod as a temp visual while we fetch the random pool
-          _ = LoadSteamAssets( 4000, "Garry's Mod" );
-          _ = InitialRandomPull();
-       }
+        LoadBootstrapFromFile( "SteamLibrary_Case/data/bootstrap_ids.txt" );
+        _bootstrapIds = _bootstrapIds.OrderBy( x => Guid.NewGuid() ).ToList();
+
+        _ = InitializeSystem();
     }
 
-    private async Task InitialRandomPull()
+    private async Task InitializeSystem()
     {
-        // Fetch the pool first
-        await RefreshAppPool();
-        
-        // Once pool is ready, trigger the first shuffle
-        if ( _appIdPool.Count > 0 )
+        if ( OnStartMode == StartBehavior.ClassicRandom )
         {
-            _isBusy = false; // Ensure we aren't locked
-            await Shuffle();
+            var gmod = await LoadGameData( 4000, "Garry's Mod" );
+            if ( gmod != null ) 
+            {
+                ApplyToRenderer( gmod );
+                AddToHistory( gmod );
+            }
+            
+            await RefreshAppPool();
+            _ = FillBuffer();
+        }
+        else
+        {
+            await RefreshAppPool();
+            await FillBuffer();
+            Shuffle(); 
         }
     }
 
-    public async Task Shuffle()
+    public void Shuffle()
     {
-       if ( _isBusy ) return;
+        // 1. PRIORITIZE FRESH BUFFER
+        if ( _readyBuffer.Count > 0 )
+        {
+            var game = _readyBuffer.Dequeue();
+            ApplyToRenderer( game );
+            _ = FillBuffer(); // Refill background
+            return;
+        }
 
-       if ( _appIdPool.Count < 5 )
-       {
-          _ = RefreshAppPool();
-       }
+        // 2. FALLBACK TO HISTORY CYCLING
+        if ( _historyPool.Count > 0 )
+        {
+            Log.Info( $"[SteamGameCase] Buffer empty, cycling history index: {_historyIndex}" );
+            
+            var cachedGame = _historyPool[_historyIndex];
+            ApplyToRenderer( cachedGame );
 
-       if ( _appIdPool.Count > 0 )
-       {
-          var keys = new List<long>( _appIdPool.Keys );
-          var randomId = Game.Random.FromList( keys );
-          var gameName = _appIdPool[randomId];
+            // Cycle oldest to newest
+            _historyIndex = ( _historyIndex + 1 ) % _historyPool.Count;
+            return;
+        }
 
-          _appIdPool.Remove( randomId );
-          await LoadSteamAssets( randomId, gameName );
-       }
+        Log.Warning( "Shuffle pressed: Buffer empty and no history available yet." );
+    }
+
+    private void AddToHistory( LoadedGame game )
+    {
+        // Don't add the same game twice in a row
+        if ( _historyPool.Any( x => x.AppId == game.AppId ) ) return;
+
+        _historyPool.Add( game );
+
+        if ( _historyPool.Count > MaxHistory )
+        {
+            _historyPool.RemoveAt( 0 ); // Remove oldest
+        }
+
+        // Reset history index to 0 so we always cycle from oldest to newest
+        _historyIndex = 0;
+    }
+
+    private void ApplyToRenderer( LoadedGame game )
+    {
+        if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
+
+        TargetRenderer.SceneObject.Attributes.Set( "CoverArt", game.Cover );
+        TargetRenderer.SceneObject.Attributes.Set( "BackArt", game.Hero );
+        TooltipTitle = game.Title;
+    }
+
+    private async Task FillBuffer()
+    {
+        if ( _isRefilling || _readyBuffer.Count >= _bufferTargetSize ) return;
+        _isRefilling = true;
+
+        while ( _readyBuffer.Count < _bufferTargetSize )
+        {
+            var next = GetNextCandidate();
+            
+            if ( next.Id == 0 ) 
+            {
+                await RefreshAppPool();
+                await Task.Delay( 500 );
+                continue;
+            }
+
+            var loaded = await LoadGameData( next.Id, next.Name );
+            
+            if ( loaded != null )
+            {
+                _readyBuffer.Enqueue( loaded );
+                AddToHistory( loaded ); // Save to history as they become ready
+            }
+        }
+
+        _isRefilling = false;
+    }
+
+    // [Rest of your candidate and loading logic remains the same...]
+    private (long Id, string Name) GetNextCandidate()
+    {
+        if ( _bootstrapIds.Count > 0 && Game.Random.Int( 0, 1 ) == 0 )
+        {
+            var id = _bootstrapIds[0];
+            _bootstrapIds.RemoveAt( 0 );
+            return (id, "Steam Game");
+        }
+
+        lock ( _processingQueue )
+        {
+            if ( _processingQueue.Count > 0 )
+            {
+                var item = _processingQueue.First.Value;
+                _processingQueue.RemoveFirst();
+                return item;
+            }
+        }
+
+        if ( _bootstrapIds.Count > 0 )
+        {
+            var id = _bootstrapIds[0];
+            _bootstrapIds.RemoveAt( 0 ); 
+            return (id, "Steam Game");
+        }
+
+        if ( _appIdPool.Count > 0 )
+        {
+            var randomId = Game.Random.FromList( _appIdPool.Keys.ToList() );
+            return (randomId, _appIdPool[randomId]);
+        }
+
+        return (0, "");
+    }
+
+    private async Task<LoadedGame> LoadGameData( long appId, string title )
+    {
+        string cdn = "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps";
+        string finalTitle = title == "Steam Game" ? await FetchGameNameFromSteam( appId ) : title;
+
+        var coverTex = await Texture.LoadAsync( $"{cdn}/{appId}/library_600x900.jpg" );
+        var heroTex = await Texture.LoadAsync( $"{cdn}/{appId}/library_hero.jpg" );
+
+        if ( coverTex == null || heroTex == null || coverTex.Width < 100 ) return null;
+
+        await Task.Delay( 200 );
+
+        return new LoadedGame { AppId = appId, Title = finalTitle, Cover = coverTex, Hero = heroTex };
     }
 
     private async Task RefreshAppPool()
     {
-       string[] genres = { "Action", "Strategy", "RPG", "Indie", "Adventure", "Simulation", "Early Access" };
-       string randomGenre = Game.Random.FromArray( genres );
+        string[] genres = { "Action", "Strategy", "RPG", "Indie", "Adventure", "Simulation" };
+        var url = $"https://steamspy.com/api.php?request=genre&genre={Game.Random.FromArray( genres )}";
+        var response = await Http.RequestAsync( url );
+        if ( !response.IsSuccessStatusCode ) return;
 
-       var url = $"https://steamspy.com/api.php?request=genre&genre={randomGenre}";
-       var response = await Http.RequestAsync( url );
-    
-       if ( !response.IsSuccessStatusCode ) return;
+        var node = JsonNode.Parse( await response.Content.ReadAsStringAsync() );
+        if ( node is not JsonObject obj ) return;
 
-       var jsonString = await response.Content.ReadAsStringAsync();
-       var node = JsonNode.Parse( jsonString );
-
-       if ( node is not JsonObject obj ) return;
-
-       foreach ( var entry in obj )
-       {
-          if ( long.TryParse( entry.Key, out var id ) )
-          {
-             var name = entry.Value?["name"]?.ToString() ?? "Unknown Game";
-             if ( !_appIdPool.ContainsKey( id ) )
-                _appIdPool.Add( id, name );
-          }
-       }
+        foreach ( var entry in obj )
+        {
+            if ( long.TryParse( entry.Key, out var id ) )
+            {
+                var name = entry.Value?["name"]?.ToString() ?? "Unknown Game";
+                lock ( _processingQueue ) { _processingQueue.AddFirst( (id, name) ); }
+                if ( !_appIdPool.ContainsKey( id ) ) _appIdPool.Add( id, name );
+            }
+        }
     }
 
-    private async Task LoadSteamAssets( long appId, string title )
+    private async Task<string> FetchGameNameFromSteam( long appId )
     {
-       _isBusy = true;
+        try
+        {
+            var url = $"https://store.steampowered.com/api/appdetails?appids={appId}";
+            var response = await Http.RequestAsync( url );
+            if ( !response.IsSuccessStatusCode ) return $"Game #{appId}";
 
-       string cdn = "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps";
-    
-       var coverTex = await Texture.LoadAsync( $"{cdn}/{appId}/library_600x900.jpg" );
-       var heroTex = await Texture.LoadAsync( $"{cdn}/{appId}/library_hero.jpg" );
+            var jsonText = await response.Content.ReadAsStringAsync();
+            var node = JsonNode.Parse( jsonText );
+            var name = node?[appId.ToString()]?["data"]?["name"]?.ToString();
+            return !string.IsNullOrEmpty( name ) ? name : $"Game #{appId}";
+        }
+        catch { return $"Game #{appId}"; }
+    }
 
-       if ( coverTex == null || heroTex == null || coverTex.Width < 100 )
-       {
-          Log.Warning( $"[SteamGameCase] Asset fetch failed for {appId} ({title}). Retrying..." );
-          await Task.Delay( 2000 );
-          _isBusy = false;
-          _ = Shuffle(); 
-          return;
-       }
-
-       if ( this.IsValid && TargetRenderer?.SceneObject != null )
-       {
-          TargetRenderer.SceneObject.Attributes.Set( "CoverArt", coverTex );
-          TargetRenderer.SceneObject.Attributes.Set( "BackArt", heroTex );
-          TooltipTitle = title;
-       }
-
-       await Task.Delay( 1000 );
-       _isBusy = false;
+    private void LoadBootstrapFromFile( string path )
+    {
+        if ( !FileSystem.Mounted.FileExists( path ) ) return;
+        string rawContent = FileSystem.Mounted.ReadAllText( path );
+        _bootstrapIds = rawContent.Split( new[] { '\n', '\r', ',' }, StringSplitOptions.RemoveEmptyEntries )
+            .Select( s => s.Trim() ).Where( s => int.TryParse( s, out _ ) ).Select( int.Parse ).ToList();
     }
 }

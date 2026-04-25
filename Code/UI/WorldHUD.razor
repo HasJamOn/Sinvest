@@ -82,7 +82,7 @@
         // Interaction Logic
         if ( _foundCase.IsValid() && IsVisible && Input.Pressed( "use" ) )
         {
-            _ = _foundCase.Shuffle();
+	        _foundCase.Shuffle();
         }
 
         // UPDATED: Ensure we clear the case reference when looking away
@@ -100,11 +100,13 @@
 
     protected override int BuildHash() 
     {
-        return System.HashCode.Combine( 
-            ActiveObject?.Id, 
-            IsVisible,
-            CurrentTitle,
-            UIPopupTrigger.ActiveInstance.IsValid()
-        );
+	    // Combine all properties that change visually
+	    return System.HashCode.Combine( 
+		    ActiveObject?.Id, 
+		    IsVisible,
+		    _foundCase?.TooltipTitle, // Crucial for rendering the game name
+		    _foundCase?.TooltipDescription,
+		    UIPopupTrigger.ActiveInstance.IsValid()
+	    );
     }
 }
