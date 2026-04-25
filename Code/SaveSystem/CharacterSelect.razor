@@ -6,48 +6,39 @@
 @inherits PanelComponent
 
 <root>
+	<div class="title">SINVEST</div>
 
-    @if ( IsCreating )
-    {
-	    @* We explicitly pass the actions to avoid the conversion error *@
-	    <CharacterCreator 
-		    SaveManager=@SaveManager 
-		    SlotIndex=@selectedSlot 
-		    OnCancel=@CancelCreation
-		    OnCreate=@CreateAndStart />
-    }
-    else
-    {
-        <div class="slot-container">
-            @for ( int i = 1; i <= 3; i++ )
-            {
-                var slotIndex = i;
-                var charName = SaveManager?.GetStoredNameForSlot(slotIndex) ?? "Empty Slot";
-                var isOccupied = charName != "New Character" && charName != "Empty Slot";
+	@if ( IsCreating ) {
+		<CharacterCreator 
+			SaveManager=@SaveManager 
+			SlotIndex=@selectedSlot 
+			OnCancel=@CancelCreation
+			OnCreate=@CreateAndStart />
+	}
+	else {
+		<div class="slot-container">
+			@for ( int i = 1; i <= 3; i++ ) {
+				var slotIndex = i;
+				var charName = SaveManager?.GetStoredNameForSlot(slotIndex) ?? "Empty Slot";
+				var isOccupied = charName != "New Character" && charName != "Empty Slot";
 
-                <div class="slot-card @(isOccupied ? "occupied" : "")" onclick=@(() => OnSelectSlot(slotIndex))>
-                    <label class="slot-number">SLOT @slotIndex</label>
-                    <div class="char-name">@charName</div>
+				<div class="slot-wrapper">
+					<div class="slot-card @(isOccupied ? "occupied" : "")" onclick=@(() => OnSelectSlot(slotIndex))>
+						<label class="slot-number">SLOT @slotIndex</label>
+						<div class="char-name">@charName</div>
+						<div class="select-hint">@(isOccupied ? "CONTINUE" : "CREATE NEW")</div>
+					</div>
 
-                    @if ( isOccupied )
-                    {
-                        <div class="delete-zone" onclick=@((PanelEvent e) => e.StopPropagation())>
-                            <div class="delete-btn" 
-                                 onmousedown=@(() => StartDeleteTimer(slotIndex))
-                                 onmouseup=@StopDeleteTimer
-                                 onmouseleave=@StopDeleteTimer
-                                 style="--fill: @((DeletingSlot == slotIndex ? DeleteProgress : 0).ToString())%"
-                                <label>@(DeletingSlot == slotIndex ? "REMOVING..." : "HOLD TO DELETE")</label>
-                                <div class="fill-bar"></div>
-                            </div>
-                        </div>
-                    }
-                    
-                    <div class="select-hint">@(isOccupied ? "CONTINUE" : "CREATE NEW")</div>
-                </div>
-            }
-        </div>
-    }
+					@if ( isOccupied ) {
+						<div class="delete-btn" onmousedown=@(() => StartDeleteTimer(slotIndex)) onmouseup=@StopDeleteTimer onmouseleave=@StopDeleteTimer>
+							<label>@(DeletingSlot == slotIndex ? "REMOVING..." : "HOLD TO DELETE")</label>
+							<div class="fill-bar" style="width: @((DeletingSlot == slotIndex ? DeleteProgress : 0).ToString())%;"></div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+	}
 </root>
 
 @code {

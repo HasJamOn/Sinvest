@@ -41,23 +41,19 @@
 @code {
     [Property] public GameSaveSystem SaveManager { get; set; }
     [Property] public int SlotIndex { get; set; }
-    
     public Action OnCancel { get; set; }
     public Action<string, StartingModifiers> OnCreate { get; set; }
 
     string CharName = "";
     StartingModifiers ActiveMods = StartingModifiers.None;
 
-    void ToggleMod( StartingModifiers mod )
-    {
+    void ToggleMod( StartingModifiers mod ) {
         if ( !(SaveManager?.IsModifierUnlocked(mod) ?? false) ) return;
-        
         if ( ActiveMods.HasFlag( mod ) ) ActiveMods &= ~mod;
         else ActiveMods |= mod;
     }
 
-    void OnConfirm()
-    {
+    void OnConfirm() {
         if ( string.IsNullOrWhiteSpace( CharName ) ) return;
         OnCreate?.Invoke( CharName, ActiveMods );
     }

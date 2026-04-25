@@ -1,107 +1,62 @@
 CharacterSelect {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-
-  pointer-events: all;
   display: flex;
   flex-direction: column;
-
-  // FIX: Minimalist gradient syntax s&box understands
-  background: radial-gradient( #2c3e50, #000000 );
-
   justify-content: center;
   align-items: center;
-  font-family: Poppins, Roboto, sans-serif;
-  color: white;
+  background: radial-gradient(#2c3e50, #000000);
+  pointer-events: all;
 
   .title {
     font-size: 48px;
     font-weight: 900;
     margin-bottom: 40px;
-    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     color: #f1c40f;
   }
 
   .slot-container {
     display: flex;
     flex-direction: row;
-    gap: 20px;
-    padding: 20px;
+    gap: 30px;
+
+    .slot-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
 
     .slot-card {
-      position: relative;
       width: 250px;
       height: 350px;
-
       background-color: rgba(255, 255, 255, 0.05);
       border: 2px solid rgba(255, 255, 255, 0.1);
       border-radius: 15px;
-      padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      transition: all 0.2s ease-in-out;
+      padding: 20px;
       cursor: pointer;
 
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-color: #f1c40f;
-        transform: scale(1.05);
-      }
+      &:hover { border-color: #f1c40f; transform: scale(1.05); }
+    }
 
-      .slot-number {
-        font-size: 14px;
-        opacity: 0.6;
-        text-transform: uppercase;
-      }
+    .delete-btn {
+      position: relative;
+      width: 180px;
+      height: 30px;
+      background-color: rgba(255, 0, 0, 0.15);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-      .char-name {
-        font-size: 24px;
-        font-weight: bold;
-        text-align: center;
-      }
-
-      .delete-zone {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-
-        .delete-btn {
-          position: relative;
-          width: 100px;
-          height: 24px;
-          background-color: rgba(255, 0, 0, 0.2);
-          border-radius: 4px;
-          overflow: hidden;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          border: 1px solid rgba(255, 0, 0, 0.3);
-
-          label {
-            font-size: 9px;
-            font-weight: bold;
-            color: white;
-            z-index: 2;
-            pointer-events: none;
-          }
-
-          .fill-bar {
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            background-color: #ff4444;
-            width: var(--fill); // It now receives "50%" instead of "50"
-            z-index: 1;
-          }
-        }
-      }
-
-      .select-hint {
-        font-size: 12px;
-        color: #f1c40f;
-        font-weight: bold;
-      }
+      label { font-size: 10px; font-weight: 900; z-index: 5; }
+      .fill-bar { position: absolute; left: 0; top: 0; bottom: 0; background-color: #ff4444; }
     }
   }
 }
