@@ -5129,7 +5129,7 @@
                   ]
                 },
                 {
-                  "__guid": "b54f4e5c-bfdd-466d-95a9-b0c13a2e6c45",
+                  "__guid": "65d00e86-3236-48ad-bed7-bd7d4106b44c",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -5146,7 +5146,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "9b68af90-6bac-49ac-a3ef-273b64a60d6e",
+                      "__guid": "5b34bc72-27a9-4652-b7cc-2e3b2d7ffd92",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5198,7 +5198,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "f3948e50-9938-468f-8133-f5cbdb90bd0d",
+                  "__guid": "57e2288e-2438-4b22-b89d-20e7e888fb46",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5215,7 +5215,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "d311a9a9-69b4-408f-8ef7-3e45622c5ca6",
+                      "__guid": "3464091a-7ceb-4023-bba2-ac22b77acced",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5267,7 +5267,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "d197228c-e784-4d94-accb-59491a040f7a",
+                  "__guid": "81bc62e3-c0a0-40e1-b524-baeedc762cce",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5284,7 +5284,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "ea85069c-84eb-4225-905d-95191d4df3c4",
+                      "__guid": "95501f89-51e8-45a1-9eb0-3ec00dde4921",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5336,7 +5336,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "0f70d0de-9a2a-4cbe-a3af-15fa90029c92",
+                  "__guid": "14378010-286c-4115-90de-fcdf1473204c",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5353,7 +5353,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "24cd03d5-7981-4fc0-9f4b-0669c8dd5632",
+                      "__guid": "03209619-6547-4477-ad29-0bab54c8cefa",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -6049,7 +6049,7 @@
                       },
                       "Scale": 0.084269665,
                       "TextScope": {
-                        "Text": "NO ENTRY\nHOTEL STAFF ONLY",
+                        "Text": "NO ENTRY\nHOTEL AREA",
                         "TextColor": "0.45103,0.47149,0.5297,1",
                         "FontName": "Poppins",
                         "FontSize": 64,
@@ -6156,55 +6156,6 @@
               "OwnerTransfer": 1,
               "Components": [
                 {
-                  "__type": "Sandbox.WorldPanel",
-                  "__guid": "d7bae7ea-e8fc-4a6f-9ab3-f97e4429dcb1",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "HorizontalAlign": "Center",
-                  "InteractionRange": 1000,
-                  "LookAtCamera": false,
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null,
-                  "PanelSize": "512,512",
-                  "RenderOptions": {
-                    "GameLayer": true,
-                    "OverlayLayer": false,
-                    "BloomLayer": false,
-                    "AfterUILayer": false
-                  },
-                  "RenderScale": 1,
-                  "VerticalAlign": "Center"
-                },
-                {
-                  "__type": "WorldDialogue",
-                  "__guid": "e40d771c-49af-473b-9c8f-3bc7ff8d592f",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "BackgroundPlane": null,
-                  "MessageText": {
-                    "_type": "component",
-                    "component_id": "b4ae6c34-dfb5-4473-af78-79a6e66de13c",
-                    "go": "0170524a-dd11-4ceb-b0e9-44765b38b164",
-                    "component_type": "TextRenderer"
-                  },
-                  "NameText": {
-                    "_type": "component",
-                    "component_id": "aea215cc-45cf-483e-91ad-3d1ac6f7d52d",
-                    "go": "06256b8d-a154-452c-9bc7-34773d5ca9ba",
-                    "component_type": "TextRenderer"
-                  },
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null
-                },
-                {
                   "__type": "CutsceneManager",
                   "__guid": "706bbe40-c2e0-4ee0-bb18-0a200fef871f",
                   "__enabled": true,
@@ -6215,7 +6166,12 @@
                     "go": "a6d6aacd-e67a-486a-b05c-dfcbf93b03c2",
                     "component_type": "CameraComponent"
                   },
-                  "ComplexConversation": [],
+                  "ComplexConversation": [
+                    {
+                      "SpeakerName": null,
+                      "Message": null
+                    }
+                  ],
                   "DefaultSpeaker": "Larry",
                   "DialogueUI": {
                     "_type": "gameobject",
@@ -6234,174 +6190,50 @@
                     "Stop!",
                     "You can't go in there!",
                     "Can't you read!",
-                    "Hotel Staff only!",
+                    "It's the Hotel's area!",
                     "It's not part of Limbo Cafe!",
                     "It's not a toilet!",
                     "Not again!",
-                    "I'm ruined..."
+                    "Oh, poop..."
                   ]
-                }
-              ],
-              "Children": [
-                {
-                  "__guid": "06256b8d-a154-452c-9bc7-34773d5ca9ba",
-                  "__version": 2,
-                  "Flags": 0,
-                  "Name": "Speaker",
-                  "Position": "0,-62.1992035,5.63034821",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "1,1,1",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.TextRenderer",
-                      "__guid": "aea215cc-45cf-483e-91ad-3d1ac6f7d52d",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "__version": 2,
-                      "BlendMode": "Normal",
-                      "FogStrength": 1,
-                      "HorizontalAlignment": "Center",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "Scale": 0.17834395,
-                      "TextScope": {
-                        "Text": "",
-                        "TextColor": "1,1,1,1",
-                        "FontName": "Poppins",
-                        "FontSize": 32,
-                        "FontWeight": 400,
-                        "FontItalic": false,
-                        "FontVariantNumeric": "Normal",
-                        "LineHeight": 1,
-                        "LetterSpacing": 0,
-                        "WordSpacing": 0,
-                        "FilterMode": "Bilinear",
-                        "FontSmooth": "Auto",
-                        "Outline": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,0,1,1"
-                        },
-                        "Shadow": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,0,0,1",
-                          "Offset": "4,4"
-                        },
-                        "OutlineUnder": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,1,0,1"
-                        },
-                        "ShadowUnder": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,0,0,1",
-                          "Offset": "4,4"
-                        }
-                      },
-                      "VerticalAlignment": "Center"
-                    }
-                  ],
-                  "Children": []
                 },
                 {
-                  "__guid": "0170524a-dd11-4ceb-b0e9-44765b38b164",
-                  "__version": 2,
+                  "__type": "Sinvest.DialogueScreen",
+                  "__guid": "e40d771c-49af-473b-9c8f-3bc7ff8d592f",
+                  "__enabled": true,
                   "Flags": 0,
-                  "Name": "Dialog",
-                  "Position": "6.4967041,44.8162384,18.4525299",
-                  "Rotation": "0,0,0.500000238,0.866025269",
-                  "Scale": "1,1,1",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.TextRenderer",
-                      "__guid": "b4ae6c34-dfb5-4473-af78-79a6e66de13c",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "__version": 2,
-                      "BlendMode": "Normal",
-                      "FogStrength": 1,
-                      "HorizontalAlignment": "Center",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "Scale": 0.15286624,
-                      "TextScope": {
-                        "Text": "",
-                        "TextColor": "1,1,1,1",
-                        "FontName": "Poppins",
-                        "FontSize": 32,
-                        "FontWeight": 400,
-                        "FontItalic": false,
-                        "FontVariantNumeric": "Normal",
-                        "LineHeight": 1,
-                        "LetterSpacing": 0,
-                        "WordSpacing": 0,
-                        "FilterMode": "Bilinear",
-                        "FontSmooth": "Auto",
-                        "Outline": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,0,1,1"
-                        },
-                        "Shadow": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,0,0,1",
-                          "Offset": "4,4"
-                        },
-                        "OutlineUnder": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,1,0,1"
-                        },
-                        "ShadowUnder": {
-                          "Enabled": false,
-                          "Size": 4,
-                          "Color": "0,0,0,1",
-                          "Offset": "4,4"
-                        }
-                      },
-                      "VerticalAlignment": "Center"
-                    }
-                  ],
-                  "Children": []
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null
+                },
+                {
+                  "__type": "Sandbox.ScreenPanel",
+                  "__guid": "0133527f-aa73-4adf-9518-e073c226de09",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "AutoScreenScale": true,
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "Opacity": 1,
+                  "Scale": 1,
+                  "ScaleStrategy": "ConsistentHeight",
+                  "TargetCamera": {
+                    "_type": "component",
+                    "component_id": "61243eee-fe11-45a6-9881-a697dfe1ffab",
+                    "go": "a6d6aacd-e67a-486a-b05c-dfcbf93b03c2",
+                    "component_type": "CameraComponent"
+                  },
+                  "ZIndex": 100
                 }
-              ]
+              ],
+              "Children": []
             },
             {
               "__guid": "89e2a00a-f95f-4c34-bde5-785b3b7cc6d9",
