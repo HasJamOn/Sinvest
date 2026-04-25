@@ -23,7 +23,7 @@
     "PerMapRanking": false,
     "LeaderboardType": "None",
     "CsProjName": "",
-    "StartupScene": "scenes/sinvest_world.scene",
+    "StartupScene": "scenes/test_mechanics.scene",
     "ControlModes": {
       "Keyboard": true,
       "VR": false,

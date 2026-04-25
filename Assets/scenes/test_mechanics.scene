@@ -473,16 +473,22 @@
               "__guid": "a047bc03-eef1-480d-a13a-6b449419120c",
               "__enabled": true,
               "Flags": 0,
+              "MaxInteractionDistance": 100,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
+              "OpenSound": "sounds/ui/sinvestos_boot.sound",
               "PopupPrefab": {
                 "_type": "gameobject",
                 "prefab": "prefabs/flipper2d.prefab"
-              }
+              },
+              "TooltipDescription": "Open Computer",
+              "TooltipIcon": "computer",
+              "ToolTipKey": "Enter",
+              "TooltipTitle": "PC Station"
             }
           ],
           "Children": [
@@ -750,16 +756,22 @@
           "__guid": "b442d87b-ab41-4651-b988-908f4b9b6e7e",
           "__enabled": true,
           "Flags": 0,
+          "MaxInteractionDistance": 100,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
+          "OpenSound": "sounds/ui/sinvestos_boot.sound",
           "PopupPrefab": {
             "_type": "gameobject",
             "prefab": "prefabs/computer_screen.prefab"
-          }
+          },
+          "TooltipDescription": "Open Computer",
+          "TooltipIcon": "computer",
+          "ToolTipKey": "Enter",
+          "TooltipTitle": "PC Station"
         }
       ],
       "Children": [
@@ -851,6 +863,50 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "8f32cdc2-f3db-4d9c-a869-aae23d064267",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "SaveSystem",
+      "Position": "-31.6374931,-209.698029,-47.6753845",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "SaveSystem",
+          "__guid": "3a1b5f8f-1d20-4308-ab32-d538b618aa55",
+          "__enabled": true,
+          "Flags": 0,
+          "ActiveSlot": 1,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
+          "__type": "SaveTest",
+          "__guid": "082eb066-61ab-47e4-b357-0546287a67e7",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -873,13 +929,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "8b600274-27b4-4a2b-b2b0-4e07733ca107"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },

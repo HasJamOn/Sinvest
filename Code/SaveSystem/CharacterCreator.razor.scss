@@ -1,0 +1,101 @@
+﻿CharacterCreator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 600px;
+  background-color: #111111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+
+  .header {
+    margin-bottom: 20px;
+    .title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #f1c40f;
+      text-transform: uppercase;
+    }
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      TextEntry {
+        background-color: #000;
+        border: 1px solid #444;
+        padding: 12px;
+        color: white;
+        font-family: monospace;
+        font-size: 16px;
+
+        &:focus { border-color: #f1c40f; }
+      }
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #888;
+      text-transform: uppercase;
+    }
+  }
+
+  .mod-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: scroll;
+
+    .mod-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      background-color: rgba(255,255,255,0.03);
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover:not(.locked) { background-color: rgba(255,255,255,0.08); }
+
+      .mod-name { font-weight: bold; }
+      .mod-status { font-size: 10px; color: #f1c40f; font-weight: 900; }
+
+      &.locked { opacity: 0.2; cursor: default; }
+    }
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: row; // Row for side-by-side buttons
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+
+    button {
+      padding: 12px 25px;
+      font-weight: 900;
+      font-size: 16px;
+      border-radius: 4px;
+      transition: all 0.1s;
+
+      &:hover { transform: scale(1.05); }
+    }
+
+    .btn-abort { background-color: #444; color: white; }
+    .btn-start { background-color: #f1c40f; color: black; }
+  }
+}

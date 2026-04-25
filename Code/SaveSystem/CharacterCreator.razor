@@ -1,0 +1,64 @@
+﻿@using Sandbox;
+@using Sandbox.UI;
+@using System;
+
+@inherits Panel
+
+<root>
+    <div class="header">
+        <label class="title">NEW CAREER: SLOT @SlotIndex</label>
+    </div>
+
+    <div class="body">
+        <div class="field">
+            <label class="field-label">LEGAL NAME</label>
+            <TextEntry Value:bind=@CharName placeholder="Enter name..." />
+        </div>
+
+        <div class="modifiers-section">
+            <label class="field-label">SELECT STARTING MODIFIERS</label>
+            <div class="mod-list">
+                @foreach ( StartingModifiers mod in Enum.GetValues( typeof( StartingModifiers ) ) )
+                {
+                    if ( mod == StartingModifiers.None ) continue;
+                    var unlocked = SaveManager?.IsModifierUnlocked( mod ) ?? false;
+                    
+                    <div class="mod-row @(unlocked ? "" : "locked")" onclick=@(() => ToggleMod(mod))>
+                        <label class="mod-name">@mod</label>
+                        <label class="mod-status">@(ActiveMods.HasFlag(mod) ? "SELECTED" : unlocked ? "AVAILABLE" : "LOCKED")</label>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <button class="btn-abort" onclick=@(() => OnCancel?.Invoke())>ABORT</button>
+        <button class="btn-start" onclick=@OnConfirm>START CAREER</button>
+    </div>
+</root>
+
+@code {
+    [Property] public GameSaveSystem SaveManager { get; set; }
+    [Property] public int SlotIndex { get; set; }
+    
+    public Action OnCancel { get; set; }
+    public Action<string, StartingModifiers> OnCreate { get; set; }
+
+    string CharName = "";
+    StartingModifiers ActiveMods = StartingModifiers.None;
+
+    void ToggleMod( StartingModifiers mod )
+    {
+        if ( !(SaveManager?.IsModifierUnlocked(mod) ?? false) ) return;
+        
+        if ( ActiveMods.HasFlag( mod ) ) ActiveMods &= ~mod;
+        else ActiveMods |= mod;
+    }
+
+    void OnConfirm()
+    {
+        if ( string.IsNullOrWhiteSpace( CharName ) ) return;
+        OnCreate?.Invoke( CharName, ActiveMods );
+    }
+}

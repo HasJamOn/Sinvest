@@ -4965,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "863ff24e-a246-42fc-b254-ffb2d5412be5",
+                  "__guid": "ecc0b97a-e26f-4b74-8cb0-9f6e90d99c05",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4982,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "326ee730-d765-4e83-817a-a2f2c9045996",
+                      "__guid": "891b3655-c3c7-4956-846e-773d104d45cd",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5034,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "04848fc3-bf3b-4834-8bc3-1569379ce242",
+                  "__guid": "580c08ae-15c2-4296-9f57-40d2af68ad6f",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5051,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "49ff6d5e-bf97-4994-828b-524b7af5f6ea",
+                      "__guid": "d5810e91-2131-49be-9f32-0df2fd14b14a",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5103,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "0848af73-53a0-436e-b8fb-de828bfb8f82",
+                  "__guid": "51390ebd-69cc-4f4e-8aff-dc14d8038501",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5120,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "7d10df8a-51f9-4665-94ea-b4c43c819893",
+                      "__guid": "09752ca6-6f46-47b5-9a77-3ae663b14c5a",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5172,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "5c36523d-96d7-4ef1-9f2a-14ea8b3e682f",
+                  "__guid": "34bbd31e-c05d-4774-a90f-04d21e866add",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5189,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "16e7d412-f3c2-4547-95aa-5a3326b73499",
+                      "__guid": "5e2154bf-0fdb-4891-9b86-22daf8f07fe5",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,

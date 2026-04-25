@@ -1,0 +1,139 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+
+@inherits PanelComponent
+
+<root>
+
+    @if ( IsCreating )
+    {
+	    @* We explicitly pass the actions to avoid the conversion error *@
+	    <CharacterCreator 
+		    SaveManager=@SaveManager 
+		    SlotIndex=@selectedSlot 
+		    OnCancel=@CancelCreation
+		    OnCreate=@CreateAndStart />
+    }
+    else
+    {
+        <div class="slot-container">
+            @for ( int i = 1; i <= 3; i++ )
+            {
+                var slotIndex = i;
+                var charName = SaveManager?.GetStoredNameForSlot(slotIndex) ?? "Empty Slot";
+                var isOccupied = charName != "New Character" && charName != "Empty Slot";
+
+                <div class="slot-card @(isOccupied ? "occupied" : "")" onclick=@(() => OnSelectSlot(slotIndex))>
+                    <label class="slot-number">SLOT @slotIndex</label>
+                    <div class="char-name">@charName</div>
+
+                    @if ( isOccupied )
+                    {
+                        <div class="delete-zone" onclick=@((PanelEvent e) => e.StopPropagation())>
+                            <div class="delete-btn" 
+                                 onmousedown=@(() => StartDeleteTimer(slotIndex))
+                                 onmouseup=@StopDeleteTimer
+                                 onmouseleave=@StopDeleteTimer
+                                 style="--fill: @((DeletingSlot == slotIndex ? DeleteProgress : 0).ToString())%"
+                                <label>@(DeletingSlot == slotIndex ? "REMOVING..." : "HOLD TO DELETE")</label>
+                                <div class="fill-bar"></div>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="select-hint">@(isOccupied ? "CONTINUE" : "CREATE NEW")</div>
+                </div>
+            }
+        </div>
+    }
+</root>
+
+@code {
+    [Property] public GameSaveSystem SaveManager { get; set; }
+
+    bool IsCreating = false;
+    int selectedSlot = 1;
+    
+    // Delete Logic State
+    int DeletingSlot = -1;
+    float DeleteProgress = 0;
+    const float DeleteTime = 1.5f;
+
+    void OnSelectSlot( int index )
+    {
+        if ( SaveManager == null || DeletingSlot != -1 ) return;
+
+        selectedSlot = index;
+        SaveManager.ActiveSlot = index;
+        SaveManager.LoadActiveSlot();
+        
+        // If the slot is empty, switch to the Creator view
+        if ( SaveManager.CurrentCharacter.Name == "New Character" )
+        {
+           IsCreating = true;
+        }
+        else
+        {
+           StartGame();
+        }
+    }
+
+    /// <summary>
+    /// Explicit helper to handle the back/abort action from the CharacterCreator
+    /// </summary>
+    void CancelCreation()
+    {
+        IsCreating = false;
+    }
+
+    void StartDeleteTimer( int index ) => DeletingSlot = index;
+    void StopDeleteTimer() { DeletingSlot = -1; DeleteProgress = 0; }
+
+    protected override void OnUpdate()
+    {
+        if ( DeletingSlot != -1 )
+        {
+            DeleteProgress += (RealTime.Delta / DeleteTime) * 100f;
+
+            if ( DeleteProgress >= 100 )
+            {
+                SaveManager?.DeleteSlot( DeletingSlot );
+                StopDeleteTimer();
+                StateHasChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Matches the Action<string, StartingModifiers> signature for the child component
+    /// </summary>
+    void CreateAndStart( string name, StartingModifiers mods )
+    {
+        if ( SaveManager == null ) return;
+
+        var charData = SaveManager.CurrentCharacter;
+        charData.Name = name;
+        charData.Modifiers = mods;
+        
+        // Apply DevMode bonus if flag is set
+        charData.Money = mods.HasFlag(StartingModifiers.DevMode) ? 999999999 : 0;
+
+        SaveManager.SaveActiveSlot();
+        
+        // Hide creator before starting
+        IsCreating = false;
+        StartGame();
+    }
+
+    void StartGame()
+    {
+        if ( SaveManager?.CurrentCharacter == null ) return;
+        
+        Log.Info( $"[UI] Launching game as {SaveManager.CurrentCharacter.Name}..." );
+        
+        // Transition to gameplay scene
+        // Scene.Load( "scenes/gameplay.scene" );
+    }
+}
