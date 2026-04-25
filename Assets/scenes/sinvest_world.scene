@@ -1092,174 +1092,10 @@
       }
     },
     {
-      "__guid": "35014908-de7d-43ef-91e3-f950286c1bd5",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "Ladder",
-      "Position": "173.997131,-234.23764,65.04245",
-      "Rotation": "1.05367128E-07,1.05367114E-07,-0.707106709,0.707106888",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sandbox.ModelRenderer",
-          "__guid": "46e11fe0-54f7-4b83-9391-0b727428ef35",
-          "__enabled": false,
-          "Flags": 0,
-          "BodyGroups": 18446744073709551615,
-          "CreateAttachments": false,
-          "LodOverride": null,
-          "MaterialGroup": null,
-          "MaterialOverride": null,
-          "Materials": null,
-          "Model": "models/dev/box.vmdl",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "RenderOptions": {
-            "GameLayer": true,
-            "OverlayLayer": false,
-            "BloomLayer": false,
-            "AfterUILayer": false
-          },
-          "RenderType": "On",
-          "Tint": "1,1,1,1"
-        },
-        {
-          "__type": "Sandbox.BoxCollider",
-          "__guid": "0bf7b6c2-14ed-482a-8e18-758d9195e03d",
-          "__enabled": true,
-          "Flags": 0,
-          "Center": "0,0,26.739996",
-          "ColliderFlags": 0,
-          "Elasticity": null,
-          "Friction": null,
-          "IsTrigger": false,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OnObjectTriggerEnter": null,
-          "OnObjectTriggerExit": null,
-          "OnTriggerEnter": null,
-          "OnTriggerExit": null,
-          "RollingResistance": null,
-          "Scale": "47.6001167,50,196.379929",
-          "Static": false,
-          "Surface": null,
-          "SurfaceVelocity": "0,0,0"
-        }
-      ],
-      "Children": [
-        {
-          "__guid": "4b09e7c4-3ddf-4af8-aae8-306fce2ea720",
-          "__version": 2,
-          "Flags": 0,
-          "Name": "Ladder_collider",
-          "Position": "-26.901516,-2.19345093E-05,-8.10623169E-06",
-          "Rotation": "0,0,0,1",
-          "Scale": "1,1,1",
-          "Tags": "ladder",
-          "Enabled": true,
-          "NetworkMode": 2,
-          "NetworkFlags": 0,
-          "NetworkOrphaned": 0,
-          "NetworkTransmit": true,
-          "OwnerTransfer": 1,
-          "Components": [
-            {
-              "__type": "Sandbox.BoxCollider",
-              "__guid": "2a56e2e5-55d8-4245-aa4c-0ec510a81424",
-              "__enabled": true,
-              "Flags": 0,
-              "Center": "-0.169984236,0,3.97387004",
-              "ColliderFlags": 0,
-              "Elasticity": null,
-              "Friction": null,
-              "IsTrigger": true,
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "OnObjectTriggerEnter": null,
-              "OnObjectTriggerExit": null,
-              "OnTriggerEnter": null,
-              "OnTriggerExit": null,
-              "RollingResistance": null,
-              "Scale": "5.59993887,50.019989,250.797028",
-              "Static": false,
-              "Surface": null,
-              "SurfaceVelocity": "0,0,0"
-            }
-          ],
-          "Children": []
-        },
-        {
-          "__guid": "e0c14011-c268-4bf3-aa4a-33903b43aadc",
-          "__version": 2,
-          "Flags": 0,
-          "Name": "Ladder_model",
-          "Position": "-27.8470383,7.62939453E-06,-65.1761093",
-          "Rotation": "3.7252903E-08,0.130526096,0,0.991444826",
-          "Scale": "1.43999958,1.69999933,3.00999022",
-          "Tags": "",
-          "Enabled": true,
-          "NetworkMode": 2,
-          "NetworkFlags": 0,
-          "NetworkOrphaned": 0,
-          "NetworkTransmit": true,
-          "OwnerTransfer": 1,
-          "Components": [
-            {
-              "__type": "Sandbox.ModelRenderer",
-              "__guid": "f06e101d-4164-4211-8567-4807538ad2cc",
-              "__enabled": true,
-              "Flags": 0,
-              "BodyGroups": 18446744073709551615,
-              "CreateAttachments": false,
-              "LodOverride": null,
-              "MaterialGroup": null,
-              "MaterialOverride": null,
-              "Materials": null,
-              "Model": "models/dev/ladder/ladder.vmdl",
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "RenderType": "On",
-              "Tint": "1,1,1,1"
-            }
-          ],
-          "Children": []
-        }
-      ]
-    },
-    {
       "__guid": "f81d9973-b624-4196-8a1d-d0b5523037bc",
       "__version": 2,
       "Flags": 0,
-      "Name": "Temp_Exterior_Env",
+      "Name": "Exterior_Env",
       "Position": "35.3341064,-193.886581,216.134857",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
@@ -3161,7 +2997,7 @@
       "__guid": "ce9653c7-ad67-4240-87d5-12328d138c65",
       "__version": 2,
       "Flags": 0,
-      "Name": "Temp_LimboCafe_Env",
+      "Name": "LimboCafe_Env",
       "Position": "233.870697,-194.016998,52.1802826",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
@@ -5129,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "9a47cb21-cd02-404d-a6f8-3336978ad014",
+                  "__guid": "863ff24e-a246-42fc-b254-ffb2d5412be5",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -5146,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "e9ab06c4-2f8a-4655-9ea7-dc99631d65b1",
+                      "__guid": "326ee730-d765-4e83-817a-a2f2c9045996",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5198,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "4f5a0c8b-a182-46e2-873c-f88a2f861a2a",
+                  "__guid": "04848fc3-bf3b-4834-8bc3-1569379ce242",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5215,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "bac5262a-97ab-41c7-a822-f15805da0446",
+                      "__guid": "49ff6d5e-bf97-4994-828b-524b7af5f6ea",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5267,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "d8740a48-5f35-49eb-a4cb-47b8fd4a421b",
+                  "__guid": "0848af73-53a0-436e-b8fb-de828bfb8f82",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5284,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "a08e5be2-782c-452f-92c3-b0180b942a1c",
+                      "__guid": "7d10df8a-51f9-4665-94ea-b4c43c819893",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5336,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "e4d816eb-05f7-448a-8f1c-6ae48748c223",
+                  "__guid": "5c36523d-96d7-4ef1-9f2a-14ea8b3e682f",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5353,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "f326532e-7adf-45e9-8be0-ed2637eaf418",
+                      "__guid": "16e7d412-f3c2-4547-95aa-5a3326b73499",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -6198,18 +6034,6 @@
                   ]
                 },
                 {
-                  "__type": "Sinvest.DialogueScreen",
-                  "__guid": "e40d771c-49af-473b-9c8f-3bc7ff8d592f",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null
-                },
-                {
                   "__type": "Sandbox.ScreenPanel",
                   "__guid": "0133527f-aa73-4adf-9518-e073c226de09",
                   "__enabled": true,
@@ -6231,6 +6055,18 @@
                     "component_type": "CameraComponent"
                   },
                   "ZIndex": 100
+                },
+                {
+                  "__type": "Sinvest.DialogueScreen",
+                  "__guid": "2d2db4b6-0d84-48b2-9a9c-b5d461083e58",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null
                 }
               ],
               "Children": []
@@ -11704,6 +11540,170 @@
               "Children": []
             }
           ]
+        },
+        {
+          "__guid": "35014908-de7d-43ef-91e3-f950286c1bd5",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Ladder",
+          "Position": "-59.8735657,-40.2206421,12.8621674",
+          "Rotation": "1.05367128E-07,1.05367114E-07,-0.707106709,0.707106888",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "46e11fe0-54f7-4b83-9391-0b727428ef35",
+              "__enabled": false,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": "models/dev/box.vmdl",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "0bf7b6c2-14ed-482a-8e18-758d9195e03d",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,26.739996",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "OnObjectTriggerEnter": null,
+              "OnObjectTriggerExit": null,
+              "OnTriggerEnter": null,
+              "OnTriggerExit": null,
+              "RollingResistance": null,
+              "Scale": "47.6001167,50,196.379929",
+              "Static": false,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": [
+            {
+              "__guid": "4b09e7c4-3ddf-4af8-aae8-306fce2ea720",
+              "__version": 2,
+              "Flags": 0,
+              "Name": "Ladder_collider",
+              "Position": "-26.901516,-2.19345093E-05,-8.10623169E-06",
+              "Rotation": "0,0,0,1",
+              "Scale": "1,1,1",
+              "Tags": "ladder",
+              "Enabled": true,
+              "NetworkMode": 2,
+              "NetworkFlags": 0,
+              "NetworkOrphaned": 0,
+              "NetworkTransmit": true,
+              "OwnerTransfer": 1,
+              "Components": [
+                {
+                  "__type": "Sandbox.BoxCollider",
+                  "__guid": "2a56e2e5-55d8-4245-aa4c-0ec510a81424",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "Center": "-0.169984236,0,3.97387004",
+                  "ColliderFlags": 0,
+                  "Elasticity": null,
+                  "Friction": null,
+                  "IsTrigger": true,
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "OnObjectTriggerEnter": null,
+                  "OnObjectTriggerExit": null,
+                  "OnTriggerEnter": null,
+                  "OnTriggerExit": null,
+                  "RollingResistance": null,
+                  "Scale": "5.59993887,50.019989,250.797028",
+                  "Static": false,
+                  "Surface": null,
+                  "SurfaceVelocity": "0,0,0"
+                }
+              ],
+              "Children": []
+            },
+            {
+              "__guid": "e0c14011-c268-4bf3-aa4a-33903b43aadc",
+              "__version": 2,
+              "Flags": 0,
+              "Name": "Ladder_model",
+              "Position": "-27.8470383,7.62939453E-06,-65.1761093",
+              "Rotation": "3.7252903E-08,0.130526096,0,0.991444826",
+              "Scale": "1.43999958,1.69999933,3.00999022",
+              "Tags": "",
+              "Enabled": true,
+              "NetworkMode": 2,
+              "NetworkFlags": 0,
+              "NetworkOrphaned": 0,
+              "NetworkTransmit": true,
+              "OwnerTransfer": 1,
+              "Components": [
+                {
+                  "__type": "Sandbox.ModelRenderer",
+                  "__guid": "f06e101d-4164-4211-8567-4807538ad2cc",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "BodyGroups": 18446744073709551615,
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": "models/dev/ladder/ladder.vmdl",
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
+                  "RenderType": "On",
+                  "Tint": "1,1,1,1"
+                }
+              ],
+              "Children": []
+            }
+          ]
         }
       ]
     },
@@ -11808,13 +11808,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1ff7db61-0293-4529-be2b-9f606b7c33ea"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },
