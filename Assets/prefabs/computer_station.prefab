@@ -777,12 +777,14 @@
                 "OnComponentFixedUpdate": null,
                 "OnComponentStart": null,
                 "OnComponentUpdate": null,
+                "OpenSound": "sounds/ui/sinvestos_boot.sound",
                 "PopupPrefab": {
                   "_type": "gameobject",
                   "prefab": "prefabs/computer_screen.prefab"
                 },
                 "TooltipDescription": "Access the SinvestOS network",
                 "TooltipIcon": "computer",
+                "ToolTipKey": "Enter",
                 "TooltipTitle": "Terminal"
               }
             ],
@@ -1454,12 +1456,14 @@
                 "OnComponentFixedUpdate": null,
                 "OnComponentStart": null,
                 "OnComponentUpdate": null,
+                "OpenSound": "sounds/ui/sinvestos_boot.sound",
                 "PopupPrefab": {
                   "_type": "gameobject",
                   "prefab": "prefabs/computer_screen.prefab"
                 },
                 "TooltipDescription": "Open Computer",
                 "TooltipIcon": "computer",
+                "ToolTipKey": "Enter",
                 "TooltipTitle": "Computer"
               }
             ],

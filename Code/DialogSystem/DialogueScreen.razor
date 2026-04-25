@@ -1,24 +1,76 @@
 ﻿@using Sandbox;
 @using Sandbox.UI;
+@using System.Threading.Tasks;
 @namespace Sinvest
 @inherits PanelComponent
 @implements IDialogueUI
 
 <root class="dialogue-overlay">
-	<div class="dialogue-box">
-		<label class="speaker">@Speaker</label>
-		<label class="message">@Message</label>
-	</div>
+    <div class="dialogue-box">
+       <label class="speaker">@Speaker</label>
+       <label class="message">@DisplayedMessage</label>
+    </div>
 </root>
 
 @code {
-	public string Speaker { get; set; }
-	public string Message { get; set; }
+    /**
+     * Private backing field for the sound path.
+     */
+    private string _typeSound = "sounds/dialog/type.sound";
 
-	public void UpdateDialogue( string name, string text )
-	{
-		Speaker = name;
-		Message = text;
-		StateHasChanged();
-	}
+    /**
+     * Public property with logic to prevent null/empty values.
+     * Use [ResourceType] to provide a sound picker in the Inspector.
+     */
+    [Property, ResourceType( "sound" )]
+    public string TypeSound
+    {
+        get => string.IsNullOrEmpty( _typeSound ) ? "sounds/dialog/type.sound" : _typeSound;
+        set => _typeSound = value;
+    }
+
+    [Property] public float CharactersPerSecond { get; set; } = 30.0f;
+
+    public string Speaker { get; set; }
+    public string Message { get; set; }
+    
+    private string DisplayedMessage { get; set; } = "";
+    private int _revealToken = 0;
+
+    /// <summary>
+    /// Updates the dialogue and initiates the typewriter effect.
+    /// </summary>
+    public void UpdateDialogue( string name, string text )
+    {
+       Speaker = name;
+       Message = text;
+       
+       _revealToken++;
+       _ = StreamText( _revealToken );
+    }
+
+    /// <summary>
+    /// Progressively reveals characters and triggers audio via Sound.Play.
+    /// Falls back to the default sound if TypeSound is empty.
+    /// </summary>
+    private async Task StreamText( int token )
+    {
+        DisplayedMessage = "";
+        
+        for ( int i = 0; i < Message.Length; i++ )
+        {
+            if ( token != _revealToken ) return;
+
+            DisplayedMessage += Message[i];
+            
+            /* Audio trigger with a guaranteed fallback path */
+            if ( !char.IsWhiteSpace( Message[i] ) )
+            {
+                Sound.Play( TypeSound );
+            }
+
+            StateHasChanged();
+            await Task.Delay( (int)( 1000 / CharactersPerSecond ) );
+        }
+    }
 }

@@ -6061,12 +6061,14 @@
                   "__guid": "2d2db4b6-0d84-48b2-9a9c-b5d461083e58",
                   "__enabled": true,
                   "Flags": 0,
+                  "CharactersPerSecond": 30,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
                   "OnComponentFixedUpdate": null,
                   "OnComponentStart": null,
-                  "OnComponentUpdate": null
+                  "OnComponentUpdate": null,
+                  "TypeSound": "sounds/dialog/type.sound"
                 }
               ],
               "Children": []
@@ -6100,6 +6102,7 @@
                   "OnComponentStart": null,
                   "OnComponentUpdate": null,
                   "OnStartMode": "ClassicRandom",
+                  "SwapSound": "sounds/ui/shuffle.sound",
                   "TargetRenderer": {
                     "_type": "component",
                     "component_id": "c6880c5f-7222-45d3-b067-f221d435ef16",

@@ -15,12 +15,17 @@ public class LoadedGame
 
 public sealed class SteamGameCase : Component
 {
-    public enum StartBehavior { ClassicRandom, InstantShuffle }
+	public enum StartBehavior { ClassicRandom, InstantShuffle }
 
-    [Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
-    [Property, Group( "Settings" )] public StartBehavior OnStartMode { get; set; } = StartBehavior.ClassicRandom;
-    
-    [Property, Group( "Settings" )] public int MaxHistory { get; set; } = 30;
+	[Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
+	
+	private string _swapSound = "sounds/ui/shuffle.sound";
+	
+	[Property, Group( "Audio" ), ResourceType( "sound" )] 
+	public string SwapSound { get; set; } = "sounds/ui/shuffle.sound";
+
+	[Property, Group( "Settings" )] public StartBehavior OnStartMode { get; set; } = StartBehavior.ClassicRandom;
+	[Property, Group( "Settings" )] public int MaxHistory { get; set; } = 30;
 
     [Property, Group( "Tooltip" )] public string TooltipTitle { get; set; } = "Steam Game Case";
     [Property, Group( "Tooltip" )] public string TooltipIcon { get; set; } = "videogame_asset";
@@ -47,12 +52,13 @@ public sealed class SteamGameCase : Component
         _ = InitializeSystem();
     }
 
+    private bool _isInitialized = false;
+
     private async Task InitializeSystem()
     {
 	    // s&box AppID: 590830
 	    if ( OnStartMode == StartBehavior.ClassicRandom )
 	    {
-		    // 1. Load GMod (The classic fallback)
 		    var gmod = await LoadGameData( 4000, "Garry's Mod" );
 		    if ( gmod != null ) 
 		    {
@@ -60,18 +66,15 @@ public sealed class SteamGameCase : Component
 			    AddToHistory( gmod );
 		    }
 
-		    // 2. Load s&box into the pool immediately
-		    var sbox = await LoadGameData( 590830, "s&box" );
+		    var sbox = await LoadGameData( 590830, "sbox" );
 		    if ( sbox != null ) AddToHistory( sbox );
-        
+    
 		    await RefreshAppPool();
 		    _ = FillBuffer();
 	    }
 	    else
 	    {
-		    // For InstantShuffle, we'll try to get s&box in there first 
-		    // before the random SteamSpy clutter fills the buffer
-		    var sbox = await LoadGameData( 590830, "s&box" );
+		    var sbox = await LoadGameData( 590830, "sbox" );
 		    if ( sbox != null ) 
 		    {
 			    _readyBuffer.Enqueue( sbox );
@@ -82,6 +85,9 @@ public sealed class SteamGameCase : Component
 		    await FillBuffer();
 		    Shuffle(); 
 	    }
+
+	    // --- SYSTEM IS NOW LIVE ---
+	    _isInitialized = true;
     }
 
     public void Shuffle()
@@ -128,13 +134,22 @@ public sealed class SteamGameCase : Component
 	    _historyIndex = 0;
     }
 
+    /// <summary>
+    /// Updates the Material Attributes on the TargetRenderer and triggers audio feedback.
+    /// </summary>
     private void ApplyToRenderer( LoadedGame game )
     {
-        if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
+	    if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
 
-        TargetRenderer.SceneObject.Attributes.Set( "CoverArt", game.Cover );
-        TargetRenderer.SceneObject.Attributes.Set( "BackArt", game.Hero );
-        TooltipTitle = game.Title;
+	    TargetRenderer.SceneObject.Attributes.Set( "CoverArt", game.Cover );
+	    TargetRenderer.SceneObject.Attributes.Set( "BackArt", game.Hero );
+	    TooltipTitle = game.Title;
+
+	    // Only play sound if the system has finished its initial load
+	    if ( _isInitialized )
+	    {
+		    Sound.Play( SwapSound, WorldPosition );
+	    }
     }
 
     private async Task FillBuffer()
