@@ -198,14 +198,17 @@ public sealed class GameSaveSystem : Component
 
     public void DeleteSlot( int slot )
     {
-       string suffix = $"_{slot}";
-       if ( ShouldUseCloud )
-       {
-          Game.Cookies.Set( $"name{suffix}", "New Character" );
-          Sandbox.Services.Stats.SetValue( $"money{suffix}", 0 );
-          Sandbox.Services.Stats.SetValue( $"modifiers{suffix}", 0 );
-          Sandbox.Services.Stats.Flush();
-       }
+	    string suffix = $"_{slot}";
+	    if ( ShouldUseCloud )
+	    {
+		    Game.Cookies.Set( $"name{suffix}", "New Character" );
+		    Stats.SetValue( $"money{suffix}", 0 );
+		    Stats.SetValue( $"modifiers{suffix}", 0 );
+		    Stats.SetValue( $"fundino_shares{suffix}", 0 );
+		    Stats.SetValue( $"claimed_startup{suffix}", 0 );
+
+		    Sandbox.Services.Stats.Flush();
+	    }
        else
        {
           _localCookies[$"name{suffix}"] = "New Character";
