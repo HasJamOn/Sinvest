@@ -48,6 +48,38 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "App_RosterManager",
+      "Position": "0,0,100",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sinvest.RosterManager",
+          "__guid": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
+          "__enabled": true,
+          "Flags": 0,
+          "ActiveNodes": [],
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
