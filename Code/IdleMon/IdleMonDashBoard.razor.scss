@@ -1,4 +1,4 @@
-﻿IdleMonDashBoard {
+IdleMonDashBoard {
   pointer-events: all;
   width: 100%;
   height: 100%;
@@ -22,11 +22,24 @@
     .label { font-size: 12px; color: rgba(0, 255, 255, 0.6); }
     .value { font-size: 24px; font-weight: bold; color: #00ffff; }
     .positive { color: #00ffaa; }
+    .btn-terminate {
+      background-color: rgba(255, 68, 68, 0.1);
+      border: 1px solid rgba(255, 68, 68, 0.4);
+      color: #ff4444;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 15px;
+
+      &:hover { background-color: #ff4444; color: black; }
+      .icon { font-size: 16px; }
+      span { font-size: 10px; font-weight: 900; }
+    }
   }
 
   .node-matrix {
     display: flex;
-    flex-direction: column; /* Stack the rows vertically */
+    flex-direction: column;
     gap: 20px;
     padding: 20px;
     width: 800px;
@@ -36,8 +49,8 @@
 
     .matrix-row {
       display: flex;
-      flex-direction: row; /* Place two cards side-by-side */
-      justify-content: space-between; /* Space them out to the edges */
+      flex-direction: row;
+      justify-content: space-between;
       width: 100%;
       flex-shrink: 0;
     }
@@ -46,7 +59,7 @@
   .node-card {
     display: flex;
     flex-direction: column;
-    width: 380px; /* Adjusted slightly to fit better in 800px with gaps */
+    width: 380px;
     height: 190px;
     flex: none;
     background-color: rgba(25, 30, 35, 0.95);
@@ -64,6 +77,13 @@
       transform: scale(1.02);
       z-index: 10;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Armed state: pulses the card border to signal pending confirmation */
+    &.armed {
+      border: 2px solid #ff0000;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+      animation: pulse-border 0.5s infinite alternate;
     }
 
     &.empty {
@@ -139,8 +159,33 @@
       justify-content: center;
       align-items: center;
       z-index: 20;
-      &.positive { border: 2px solid #00ffaa; .delta-value { color: #00ffaa; } }
-      &.negative { border: 2px solid #ff4444; .delta-value { color: #ff4444; } }
+
+      &.positive {
+        border: 2px solid #00ffaa;
+        .delta-value { color: #00ffaa; }
+      }
+
+      &.negative {
+        border: 2px solid #ff4444;
+        .delta-value { color: #ff4444; }
+      }
+
+      /* Armed + negative: escalate urgency */
+      &.negative.is-armed {
+        background-color: rgba(60, 10, 10, 0.95);
+        border: 3px solid #ff0000;
+
+        .delta-value {
+          animation: pulse-red 0.5s infinite alternate;
+        }
+
+        .action-hint.danger-flash {
+          background-color: #ff0000;
+          color: white;
+          animation: shake 0.2s infinite;
+        }
+      }
+
       .delta-box {
         display: flex;
         flex-direction: column;
@@ -148,6 +193,7 @@
         .delta-value { font-size: 32px; font-weight: 900; }
         .delta-unit { font-size: 11px; color: rgba(255, 255, 255, 0.4); }
       }
+
       .action-hint {
         font-size: 10px; font-weight: 900; margin-top: 15px; color: #000;
         background-color: #fff; padding: 4px 12px; border-radius: 2px; text-transform: uppercase;
@@ -181,18 +227,34 @@
     padding: 20px 40px;
     flex-shrink: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(15, 18, 22, 0.6);
-    height: 240px;
+    background-color: rgba(15, 18, 22, 0.9);
+    min-height: 280px; /* FIX: min-height instead of height to prevent clipping */
+    width: 100%;
 
     .draft-controls {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
       width: 100%;
+      height: auto;
 
       .candidate-card {
-        margin-bottom: 5px;
+        margin-bottom: 0; /* Gap handles spacing */
+      }
+    }
+
+    .draft-actions {
+      margin-top: 10px;
+      .btn-discard {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 10px 30px;
+        font-size: 12px;
+        text-transform: uppercase;
+
+        &:hover { border-color: #00ffff; background-color: rgba(0, 255, 255, 0.05); }
       }
     }
 
@@ -227,14 +289,15 @@
       background-color: #ff4444;
       color: white;
       font-family: 'Consolas', monospace;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: bold;
-      padding: 8px 20px;
+      padding: 10px 24px;
       border: none;
       border-radius: 2px;
       text-transform: uppercase;
       letter-spacing: 1px;
       box-shadow: 0 3px 0 #882222;
+      cursor: pointer;
 
       &:hover {
         background-color: #ff6666;
@@ -247,4 +310,21 @@
       }
     }
   }
+}
+
+@keyframes pulse-red {
+  from { text-shadow: 0 0 5px #ff0000; transform: scale(1); }
+  to   { text-shadow: 0 0 20px #ff0000; transform: scale(1.1); }
+}
+
+@keyframes pulse-border {
+  from { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
+  to   { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); }
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-2px); }
+  75%  { transform: translateX(2px); }
+  100% { transform: translateX(0); }
 }

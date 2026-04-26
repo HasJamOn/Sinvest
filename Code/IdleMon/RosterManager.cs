@@ -22,11 +22,21 @@ public sealed class RosterManager : Component
     
     private double _pendingBucks = 0;
     private TimeSince _timeSinceLastFlush = 0;
-    [Property] public float FlushInterval { get; set; } = 1.0f; 
+    [Property] public float FlushInterval { get; set; } = 1.0f;
+
+    // --- SYNC & DEBOUNCE STATE ---
+    private RealTimeSince _timeSinceLastChange;
+    private bool _isDirty = false;
+    private const float SYNC_DELAY = 10.0f; // Wait 10 seconds of inactivity to save
+
+    /// <summary>
+    /// Exposed for the Razor UI to show "SYNC PENDING..."
+    /// </summary>
+    public bool IsDirty => _isDirty;
 
     private bool _hasInitialized = false;
 
-    // --- NEW: MARKET GENERATION LOGIC ---
+    // --- MARKET GENERATION LOGIC ---
 
     /// <summary>
     /// Deducts IdleBucks and flushes the change to the save system.
@@ -60,38 +70,37 @@ public sealed class RosterManager : Component
     /// </summary>
     public double[] GetSwapDeltas( IdleMonData candidate )
     {
-	    double[] deltas = new double[6];
-	    // Ensure we have 6 slots to compare against
-	    if ( ActiveNodes == null || ActiveNodes.Count < 6 ) return deltas;
+        double[] deltas = new double[6];
+        if ( ActiveNodes == null || ActiveNodes.Count < 6 ) return deltas;
 
-	    double currentYield = CalculateTotalYield();
+        double currentYield = CalculateTotalYield();
 
-	    for ( int i = 0; i < 6; i++ )
-	    {
-		    var originalMon = ActiveNodes[i];
+        for ( int i = 0; i < 6; i++ )
+        {
+            var originalMon = ActiveNodes[i];
         
-		    // Temporarily swap
-		    ActiveNodes[i] = candidate;
-		    double projectedYield = CalculateTotalYield();
+            // Temporarily swap
+            ActiveNodes[i] = candidate;
+            double projectedYield = CalculateTotalYield();
         
-		    // Calculate the difference
-		    deltas[i] = projectedYield - currentYield;
+            // Calculate the difference
+            deltas[i] = projectedYield - currentYield;
         
-		    // Restore
-		    ActiveNodes[i] = originalMon;
-	    }
+            // Restore
+            ActiveNodes[i] = originalMon;
+        }
 
-	    return deltas;
+        return deltas;
     }
 
     // --- CORE LOOP ---
 
     protected override void OnUpdate()
     {
-	    if ( ShowDebugHUD ) // Only draw if toggled on
-	    {
-		    DrawDebugHUD();
-	    }
+        if ( ShowDebugHUD )
+        {
+            DrawDebugHUD();
+        }
 
         if ( !_hasInitialized && GameSaveSystem.Instance.IsValid() )
         {
@@ -119,6 +128,14 @@ public sealed class RosterManager : Component
         if ( !_hasInitialized ) return;
 
         ProcessEconomy();
+
+        // Handle the dirty sync debounce
+        if ( _isDirty && _timeSinceLastChange > SYNC_DELAY )
+        {
+            _isDirty = false;
+            SaveRoster();
+            Log.Info( "[ROSTER] Inactivity threshold met. Cloud Sync complete." );
+        }
     }
 
     private void DrawDebugHUD()
@@ -126,7 +143,6 @@ public sealed class RosterManager : Component
         double currentG = CalculateTotalYield();
         var econ = EconomyManager.Instance;
         
-        // Added Market Scale to HUD for testing
         float s = (float)(MarketService.CurrentPrice / 7126.0);
 
         Gizmo.Draw.Color = Color.Yellow;
@@ -136,7 +152,8 @@ public sealed class RosterManager : Component
             $"OS Cash: ${(econ.IsValid() ? econ.CurrentMoney : 0):C}\n" +
             $"IdleBucks: {IdleBucks:F0} IB\n" +
             $"Current Yield: {currentG:F2} IB/sec\n" +
-            $"Active Nodes: {ActiveNodes.Count( x => x.ID != Guid.Empty )}/6",
+            $"Active Nodes: {ActiveNodes.Count( x => x.ID != Guid.Empty )}/6\n" +
+            $"Sync: {(_isDirty ? "PENDING..." : "OK")}",
             new Vector2( 50, 50 ), "Consolas", 18, TextFlag.Left
         );
     }
@@ -152,6 +169,7 @@ public sealed class RosterManager : Component
             {
                 IdleBucks += _pendingBucks;
                 _pendingBucks = 0;
+                // Note: We don't mark dirty here because Bucks are handled by the flush interval
                 GameSaveSystem.Instance?.SetStoredStat( "idlemon_bucks", IdleBucks );
             }
             _timeSinceLastFlush = 0;
@@ -163,8 +181,11 @@ public sealed class RosterManager : Component
         if ( index < 0 || index >= ActiveNodes.Count ) return;
         
         ActiveNodes[index] = candidate;
-        Log.Info( $"[ROSTER] Slot {index} replaced with {candidate.Name}" );
-        SaveRoster();
+
+        // Mark as dirty and reset the debounce timer instead of saving immediately
+        _isDirty = true;
+        _timeSinceLastChange = 0;
+        Log.Info( $"[ROSTER] Slot {index} replaced locally with {candidate.Name}. Pending Sync..." );
     }
 
     public double CalculateTotalYield()
@@ -174,7 +195,6 @@ public sealed class RosterManager : Component
         double sumA = ActiveNodes.Sum( n => n.Addition );
         double sumS = ActiveNodes.Sum( n => n.Subtraction );
         
-        // Aggregate logic modified to match GDD: ΠD, ΠM, ΠT
         double prodD = ActiveNodes.Aggregate( 1.0, ( acc, n ) => acc * ( n.ID == Guid.Empty || n.Division <= 0 ? 1.0 : n.Division ) );
         double prodM = ActiveNodes.Aggregate( 1.0, ( acc, n ) => acc * ( n.ID == Guid.Empty ? 1.0 : n.Multiplier ) );
         double prodT = ActiveNodes.Aggregate( 1.0, ( acc, n ) => acc * ( n.ID == Guid.Empty ? 1.0 : n.TeamBonus ) );
