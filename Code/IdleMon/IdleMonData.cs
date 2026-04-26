@@ -23,8 +23,10 @@ public struct IdleMonData
 	{ 
 		ID = Guid.Empty, 
 		Name = "Empty Node",
-		Multiplier = 1.0, 
-		Division = 1.0, 
-		TeamBonus = 1.0 
+		Addition = 0,
+		Subtraction = 0,
+		Multiplier = 1.0, // Identity
+		Division = 1.0,   // Identity
+		TeamBonus = 1.0   // Identity
 	};
 }

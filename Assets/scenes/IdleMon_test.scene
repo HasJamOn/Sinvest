@@ -70,13 +70,52 @@
           "__guid": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
           "__enabled": true,
           "Flags": 0,
-          "ActiveNodes": [],
+          "ActiveNodes": [
+            {}
+          ],
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null
+        },
+        {
+          "__type": "Sinvest.AssetGenerator",
+          "__guid": "69128f78-e4dc-4a76-8e49-3f57b83919cf",
+          "__enabled": true,
+          "Flags": 0,
+          "BasePotential": 10,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
+          "__type": "Sinvest.TestInputHandler",
+          "__guid": "99b05d66-4b7c-4194-9b4a-28ee1f8ddf3d",
+          "__enabled": true,
+          "Flags": 0,
+          "Generator": {
+            "_type": "component",
+            "component_id": "69128f78-e4dc-4a76-8e49-3f57b83919cf",
+            "go": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
+            "component_type": "AssetGenerator"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Roster": {
+            "_type": "component",
+            "component_id": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
+            "go": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
+            "component_type": "RosterManager"
+          }
         }
       ],
       "Children": []
