@@ -103,7 +103,8 @@
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null
+          "OnComponentUpdate": null,
+          "ShowDebugHUD": true
         },
         {
           "__type": "Sinvest.AssetGenerator",
@@ -123,6 +124,10 @@
           "__guid": "99b05d66-4b7c-4194-9b4a-28ee1f8ddf3d",
           "__enabled": true,
           "Flags": 0,
+          "DashboardRoot": {
+            "_type": "gameobject",
+            "go": "c64ac180-94a3-4f16-8806-4eb03ed607bf"
+          },
           "Generator": {
             "_type": "component",
             "component_id": "69128f78-e4dc-4a76-8e49-3f57b83919cf",

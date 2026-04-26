@@ -8,7 +8,7 @@
 
 @inherits PanelComponent
 
-<root class="dashboard-root">
+<root>
     @if ( Roster == null )
     {
         <div class="error">MISSING ROSTER_MANAGER REFERENCE</div>
@@ -32,50 +32,116 @@
         </div>
 
         <div class="node-matrix">
-            @for ( int i = 0; i < 6; i++ )
+    @for ( int i = 0; i < 6; i += 2 )
+    {
+        <div class="matrix-row">
+            @for ( int j = 0; j < 2; j++ )
             {
-                var index = i;
+                var index = i + j;
                 var mon = (Roster.ActiveNodes != null && index < Roster.ActiveNodes.Count) 
-                          ? Roster.ActiveNodes[index] 
-                          : IdleMonData.Empty;
-                
-                var delta = (CurrentDeltas != null && index < CurrentDeltas.Length) ? CurrentDeltas[index] : 0;
+                    ? Roster.ActiveNodes[index] 
+                    : IdleMonData.Empty;
 
-                <div class="node-slot @(mon.ID == Guid.Empty ? "empty" : "active")" onclick="@(() => ConfirmSwap(index))">
-                    <div class="node-info">
-                        <label class="node-name">@mon.Name</label>
-                        <div class="stats-mini">
-                            <label>A: @mon.Addition.ToString("F1")</label>
-                            <label>M: @mon.Multiplier.ToString("F2")x</label>
+                bool isEmpty = mon.ID == Guid.Empty;
+
+                <div class="node-card @(isEmpty ? "empty" : "active")" onclick="@(() => OnNodeClick(index))">
+                    @if (!isEmpty)
+                    {
+                        <div class="card-header">
+                            <span class="name">@mon.Name</span>
+                            <span class="gen-tag">GEN @mon.Generation</span>
                         </div>
-                    </div>
+                        
+                        <div class="card-body">
+                            <div class="stat-row">
+                                <span class="stat-label">ADDITION (A)</span>
+                                <span class="stat-value">@mon.Addition.ToString("F1")</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">MULTIPLIER (M)</span>
+                                <span class="stat-value">@mon.Multiplier.ToString("F2")x</span>
+                            </div>
+                            <div class="stat-row @(mon.Subtraction > 0 ? "warning" : "")">
+                                <span class="stat-label">SUBTRACTION (S)</span>
+                                <span class="stat-value">@mon.Subtraction.ToString("F1")</span>
+                            </div>
+                            <div class="stat-row secondary">
+                                <span class="stat-label">MARKET SCALE</span>
+                                <span class="stat-value">@mon.MarketScaleAtBirth.ToString("F2")x</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <span class="yield-contribution">+@(((mon.Addition - mon.Subtraction) * mon.Multiplier).ToString("F2")) IB/s</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="icon">add_circle_outline</i>
+                            <span>EMPTY NODE</span>
+                        </div>
+                    }
 
                     @if ( IsDrafting )
                     {
+                        var delta = (CurrentDeltas != null && index < CurrentDeltas.Length) ? CurrentDeltas[index] : 0;
+                        
                         <div class="swap-overlay @(delta >= 0 ? "positive" : "negative")">
-                            <label class="delta-text">@(delta >= 0 ? "+" : "")@delta.ToString("F2")</label>
-                            <label class="action-hint">CLICK TO SWAP</label>
+                            <div class="delta-box">
+                                <label class="delta-value">@(delta >= 0 ? "+" : "")@delta.ToString("F2")</label>
+                                <label class="delta-unit">IB/s</label>
+                            </div>
+                            <label class="action-hint">@(isEmpty ? "INSTALL" : "REPLACE")</label>
                         </div>
                     }
                 </div>
             }
         </div>
+    }
+</div>
 
         <div class="footer">
-            @if ( !IsDrafting )
-            {
-                <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
-            }
-            else
-            {
-                <div class="draft-controls">
-                    <div class="candidate-preview">
-                        <label class="title">DRAFT CANDIDATE: @DraftCandidate?.Name</label>
-                        <label class="stats">Gen @DraftCandidate?.Generation | Scale @DraftCandidate?.MarketScaleAtBirth.ToString("F2")x</label>
-                    </div>
-                    <button class="btn-danger" onclick="@CancelDraft">TERMINATE DRAFT</button>
-                </div>
-            }
+	        @if ( !IsDrafting )
+	        {
+		        <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
+	        }
+	        else
+	        {
+		        <div class="draft-controls">
+			        <div class="node-card candidate-card">
+				        <div class="card-header">
+					        <span class="name">@DraftCandidate?.Name</span>
+					        <span class="gen-tag">CANDIDATE</span>
+				        </div>
+        
+				        <div class="card-body">
+					        <div class="stat-row">
+						        <span class="stat-label">ADDITION (A)</span>
+						        <span class="stat-value">@DraftCandidate?.Addition.ToString("F1")</span>
+					        </div>
+					        <div class="stat-row">
+						        <span class="stat-label">MULTIPLIER (M)</span>
+						        <span class="stat-value">@DraftCandidate?.Multiplier.ToString("F2")x</span>
+					        </div>
+					        <div class="stat-row @(DraftCandidate?.Subtraction > 0 ? "warning" : "")">
+						        <span class="stat-label">SUBTRACTION (S)</span>
+						        <span class="stat-value">@DraftCandidate?.Subtraction.ToString("F1")</span>
+					        </div>
+					        <div class="stat-row secondary">
+						        <span class="stat-label">MARKET SCALE</span>
+						        <span class="stat-value">@DraftCandidate?.MarketScaleAtBirth.ToString("F2")x</span>
+					        </div>
+				        </div>
+
+				        <div class="card-footer">
+					        <span class="yield-contribution">POTENTIAL ASSET</span>
+				        </div>
+			        </div>
+
+			        <button class="btn-danger" onclick="@CancelDraft">TERMINATE DRAFT</button>
+		        </div>
+	        }
         </div>
     }
 </root>
@@ -93,10 +159,11 @@
     /// We check the money, yield, and draft state.
     /// </summary>
     protected override int BuildHash() => System.HashCode.Combine( 
-        Roster?.IdleBucks, 
-        Roster?.CalculateTotalYield(), 
-        IsDrafting, 
-        DraftCandidate?.ID 
+	    Roster?.IdleBucks, 
+	    Roster?.CalculateTotalYield(), 
+	    IsDrafting, 
+	    DraftCandidate?.ID,
+	    CurrentDeltas?.Sum() // Forces update when deltas change
     );
 
     public void StartDraft()
@@ -121,5 +188,18 @@
         
         Roster.SwapNode( slotIndex, DraftCandidate.Value );
         CancelDraft();
+    }
+    private void OnNodeClick( int index )
+    {
+	    // If we are currently drafting a new roll, clicking a node means SWAP
+	    if ( IsDrafting )
+	    {
+		    ConfirmSwap( index );
+	    }
+	    else
+	    {
+		    // Future: Open "The Lab" for this specific node
+		    Log.Info( $"[UI] Selected Node {index} for inspection." );
+	    }
     }
 }

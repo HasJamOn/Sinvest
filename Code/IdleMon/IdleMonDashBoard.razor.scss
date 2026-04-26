@@ -4,17 +4,20 @@
   height: 100%;
   background-color: rgba(20, 24, 28, 0.95);
   font-family: 'Consolas', monospace;
+  display: flex;
   flex-direction: column;
   padding: 20px;
   color: white;
 
   .header {
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid rgba(0, 255, 255, 0.2);
     padding-bottom: 15px;
     margin-bottom: 20px;
+    flex-shrink: 0;
 
     .label { font-size: 12px; color: rgba(0, 255, 255, 0.6); }
     .value { font-size: 24px; font-weight: bold; color: #00ffff; }
@@ -22,49 +25,226 @@
   }
 
   .node-matrix {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 15px;
+    display: flex;
+    flex-direction: column; /* Stack the rows vertically */
+    gap: 20px;
+    padding: 20px;
+    width: 800px;
+    margin: 0 auto;
     flex-grow: 1;
+    pointer-events: all;
 
-    .node-slot {
-      background-color: rgba(255, 255, 255, 0.03);
+    .matrix-row {
+      display: flex;
+      flex-direction: row; /* Place two cards side-by-side */
+      justify-content: space-between; /* Space them out to the edges */
+      width: 100%;
+      flex-shrink: 0;
+    }
+  }
+
+  .node-card {
+    display: flex;
+    flex-direction: column;
+    width: 380px; /* Adjusted slightly to fit better in 800px with gaps */
+    height: 190px;
+    flex: none;
+    background-color: rgba(25, 30, 35, 0.95);
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.1s ease-out, border-color 0.1s ease;
+    transform-origin: center center;
+    z-index: 1;
+
+    &.active:hover {
+      border: 1px solid #00ffff;
+      background-color: rgba(0, 255, 255, 0.08);
+      transform: scale(1.02);
+      z-index: 10;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    &.empty {
+      justify-content: center;
+      align-items: center;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      position: relative;
-
-      &.active { border-left: 4px solid #00ffff; }
-      &.empty { border: 1px dashed rgba(255, 255, 255, 0.1); }
-
-      .swap-overlay {
-        position: absolute;
-        inset: 0;
-        background-color: rgba(0, 0, 0, 0.9);
-        justify-content: center;
+      color: rgba(255, 255, 255, 0.2);
+      .empty-state {
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        z-index: 10;
-
-        &.positive { color: #00ffaa; }
-        &.negative { color: #ff4444; }
+        gap: 12px;
+        .icon { font-size: 32px; color: rgba(255, 255, 255, 0.1); }
+        span { font-size: 11px; letter-spacing: 2px; font-weight: bold; }
       }
+    }
+
+    .card-header {
+      display: flex;
+      padding: 12px;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      .name { font-weight: 800; font-size: 14px; color: white; text-transform: uppercase; }
+      .gen-tag { color: #00ffff; font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 15px;
+      gap: 6px;
+      flex-grow: 1;
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .stat-label { font-size: 10px; color: rgba(255, 255, 255, 0.4); font-weight: bold; }
+        .stat-value { font-size: 13px; color: white; font-weight: 600; }
+        &.warning .stat-value { color: #ff5555; }
+        &.secondary {
+          margin-top: 4px;
+          border-top: 1px solid rgba(255, 255, 255, 0.03);
+          padding-top: 4px;
+          .stat-label { font-size: 9px; color: rgba(0, 255, 255, 0.3); }
+          .stat-value { font-size: 11px; color: rgba(0, 255, 255, 0.7); }
+        }
+      }
+    }
+
+    .card-footer {
+      display: flex;
+      padding: 10px 15px;
+      background-color: rgba(0, 255, 255, 0.03);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      .yield-contribution {
+        color: #00ffaa;
+        text-align: right;
+        width: 100%;
+        font-size: 12px;
+        font-weight: 800;
+        text-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
+      }
+    }
+
+    .swap-overlay {
+      position: absolute;
+      left: 0; right: 0; top: 0; bottom: 0;
+      background-color: rgba(10, 12, 14, 0.98);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+      &.positive { border: 2px solid #00ffaa; .delta-value { color: #00ffaa; } }
+      &.negative { border: 2px solid #ff4444; .delta-value { color: #ff4444; } }
+      .delta-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .delta-value { font-size: 32px; font-weight: 900; }
+        .delta-unit { font-size: 11px; color: rgba(255, 255, 255, 0.4); }
+      }
+      .action-hint {
+        font-size: 10px; font-weight: 900; margin-top: 15px; color: #000;
+        background-color: #fff; padding: 4px 12px; border-radius: 2px; text-transform: uppercase;
+      }
+    }
+
+    &.candidate-card {
+      border: 1px solid #00ffff;
+      width: 350px !important;
+      height: 220px !important;
+      flex: none !important;
+      background-color: rgba(0, 255, 255, 0.05);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+      pointer-events: none;
+      transform: none;
+
+      .card-header {
+        background-color: rgba(0, 255, 255, 0.1);
+        .gen-tag { background-color: #00ffff; color: #000; padding: 0 6px; }
+      }
+      .card-body .stat-row .stat-label { color: rgba(0, 255, 255, 0.5); }
+      .card-footer .yield-contribution { color: #00ffff; text-align: center; }
     }
   }
 
   .footer {
-    height: 80px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 20px 40px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(15, 18, 22, 0.6);
+    height: 240px;
 
-    button {
-      padding: 10px 30px;
+    .draft-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+
+      .candidate-card {
+        margin-bottom: 5px;
+      }
+    }
+
+    .btn-primary {
       background-color: #00ffff;
-      color: black;
-      font-weight: bold;
+      color: #000;
+      font-family: 'Consolas', monospace;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 12px 40px;
       border: none;
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 0 #008888;
+      transition: all 0.05s ease;
+      margin: auto 0;
 
-      &:hover { background-color: white; }
+      &:hover {
+        background-color: #fff;
+        box-shadow: 0 4px 0 #cccccc;
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(2px);
+        box-shadow: 0 0px 0 #008888;
+      }
+    }
+
+    .btn-danger {
+      background-color: #ff4444;
+      color: white;
+      font-family: 'Consolas', monospace;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 3px 0 #882222;
+
+      &:hover {
+        background-color: #ff6666;
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(2px);
+        box-shadow: 0 0px 0 #882222;
+      }
     }
   }
 }

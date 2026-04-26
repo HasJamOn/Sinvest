@@ -10,6 +10,8 @@ public sealed class RosterManager : Component
 {
     public static RosterManager Instance { get; private set; }
     
+    [Property] public bool ShowDebugHUD { get; set; } = true;
+    
     protected override void OnAwake()
     {
        Instance = this;
@@ -86,7 +88,10 @@ public sealed class RosterManager : Component
 
     protected override void OnUpdate()
     {
-        DrawDebugHUD();
+	    if ( ShowDebugHUD ) // Only draw if toggled on
+	    {
+		    DrawDebugHUD();
+	    }
 
         if ( !_hasInitialized && GameSaveSystem.Instance.IsValid() )
         {
