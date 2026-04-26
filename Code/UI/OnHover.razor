@@ -19,23 +19,31 @@
 
     protected override void OnUpdate()
     {
-        var camera = Scene.GetAllComponents<CameraComponent>()
-            .FirstOrDefault( x => x.IsMainCamera );
+	    // 1. If SinvestOS exists in the scene, force the popup to hide and exit early.
+	    if ( SinvestOS.Instance != null )
+	    {
+		    IsLookedAt = false;
+		    return;
+	    }
 
-        if ( camera is null )
-        {
-            IsLookedAt = false;
-            return;
-        }
+	    // 2. Otherwise, proceed with your normal trace logic...
+	    var camera = Scene.GetAllComponents<CameraComponent>()
+		    .FirstOrDefault( x => x.IsMainCamera );
 
-        var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault();
+	    if ( camera is null )
+	    {
+		    IsLookedAt = false;
+		    return;
+	    }
 
-        var tr = Scene.Trace
-            .Ray( camera.WorldPosition, camera.WorldPosition + camera.WorldRotation.Forward * 150f )
-            .IgnoreGameObjectHierarchy( player?.GameObject )
-            .Run();
+	    var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault();
 
-        IsLookedAt = tr.Hit && tr.GameObject == GameObject.Parent;
+	    var tr = Scene.Trace
+		    .Ray( camera.WorldPosition, camera.WorldPosition + camera.WorldRotation.Forward * 150f )
+		    .IgnoreGameObjectHierarchy( player?.GameObject )
+		    .Run();
+
+	    IsLookedAt = tr.Hit && tr.GameObject == GameObject.Parent;
     }
 
     protected override int BuildHash() => System.HashCode.Combine( IsLookedAt );

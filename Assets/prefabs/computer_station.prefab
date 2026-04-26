@@ -140,7 +140,7 @@
             "StartAsleep": false
           },
           {
-            "__type": "Sandbox.RecallRewind",
+            "__type": "Sinvest.RecallRewind",
             "__guid": "35ce9836-1bf4-4d1f-a69a-63fa66200915",
             "__enabled": true,
             "Flags": 0,
@@ -304,7 +304,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "9073509a-3014-40dd-a68a-0ac0f434484e",
                 "__enabled": true,
                 "Flags": 0,
@@ -451,7 +451,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "fefe94de-0179-4837-a65a-44186afcb9e6",
                 "__enabled": true,
                 "Flags": 0,
@@ -598,7 +598,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "70fa5f89-bb58-44b2-a5d2-fa17d2dc4e51",
                 "__enabled": true,
                 "Flags": 0,
@@ -745,7 +745,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "8861fb69-22e6-423b-9e75-d77c40cf250e",
                 "__enabled": true,
                 "Flags": 0,
@@ -780,7 +780,7 @@
                 "OpenSound": "sounds/ui/sinvestos_boot.sound",
                 "PopupPrefab": {
                   "_type": "gameobject",
-                  "prefab": "prefabs/computer_screen.prefab"
+                  "prefab": "prefabs/sinvestos.prefab"
                 },
                 "TooltipDescription": "Access the SinvestOS network",
                 "TooltipIcon": "computer",
@@ -983,7 +983,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "92890e83-a844-4d1d-af5c-793218da17d5",
                 "__enabled": true,
                 "Flags": 0,
@@ -1130,7 +1130,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "56c78967-486d-4eb8-a3da-a1e310e25baa",
                 "__enabled": true,
                 "Flags": 0,
@@ -1277,7 +1277,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "aaf8e327-62bd-4e71-8823-893e5d7b4ce1",
                 "__enabled": true,
                 "Flags": 0,
@@ -1424,7 +1424,7 @@
                 "StartAsleep": false
               },
               {
-                "__type": "Sandbox.RecallRewind",
+                "__type": "Sinvest.RecallRewind",
                 "__guid": "8724d9ee-e46e-4c9a-88a5-46c9b5a9e374",
                 "__enabled": true,
                 "Flags": 0,
@@ -1459,7 +1459,7 @@
                 "OpenSound": "sounds/ui/sinvestos_boot.sound",
                 "PopupPrefab": {
                   "_type": "gameobject",
-                  "prefab": "prefabs/computer_screen.prefab"
+                  "prefab": "prefabs/sinvestos.prefab"
                 },
                 "TooltipDescription": "Open Computer",
                 "TooltipIcon": "computer",
@@ -1538,7 +1538,7 @@
         "OwnerTransfer": 1,
         "Components": [
           {
-            "__type": "Sandbox.RecallArea",
+            "__type": "Sinvest.RecallArea",
             "__guid": "0defa770-a898-4460-8feb-e1f14f6b9869",
             "__enabled": true,
             "Flags": 0,
@@ -1643,7 +1643,7 @@
             "SurfaceVelocity": "0,0,0"
           },
           {
-            "__type": "Sandbox.RecallRewind",
+            "__type": "Sinvest.RecallRewind",
             "__guid": "ce5ddcd8-0079-4acb-98ef-83304a382b3f",
             "__enabled": true,
             "Flags": 0,
@@ -1958,7 +1958,7 @@
             "StartAsleep": false
           },
           {
-            "__type": "Sandbox.RecallRewind",
+            "__type": "Sinvest.RecallRewind",
             "__guid": "6753ad03-481e-4806-8752-5818ad76e532",
             "__enabled": true,
             "Flags": 0,

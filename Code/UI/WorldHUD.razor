@@ -7,27 +7,27 @@
 @namespace Sandbox
 
 <root class="@(IsVisible ? "visible" : "")">
-	@if ( ActiveObject.IsValid() && !string.IsNullOrEmpty(CurrentTitle) )
-	{
-		<div class="panel">
-			<div class="header">
-				@if ( !string.IsNullOrEmpty(CurrentIcon) )
-				{
-					<i class="icon">@CurrentIcon</i>
-				}
-				<div class="name">@CurrentTitle</div>
-			</div>
+    @if ( ActiveObject.IsValid() && !string.IsNullOrEmpty(CurrentTitle) )
+    {
+       <div class="panel">
+          <div class="header">
+             @if ( !string.IsNullOrEmpty(CurrentIcon) )
+             {
+                <i class="icon">@CurrentIcon</i>
+             }
+             <div class="name">@CurrentTitle</div>
+          </div>
 
-			<div class="divider"></div>
+          <div class="divider"></div>
 
-			<div class="actions">
-				<div class="action">
-					<label class="key">@CurrentKey</label>
-					<span class="text">@CurrentAction</span>
-				</div>
-			</div>
-		</div>
-	}
+          <div class="actions">
+             <div class="action">
+                <label class="key">@CurrentKey</label>
+                <span class="text">@CurrentAction</span>
+             </div>
+          </div>
+       </div>
+    }
 </root>
 
 @code
@@ -39,22 +39,32 @@
 
     GameObject ActiveObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject ?? _foundCase?.GameObject;
     
+    // UPDATED: Added check for SinvestOS.Instance to hide tooltips when OS is up (Phone or PC)
     bool IsVisible => ActiveObject.IsValid() 
                       && _timeSinceLastHit < 0.1f 
                       && !(Player?.WantsHideHud ?? false)
-                      && !UIPopupTrigger.ActiveInstance.IsValid();
+                      && !UIPopupTrigger.ActiveInstance.IsValid()
+                      && SinvestOS.Instance == null; // New Check
 
     string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? _foundCase?.TooltipTitle ?? string.Empty;
     string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? _foundCase?.TooltipIcon ?? string.Empty;
     string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? _foundCase?.TooltipDescription ?? string.Empty;
     
-    // UPDATED: Added _foundCase check to ensure "E" (or the bound key) shows up
     string CurrentKey => (_foundChair != null || _foundCase != null) 
                          ? Input.GetButtonOrigin( "use" ).ToUpper() 
                          : _foundTrigger?.ToolTipKey?.ToUpper();
 
     protected override void OnUpdate()
     {
+        // Optimization: Early exit if SinvestOS is active to stop tracing entirely
+        if ( SinvestOS.Instance != null )
+        {
+            _foundChair = null;
+            _foundTrigger = null;
+            _foundCase = null;
+            return;
+        }
+
         var controller = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
         if ( controller == null ) return;
 
@@ -80,13 +90,11 @@
             }
         }
         
-        // Interaction Logic
         if ( _foundCase.IsValid() && IsVisible && Input.Pressed( "use" ) )
         {
-	        _foundCase.Shuffle();
+            _foundCase.Shuffle();
         }
 
-        // UPDATED: Ensure we clear the case reference when looking away
         if ( _timeSinceLastHit > 0.15f )
         {
             _foundChair = null;
@@ -101,13 +109,13 @@
 
     protected override int BuildHash() 
     {
-	    // Combine all properties that change visually
-	    return System.HashCode.Combine( 
-		    ActiveObject?.Id, 
-		    IsVisible,
-		    _foundCase?.TooltipTitle, // Crucial for rendering the game name
-		    _foundCase?.TooltipDescription,
-		    UIPopupTrigger.ActiveInstance.IsValid()
-	    );
+        return System.HashCode.Combine( 
+           ActiveObject?.Id, 
+           IsVisible,
+           _foundCase?.TooltipTitle,
+           _foundCase?.TooltipDescription,
+           UIPopupTrigger.ActiveInstance.IsValid(),
+           SinvestOS.Instance != null // Added to BuildHash to ensure UI refreshes when OS opens/closes
+        );
     }
 }

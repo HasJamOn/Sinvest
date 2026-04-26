@@ -3,7 +3,7 @@
     "__guid": "598e729a-2cfb-43e3-840d-c95b6c3499f3",
     "__version": 2,
     "Flags": 0,
-    "Name": "computer_screen",
+    "Name": "SinvestOS",
     "Position": "0,0,0",
     "Rotation": "0,0,0,1",
     "Scale": "1,1,1",
@@ -288,12 +288,15 @@
                 "__enabled": true,
                 "Flags": 0,
                 "ClickSound": "sounds/ui/click.sound",
+                "CoinSpinSound": "sounds/ui/coin_spin.sound",
+                "LoseSound": "sounds/ui/lose.sound",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
                 "OnComponentFixedUpdate": null,
                 "OnComponentStart": null,
-                "OnComponentUpdate": null
+                "OnComponentUpdate": null,
+                "WinSound": "sounds/ui/win.sound"
               }
             ],
             "Children": []

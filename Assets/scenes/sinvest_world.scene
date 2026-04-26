@@ -107,7 +107,7 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Sandbox.NetworkHelper",
+          "__type": "Sinvest.NetworkHelper",
           "__guid": "9e00ef68-eed3-4c87-888c-d3b5d80082d5",
           "__enabled": true,
           "Flags": 0,
@@ -1142,7 +1142,7 @@
               "OwnerTransfer": 1,
               "Components": [
                 {
-                  "__type": "Sandbox.RecallArea",
+                  "__type": "Sinvest.RecallArea",
                   "__guid": "9d01a165-2d69-472c-a58b-f4336b34ebab",
                   "__enabled": true,
                   "Flags": 0,
@@ -1281,7 +1281,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "d51c8d1c-6b07-4a0b-a7e8-5c3eda70c3d3",
                   "__enabled": true,
                   "Flags": 0,
@@ -1428,7 +1428,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "321f2e39-cd51-482f-a85b-d6117067b4a8",
                   "__enabled": true,
                   "Flags": 0,
@@ -1621,7 +1621,7 @@
                   "SurfaceVelocity": "0,0,0"
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "4a5e8e89-03da-45d0-8f51-81f7992005e8",
                   "__enabled": true,
                   "Flags": 0,
@@ -1903,7 +1903,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "4effd356-0387-4997-ae51-d2c0b751cde9",
                   "__enabled": true,
                   "Flags": 0,
@@ -2326,7 +2326,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "4ca707e0-4114-4cf2-b599-2565507b3609",
                   "__enabled": true,
                   "Flags": 0,
@@ -2473,7 +2473,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "e1379fbc-4e74-4003-bc60-7973bd067b17",
                   "__enabled": true,
                   "Flags": 0,
@@ -3148,7 +3148,7 @@
                   "StartAsleep": true
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "232b9b36-896e-40f4-9cce-edebae07595d",
                   "__enabled": true,
                   "Flags": 0,
@@ -4965,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "6ba7398c-7bd7-43c4-894b-34d58a96f72f",
+                  "__guid": "33a8bb24-10bf-4bb6-992b-f3709b6e64ea",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4982,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "7770116e-bfa0-4f7b-99b9-4eb566067750",
+                      "__guid": "7045f4a7-d468-436e-9c4b-ffb15843d478",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5034,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "554600df-d078-4d2d-ab3a-a7c161149f2d",
+                  "__guid": "9469bafa-e066-40d9-a89d-e64a8bf5c7f4",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5051,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "c4fb96b0-6b0e-4ede-a212-0fc0102ea2fb",
+                      "__guid": "fd56b158-544d-4643-b6a4-32e7a3bea1c9",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5103,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "82cabb02-c655-4d83-a653-a0e58fe4d212",
+                  "__guid": "cf1b765f-6b4d-4494-a435-760f2cd1d62e",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5120,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "cd259ca3-28b3-4e7c-9e78-2168b27e4837",
+                      "__guid": "fad4e0e5-f8a2-4622-a45f-e19f354f6af9",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5172,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "b38a6bf5-bf2d-46f2-a824-217a9f48dbea",
+                  "__guid": "59ddb619-dbaa-4948-aba7-23b3061bfea4",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5189,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "e2f19de1-ae15-4b5d-9e57-909e2b7b5c66",
+                      "__guid": "41bd2a47-4379-4509-8d10-964c796e7852",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5366,7 +5366,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "eae4c460-ccc1-4bef-a8fa-29e0bb468212",
                   "__enabled": true,
                   "Flags": 0,
@@ -5514,7 +5514,7 @@
                   "SurfaceVelocity": "0,0,0"
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "c7a3381b-ac73-498e-ad80-f7064f1e55e0",
                   "__enabled": true,
                   "Flags": 0,
@@ -5758,7 +5758,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "f87ac461-87de-4b66-9168-51bb6265e055",
                   "__enabled": true,
                   "Flags": 0,
@@ -6201,7 +6201,7 @@
                   "StartAsleep": false
                 },
                 {
-                  "__type": "Sandbox.RecallRewind",
+                  "__type": "Sinvest.RecallRewind",
                   "__guid": "8e1bccfe-3aa4-4214-8bf2-d2a724799335",
                   "__enabled": true,
                   "Flags": 0,
@@ -6243,7 +6243,7 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.RecallArea",
+              "__type": "Sinvest.RecallArea",
               "__guid": "46c438af-5b79-4f8a-8119-e154963a9a77",
               "__enabled": true,
               "Flags": 0,
@@ -11727,7 +11727,7 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Sandbox.MarketServerSystem",
+          "__type": "Sinvest.MarketServerSystem",
           "__guid": "b81027ac-923f-4fb7-82a8-c7e8dc406ee0",
           "__enabled": true,
           "Flags": 0,
@@ -11811,13 +11811,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1ff7db61-0293-4529-be2b-9f606b7c33ea"
         }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },
