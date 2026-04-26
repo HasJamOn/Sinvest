@@ -60,7 +60,7 @@ public sealed class GameSaveSystem : Component
 		Log.Info( $"[SAVE SYSTEM] Loaded {CurrentCharacter.Name} (Slot {ActiveSlot})" );
 	}
 
-	public void SaveActiveSlot()
+	public async System.Threading.Tasks.Task SaveActiveSlotAsync()
 	{
 		if ( CurrentCharacter == null ) return;
 
@@ -68,15 +68,22 @@ public sealed class GameSaveSystem : Component
 		SetStoredStat( "money", CurrentCharacter.Money );
 		SetStoredStat( "modifiers", (int)CurrentCharacter.Modifiers );
 
-		if ( UseCloud ) Stats.Flush();
+		if ( UseCloud )
+		{
+			// Pause this method until the cloud confirms receipt.
+			// The game itself keeps rendering at 60+ FPS while we wait.
+			await Sandbox.Services.Stats.FlushAsync();
+		}
 
-		Log.Info( $"[SAVE SYSTEM] Saved {CurrentCharacter.Name} to Slot {ActiveSlot}" );
+		Log.Info( $"[SAVE SYSTEM] Save confirmed for {CurrentCharacter.Name}" );
 	}
+
+	private HashSet<string> _localAchievements = new();
 
 	public bool IsModifierUnlocked( StartingModifiers modifier )
 	{
 		if ( UnlockAllModifiers ) return true;
-		if ( modifier == StartingModifiers.None || modifier == StartingModifiers.MentorDad ) return true;
+		if ( modifier == StartingModifiers.MentorDad || modifier == StartingModifiers.None ) return true;
 
 		string achievementId = modifier switch
 		{
@@ -89,7 +96,24 @@ public sealed class GameSaveSystem : Component
 		};
 
 		if ( string.IsNullOrEmpty( achievementId ) ) return false;
-		return Achievements.All.Any( x => x.Name == achievementId && x.IsUnlocked );
+
+		// Check Cloud vs Local
+		if ( UseCloud )
+		{
+			return Sandbox.Services.Achievements.All.Any( x => x.Name == achievementId && x.IsUnlocked );
+		}
+		else
+		{
+			return _localAchievements.Contains( achievementId );
+		}
+	}
+
+	//a helper to "fake" an unlock for testing
+	public void DebugUnlockAchievement( string id )
+	{
+		if ( UseCloud ) return; // Don't allow debug unlocks to touch the cloud
+		_localAchievements.Add( id );
+		Log.Info( $"[SAVE SYSTEM] Debug Unlocked: {id}" );
 	}
 
 	private void SetStoredName( string name )
@@ -143,5 +167,21 @@ public sealed class GameSaveSystem : Component
 			_localStats[$"modifiers{suffix}"] = 0;
 		}
 		Log.Info( $"[SAVE SYSTEM] Wiped Slot {slot}" );
+	}
+	public bool HasGraduated()
+	{
+		// If we are unlocking all, or in local mode and have the fake ID
+		if ( UnlockAllModifiers ) return true;
+    
+		const string id = "graduated";
+    
+		if ( UseCloud )
+		{
+			return Sandbox.Services.Achievements.All.Any( x => x.Name == id && x.IsUnlocked );
+		}
+		else
+		{
+			return _localAchievements.Contains( id );
+		}
 	}
 }

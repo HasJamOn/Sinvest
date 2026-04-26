@@ -100,31 +100,36 @@
     /// <summary>
     /// Matches the Action<string, StartingModifiers> signature for the child component
     /// </summary>
-    void CreateAndStart( string name, StartingModifiers mods )
+    async void CreateAndStart( string name, StartingModifiers mods )
     {
-        if ( SaveManager == null ) return;
+	    if ( SaveManager == null ) return;
 
-        var charData = SaveManager.CurrentCharacter;
-        charData.Name = name;
-        charData.Modifiers = mods;
-        
-        // Apply DevMode bonus if flag is set
-        charData.Money = mods.HasFlag(StartingModifiers.DevMode) ? 999999999 : 0;
+	    // 1. Prepare data
+	    var charData = SaveManager.CurrentCharacter;
+	    charData.Name = name;
+	    charData.Modifiers = mods;
+	    charData.Money = mods.HasFlag(StartingModifiers.DevMode) ? 999999999 : 0;
 
-        SaveManager.SaveActiveSlot();
-        
-        // Hide creator before starting
-        IsCreating = false;
-        StartGame();
+	    // 2. Wait for the cloud to say "Got it!"
+	    // You could show a "Saving..." spinner here if you wanted!
+	    await SaveManager.SaveActiveSlotAsync();
+    
+	    // 3. Now it is safe to leave the scene
+	    IsCreating = false;
+	    StartGame();
     }
+
+    // Add this property so you can pick the scene in the Inspector
+    [Property] public SceneFile WorldScene { get; set; }
 
     void StartGame()
     {
-        if ( SaveManager?.CurrentCharacter == null ) return;
-        
-        Log.Info( $"[UI] Launching game as {SaveManager.CurrentCharacter.Name}..." );
-        
-        // Transition to gameplay scene
-        // Scene.Load( "scenes/gameplay.scene" );
+	    if ( WorldScene == null )
+	    {
+		    Log.Error( "WorldScene is not assigned in the Inspector!" );
+		    return;
+	    }
+
+	    SceneNavigator.TransitionTo( WorldScene );
     }
 }

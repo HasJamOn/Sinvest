@@ -1,11 +1,11 @@
 {
-  "__guid": "f2d0a28f-ab73-454b-bae0-53fbaef5a3d4",
+  "__guid": "07bc9347-c2cc-4d08-8857-b2a9ccc61c16",
   "GameObjects": [
     {
-      "__guid": "53fd63de-6950-4b68-8248-236481290b0d",
+      "__guid": "f9716cd3-a472-4eb2-83eb-ab7affcfe048",
       "__version": 2,
       "Flags": 0,
-      "Name": "MenuCamera",
+      "Name": "Camera",
       "Position": "149.994965,149.994995,-212.124985",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
@@ -19,7 +19,7 @@
       "Components": [
         {
           "__type": "Sandbox.CameraComponent",
-          "__guid": "00ed2d95-039c-4b46-9000-73e6fb7e6634",
+          "__guid": "9deb88c1-b852-4bb3-a964-97e094630c6e",
           "__enabled": true,
           "Flags": 0,
           "BackgroundColor": "0.33333,0.46275,0.52157,1",
@@ -45,29 +45,10 @@
           "Viewport": "0,0,1,1",
           "ZFar": 10000,
           "ZNear": 10
-        }
-      ],
-      "Children": []
-    },
-    {
-      "__guid": "0dc3de13-61df-432f-9a4d-0174925c3d38",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "GameSaveSystem",
-      "Position": "-31.6374931,-209.698029,-47.6753845",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
+        },
         {
-          "__type": "SaveTest",
-          "__guid": "b455b53c-afbd-441f-abf0-80417bd5ff7a",
+          "__type": "Sandbox.LoadingScreenUI",
+          "__guid": "787dd718-baaf-44e1-b273-ff3b9fc667f2",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
@@ -76,30 +57,15 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null
-        },
-        {
-          "__type": "Sandbox.GameSaveSystem",
-          "__guid": "364119fc-b404-482a-80c9-7b5367d03477",
-          "__enabled": true,
-          "Flags": 0,
-          "ActiveSlot": 1,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "UnlockAllModifiers": false,
-          "UseCloud": false
         }
       ],
       "Children": []
     },
     {
-      "__guid": "3636b8d1-1779-4a0f-8716-839dceae3011",
+      "__guid": "b080077c-fa6e-40a9-96c4-eedbe602d57d",
       "__version": 2,
       "Flags": 0,
-      "Name": "CharacterSelect_Screen",
+      "Name": "LoadingScreen",
       "Position": "149.994965,149.994995,-212.124985",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
@@ -112,8 +78,21 @@
       "OwnerTransfer": 1,
       "Components": [
         {
+          "__type": "LoadingScreen",
+          "__guid": "6812af0c-96c1-46ba-a436-4864bcc56b89",
+          "__enabled": true,
+          "Flags": 0,
+          "MinimumTime": 1.5,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
           "__type": "Sandbox.ScreenPanel",
-          "__guid": "9312973d-5dca-4cfb-8942-c71807903e36",
+          "__guid": "1f1d496a-1e96-4cf6-8ead-e144c5f24e69",
           "__enabled": true,
           "Flags": 0,
           "AutoScreenScale": true,
@@ -126,12 +105,17 @@
           "Opacity": 1,
           "Scale": 1,
           "ScaleStrategy": "ConsistentHeight",
-          "TargetCamera": null,
+          "TargetCamera": {
+            "_type": "component",
+            "component_id": "9deb88c1-b852-4bb3-a964-97e094630c6e",
+            "go": "f9716cd3-a472-4eb2-83eb-ab7affcfe048",
+            "component_type": "CameraComponent"
+          },
           "ZIndex": 100
         },
         {
-          "__type": "Sandbox.SaveSystem.CharacterSelect",
-          "__guid": "850a5191-3944-45e9-ab14-e166a56ef572",
+          "__type": "Sandbox.LoadingScreenUI",
+          "__guid": "fd020c69-7a26-4b01-b835-b02476372c6f",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
@@ -139,16 +123,45 @@
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "SaveManager": {
-            "_type": "component",
-            "component_id": "364119fc-b404-482a-80c9-7b5367d03477",
-            "go": "0dc3de13-61df-432f-9a4d-0174925c3d38",
-            "component_type": "GameSaveSystem"
-          },
-          "WorldScene": "scenes/sinvest_world.scene"
+          "OnComponentUpdate": null
         }
       ],
+      "Children": []
+    },
+    {
+      "__guid": "3ffcbd76-ab3a-43bb-a8d6-14dec70c13d2",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "GameObject",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": false,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": []
+    },
+    {
+      "__guid": "62acbd79-7a81-4047-83c8-d23c2cfe1097",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "GameObject (1)",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": false,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
       "Children": []
     }
   ],
@@ -177,7 +190,7 @@
       },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
-          "$blob": "10451406-e6c8-4ffa-aadb-5296f2df955e"
+          "$blob": "4d1294bd-884c-4016-99b5-85fd39433e64"
         }
       }
     }
