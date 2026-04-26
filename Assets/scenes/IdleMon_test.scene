@@ -206,6 +206,18 @@
           "SetMoney": 1000,
           "SetShares": 0,
           "UseLocalSaveOnly": false
+        },
+        {
+          "__type": "Sinvest.MarketServerSystem",
+          "__guid": "b8cb28b1-6183-43a9-acb0-1f32312c916d",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
         }
       ],
       "Children": []

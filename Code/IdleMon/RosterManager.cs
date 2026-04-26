@@ -8,52 +8,111 @@ namespace Sinvest;
 
 public sealed class RosterManager : Component
 {
-    [Property, ReadOnly] public List<IdleMonData> ActiveNodes { get; set; } = new();
+    public static RosterManager Instance { get; private set; }
     
+    protected override void OnAwake()
+    {
+       Instance = this;
+    }
+
+    [Property, ReadOnly] public List<IdleMonData> ActiveNodes { get; set; } = new();
     [Property, ReadOnly] public double IdleBucks { get; private set; } = 0;
+    
     private double _pendingBucks = 0;
     private TimeSince _timeSinceLastFlush = 0;
     [Property] public float FlushInterval { get; set; } = 1.0f; 
 
     private bool _hasInitialized = false;
 
+    // --- NEW: MARKET GENERATION LOGIC ---
+
+    /// <summary>
+    /// Deducts IdleBucks and flushes the change to the save system.
+    /// </summary>
+    public void ConsumeIdleBucks( double amount )
+    {
+        IdleBucks -= amount;
+        GameSaveSystem.Instance?.SetStoredStat( "idlemon_bucks", IdleBucks );
+    }
+
+    /// <summary>
+    /// Predicts the change in Yield (G) for a specific slot.
+    /// </summary>
+    public double GetSwapDelta( int slotIndex, IdleMonData candidate )
+    {
+        if ( slotIndex < 0 || slotIndex >= ActiveNodes.Count ) return 0;
+
+        double currentYield = CalculateTotalYield();
+        var previousMon = ActiveNodes[slotIndex];
+        
+        ActiveNodes[slotIndex] = candidate;
+        double projectedYield = CalculateTotalYield();
+        
+        ActiveNodes[slotIndex] = previousMon; // Revert
+        
+        return projectedYield - currentYield;
+    }
+    
+    /// <summary>
+    /// Calculates yield deltas for all 6 slots at once.
+    /// </summary>
+    public double[] GetSwapDeltas( IdleMonData candidate )
+    {
+	    double[] deltas = new double[6];
+	    // Ensure we have 6 slots to compare against
+	    if ( ActiveNodes == null || ActiveNodes.Count < 6 ) return deltas;
+
+	    double currentYield = CalculateTotalYield();
+
+	    for ( int i = 0; i < 6; i++ )
+	    {
+		    var originalMon = ActiveNodes[i];
+        
+		    // Temporarily swap
+		    ActiveNodes[i] = candidate;
+		    double projectedYield = CalculateTotalYield();
+        
+		    // Calculate the difference
+		    deltas[i] = projectedYield - currentYield;
+        
+		    // Restore
+		    ActiveNodes[i] = originalMon;
+	    }
+
+	    return deltas;
+    }
+
+    // --- CORE LOOP ---
+
     protected override void OnUpdate()
     {
-        // --- 1. DRAW HUD FIRST ---
-        // This ensures the screen isn't black even if loading fails
         DrawDebugHUD();
 
-        // --- 2. INITIALIZATION ---
-        // Inside RosterManager.cs -> OnUpdate()
         if ( !_hasInitialized && GameSaveSystem.Instance.IsValid() )
         {
-	        var save = GameSaveSystem.Instance;
+            var save = GameSaveSystem.Instance;
 
-	        // FIX: If we are in the editor/test scene and haven't loaded a character, force it.
-	        if ( save.CurrentCharacter == null )
-	        {
-		        Log.Warning( "[ROSTER] No character session found. Forcing LoadActiveSlot for Test Scene." );
-		        save.LoadActiveSlot(); 
-	        }
+            if ( save.CurrentCharacter == null )
+            {
+               Log.Warning( "[ROSTER] No character session found. Forcing Load for Test Scene." );
+               save.LoadActiveSlot(); 
+            }
 
-	        // Now check again
-	        if ( save.CurrentCharacter != null && save.CurrentCharacter.Name != "New Character" )
-	        {
-		        LoadRoster();
-		        CalculateOfflineGains();
-		        _hasInitialized = true;
-	        }
-	        else
-	        {
-		        // If we still have no character, it's a fresh save.
-		        ResetToGenesis();
-		        _hasInitialized = true;
-	        }
+            if ( save.CurrentCharacter != null && save.CurrentCharacter.Name != "New Character" )
+            {
+               LoadRoster();
+               CalculateOfflineGains();
+               _hasInitialized = true;
+            }
+            else
+            {
+               ResetToGenesis();
+               _hasInitialized = true;
+            }
         }
 
         if ( !_hasInitialized ) return;
 
-        // --- 3. CORE LOGIC ---
         ProcessEconomy();
     }
 
@@ -62,13 +121,17 @@ public sealed class RosterManager : Component
         double currentG = CalculateTotalYield();
         var econ = EconomyManager.Instance;
         
+        // Added Market Scale to HUD for testing
+        float s = (float)(MarketService.CurrentPrice / 7126.0);
+
+        Gizmo.Draw.Color = Color.Yellow;
         Gizmo.Draw.ScreenText(
-            $"--- IDLEMON.INO TEST HARNESS ---\n" +
+            $"--- IDLEMON.INO SYSTEM ---\n" +
+            $"Market Scale (S): {s:F2}x\n" +
             $"OS Cash: ${(econ.IsValid() ? econ.CurrentMoney : 0):C}\n" +
-            $"IdleBucks: {IdleBucks:F2} IB\n" +
+            $"IdleBucks: {IdleBucks:F0} IB\n" +
             $"Current Yield: {currentG:F2} IB/sec\n" +
-            $"Active Nodes: {ActiveNodes.Count( x => x.ID != Guid.Empty )}/6\n" +
-            $"[R] Roll | [1-6] Swap",
+            $"Active Nodes: {ActiveNodes.Count( x => x.ID != Guid.Empty )}/6",
             new Vector2( 50, 50 ), "Consolas", 18, TextFlag.Left
         );
     }
@@ -95,24 +158,8 @@ public sealed class RosterManager : Component
         if ( index < 0 || index >= ActiveNodes.Count ) return;
         
         ActiveNodes[index] = candidate;
-        Log.Info( $"[ROSTER] Node {index} updated to {candidate.Name}" );
+        Log.Info( $"[ROSTER] Slot {index} replaced with {candidate.Name}" );
         SaveRoster();
-    }
-
-    public double[] GetSwapDeltas( IdleMonData candidate )
-    {
-        double[] deltas = new double[6];
-        if ( ActiveNodes == null || ActiveNodes.Count < 6 ) return deltas;
-
-        double currentYield = CalculateTotalYield();
-        for ( int i = 0; i < 6; i++ )
-        {
-            var previousMon = ActiveNodes[i];
-            ActiveNodes[i] = candidate;
-            deltas[i] = CalculateTotalYield() - currentYield;
-            ActiveNodes[i] = previousMon; 
-        }
-        return deltas;
     }
 
     public double CalculateTotalYield()
@@ -121,7 +168,9 @@ public sealed class RosterManager : Component
 
         double sumA = ActiveNodes.Sum( n => n.Addition );
         double sumS = ActiveNodes.Sum( n => n.Subtraction );
-        double prodD = ActiveNodes.Aggregate( 1.0, ( acc, n ) => acc * ( n.ID == Guid.Empty || n.Division == 0 ? 1.0 : n.Division ) );
+        
+        // Aggregate logic modified to match GDD: ΠD, ΠM, ΠT
+        double prodD = ActiveNodes.Aggregate( 1.0, ( acc, n ) => acc * ( n.ID == Guid.Empty || n.Division <= 0 ? 1.0 : n.Division ) );
         double prodM = ActiveNodes.Aggregate( 1.0, ( acc, n ) => acc * ( n.ID == Guid.Empty ? 1.0 : n.Multiplier ) );
         double prodT = ActiveNodes.Aggregate( 1.0, ( acc, n ) => acc * ( n.ID == Guid.Empty ? 1.0 : n.TeamBonus ) );
 
@@ -182,10 +231,12 @@ public sealed class RosterManager : Component
         if ( DateTime.TryParse( lastTimestampStr, out DateTime lastSeen ) )
         {
             TimeSpan gap = DateTime.UtcNow - lastSeen;
-            if ( gap.TotalSeconds > 2 ) 
+            if ( gap.TotalSeconds > 5 ) 
             {
                 double yield = CalculateTotalYield();
-                IdleBucks += (yield * gap.TotalSeconds);
+                double gains = yield * gap.TotalSeconds;
+                IdleBucks += gains;
+                Log.Info( $"[ROSTER] Welcome back! You earned {gains:F0} IdleBucks while away." );
             }
         }
     }
