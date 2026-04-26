@@ -1,16 +1,28 @@
 ﻿using Sandbox;
 using Sandbox.Services;
+using System.Linq;
 
 namespace Sinvest;
 
 public sealed class InventoryManager : Component
 {
-	// 1. ADD THIS PROPERTY
 	public static InventoryManager Instance { get; private set; }
 
-	[Property] public bool HasPhone { get; private set; }
+	// We keep the property but allow the debug manager to influence the getter
+	private bool _hasPhone;
+	[Property] public bool HasPhone 
+	{ 
+		get 
+		{
+			// If debug is forcing it, always return true
+			var dbg = Scene.GetAllComponents<SinvestDebugManager>().FirstOrDefault();
+			if ( dbg != null && dbg.ForceHasPhone ) return true;
+            
+			return _hasPhone;
+		}
+		private set => _hasPhone = value;
+	}
 
-	// 2. ADD THIS METHOD TO ASSIGN THE INSTANCE
 	protected override void OnAwake()
 	{
 		Instance = this;
@@ -19,15 +31,12 @@ public sealed class InventoryManager : Component
 	protected override void OnStart()
 	{
 		if ( IsProxy ) return;
-
 		LoadInventoryFromCloud();
 	}
 
 	private void LoadInventoryFromCloud()
 	{
-		// Ensure your SinvestSession helper is accessible here
 		string phoneKey = SinvestSession.GetSlotKey( "has_phone" );
-
 		var stat = Stats.LocalPlayer.Get( phoneKey );
     
 		if ( stat.Value > 0 )
@@ -38,15 +47,18 @@ public sealed class InventoryManager : Component
 
 	public void UnlockPhone()
 	{
-		if ( HasPhone ) return;
+		// Only skip if the ACTUAL backing variable is true
+		if ( _hasPhone ) return;
 
 		SetPhoneEnabled( true );
+       
+		// Save to cloud/local stats
 		Stats.SetValue( SinvestSession.GetSlotKey( "has_phone" ), 1 );
 
 		if ( !Achievements.All.Any( x => x.Name == "disconnected" && x.IsUnlocked ) )
 		{
 			Achievements.Unlock( "disconnected" );
-			Log.Info( "Meta-Progression: Phone modifier unlocked for all future characters!" );
+			Log.Info( "Meta-Progression: Phone modifier unlocked!" );
 		}
 
 		Stats.Flush();
@@ -54,7 +66,7 @@ public sealed class InventoryManager : Component
 
 	private void SetPhoneEnabled( bool state )
 	{
-		HasPhone = state;
-		Log.Info( $"Inventory: Phone status set to {state}" );
+		_hasPhone = state;
+		Log.Info( $"Inventory: Phone status set to {HasPhone} (Backing: {_hasPhone})" );
 	}
 }

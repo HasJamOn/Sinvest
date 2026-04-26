@@ -1,64 +1,133 @@
 ﻿using Sandbox;
+using Sandbox.Services;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sinvest;
 
 public sealed class StartupManager : Component
 {
-	[Property] public EconomyManager Economy { get; set; }
+    // Local sibling reference
+    private EconomyManager _economy => Components.Get<EconomyManager>( FindMode.EverythingInSelfAndAncestors );
 
-	protected override void OnStart()
-	{
-		if ( IsProxy ) return;
+    protected override void OnStart()
+    {
+       if ( IsProxy ) return;
 
-		var session = GameSaveSystem.Instance?.CurrentCharacter;
-		if ( session == null ) return;
+       // Fire and forget the initialization task
+       _ = InitializeCharacterAsync();
+    }
 
-		ApplyModifiers( session.Modifiers );
-	}
+    private async Task InitializeCharacterAsync()
+    {
+       // 1. POLLING: Wait for the singleton to settle in the new scene
+       // We'll check every 100ms for up to 3 seconds.
+       int attempts = 0;
+       while ( (GameSaveSystem.Instance == null || GameSaveSystem.Instance.CurrentCharacter == null) && attempts < 30 )
+       {
+          await Task.Delay( 100 );
+          attempts++;
+       }
 
-	private void ApplyModifiers( StartingModifiers mods )
-	{
-		Log.Info( $"[STARTUP] Processing modifiers for {GameSaveSystem.Instance.ActiveSlot}..." );
+       var saveSystem = GameSaveSystem.Instance;
 
-		// 1. Nepokid: Starts with $500k in S&P 500
-		if ( mods.HasFlag( StartingModifiers.Nepokid ) )
-		{
-			// We inject into the 'shares' stat via EconomyManager
-			// Note: Design doc says "Locked S&P 500", we'll track this as shares
-			Economy.CommitTransaction( 0, 500000 ); 
-			Log.Info( "Modifier Applied: Nepokid ($500k in shares injected)" );
-		}
+       // 2. SAFETY: If it's still not here after 3 seconds, something is actually broken
+       if ( !saveSystem.IsValid() || saveSystem.CurrentCharacter == null )
+       {
+          Log.Error( "[STARTUP] Timed out waiting for SaveSystem. Character modifiers failed to apply." );
+          return;
+       }
 
-		// 2. Phoney: Start with a Phone (Skip Café)
-		if ( mods.HasFlag( StartingModifiers.Phoney ) )
-		{
-			GrantItem( "item_phone" );
-		}
+       // 3. PROCEED: Everything is ready
+       RunStartupLogic( saveSystem );
+    }
 
-		// 3. Internity: Unlock all jobs
-		if ( mods.HasFlag( StartingModifiers.Internity ) )
-		{
-			// Logic to set all job level stats to 1 instead of 0
-			UnlockAllJobs();
-		}
+    private void RunStartupLogic( GameSaveSystem saveSystem )
+    {
+       var session = saveSystem.CurrentCharacter;
+       string claimKey = SinvestSession.GetSlotKey( "claimed_startup" );
+       
+       bool hasClaimed = false;
+       if ( saveSystem.ShouldUseCloud )
+       {
+          try 
+          {
+             hasClaimed = Stats.LocalPlayer.Get( claimKey ).Value > 0;
+          }
+          catch { hasClaimed = false; }
+       }
 
-		// 4. DevMode: For testing
-		if ( mods.HasFlag( StartingModifiers.DevMode ) )
-		{
-			Economy.CommitTransaction( 100000000, 0 );
-		}
-	}
+       if ( !hasClaimed )
+       {
+          ApplyModifiers( session.Modifiers, claimKey );
+       }
+       else
+       {
+          Log.Info( $"[STARTUP] Modifiers already claimed for {session.Name}. Skipping injection." );
+       }
+    }
 
-	private void GrantItem( string itemTag )
-	{
-		// This is where you'll link to your Inventory System later
-		Log.Info( $"Modifier Applied: Phoney (Granted {itemTag})" );
-		// Inventory.Add( itemTag );
-	}
+    private void ApplyModifiers( StartingModifiers mods, string claimKey )
+    {
+       if ( !_economy.IsValid() )
+       {
+          Log.Error( "[STARTUP] EconomyManager not found on Player Prefab!" );
+          return;
+       }
 
-	private void UnlockAllJobs()
-	{
-		Log.Info( "Modifier Applied: Internity (All career paths unlocked)" );
-	}
+       Log.Info( $"[STARTUP] Initializing modifiers for {SinvestSession.ActiveSlot}..." );
+
+       // 1. Nepokid: Starts with $500k in S&P 500
+       if ( mods.HasFlag( StartingModifiers.Nepokid ) )
+       {
+          _economy.CommitTransaction( 0, 500000 ); 
+          Log.Info( "Modifier Applied: Nepokid ($500k shares)" );
+       }
+
+       // 2. Phoney: Start with a Phone
+       if ( mods.HasFlag( StartingModifiers.Phoney ) )
+       {
+          GrantItem( "item_phone" );
+       }
+
+       // 3. Internity: Unlock all jobs
+       if ( mods.HasFlag( StartingModifiers.Internity ) )
+       {
+          UnlockAllJobs();
+       }
+
+       // 4. DevMode: For testing
+       if ( mods.HasFlag( StartingModifiers.DevMode ) )
+       {
+          _economy.CommitTransaction( 100000000, 0 );
+       }
+
+       // --- FINALIZE CLAIM ---
+       if ( GameSaveSystem.Instance.ShouldUseCloud )
+       {
+           Stats.SetValue( claimKey, 1 );
+           _ = Stats.FlushAsync();
+       }
+       
+       Log.Info( "[STARTUP] Character initialization complete." );
+    }
+
+    private void GrantItem( string itemTag )
+    {
+       if ( itemTag == "item_phone" )
+       {
+          var inv = Components.Get<InventoryManager>( FindMode.EverythingInSelfAndAncestors );
+          if ( inv.IsValid() )
+          {
+             inv.UnlockPhone();
+             Log.Info( "Modifier Applied: Phoney (Phone Unlocked)" );
+          }
+       }
+    }
+
+    private void UnlockAllJobs()
+    {
+       Log.Info( "Modifier Applied: Internity (Unlocked)" );
+    }
 }

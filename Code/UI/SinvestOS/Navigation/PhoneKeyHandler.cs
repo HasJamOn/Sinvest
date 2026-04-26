@@ -15,6 +15,7 @@ public sealed class PhoneKeyHandler : Component
 	{
 		if ( IsProxy ) return;
 
+		// 1. Only check input if the local player actually exists
 		if ( Input.Pressed( "phone" ) )
 		{
 			TryTogglePhone();
@@ -23,38 +24,41 @@ public sealed class PhoneKeyHandler : Component
 
 	private void TryTogglePhone()
 	{
-		// 1. Ownership Check
-		if ( InventoryManager.Instance == null || !InventoryManager.Instance.HasPhone )
+		// 2. Safety: Is the InventoryManager ready?
+		if ( InventoryManager.Instance == null )
 		{
-			Log.Info( "Check failed: No phone owned." );
+			Log.Warning( "PhoneKeyHandler: InventoryManager.Instance is not ready yet." );
 			return;
 		}
 
-		// 2. If the OS is already open (either on PC or Phone), close it
-		if ( SinvestOS.Instance != null )
+		// 3. Logic: Does the player have the phone?
+		if ( !InventoryManager.Instance.HasPhone )
 		{
-			// If it's already open, we just shut it down via the instance
+			Log.Info( "Phone: You don't have a device to open." );
+			return;
+		}
+
+		// 4. Toggle: If OS is open, close it.
+		if ( SinvestOS.Instance.IsValid() )
+		{
 			SinvestOS.Instance.CloseAndDestroy();
-			_spawnedPhoneOS = null;
 			return;
 		}
 
-		// 3. Spawning Logic (Based on your UIPopupTrigger reference)
+		// 5. Spawn: Ensure the prefab is assigned in the Inspector
 		if ( SinvestOSPrefab == null )
 		{
-			Log.Error( "PhoneKeyHandler: SinvestOSPrefab is not assigned in the Inspector!" );
+			Log.Error( "PhoneKeyHandler: SinvestOSPrefab is NULL! Assign it in the Inspector." );
 			return;
 		}
 
-		// Clone and Setup exactly like your stationary PC does
-		_spawnedPhoneOS = SinvestOSPrefab.Clone();
-		_spawnedPhoneOS.WorldPosition = new Vector3( 5000, 0, 0 ); // Move off-map per your design
+		var spawned = SinvestOSPrefab.Clone();
+		spawned.WorldPosition = new Vector3( 5000, 0, 0 );
 
-		var hud = _spawnedPhoneOS.Components.Get<SinvestOS>( FindMode.EverythingInDescendants );
+		var hud = spawned.Components.Get<SinvestOS>( FindMode.EverythingInDescendants );
 		if ( hud != null )
 		{
 			hud.Open();
-			// Play your boot sound if you want
 			Sound.Play( "sounds/ui/sinvestos_boot.sound" );
 		}
 	}

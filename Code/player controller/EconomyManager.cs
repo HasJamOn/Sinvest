@@ -2,6 +2,7 @@ using Sandbox;
 using Sinvest;
 using Sandbox.Services;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Sinvest;
 
@@ -16,51 +17,90 @@ public sealed class EconomyManager : Component
 
     protected override void OnAwake()
     {
-        Instance = this;
+	    if ( !IsProxy ) Instance = this;
     }
 
     protected override void OnStart()
     {
         if ( IsProxy ) return;
 
-        // 1. First, prioritize the data passed from the GameSaveSystem (Menu Selection)
         if ( GameSaveSystem.Instance?.CurrentCharacter != null )
         {
             CurrentMoney = GameSaveSystem.Instance.CurrentCharacter.Money;
             
-            // 2. Since the CharacterSession only had Name/Money/Mods, 
-            // let's fetch the Shares directly from the Cloud for this slot.
             string sharesKey = SinvestSession.GetSlotKey( "fundino_shares" );
-            
-            // FIX: Using the correct property/method from your source snippet
             var shareStat = Stats.LocalPlayer.Get( sharesKey );
             CurrentShares = shareStat.Value;
         }
     }
 
     /// <summary>
-    /// Handles slot-aware communication with s&box cloud services.
+    /// Debug helper to force specific values from the Debug Manager.
     /// </summary>
+    public void DebugSetValues( double targetMoney, double targetShares )
+    {
+	    var save = GameSaveSystem.Instance;
+	    if ( !save.IsValid() || save.CurrentCharacter == null ) return;
+
+	    // Use the SaveSystem as the source of truth for the calculation
+	    double currentMoney = save.CurrentCharacter.Money;
+	    double currentShares = save.CurrentCharacter.Shares;
+
+	    double moneyDelta = targetMoney - currentMoney;
+	    double sharesDelta = targetShares - currentShares;
+
+	    if ( moneyDelta != 0 || sharesDelta != 0 )
+	    {
+		    Log.Info( $"[DEBUG] Adjusting: Money Δ{moneyDelta}, Shares Δ{sharesDelta}" );
+		    CommitTransaction( moneyDelta, sharesDelta );
+	    }
+    }
+
     public async void CommitTransaction( double moneyDelta, double sharesDelta )
     {
-        if ( IsProxy ) return;
+	    if ( IsProxy ) return;
 
-        string moneyKey = SinvestSession.GetSlotKey( "money" );
-        string sharesKey = SinvestSession.GetSlotKey( "fundino_shares" );
+	    // 1. Update local tracking immediately
+	    CurrentMoney += moneyDelta;
+	    CurrentShares += sharesDelta;
 
-        // These methods exist in your source snippet and work correctly
-        Stats.Increment( moneyKey, moneyDelta );
-        Stats.Increment( sharesKey, sharesDelta );
+	    var save = GameSaveSystem.Instance;
+	    if ( !save.IsValid() || save.CurrentCharacter == null ) return;
 
-        CurrentMoney += moneyDelta;
-        CurrentShares += sharesDelta;
+	    // 2. CRITICAL: Update the Session reference for BOTH
+	    save.CurrentCharacter.Money = CurrentMoney;
+	    save.CurrentCharacter.Shares = CurrentShares;
 
-        if ( GameSaveSystem.Instance?.CurrentCharacter != null )
-        {
-            GameSaveSystem.Instance.CurrentCharacter.Money = CurrentMoney;
-        }
+	    // 3. Handle Persistence
+	    if ( save.ShouldUseCloud )
+	    {
+		    try 
+		    {
+			    string moneyKey = SinvestSession.GetSlotKey( "money" );
+			    string sharesKey = SinvestSession.GetSlotKey( "fundino_shares" );
 
-        // Using FlushAsync as defined in your source snippet
-        await Stats.FlushAsync();
+			    Stats.Increment( moneyKey, moneyDelta );
+			    Stats.Increment( sharesKey, sharesDelta );
+
+			    await Stats.FlushAsync();
+			    Log.Info( "[ECONOMY] Cloud Sync Success." );
+		    }
+		    catch ( System.Exception e )
+		    {
+			    Log.Error( $"[ECONOMY] Cloud Sync Failed: {e.Message}" );
+			    // Optional: Fallback to local save if cloud fails
+			    save.SetStoredStat( "money", CurrentMoney );
+			    save.SetStoredStat( "fundino_shares", CurrentShares );
+		    }
+	    }
+	    else
+	    {
+		    // 4. LOCAL PERSISTENCE: This ensures Local Mode actually saves to the dictionary
+		    // This will also trigger the OnDataChanged event for the UI!
+		    save.SetStoredStat( "money", CurrentMoney );
+		    save.SetStoredStat( "fundino_shares", CurrentShares );
+        
+		    Log.Info( "[ECONOMY] Local Transaction Confirmed (Cloud Bypassed)." );
+	    }
     }
 }

@@ -150,6 +150,42 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "d2953bdb-42bc-4e1b-b818-dcffda91e169",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "DebugManager",
+      "Position": "49.0254288,-193.202148,-38.5255432",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sinvest.SinvestDebugManager",
+          "__guid": "db43a5b0-5fd9-41d3-83f8-b3fdc084eecf",
+          "__enabled": true,
+          "Flags": 0,
+          "ForceHasPhone": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ResetStatsOnStart": false,
+          "SetMoney": 1000,
+          "SetShares": 0,
+          "UseLocalSaveOnly": true
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -172,13 +208,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "10451406-e6c8-4ffa-aadb-5296f2df955e"
         }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

@@ -127,42 +127,6 @@
         }
       ],
       "Children": []
-    },
-    {
-      "__guid": "3ffcbd76-ab3a-43bb-a8d6-14dec70c13d2",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "GameObject",
-      "Position": "0,0,0",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": false,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [],
-      "Children": []
-    },
-    {
-      "__guid": "62acbd79-7a81-4047-83c8-d23c2cfe1097",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "GameObject (1)",
-      "Position": "0,0,0",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": false,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [],
-      "Children": []
     }
   ],
   "SceneProperties": {
@@ -185,13 +149,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "4d1294bd-884c-4016-99b5-85fd39433e64"
         }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

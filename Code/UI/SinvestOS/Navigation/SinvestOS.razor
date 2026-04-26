@@ -103,12 +103,40 @@
     {
 	    if ( Panel == null ) return;
 
-	    Panel.AddEventListener( "onmousedown", () => 
-	    {
-		    // Use the string from the inspector
-		    Sound.Play( ClickSound );
-	    } );
+	    // Sound listener
+	    Panel.AddEventListener( "onmousedown", () => Sound.Play( ClickSound ) );
+
+	    // SUBSCRIBE: Do this once here, NOT inside the click listener
+	    GameSaveSystem.OnDataChanged += RefreshData;
+        
+	    RefreshData();
     }
+    
+    protected override void OnDisabled()
+    {
+	    // UNSUBSCRIBE: Essential to prevent ghosting
+	    GameSaveSystem.OnDataChanged -= RefreshData;
+    }
+    
+    private void RefreshData()
+    {
+	    var save = GameSaveSystem.Instance;
+	    if ( !save.IsValid() || save.CurrentCharacter == null ) return;
+
+	    // Now we can pull directly from the character session!
+	    _targetMoney = save.CurrentCharacter.Money;
+	    _targetShares = save.CurrentCharacter.Shares; 
+
+	    if ( !_initialized )
+	    {
+		    _displayMoney = _targetMoney;
+		    _displayShares = _targetShares;
+		    _initialized = true;
+	    }
+
+	    StateHasChanged();
+    }
+    
     private Panel _activeViewPanel;
     private Stack<Type> _history = new Stack<Type>();
 
@@ -205,56 +233,34 @@
     
     protected override void OnUpdate()
     {
-        if (!_initialized)
-        {
-           // Initial fetch from cloud stats
-           var moneyStat = Sandbox.Services.Stats.LocalPlayer.Get("money");
-           var sharesStat = Sandbox.Services.Stats.LocalPlayer.Get("fundino_shares");
-       
-           _targetMoney = moneyStat.Value;
-           _displayMoney = _targetMoney; 
+	    bool needsUpdate = false;
 
-           _targetShares = sharesStat.Value;
-           _displayShares = _targetShares;
+	    if ( Math.Abs( _displayMoney - _targetMoney ) > 0.1 )
+	    {
+		    _displayMoney = MathX.Lerp( _displayMoney, _targetMoney, RealTime.Delta * 8.0f );
+		    needsUpdate = true;
+	    }
 
-           _initialized = true;
-        }
+	    if ( Math.Abs( _displayShares - _targetShares ) > 0.1 )
+	    {
+		    _displayShares = MathX.Lerp( _displayShares, _targetShares, RealTime.Delta * 8.0f );
+		    needsUpdate = true;
+	    }
 
-        // --- Money Animation ---
-        if ( Math.Abs(_displayMoney - _targetMoney) > 0.1 )
-        {
-           _displayMoney = MathX.Lerp( _displayMoney, _targetMoney, RealTime.Delta * 8.0f );
-           StateHasChanged();
-        }
-        else if (_displayMoney != _targetMoney)
-        {
-           _displayMoney = _targetMoney;
-           StateHasChanged();
-        }
-
-        // --- Shares Animation ---
-        if ( Math.Abs(_displayShares - _targetShares) > 0.1 )
-        {
-           _displayShares = MathX.Lerp( _displayShares, _targetShares, RealTime.Delta * 8.0f );
-           StateHasChanged();
-        }
-        else if (_displayShares != _targetShares)
-        {
-           _displayShares = _targetShares;
-           StateHasChanged();
-        }
+	    if ( needsUpdate ) StateHasChanged();
+    }
+    
+    private double GetSharesFromSave()
+    {
+	    return GameSaveSystem.Instance.GetStoredStat("fundino_shares");
     }
 
-    public void Transaction(double moneyAmount, double sharesAmount = 0)
+    public void Transaction( double moneyAmount, double sharesAmount = 0 )
     {
-	    _targetMoney += moneyAmount;
-	    _targetShares += sharesAmount;
-
 	    var eco = Scene.GetAllComponents<EconomyManager>().FirstOrDefault();
-	    if (eco != null)
+	    if ( eco.IsValid() )
 	    {
-		    // Just call it directly
-		    eco.CommitTransaction(moneyAmount, sharesAmount);
+		    eco.CommitTransaction( moneyAmount, sharesAmount );
 	    }
     }
 

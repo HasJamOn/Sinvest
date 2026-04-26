@@ -4,28 +4,44 @@ using System.Threading.Tasks;
 
 public sealed class LoadingScreen : Component
 {
-	[Property] public float MinimumTime { get; set; } = 1.5f; // Prevents "flickering" loading screens
+	[Property] public float MinimumTime { get; set; } = 1.5f; 
 
-	protected override async void OnStart()
+	private float _timer = 0;
+	private bool _loadingStarted = false;
+
+	protected override void OnStart()
 	{
-		float startTime = RealTime.Now;
+		_timer = 0;
+		_loadingStarted = false;
 
-		// 1. Ensure all Cloud Stats are synced before proceeding
-		// This is our safety check!
-		await Sandbox.Services.Stats.FlushAsync();
+		// Ensure any pending cloud stats from the menu are pushed before we load the world
+		_ = Sandbox.Services.Stats.FlushAsync();
+	}
 
-		// 2. Add a slight artificial delay if the loading was too fast
-		// (Better for player psychology than a 0.1s flash)
-		var elapsed = RealTime.Now - startTime;
-		if ( elapsed < MinimumTime )
+	protected override void OnUpdate()
+	{
+		if ( _loadingStarted ) return;
+
+		_timer += RealTime.Delta;
+
+		// --- DEPENDENCY CHECK ---
+		// We do not proceed if the SaveSystem isn't ready. 
+		// This prevents StartupManager exceptions in the next scene.
+		if ( GameSaveSystem.Instance == null || GameSaveSystem.Instance.CurrentCharacter == null )
 		{
-			await Task.DelayRealtimeSeconds( MinimumTime - elapsed );
+			return;
 		}
 
-		// 3. Load the actual game
-		if ( !string.IsNullOrEmpty( SceneNavigator.TargetScene ) )
+		// --- TIMING CHECK ---
+		if ( _timer >= MinimumTime )
 		{
-			Scene.LoadFromFile( SceneNavigator.TargetScene );
+			if ( !string.IsNullOrEmpty( SceneNavigator.TargetScene ) )
+			{
+				_loadingStarted = true;
+				Log.Info( $"[Loading] Dependencies ready. Transitioning to: {SceneNavigator.TargetScene}" );
+                
+				Scene.LoadFromFile( SceneNavigator.TargetScene );
+			}
 		}
 	}
 }

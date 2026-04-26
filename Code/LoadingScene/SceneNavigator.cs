@@ -4,14 +4,8 @@ using System.Linq;
 
 public static class SceneNavigator
 {
-	/// <summary>
-	/// The path the Loading Screen should jump to once ready.
-	/// </summary>
 	public static string TargetScene { get; private set; }
 
-	/// <summary>
-	/// Safely transitions the player to the loading screen.
-	/// </summary>
 	public static void TransitionTo( SceneFile worldScene )
 	{
 		if ( worldScene == null )
@@ -22,22 +16,21 @@ public static class SceneNavigator
 
 		TargetScene = worldScene.ResourcePath;
 
-		// Find the loading scene by name. This is faster than raw paths and 
-		// works even if you move the file to a different folder.
+		// Find the loading scene. We search by name OR path for maximum reliability.
 		var loadingScene = ResourceLibrary.GetAll<SceneFile>()
-			.FirstOrDefault( x => x.ResourceName.Equals( "loading", System.StringComparison.OrdinalIgnoreCase ) );
+			.FirstOrDefault( x => x.ResourceName.Equals( "loading", System.StringComparison.OrdinalIgnoreCase ) 
+			                      || x.ResourcePath.Contains( "loading.scene" ) );
 
 		if ( loadingScene != null )
 		{
-			// Useful for production logs to track player flow
 			Log.Info( $"[SceneNavigator] Navigating to: {loadingScene.ResourceName} -> {TargetScene}" );
+          
+			// Use Game.ActiveScene to ensure we are calling the load from a static context correctly
 			Game.ActiveScene.Load( loadingScene );
 		}
 		else
 		{
-			// This remains critical even in shipping; if the loading screen is missing, 
-			// the game would just "soft lock" on the menu without this error.
-			Log.Error( "[SceneNavigator] CRITICAL: 'loading.scene' not found in ResourceLibrary!" );
+			Log.Error( "[SceneNavigator] CRITICAL: 'loading.scene' not found! Check your file names." );
 		}
 	}
 }
