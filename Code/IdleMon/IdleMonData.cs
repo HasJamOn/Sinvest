@@ -3,7 +3,6 @@ using System;
 
 namespace Sinvest;
 
-// [System.Serializable] allows the Inspector to show these fields
 [System.Serializable]
 public struct IdleMonData
 {
@@ -16,17 +15,20 @@ public struct IdleMonData
 	[Title("Division (D)")] public double Division;      
 	[Title("Team Bonus (T)")] public double TeamBonus;     
     
+	// --- Birth Certificate Metadata ---
 	public DateTime RolledAt;
+	public float MarketScaleAtBirth { get; set; } // The 'S' factor when created
+	public int Generation { get; set; }           // Derived from Era/Seed history
 
-	// This makes sure new slots aren't "0" (which would break math)
 	public static IdleMonData Empty => new IdleMonData 
 	{ 
 		ID = Guid.Empty, 
 		Name = "Empty Node",
 		Addition = 0,
 		Subtraction = 0,
-		Multiplier = 1.0, // Identity
-		Division = 1.0,   // Identity
-		TeamBonus = 1.0   // Identity
+		Multiplier = 1.0, 
+		Division = 1.0,   
+		TeamBonus = 1.0,
+		Generation = 0
 	};
 }
