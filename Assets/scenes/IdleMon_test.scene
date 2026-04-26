@@ -70,9 +70,7 @@
           "__guid": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
           "__enabled": true,
           "Flags": 0,
-          "ActiveNodes": [
-            {}
-          ],
+          "ActiveNodes": [],
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -116,6 +114,71 @@
             "go": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
             "component_type": "RosterManager"
           }
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "ba3838c9-bfd6-439a-ae35-9dd06cfe8bb8",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "[TEST_INFRASTRUCTURE]",
+      "Position": "149.994965,149.994995,-212.124985",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sinvest.GameSaveSystem",
+          "__guid": "6b99263a-c5ed-417c-8d63-8bc321ddba98",
+          "__enabled": true,
+          "Flags": 0,
+          "ActiveSlot": 1,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "UnlockAllModifiers": false,
+          "UseCloud": false
+        },
+        {
+          "__type": "Sinvest.EconomyManager",
+          "__guid": "871feae4-f1a0-4a15-b165-e92e7502dbec",
+          "__enabled": true,
+          "Flags": 0,
+          "CurrentMoney": 0,
+          "CurrentShares": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
+          "__type": "Sinvest.SinvestDebugManager",
+          "__guid": "06b004c2-a41a-4db7-9792-8ebce8903bcc",
+          "__enabled": true,
+          "Flags": 0,
+          "ForceHasPhone": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ResetStatsOnStart": false,
+          "SetMoney": 1000,
+          "SetShares": 0,
+          "UseLocalSaveOnly": false
         }
       ],
       "Children": []

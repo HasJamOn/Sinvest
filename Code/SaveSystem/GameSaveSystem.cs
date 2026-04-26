@@ -28,7 +28,7 @@ public class CharacterSession
 	public StartingModifiers Modifiers { get; set; }
 }
 
-public sealed class GameSaveSystem : Component
+public sealed partial class GameSaveSystem : Component
 {
     public static GameSaveSystem Instance { get; private set; }
     
@@ -154,39 +154,42 @@ public sealed class GameSaveSystem : Component
 
     private void SetStoredName( string name )
     {
-       string key = $"name{SlotSuffix}";
-       if ( ShouldUseCloud ) Game.Cookies.Set( key, name );
-       else _localCookies[key] = name;
+	    string key = $"name{SlotSuffix}";
+	    // Always use Cookies so it persists on your PC, even if Cloud is off
+	    Game.Cookies.Set( key, name );
     }
 
     private string GetStoredName()
     {
-       string key = $"name{SlotSuffix}";
-       if ( ShouldUseCloud ) return Game.Cookies.Get( key, "New Character" );
-       return _localCookies.GetValueOrDefault( key, "New Character" );
+	    string key = $"name{SlotSuffix}";
+	    return Game.Cookies.Get( key, "New Character" );
     }
 
     public void SetStoredStat( string statName, double val )
     {
 	    string key = $"{statName}{SlotSuffix}";
-       
-	    if ( ShouldUseCloud ) Stats.SetValue( key, val );
-	    else _localStats[key] = val;
+   
+	    if ( ShouldUseCloud ) 
+		    Stats.SetValue( key, val );
+    
+	    // Always save a local copy to the cookie file so it survives Editor reloads
+	    Game.Cookies.Set( key, val.ToString() );
 
-	    // PUSH: Tell everyone listening that data just changed
 	    OnDataChanged?.Invoke();
     }
 
     public double GetStoredStat( string statName )
     {
-        string key = $"{statName}{SlotSuffix}";
-       
-        if ( ShouldUseCloud ) 
-        {
-           return Stats.LocalPlayer.Get( key ).Value;
-        }
+	    string key = $"{statName}{SlotSuffix}";
+   
+	    if ( ShouldUseCloud ) 
+	    {
+		    return (double)Stats.LocalPlayer.Get( key ).Value;
+	    }
 
-        return _localStats.GetValueOrDefault( key, 0 );
+	    // Pull from cookie file and parse back to double
+	    string val = Game.Cookies.Get( key, "0" );
+	    return double.TryParse(val, out double result) ? result : 0;
     }
     
     public string GetStoredNameForSlot( int slot )
