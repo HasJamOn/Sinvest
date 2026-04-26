@@ -78,8 +78,8 @@
           "OnComponentUpdate": null
         },
         {
-          "__type": "Sandbox.GameSaveSystem",
-          "__guid": "364119fc-b404-482a-80c9-7b5367d03477",
+          "__type": "Sinvest.GameSaveSystem",
+          "__guid": "ba39a522-a8aa-4b3e-be35-a8c10979f8d0",
           "__enabled": true,
           "Flags": 0,
           "ActiveSlot": 1,
@@ -142,7 +142,7 @@
           "OnComponentUpdate": null,
           "SaveManager": {
             "_type": "component",
-            "component_id": "364119fc-b404-482a-80c9-7b5367d03477",
+            "component_id": "ba39a522-a8aa-4b3e-be35-a8c10979f8d0",
             "go": "0dc3de13-61df-432f-9a4d-0174925c3d38",
             "component_type": "GameSaveSystem"
           },

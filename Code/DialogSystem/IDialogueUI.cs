@@ -1,4 +1,4 @@
-﻿namespace Sandbox; 
+﻿namespace Sinvest; 
 
 public interface IDialogueUI
 {

@@ -1,4 +1,5 @@
-using Sandbox;
+using Sandbox; 
+using Sinvest;
 using Sandbox.Movement;
 
 public sealed class PreventChairToChair : Component, Component.IPressable

@@ -1,8 +1,9 @@
-using Sandbox;
+using Sandbox; 
+using Sinvest;
 using Sandbox.Services;
 using System.Threading.Tasks;
 
-namespace Sandbox;
+namespace Sinvest;
 
 public sealed class EconomyManager : Component
 {
