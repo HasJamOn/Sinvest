@@ -24,21 +24,31 @@ public sealed class RosterManager : Component
         DrawDebugHUD();
 
         // --- 2. INITIALIZATION ---
+        // Inside RosterManager.cs -> OnUpdate()
         if ( !_hasInitialized && GameSaveSystem.Instance.IsValid() )
         {
-            var save = GameSaveSystem.Instance;
-            if ( save.CurrentCharacter != null )
-            {
-                LoadRoster();
-                CalculateOfflineGains();
-                _hasInitialized = true;
-            }
-            else
-            {
-                // Fallback for testing without a character loaded
-                ResetToGenesis();
-                _hasInitialized = true;
-            }
+	        var save = GameSaveSystem.Instance;
+
+	        // FIX: If we are in the editor/test scene and haven't loaded a character, force it.
+	        if ( save.CurrentCharacter == null )
+	        {
+		        Log.Warning( "[ROSTER] No character session found. Forcing LoadActiveSlot for Test Scene." );
+		        save.LoadActiveSlot(); 
+	        }
+
+	        // Now check again
+	        if ( save.CurrentCharacter != null && save.CurrentCharacter.Name != "New Character" )
+	        {
+		        LoadRoster();
+		        CalculateOfflineGains();
+		        _hasInitialized = true;
+	        }
+	        else
+	        {
+		        // If we still have no character, it's a fresh save.
+		        ResetToGenesis();
+		        _hasInitialized = true;
+	        }
         }
 
         if ( !_hasInitialized ) return;

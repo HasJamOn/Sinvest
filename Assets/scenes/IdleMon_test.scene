@@ -70,7 +70,34 @@
           "__guid": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
           "__enabled": true,
           "Flags": 0,
-          "ActiveNodes": [],
+          "ActiveNodes": [
+            {
+              "MarketScaleAtBirth": 0,
+              "Generation": 0
+            },
+            {
+              "MarketScaleAtBirth": 0,
+              "Generation": 0
+            },
+            {
+              "MarketScaleAtBirth": 0,
+              "Generation": 0
+            },
+            {
+              "MarketScaleAtBirth": 0,
+              "Generation": 0
+            },
+            {
+              "MarketScaleAtBirth": 0,
+              "Generation": 0
+            },
+            {
+              "MarketScaleAtBirth": 0,
+              "Generation": 0
+            }
+          ],
+          "FlushInterval": 2,
+          "IdleBucks": 0,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -182,6 +209,67 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "c64ac180-94a3-4f16-8806-4eb03ed607bf",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "IdleMonUI",
+      "Position": "0,0,100",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "9928e10b-d036-4863-80ec-e60f9212ed3b",
+          "__enabled": true,
+          "Flags": 0,
+          "AutoScreenScale": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Opacity": 1,
+          "Scale": 1,
+          "ScaleStrategy": "ConsistentHeight",
+          "TargetCamera": null,
+          "ZIndex": 100
+        },
+        {
+          "__type": "Sinvest.IdleMonDashBoard",
+          "__guid": "d5856fc0-e320-47d9-9aa6-0e690a7d3238",
+          "__enabled": true,
+          "Flags": 0,
+          "Generator": {
+            "_type": "component",
+            "component_id": "69128f78-e4dc-4a76-8e49-3f57b83919cf",
+            "go": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
+            "component_type": "AssetGenerator"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Roster": {
+            "_type": "component",
+            "component_id": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
+            "go": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
+            "component_type": "RosterManager"
+          }
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -204,13 +292,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "5865e4ab-5814-4745-8ae8-2216b6c38bf8"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },

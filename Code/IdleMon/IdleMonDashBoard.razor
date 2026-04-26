@@ -1,0 +1,125 @@
+﻿@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+
+@namespace Sinvest
+
+@inherits PanelComponent
+
+<root class="dashboard-root">
+    @if ( Roster == null )
+    {
+        <div class="error">MISSING ROSTER_MANAGER REFERENCE</div>
+    }
+    else
+    {
+        <div class="header">
+            <div class="currency-block">
+                <label class="label">TOTAL ASSETS</label>
+                <label class="value">@Roster.IdleBucks.ToString("F2") IB</label>
+            </div>
+            
+            <div class="yield-block">
+                <label class="label">CURRENT YIELD</label>
+                <label class="value positive">@Roster.CalculateTotalYield().ToString("F2") IB/s</label>
+            </div>
+
+            <div class="sync-status">
+                <label class="status-text">DATA SECURED</label>
+            </div>
+        </div>
+
+        <div class="node-matrix">
+            @for ( int i = 0; i < 6; i++ )
+            {
+                var index = i;
+                var mon = (Roster.ActiveNodes != null && index < Roster.ActiveNodes.Count) 
+                          ? Roster.ActiveNodes[index] 
+                          : IdleMonData.Empty;
+                
+                var delta = (CurrentDeltas != null && index < CurrentDeltas.Length) ? CurrentDeltas[index] : 0;
+
+                <div class="node-slot @(mon.ID == Guid.Empty ? "empty" : "active")" onclick="@(() => ConfirmSwap(index))">
+                    <div class="node-info">
+                        <label class="node-name">@mon.Name</label>
+                        <div class="stats-mini">
+                            <label>A: @mon.Addition.ToString("F1")</label>
+                            <label>M: @mon.Multiplier.ToString("F2")x</label>
+                        </div>
+                    </div>
+
+                    @if ( IsDrafting )
+                    {
+                        <div class="swap-overlay @(delta >= 0 ? "positive" : "negative")">
+                            <label class="delta-text">@(delta >= 0 ? "+" : "")@delta.ToString("F2")</label>
+                            <label class="action-hint">CLICK TO SWAP</label>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="footer">
+            @if ( !IsDrafting )
+            {
+                <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
+            }
+            else
+            {
+                <div class="draft-controls">
+                    <div class="candidate-preview">
+                        <label class="title">DRAFT CANDIDATE: @DraftCandidate?.Name</label>
+                        <label class="stats">Gen @DraftCandidate?.Generation | Scale @DraftCandidate?.MarketScaleAtBirth.ToString("F2")x</label>
+                    </div>
+                    <button class="btn-danger" onclick="@CancelDraft">TERMINATE DRAFT</button>
+                </div>
+            }
+        </div>
+    }
+</root>
+
+@code {
+    [Property] public RosterManager Roster { get; set; }
+    [Property] public AssetGenerator Generator { get; set; }
+
+    private bool IsDrafting => DraftCandidate.HasValue;
+    private IdleMonData? DraftCandidate = null;
+    private double[] CurrentDeltas;
+
+    /// <summary>
+    /// The BuildHash determines when the UI should re-render.
+    /// We check the money, yield, and draft state.
+    /// </summary>
+    protected override int BuildHash() => System.HashCode.Combine( 
+        Roster?.IdleBucks, 
+        Roster?.CalculateTotalYield(), 
+        IsDrafting, 
+        DraftCandidate?.ID 
+    );
+
+    public void StartDraft()
+    {
+        if ( Generator == null || Roster == null ) return;
+        
+        DraftCandidate = Generator.RollNewAsset();
+        CurrentDeltas = Roster.GetSwapDeltas( DraftCandidate.Value );
+        
+        Log.Info( $"[UI] Draft Started: {DraftCandidate?.Name}" );
+    }
+
+    private void CancelDraft()
+    {
+        DraftCandidate = null;
+        CurrentDeltas = null;
+    }
+
+    private void ConfirmSwap( int slotIndex )
+    {
+        if ( !DraftCandidate.HasValue || Roster == null ) return;
+        
+        Roster.SwapNode( slotIndex, DraftCandidate.Value );
+        CancelDraft();
+    }
+}
