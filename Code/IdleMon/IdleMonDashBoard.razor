@@ -262,14 +262,24 @@
 	// s&box equivalent to OnParametersSet
 	protected override void OnEnabled()
 	{
-		// If the prefab lost its reference, find it in the children/scene
+		// Existing reference logic
 		if ( Roster == null ) 
 			Roster = Scene.GetAllComponents<RosterManager>().FirstOrDefault();
-        
+    
 		if ( Generator == null )
 			Generator = Scene.GetAllComponents<AssetGenerator>().FirstOrDefault();
 
 		if (CurrentDeltas == null) CurrentDeltas = new double[6];
+		
+		if ( Panel.IsValid() )
+		{
+			// Panel is the Sandbox.UI.Panel instance
+			Panel.Style.PointerEvents = PointerEvents.All;
+      
+			// This allows the panel to become the active input target
+			Panel.AcceptsFocus = true; 
+			Panel.Focus();
+		}
 	}
 
 	// s&box equivalent to OnAfterTreeRender
@@ -362,24 +372,21 @@
     
     private void ExitIdleMon()
     {
-	    var player = Scene.GetAllComponents<PlayerController>()
-		    .FirstOrDefault(x => !x.IsProxy);
-
+	    // 1. Restore player controls immediately for responsiveness
+	    var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
 	    if ( player.IsValid() )
 	    {
 		    player.UseLookControls = true;
 		    player.UseInputControls = true;
 	    }
 
-	    // Save data before closing
+	    // 2. Local Cleanup
 	    Roster?.SaveRoster();
 	    CancelDraft();
 	    SelectedSlotIndex = null;
 
-	    // Instead of Destroy, we disable the ScreenPanel so it can be re-enabled by SinvestOS
-	    GameObject.Enabled = false; 
-    
-	    // Notify SinvestOS to show its main menu again
+	    // 3. Hand over control to the OS
+	    // Do NOT use GameObject.Enabled = false here!
 	    if (SinvestOS.Instance != null)
 	    {
 		    SinvestOS.Instance.GoBack();

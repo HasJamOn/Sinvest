@@ -306,12 +306,15 @@
 	    {
 		    if (IdleMonObject.IsValid())
 		    {
+			    // Ensure data is safe
 			    var roster = IdleMonObject.Components.GetInChildren<RosterManager>();
 			    roster?.SaveRoster();
+
+			    // The OS is the "Single Source of Truth" for this object's state
 			    IdleMonObject.Enabled = false;
 		    }
 
-		    // Restore OS Input
+		    // Restore OS Desktop Input
 		    if (Panel.IsValid())
 		    {
 			    Panel.Style.PointerEvents = PointerEvents.All;
