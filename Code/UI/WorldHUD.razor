@@ -44,7 +44,7 @@
                       && _timeSinceLastHit < 0.1f 
                       && !(Player?.WantsHideHud ?? false)
                       && !UIPopupTrigger.ActiveInstance.IsValid()
-                      && SinvestOS.Instance == null; // New Check
+                      && !(SinvestOS.Instance?.IsOpen ?? false);
 
     string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? _foundCase?.TooltipTitle ?? string.Empty;
     string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? _foundCase?.TooltipIcon ?? string.Empty;
@@ -57,12 +57,12 @@
     protected override void OnUpdate()
     {
         // Optimization: Early exit if SinvestOS is active to stop tracing entirely
-        if ( SinvestOS.Instance != null )
+        if ( SinvestOS.Instance.IsValid() && SinvestOS.Instance.IsOpen )
         {
-            _foundChair = null;
-            _foundTrigger = null;
-            _foundCase = null;
-            return;
+	        _foundChair = null;
+	        _foundTrigger = null;
+	        _foundCase = null;
+	        return;
         }
 
         var controller = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );

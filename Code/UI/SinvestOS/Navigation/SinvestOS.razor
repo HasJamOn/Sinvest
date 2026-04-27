@@ -88,6 +88,7 @@
 @code
 {
     public static SinvestOS Instance { get; private set; }
+    public bool IsOpen => _isOpen;
     /* --- INSPECTOR SETTINGS --- */
     /* --- Global Sounds --- */
     [Property, Group("Audio"), ResourceType("sound")] 
