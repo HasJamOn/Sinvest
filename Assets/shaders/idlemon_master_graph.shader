@@ -1,0 +1,149 @@
+
+HEADER
+{
+	Description = "";
+}
+
+FEATURES
+{
+	#include "common/features.hlsl"
+}
+
+MODES
+{
+	Forward();
+	Depth();
+	ToolsShadingComplexity( "tools_shading_complexity.shader" );
+}
+
+COMMON
+{
+	#ifndef S_ALPHA_TEST
+	#define S_ALPHA_TEST 0
+	#endif
+	#ifndef S_TRANSLUCENT
+	#define S_TRANSLUCENT 0
+	#endif
+	
+	#include "common/shared.hlsl"
+	#include "procedural.hlsl"
+
+	#define S_UV2 1
+}
+
+struct VertexInput
+{
+	#include "common/vertexinput.hlsl"
+	float4 vColor : COLOR0 < Semantic( Color ); >;
+};
+
+struct PixelInput
+{
+	#include "common/pixelinput.hlsl"
+	float3 vPositionOs : TEXCOORD14;
+	float3 vNormalOs : TEXCOORD15;
+	float4 vTangentUOs_flTangentVSign : TANGENT	< Semantic( TangentU_SignV ); >;
+	float4 vColor : COLOR0;
+	float4 vTintColor : COLOR1;
+	#if ( PROGRAM == VFX_PROGRAM_PS )
+		bool vFrontFacing : SV_IsFrontFace;
+	#endif
+};
+
+VS
+{
+	#include "common/vertex.hlsl"
+
+	PixelInput MainVs( VertexInput v )
+	{
+		
+		PixelInput i = ProcessVertex( v );
+		i.vPositionOs = v.vPositionOs.xyz;
+		i.vColor = v.vColor;
+		
+		ExtraShaderData_t extraShaderData = GetExtraPerInstanceShaderData( v.nInstanceTransformID );
+		i.vTintColor = extraShaderData.vTint;
+		
+		VS_DecodeObjectSpaceNormalAndTangent( v, i.vNormalOs, i.vTangentUOs_flTangentVSign );
+		return FinalizeVertex( i );
+		
+	}
+}
+
+PS
+{
+	#include "common/pixel.hlsl"
+	RenderState( CullMode, F_RENDER_BACKFACES ? NONE : DEFAULT );
+		
+	SamplerState g_sSampler0 < Filter( ANISO ); AddressU( WRAP ); AddressV( WRAP ); >;
+	Texture2D g_tArtwork < Attribute( "Artwork" ); >;
+	float g_flValueRarity < Attribute( "g_flValueRarity" ); Default1( 0 ); >;
+	float g_flShaderTime < Attribute( "ShaderTime" ); Default1( 0 ); >;
+	float g_flshadertime < Attribute( "shadertime" ); Default1( 0 ); >;
+	
+	float4 MainPs( PixelInput i ) : SV_Target0
+	{
+		
+		Material m = Material::Init( i );
+		m.Albedo = float3( 1, 1, 1 );
+		m.Normal = float3( 0, 0, 1 );
+		m.Roughness = 1;
+		m.Metalness = 0;
+		m.AmbientOcclusion = 1;
+		m.TintMask = 1;
+		m.Opacity = 1;
+		m.Emission = float3( 0, 0, 0 );
+		m.Transmission = 0;
+		
+		float4 l_0 = Tex2DS( g_tArtwork, g_sSampler0, i.vTextureCoords.xy );
+		float l_1 = g_flValueRarity;
+		float3 l_2 = 
+		        (l_1 < 0.10 ? float3(0.29, 0.23, 0.16) :
+		         l_1 < 0.20 ? float3(0.42, 0.35, 0.23) :
+		         l_1 < 0.30 ? float3(0.48, 0.48, 0.48) :
+		         l_1 < 0.40 ? float3(0.63, 0.63, 0.63) :
+		         l_1 < 0.50 ? float3(0.55, 0.38, 0.22) :
+		         l_1 < 0.60 ? float3(0.72, 0.45, 0.20) :
+		         l_1 < 0.68 ? float3(0.54, 0.00, 0.00) :
+		         l_1 < 0.72 ? float3(0.76, 0.07, 0.12) :
+		         l_1 < 0.78 ? float3(0.35, 0.16, 0.51) :
+		         l_1 < 0.82 ? float3(0.48, 0.25, 0.63) :
+		         l_1 < 0.86 ? float3(0.17, 0.35, 0.63) :
+		         l_1 < 0.90 ? float3(0.23, 0.48, 0.84) :
+		         l_1 < 0.95 ? float3(0.75, 0.75, 0.75) :
+		         l_1 < 0.98 ? float3(0.83, 0.69, 0.22) :
+		         l_1 < 1.00 ? float3(0.00, 0.61, 0.47) :
+		         float3(0.00, 1.00, 1.00));
+		float l_3 = g_flShaderTime;
+		float l_4 = l_3 * 2;
+		float l_5 = sin( l_4 );
+		float l_6 = saturate( ( l_5 - -1 ) / ( 1 - -1 ) ) * ( 1 - 0 ) + 0;
+		float l_7 = g_flshadertime;
+		float2 l_8 = TileAndOffsetUv( i.vTextureCoords.xy, float2( 1, 1 ), float2( l_7, l_7 ) );
+		float l_9 = VoronoiNoise( l_8, 3.1415925, 10 );
+		float l_10 = step( l_6, l_9 );
+		float4 l_11 = saturate( lerp( l_0, l_0*float4( l_2, 0 ), l_10 ) );
+		
+		m.Albedo = l_11.xyz;
+		m.Opacity = 1;
+		m.Roughness = 1;
+		m.Metalness = 0;
+		m.AmbientOcclusion = 1;
+		
+		
+		m.AmbientOcclusion = saturate( m.AmbientOcclusion );
+		m.Roughness = saturate( m.Roughness );
+		m.Metalness = saturate( m.Metalness );
+		m.Opacity = saturate( m.Opacity );
+		
+		// Result node takes normal as tangent space, convert it to world space now
+		m.Normal = TransformNormal( m.Normal, i.vNormalWs, i.vTangentUWs, i.vTangentVWs );
+		
+		// for some toolvis shit
+		m.WorldTangentU = i.vTangentUWs;
+		m.WorldTangentV = i.vTangentVWs;
+		m.TextureCoords = i.vTextureCoords.xy;
+				
+		return ShadingModelStandard::Shade( m );
+	}
+}

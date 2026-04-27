@@ -48,7 +48,7 @@
         "CreateAttachments": false,
         "LodOverride": null,
         "MaterialGroup": null,
-        "MaterialOverride": "steamlibrary_case/steamgamecase.vmat",
+        "MaterialOverride": "shaders/steamlibrary_case/steamgamecase.vmat",
         "Materials": null,
         "Model": null,
         "OnComponentDestroy": null,

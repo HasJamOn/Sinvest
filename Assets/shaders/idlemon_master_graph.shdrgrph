@@ -1,0 +1,256 @@
+{
+  "IsSubgraph": false,
+  "Path": "shaders/idlemon_master_graph.shdrgrph",
+  "Model": null,
+  "Title": null,
+  "Description": "",
+  "Category": null,
+  "Icon": null,
+  "AddToNodeLibrary": false,
+  "BlendMode": "Opaque",
+  "ShadingModel": "Lit",
+  "Domain": "Surface",
+  "PreviewSettings": {
+    "RenderBackfaces": false,
+    "EnableShadows": true,
+    "ShowGround": false,
+    "ShowSkybox": true,
+    "BackgroundColor": "0,0,0,1",
+    "Tint": "1,1,1,1"
+  },
+  "Version": 1,
+  "nodes": [
+    {
+      "_class": "Result",
+      "DefaultOpacity": 1,
+      "DefaultRoughness": 1,
+      "DefaultMetalness": 0,
+      "DefaultAmbientOcclusion": 1,
+      "Identifier": "0",
+      "Position": "660,-492",
+      "HandleOffsets": {},
+      "Albedo": {
+        "Identifier": "5",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "g_flValueRarity",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "1",
+      "Position": "-252,-204",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "IdlemonColorNode",
+      "Identifier": "2",
+      "Position": "12,-216",
+      "HandleOffsets": {},
+      "InputT": {
+        "Identifier": "1",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 2,
+      "Identifier": "3",
+      "Position": "-324,24",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "7",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "TextureSampler",
+      "Image": null,
+      "Sampler": {
+        "Filter": "Aniso",
+        "AddressU": "Wrap",
+        "AddressV": "Wrap"
+      },
+      "UI": {
+        "Name": "Artwork",
+        "IsAttribute": true,
+        "Default": "1,1,1,1",
+        "Extension": "Color",
+        "CustomExtension": null,
+        "ShowExtension": true,
+        "Processor": "None",
+        "ColorSpace": "Srgb",
+        "ImageFormat": "DXT5",
+        "SrgbRead": true,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": "",
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "4",
+      "Position": "-48,-468",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Blend",
+      "DefaultA": "0,0,0,1",
+      "DefaultB": "1,1,1,1",
+      "Fraction": 0.5,
+      "BlendMode": "Multiply",
+      "Clamp": true,
+      "Identifier": "5",
+      "Position": "360,-480",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "4",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "2",
+        "Output": "Result"
+      },
+      "C": {
+        "Identifier": "10",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Sine",
+      "Identifier": "6",
+      "Position": "-48,24",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "3",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "ShaderTime",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "7",
+      "Position": "-624,0",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "RemapValue",
+      "In": 0.5,
+      "InMin": -1,
+      "InMax": 1,
+      "OutMin": 0,
+      "OutMax": 1,
+      "Clamp": true,
+      "Identifier": "8",
+      "Position": "180,-36",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "6",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "VoronoiNoise",
+      "AngleOffset": 3.1415925,
+      "CellDensity": 10,
+      "Worley": false,
+      "Identifier": "9",
+      "Position": "240,-204",
+      "HandleOffsets": {},
+      "Coords": {
+        "Identifier": "12",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Step",
+      "DefaultInput": 0,
+      "DefaultEdge": 0,
+      "Identifier": "10",
+      "Position": "468,-180",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "9",
+        "Output": "Result"
+      },
+      "Edge": {
+        "Identifier": "8",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "shadertime",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "11",
+      "Position": "-264,-96",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "TileAndOffset",
+      "DefaultTile": "1,1",
+      "DefaultOffset": "0,0",
+      "WrapTo01": false,
+      "Identifier": "12",
+      "Position": "36,-144",
+      "HandleOffsets": {},
+      "Offset": {
+        "Identifier": "11",
+        "Output": "Result"
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+"Layer0"
+{
+	"shader"		"shaders/steamlibrary_case/steamgamecase.shader"
+	"g_bFogEnabled"		"1"
+	"Attributes"
+	{
+	}
+}
