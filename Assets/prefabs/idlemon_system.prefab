@@ -49,39 +49,172 @@
             "ScaleStrategy": "ConsistentHeight",
             "TargetCamera": null,
             "ZIndex": 100
-          },
-          {
-            "__type": "Sinvest.IdleMonDashBoard",
-            "__guid": "36c42c3a-3d08-4300-a0f9-3d34a0817c28",
-            "__enabled": true,
-            "Flags": 0,
-            "Generator": {
-              "_type": "component",
-              "component_id": "b3176b8a-1a88-4863-bf2a-21a250c58b27",
-              "go": "d4bafd5b-7929-407f-bbb0-28189676eb16",
-              "component_type": "AssetGenerator"
-            },
-            "OnComponentDestroy": null,
-            "OnComponentDisabled": null,
-            "OnComponentEnabled": null,
-            "OnComponentFixedUpdate": null,
-            "OnComponentStart": null,
-            "OnComponentUpdate": null,
-            "Roster": {
-              "_type": "component",
-              "component_id": "a23b4cd2-8965-45e6-b46e-10bf65519842",
-              "go": "d4bafd5b-7929-407f-bbb0-28189676eb16",
-              "component_type": "RosterManager"
-            }
           }
         ],
-        "Children": []
+        "Children": [
+          {
+            "__guid": "94b06e93-18e1-4aa0-9d76-248a1360e254",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "Dashboard",
+            "Position": "0,0,0",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [
+              {
+                "__type": "Sinvest.IdleMonDashBoard",
+                "__guid": "27c1162e-8b7f-476d-b611-20467b484f2e",
+                "__enabled": true,
+                "Flags": 0,
+                "Generator": {
+                  "_type": "component",
+                  "component_id": "b3176b8a-1a88-4863-bf2a-21a250c58b27",
+                  "go": "d4bafd5b-7929-407f-bbb0-28189676eb16",
+                  "component_type": "AssetGenerator"
+                },
+                "IdleMonSystem": {
+                  "_type": "gameobject",
+                  "go": "6cf93e02-382d-48b3-a8b7-ba2b9a5d2474"
+                },
+                "OnComponentDestroy": null,
+                "OnComponentDisabled": null,
+                "OnComponentEnabled": null,
+                "OnComponentFixedUpdate": null,
+                "OnComponentStart": null,
+                "OnComponentUpdate": null,
+                "Roster": {
+                  "_type": "component",
+                  "component_id": "a23b4cd2-8965-45e6-b46e-10bf65519842",
+                  "go": "d4bafd5b-7929-407f-bbb0-28189676eb16",
+                  "component_type": "RosterManager"
+                }
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "6d6f25a9-7ba2-49a3-bf3b-c062cda1b2d2",
+            "__version": 2,
+            "Flags": 0,
+            "Name": "VisualStage",
+            "Position": "0,0,0",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "NetworkFlags": 0,
+            "NetworkOrphaned": 0,
+            "NetworkTransmit": true,
+            "OwnerTransfer": 1,
+            "Components": [
+              {
+                "__type": "Sinvest.IdleMonVisuals",
+                "__guid": "35fc20fb-c26a-4e9f-a80a-94fcb1986b9e",
+                "__enabled": true,
+                "Flags": 0,
+                "ModelVisual": {
+                  "_type": "component",
+                  "component_id": "308e6930-6931-4fd4-8856-9f8cc0ecda60",
+                  "go": "6d6f25a9-7ba2-49a3-bf3b-c062cda1b2d2",
+                  "component_type": "ModelRenderer"
+                },
+                "OnComponentDestroy": null,
+                "OnComponentDisabled": null,
+                "OnComponentEnabled": null,
+                "OnComponentFixedUpdate": null,
+                "OnComponentStart": null,
+                "OnComponentUpdate": null
+              },
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "308e6930-6931-4fd4-8856-9f8cc0ecda60",
+                "__enabled": true,
+                "Flags": 0,
+                "BodyGroups": 18446744073709551615,
+                "CreateAttachments": false,
+                "LodOverride": null,
+                "MaterialGroup": null,
+                "MaterialOverride": "shaders/idlemon_master_graph.vmat",
+                "Materials": null,
+                "Model": "models/dev/box.vmdl",
+                "OnComponentDestroy": null,
+                "OnComponentDisabled": null,
+                "OnComponentEnabled": null,
+                "OnComponentFixedUpdate": null,
+                "OnComponentStart": null,
+                "OnComponentUpdate": null,
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false,
+                  "BloomLayer": false,
+                  "AfterUILayer": false
+                },
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              },
+              {
+                "__type": "Sinvest.IdlemonDebugger_finishline",
+                "__guid": "08e3172c-84c9-4cff-acd5-98ed79c17d4c",
+                "__enabled": true,
+                "Flags": 0,
+                "Addition": 0,
+                "Multiplier": 1,
+                "OnComponentDestroy": null,
+                "OnComponentDisabled": null,
+                "OnComponentEnabled": null,
+                "OnComponentFixedUpdate": null,
+                "OnComponentStart": null,
+                "OnComponentUpdate": null,
+                "SteamId": 4000,
+                "TargetCase": {
+                  "_type": "component",
+                  "component_id": "959b41d8-a7e1-4be0-9790-5f703b03446e",
+                  "go": "6d6f25a9-7ba2-49a3-bf3b-c062cda1b2d2",
+                  "component_type": "IdlemonCase"
+                },
+                "TargetVisuals": {
+                  "_type": "component",
+                  "component_id": "35fc20fb-c26a-4e9f-a80a-94fcb1986b9e",
+                  "go": "6d6f25a9-7ba2-49a3-bf3b-c062cda1b2d2",
+                  "component_type": "IdleMonVisuals"
+                }
+              },
+              {
+                "__type": "IdlemonCase",
+                "__guid": "959b41d8-a7e1-4be0-9790-5f703b03446e",
+                "__enabled": true,
+                "Flags": 0,
+                "OnComponentDestroy": null,
+                "OnComponentDisabled": null,
+                "OnComponentEnabled": null,
+                "OnComponentFixedUpdate": null,
+                "OnComponentStart": null,
+                "OnComponentUpdate": null,
+                "TargetRenderer": {
+                  "_type": "component",
+                  "component_id": "308e6930-6931-4fd4-8856-9f8cc0ecda60",
+                  "go": "6d6f25a9-7ba2-49a3-bf3b-c062cda1b2d2",
+                  "component_type": "ModelRenderer"
+                }
+              }
+            ],
+            "Children": []
+          }
+        ]
       },
       {
         "__guid": "d4bafd5b-7929-407f-bbb0-28189676eb16",
         "__version": 2,
         "Flags": 0,
-        "Name": "App_RosterManager",
+        "Name": "Logic_Hub",
         "Position": "186.40271,187.516449,-50.6898651",
         "Rotation": "0,0,0,1",
         "Scale": "1,1,1",
@@ -151,7 +284,28 @@
         ],
         "Children": []
       }
-    ]
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": false,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
+      }
+    },
+    "__variables": []
   },
   "ResourceVersion": 2,
   "ShowInMenu": false,

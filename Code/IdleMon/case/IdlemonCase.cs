@@ -1,76 +1,67 @@
 using Sandbox;
-using System;
 using System.Threading.Tasks;
-using Sinvest;
 
 public sealed class IdlemonCase : Component
 {
-    [Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
+    [Property] public ModelRenderer TargetRenderer { get; set; }
     
-    // Internal State
-    public int SteamIdOverride { get; set; } = 4000; 
-    private IdleMonData _currentData = IdleMonData.Empty;
-
-    private int _lastAppliedTextureId = -1;
-    private bool _isUpdatingTexture = false;
+    public int SteamIdOverride { get; set; } = -1; 
+    private int _lastAppliedId = -1;
+    private bool _isUpdating = false;
 
     protected override void OnUpdate()
     {
-       if ( !TargetRenderer.IsValid || TargetRenderer.SceneObject == null ) return;
+       // Check for validity - using .IsValid() is the preferred s&box way
+       if ( !TargetRenderer.IsValid() ) return;
 
-       var attributes = TargetRenderer.SceneObject.Attributes;
-
-       // 1. ANIMS: The time-god node
-       attributes.Set( "ShaderTime", RealTime.Now );
-
-       // 2. THE FULL SOUL: Every stat from the GDD
-       attributes.Set( "Addition", (float)_currentData.Addition );
-       attributes.Set( "Multiplier", (float)_currentData.Multiplier );
-       attributes.Set( "Subtraction", (float)_currentData.Subtraction );
-       attributes.Set( "Division", (float)_currentData.Division );
-       attributes.Set( "TeamBonus", (float)_currentData.TeamBonus );
-       attributes.Set( "Luck", (float)_currentData.Luck / 100.0f ); 
-       attributes.Set( "Efficiency", (float)_currentData.CostEfficiency / 100.0f );
-       attributes.Set( "Generation", (float)_currentData.Generation );
-       attributes.Set( "ModelPath", _currentData.ModelPath );
-
-       // 3. TEXTURE: Logic gate fixed
-       if ( _lastAppliedTextureId != SteamIdOverride )
+       if ( _lastAppliedId != SteamIdOverride )
        {
-          // We set this immediately so the next frame doesn't try to LoadTexture again
-          _lastAppliedTextureId = SteamIdOverride;
+          _lastAppliedId = SteamIdOverride;
           _ = LoadTexture( SteamIdOverride );
        }
     }
 
-    public void UpdateAllStats( int steamId, IdleMonData data )
+    public void UpdateAllStats( int steamId, Sinvest.IdleMonData data )
     {
        SteamIdOverride = steamId;
-       _currentData = data;
     }
 
     private async Task LoadTexture( int steamId )
     {
-       if ( _isUpdatingTexture ) return;
-       _isUpdatingTexture = true;
+       if ( _isUpdating || steamId <= 0 ) return;
+       _isUpdating = true;
 
        try 
        {
           string url = $"https://steamcdn-a.akamaihd.net/steam/apps/{steamId}/library_600x900.jpg";
           var tex = await Texture.LoadAsync( url );
 
-          // Fallback to GMod (4000) if needed
-          if ( tex == null || tex.Width <= 1 )
+          if ( tex == null || tex.IsError )
           {
-             tex = await Texture.LoadAsync( "https://steamcdn-a.akamaihd.net/steam/apps/4000/library_600x900.jpg" );
+             tex = await Texture.LoadAsync( $"https://cdn.akamai.steamstatic.com/steam/apps/{steamId}/header.jpg" );
           }
 
-          if ( tex != null && TargetRenderer.IsValid && TargetRenderer.SceneObject != null )
+          if ( tex != null && TargetRenderer.IsValid() )
           {
-             TargetRenderer.SceneObject.Attributes.Set( "Artwork", tex );
+             // 1. Set on the Component level (This is the most reliable for current s&box)
+             TargetRenderer.Attributes.Set( "Artwork", tex );
+
+             // 2. Set on the SceneObject level (Double-tap to ensure the GPU sees it)
+             if ( TargetRenderer.SceneObject != null )
+             {
+                TargetRenderer.SceneObject.Attributes.Set( "Artwork", tex );
+             }
+             
+             Log.Info( $"[Idlemon] Successfully applied SteamID {steamId} to Artwork attribute." );
           }
        }
-       catch ( Exception e ) { Log.Error( $"[Idlemon] Texture Error: {e.Message}" ); }
-       finally { _isUpdatingTexture = false; }
+       catch ( System.Exception e ) 
+       { 
+          Log.Error( $"[Idlemon] Texture Fail: {e.Message}" ); 
+       }
+       finally 
+       { 
+          _isUpdating = false; 
+       }
     }
 }

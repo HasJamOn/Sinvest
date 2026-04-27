@@ -47,6 +47,8 @@ public sealed class AssetGenerator : Component
     {
         ID = Guid.NewGuid(),
         Name = randomName,
+        SteamId = 4000,
+        ModelPath = "models/dev/box.vmdl",
         RolledAt = DateTime.UtcNow,
         MarketScaleAtBirth = S,
         Generation = 2, // Era-linked in GDD

@@ -24,7 +24,7 @@
         "CreateAttachments": false,
         "LodOverride": null,
         "MaterialGroup": null,
-        "MaterialOverride": null,
+        "MaterialOverride": "shaders/idlemon_master_graph.vmat",
         "Materials": null,
         "Model": "models/dev/box.vmdl",
         "OnComponentDestroy": null,
@@ -59,6 +59,24 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null
+      },
+      {
+        "__type": "IdlemonCase",
+        "__guid": "1ceb342d-5e54-4f61-a4c6-1b80b7e966aa",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "TargetRenderer": {
+          "_type": "component",
+          "component_id": "e2ef2242-1abc-462e-ad4f-0cd8ffb10ef8",
+          "go": "1a03b5cb-b025-4b77-98cd-baa50bb05cf8",
+          "component_type": "ModelRenderer"
+        }
       }
     ],
     "Children": [
@@ -184,6 +202,40 @@
             "Viewport": "0,0,1,1",
             "ZFar": 10000,
             "ZNear": 10
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "13617ad5-f6c7-4920-9e4a-b5b37be16182",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "2D Skybox",
+        "Position": "-143.076935,-143.076935,202.341248",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "skybox",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.SkyBox2D",
+            "__guid": "aa3cc809-7f49-4e23-b806-14cd9b5fb570",
+            "__enabled": true,
+            "Flags": 0,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "SkyIndirectLighting": true,
+            "SkyMaterial": "materials/skybox/skybox_day_01.vmat",
+            "Tint": "1,1,1,1"
           }
         ],
         "Children": []

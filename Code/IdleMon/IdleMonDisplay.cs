@@ -34,6 +34,18 @@ public class IdleMonDisplay : ScenePanel
 		    camObj.LocalRotation = Rotation.LookAt( targetPoint - camObj.LocalPosition );
 	    }
     }
+    
+    public void UpdateStats( IdleMonData data, int steamId = 4000 )
+    {
+	    if ( !_monInstance.IsValid() ) return;
+
+	    var visuals = _monInstance.Components.Get<IdleMonVisuals>( FindMode.EverythingInSelfAndDescendants );
+	    if ( visuals.IsValid() )
+	    {
+		    // Now visuals can handle the data and the specific steamId
+		    visuals.UpdateFromData( data, steamId );
+	    }
+    }
 
     public void SetModel( string modelPath )
     {
@@ -103,9 +115,11 @@ public class IdleMonDisplay : ScenePanel
 
     public override void Tick()
     {
-        base.Tick();
-        if ( _monInstance.IsValid() )
-            _monInstance.LocalRotation *= Rotation.FromYaw( RealTime.Delta * 50f );
+	    base.Tick();
+	    if ( !_monInstance.IsValid() ) return;
+
+	    // Constant rotation for the UI view
+	    _monInstance.LocalRotation *= Rotation.FromYaw( RealTime.Delta * 50f ); 
     }
 
     public override void OnDeleted()

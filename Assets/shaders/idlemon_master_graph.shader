@@ -142,7 +142,7 @@ PS
 		float l_13 = pow( l_12, 2 );
 		float l_14 = g_flAddition;
 		float l_15 = sqrt( l_14 );
-		float l_16 = saturate( ( l_15 - 0 ) / ( 1000 - 0 ) ) * ( 150 - 0 ) + 0;
+		float l_16 = saturate( ( l_15 - 0 ) / ( 1000 - 0 ) ) * ( 150 - 1 ) + 1;
 		float l_17 = l_13 * l_16;
 		float l_18 = g_flMultiplier;
 		float l_19 = g_flShaderTime;

@@ -71,7 +71,7 @@
           "CostEfficiency": 50,
           "Division": 1,
           "Generation": 1917,
-          "Luck": 50,
+          "Luck": 0,
           "Multiplier": 3.4000000953674316,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,

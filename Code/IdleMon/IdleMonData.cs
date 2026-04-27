@@ -8,7 +8,8 @@ public struct IdleMonData
 {
 	public Guid ID;
 	public string Name;
-	public string ModelPath; // Added this
+	public string ModelPath;
+	public int SteamId;
     
 	[Title("Addition (A)")] public double Addition;      
 	[Title("Multiplier (M)")] public double Multiplier;    

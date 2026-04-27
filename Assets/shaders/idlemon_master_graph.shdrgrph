@@ -27,7 +27,7 @@
       "DefaultMetalness": 0,
       "DefaultAmbientOcclusion": 1,
       "Identifier": "0",
-      "Position": "2424,-348",
+      "Position": "3108,-444",
       "HandleOffsets": {},
       "Albedo": {
         "Identifier": "5",
@@ -50,7 +50,7 @@
       "_class": "Float",
       "Min": 0,
       "Max": 1,
-      "Value": 0,
+      "Value": 1,
       "Name": "Luck",
       "IsAttribute": true,
       "UI": {
@@ -67,7 +67,7 @@
         }
       },
       "Identifier": "1",
-      "Position": "1416,312",
+      "Position": "1920,300",
       "HandleOffsets": {}
     },
     {
@@ -285,7 +285,7 @@
         }
       },
       "Identifier": "13",
-      "Position": "1944,228",
+      "Position": "1476,1056",
       "HandleOffsets": {}
     },
     {
@@ -309,7 +309,7 @@
         }
       },
       "Identifier": "14",
-      "Position": "1728,264",
+      "Position": "1260,1092",
       "HandleOffsets": {}
     },
     {
@@ -381,7 +381,7 @@
         }
       },
       "Identifier": "17",
-      "Position": "1404,564",
+      "Position": "1920,384",
       "HandleOffsets": {}
     },
     {
@@ -405,7 +405,7 @@
         }
       },
       "Identifier": "18",
-      "Position": "1404,492",
+      "Position": "2028,168",
       "HandleOffsets": {}
     },
     {
@@ -604,7 +604,7 @@
         }
       },
       "Identifier": "33",
-      "Position": "1656,360",
+      "Position": "1188,1188",
       "HandleOffsets": {}
     },
     {
@@ -612,7 +612,7 @@
       "DefaultA": 0,
       "DefaultB": 1,
       "Identifier": "34",
-      "Position": "1932,300",
+      "Position": "1464,1128",
       "HandleOffsets": {},
       "A": {
         "Identifier": "14",
@@ -626,7 +626,7 @@
     {
       "_class": "Sine",
       "Identifier": "35",
-      "Position": "2076,312",
+      "Position": "1608,1140",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "34",
@@ -639,7 +639,7 @@
       "DefaultB": 1,
       "Fraction": 0.5,
       "Identifier": "36",
-      "Position": "2304,276",
+      "Position": "1836,1104",
       "HandleOffsets": {},
       "C": {
         "Identifier": "35",
@@ -651,11 +651,11 @@
       "In": 0.5,
       "InMin": 0,
       "InMax": 1000,
-      "OutMin": 0,
+      "OutMin": 1,
       "OutMax": 150,
       "Clamp": true,
       "Identifier": "37",
-      "Position": "2136,144",
+      "Position": "1668,972",
       "HandleOffsets": {},
       "A": {
         "Identifier": "44",
@@ -667,7 +667,7 @@
       "DefaultA": 0,
       "DefaultB": 1,
       "Identifier": "38",
-      "Position": "2340,120",
+      "Position": "1872,948",
       "HandleOffsets": {},
       "A": {
         "Identifier": "43",
@@ -683,7 +683,7 @@
       "DefaultA": 0,
       "DefaultB": 1,
       "Identifier": "39",
-      "Position": "2496,180",
+      "Position": "2028,1008",
       "HandleOffsets": {},
       "A": {
         "Identifier": "38",
@@ -702,13 +702,13 @@
       "Description": "",
       "Layer": 4,
       "Identifier": "40",
-      "Position": "1620,-0",
+      "Position": "1152,828",
       "HandleOffsets": {}
     },
     {
       "_class": "DotProduct",
       "Identifier": "41",
-      "Position": "1848,36",
+      "Position": "1380,864",
       "HandleOffsets": {},
       "InputA": {
         "Identifier": "4",
@@ -740,7 +740,7 @@
         }
       },
       "Identifier": "42",
-      "Position": "1800,132",
+      "Position": "1332,960",
       "HandleOffsets": {}
     },
     {
@@ -748,7 +748,7 @@
       "DefaultA": 1,
       "DefaultB": 2,
       "Identifier": "43",
-      "Position": "2124,36",
+      "Position": "1656,864",
       "HandleOffsets": {},
       "A": {
         "Identifier": "41",
@@ -758,10 +758,71 @@
     {
       "_class": "Sqrt",
       "Identifier": "44",
-      "Position": "2004,144",
+      "Position": "1536,972",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "13",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "Efficiency",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "45",
+      "Position": "1920,72",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "OneMinus",
+      "Identifier": "46",
+      "Position": "2124,60",
+      "HandleOffsets": {},
+      "In": {
+        "Identifier": "45",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "CommentNode",
+      "Size": "328,224",
+      "Color": "Green",
+      "Title": "Efficiency",
+      "Description": "",
+      "Layer": 5,
+      "Identifier": "47",
+      "Position": "1896,12",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "RemapValue",
+      "In": 0.5,
+      "InMin": 1,
+      "InMax": 1.1,
+      "OutMin": 0,
+      "OutMax": 1,
+      "Clamp": true,
+      "Identifier": "48",
+      "Position": "2172,360",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "17",
         "Output": "Result"
       }
     }
