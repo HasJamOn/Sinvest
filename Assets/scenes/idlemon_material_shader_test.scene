@@ -67,19 +67,44 @@
           "__guid": "9292e344-beda-4f37-bcd1-069c6602731d",
           "__enabled": true,
           "Flags": 0,
-          "Case": {
-            "_type": "component",
-            "component_id": "c1d7c5ba-9762-4739-a082-ecd8633ed3c5",
-            "go": "a4669496-ef3f-49be-8940-cf30ad9a62fa",
-            "component_type": "IdlemonCase"
-          },
-          "ManualId": 12345,
+          "Addition": 0,
+          "CostEfficiency": 50,
+          "Division": 1,
+          "Generation": 1917,
+          "Luck": 50,
+          "Multiplier": 3.4000000953674316,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null
+          "OnComponentUpdate": null,
+          "SteamId": 4000,
+          "Subtraction": 0,
+          "TargetCase": {
+            "_type": "component",
+            "component_id": "c1d7c5ba-9762-4739-a082-ecd8633ed3c5",
+            "go": "a4669496-ef3f-49be-8940-cf30ad9a62fa",
+            "component_type": "IdlemonCase"
+          },
+          "TeamBonus": 1
+        },
+        {
+          "__type": "Sinvest.RosterManager",
+          "__guid": "4343f47e-831c-4daf-bcf6-3f926b063a75",
+          "__enabled": true,
+          "Flags": 0,
+          "ActiveNodes": [],
+          "BaseGeneration": 0,
+          "FlushInterval": 1,
+          "IdleBucks": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShowDebugHUD": false
         }
       ],
       "Children": []

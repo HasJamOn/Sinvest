@@ -39,7 +39,7 @@
       "Min": 0,
       "Max": 1,
       "Value": 0,
-      "Name": "g_flValueRarity",
+      "Name": "Luck",
       "IsAttribute": true,
       "UI": {
         "Type": "Default",
@@ -55,16 +55,16 @@
         }
       },
       "Identifier": "1",
-      "Position": "-252,-204",
+      "Position": "-528,-120",
       "HandleOffsets": {}
     },
     {
       "_class": "IdlemonColorNode",
       "Identifier": "2",
-      "Position": "12,-216",
+      "Position": "0,-240",
       "HandleOffsets": {},
-      "InputT": {
-        "Identifier": "1",
+      "GenerationInput": {
+        "Identifier": "11",
         "Output": "Result"
       }
     },
@@ -218,13 +218,13 @@
     {
       "_class": "Float",
       "Min": 0,
-      "Max": 1,
+      "Max": 9999,
       "Value": 0,
       "Name": "shadertime",
       "IsAttribute": true,
       "UI": {
         "Type": "Default",
-        "Step": 0,
+        "Step": 1,
         "Priority": 0,
         "PrimaryGroup": {
           "Name": null,
@@ -236,7 +236,7 @@
         }
       },
       "Identifier": "11",
-      "Position": "-264,-96",
+      "Position": "-288,-192",
       "HandleOffsets": {}
     },
     {
@@ -251,6 +251,150 @@
         "Identifier": "11",
         "Output": "Result"
       }
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "Addition",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "13",
+      "Position": "-528,-516",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "Multiplier",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "14",
+      "Position": "-528,-444",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "Subtraction",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "15",
+      "Position": "-528,-372",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "Division",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "16",
+      "Position": "-528,-300",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "TeamBonus",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "17",
+      "Position": "-516,-240",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "Efficiency",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "18",
+      "Position": "-528,-180",
+      "HandleOffsets": {}
     }
   ]
 }

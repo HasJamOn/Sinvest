@@ -1,50 +1,51 @@
 using Sandbox;
-using System.Linq;
+using System;
+using Sinvest;
 
 public sealed class IdlemonDebugger : Component
 {
-	[Property, Group( "References" )] public IdlemonCase Case { get; set; }
-    
-	[Property, Group( "Settings" )] public int ManualId { get; set; } = 400; // Portal
+	[Property, Group( "Target" )] public IdlemonCase TargetCase { get; set; }
 
-	protected override void OnStart()
+	[Header( "Steam Identity" )]
+	[Property] public int SteamId { get; set; } = 4000;
+
+	[Header( "Core Formula Stats" )]
+	[Property, Range( 0, 1000 )] public double Addition { get; set; } = 0;
+	[Property, Range( 0, 1000 )] public double Subtraction { get; set; } = 0;
+	[Property, Range( 1, 20 )] public double Multiplier { get; set; } = 1.0;
+	[Property, Range( 1, 20 )] public double Division { get; set; } = 1.0;
+	[Property, Range( 1, 5 )] public double TeamBonus { get; set; } = 1.0;
+
+	[Header( "Metadata & Rarity" )]
+	[Property, Range( 0, 100 )] public double Luck { get; set; } = 50;
+	[Property, Range( 0, 100 )] public double CostEfficiency { get; set; } = 50;
+	[Property, Range( 1, 9999 )] public int Generation { get; set; } = 1;
+
+	protected override void OnUpdate()
 	{
-		if ( Case == null )
+		if ( !TargetCase.IsValid() ) return;
+
+		// Package every single datapoint into the struct
+		var mock = new IdleMonData
 		{
-			Case = Components.Get<IdlemonCase>();
-		}
-	}
+			ID = Guid.Empty, // Placeholder for debug
+			Name = "DebugMon",
+			ModelPath = "models/dev/box.vmdl",
+			
+			Addition = Addition,
+			Multiplier = Multiplier,
+			Subtraction = Subtraction,
+			Division = Division,
+			TeamBonus = TeamBonus,
+			
+			Luck = Luck,
+			CostEfficiency = CostEfficiency,
+			Generation = Generation,
+			
+			RolledAt = DateTime.Now
+		};
 
-	[Button( "Cycle Next (Bootstrap)", "refresh" )]
-	public void CycleNext()
-	{
-		if ( Case == null ) { Log.Warning("No IdlemonCase found!"); return; }
-		Case.CycleIdlemon();
-	}
-
-	[Button( "Generate Manual ID", "fingerprint" )]
-	public void GenerateManual()
-	{
-		if ( Case == null ) return;
-		// We use _ = to fire and forget the Task
-		_ = Case.ApplyStatsFromId( ManualId );
-	}
-
-	[Button( "Generate Random ID (From Pool)", "casino" )]
-	public void GenerateRandom()
-	{
-		if ( Case == null ) return;
-
-		// Check if the pool actually has IDs to choose from
-		if ( Case.IdPool != null && Case.IdPool.Count > 0 )
-		{
-			// Pick a random ID that we KNOW exists on Steam
-			ManualId = Game.Random.FromList( Case.IdPool );
-			_ = Case.ApplyStatsFromId( ManualId );
-		}
-		else
-		{
-			Log.Warning( "Cannot generate random: IdlemonCase Pool is empty!" );
-		}
+		// Push the full payload to the case
+		TargetCase.UpdateAllStats( SteamId, mock );
 	}
 }
