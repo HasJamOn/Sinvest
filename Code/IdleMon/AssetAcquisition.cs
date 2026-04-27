@@ -64,9 +64,27 @@ public sealed class AssetAcquisition : Component
         };
     }
 
+    [Property] public bool IsDrafting { get; private set; }
+    public IdleMonData CurrentCandidate { get; private set; }
+
     private void OpenDraftOverlay( IdleMonData candidate )
     {
-        // This is where we trigger the UI State B (Asset Acquisition)
-        // We will pass the 'candidate' to the UI to show the +/- Delta
+	    CurrentCandidate = candidate;
+	    IsDrafting = true;
+    
+	    // Trigger a UI refresh
+	    GameSaveSystem.OnDataChanged?.Invoke(); 
+    }
+
+    public void FinalizeDraft( int slotIndex )
+    {
+	    if ( !IsDrafting ) return;
+    
+	    // Swap the node into the roster
+	    RosterManager.Instance.ActiveNodes[slotIndex] = CurrentCandidate;
+    
+	    // Cleanup
+	    IsDrafting = false;
+	    CurrentCandidate = IdleMonData.Empty;
     }
 }

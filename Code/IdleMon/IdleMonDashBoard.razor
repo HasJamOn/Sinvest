@@ -305,7 +305,10 @@
 	}
 
 	RenderFragment RenderStats(IdleMonData data) => __builder => {
-		if (data.ID == Guid.Empty && data.Name == null) return; // Guard against uninitialized data
+		if (data.ID == Guid.Empty) {
+			<div class="empty-stats-msg">NO DATA DETECTED</div>
+			return;
+		}
 
 		<div class="stat-grid">
 		    @* PRIMARY STATS *@

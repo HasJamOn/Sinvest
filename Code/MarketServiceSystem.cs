@@ -34,6 +34,21 @@ public sealed class MarketServerSystem : Component
     {
 	    Instance = this;
     }
+    
+    /// <summary>
+    /// Returns the current Market Scale Factor (S).
+    /// 1.0 means the market is at BasePrice. 2.0 means it has doubled.
+    /// </summary>
+    public static float GetCurrentScale()
+    {
+	    if ( Instance == null ) return 1.0f;
+    
+	    // S = CurrentPrice / BasePrice
+	    double scale = Instance.SyncedPrice / BasePrice;
+    
+	    // We cast to float for storage efficiency in the IdleMonData struct
+	    return (float)Math.Max( 0.1, scale ); 
+    }
 
     protected override void OnUpdate()
     {
