@@ -39,9 +39,7 @@ public class IdleMonDisplay : ScenePanel
     {
 	    if ( _uiCamera == null ) return;
 
-	    // Use empty string if modelPath is null to avoid comparison issues
 	    var targetPath = modelPath ?? string.Empty;
-
 	    if ( _monInstance.IsValid() && _currentModelPath == targetPath ) return;
 	    _currentModelPath = targetPath;
 
@@ -52,23 +50,38 @@ public class IdleMonDisplay : ScenePanel
 
 	    using ( RenderScene.Push() )
 	    {
-		    _monInstance = GameObject.Clone( prefab.ResourcePath, new CloneConfig
+		    _monInstance = GameObject.Clone( prefab.ResourcePath, new CloneConfig { StartEnabled = true } );
+        
+		    // --- NEW CAMERA OVERRIDE LOGIC ---
+		    // Look for a camera component anywhere inside the prefab
+		    var prefabCam = _monInstance.Components.Get<CameraComponent>( FindMode.EverythingInSelfAndDescendants );
+		    if ( prefabCam.IsValid() )
 		    {
-			    StartEnabled = true
-		    } );
+			    // Sync our ScenePanel camera to the prefab's camera settings
+			    _uiCamera.WorldPosition = prefabCam.WorldPosition;
+			    _uiCamera.WorldRotation = prefabCam.WorldRotation;
+			    _uiCamera.FieldOfView = prefabCam.FieldOfView;
+            
+			    // Disable the camera component inside the prefab so it doesn't try to 
+			    // render to the main screen, we only want its transform data.
+			    prefabCam.Enabled = false; 
+		    }
+		    else
+		    {
+			    // Fallback: If no camera in prefab, reset to your default hardcoded view
+			    var targetPoint = Vector3.Up * 20f;
+			    _uiCamera.LocalPosition = new Vector3( -120, 0, 40 );
+			    _uiCamera.LocalRotation = Rotation.LookAt( targetPoint - _uiCamera.LocalPosition );
+			    _uiCamera.FieldOfView = 30;
+		    }
 	    }
 
 	    if ( !_monInstance.IsValid() ) return;
-
 	    _monInstance.LocalPosition = Vector3.Zero;
 	    _monInstance.LocalRotation = Rotation.Identity;
 
-	    // ONLY override if a path is provided. 
-	    // If path is null or empty, it stays as the sphere defined in the prefab.
 	    if ( !string.IsNullOrEmpty( modelPath ) )
-	    {
 		    ApplyModelOverride( modelPath );
-	    }
     }
 
     private void ApplyModelOverride( string path )
