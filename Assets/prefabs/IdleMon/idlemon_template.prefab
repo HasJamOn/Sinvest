@@ -1,0 +1,134 @@
+{
+  "RootObject": {
+    "__guid": "1a03b5cb-b025-4b77-98cd-baa50bb05cf8",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "idlemon_template",
+    "Position": "0,0,0",
+    "Rotation": "-0.0990457311,-0.239117548,0.369643837,0.892399132",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "e2ef2242-1abc-462e-ad4f-0cd8ffb10ef8",
+        "__enabled": true,
+        "Flags": 0,
+        "BodyGroups": 18446744073709551615,
+        "CreateAttachments": false,
+        "LodOverride": null,
+        "MaterialGroup": null,
+        "MaterialOverride": null,
+        "Materials": null,
+        "Model": "models/dev/box.vmdl",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "On",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Sinvest.IdleMonVisuals",
+        "__guid": "bbecd031-85d2-4f2d-9bcb-d15939b0dc08",
+        "__enabled": true,
+        "Flags": 0,
+        "ModelVisual": {
+          "_type": "component",
+          "component_id": "e2ef2242-1abc-462e-ad4f-0cd8ffb10ef8",
+          "go": "1a03b5cb-b025-4b77-98cd-baa50bb05cf8",
+          "component_type": "ModelRenderer"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "39db6a35-ec78-47b2-be34-d576bb548dc8",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "Point Light",
+        "Position": "-89.898613,96.4359512,118.536514",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "light_point,light",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.PointLight",
+            "__guid": "b8efdfcd-5278-451f-9731-86c6c2403634",
+            "__enabled": true,
+            "Flags": 0,
+            "Attenuation": 1,
+            "FogMode": "Enabled",
+            "FogStrength": 4.7380013,
+            "LightColor": "0.91373,0.98039,1,1",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Radius": 400,
+            "ShadowBias": 0.0005,
+            "ShadowHardness": 0,
+            "Shadows": true
+          }
+        ],
+        "Children": []
+      }
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": false,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}

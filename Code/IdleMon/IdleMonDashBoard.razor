@@ -60,26 +60,32 @@
                             <div class="node-card @(isEmpty ? "empty" : "active") @(isSelected ? "selected" : "")" 
                                  onclick="@(() => OnNodeClick(index))">
                                 
-                                @if ( !isEmpty )
-                                {
-                                    <div class="card-header">
-                                        <span class="name">@mon.Name</span>
-                                        <span class="gen-tag">G@mon.Generation</span>
-                                    </div>
-                                    <div class="card-footer">
-	                                    @if ( IsDrafting && CurrentDeltas != null )
-	                                    {
-		                                    var d = CurrentDeltas[index];
-		                                    <span class="yield-delta @(d >= 0 ? "pos" : "neg")">
-			                                    @(d >= 0 ? "+" : "")@d.ToString("F2") IB/s
-		                                    </span>
-	                                    }
-	                                    else if (!isEmpty)
-	                                    {
-		                                    <span class="status-tag">ACTIVE NODE</span>
-	                                    }
-                                    </div>
-                                }
+	                            @if ( !isEmpty )
+	                            {
+		                            <div class="card-header">
+			                            <span class="name">@mon.Name</span>
+			                            <span class="gen-tag">G@mon.Generation</span>
+		                            </div>
+
+		                            @* --- 3D VIEWPORT --- *@
+		                            <div class="portrait-viewport" style="flex-grow: 1; min-height: 100px; width: 100%; pointer-events: none; background-color: rgba(0,0,0,0.3); border-radius: 4px;">
+			                             <IdleMonDisplay @ref=" NodeDisplays[index]" style="width: 100%; height: 100%;"/>
+		                            </div>
+
+		                            <div class="card-footer">
+			                            @if ( IsDrafting && CurrentDeltas != null )
+			                            {
+				                            var d = CurrentDeltas[index];
+				                            <span class="yield-delta @(d >= 0 ? "pos" : "neg")">
+					                            @(d >= 0 ? "+" : "")@d.ToString("F2") IB/s
+				                            </span>
+			                            }
+			                            else
+			                            {
+				                            <span class="status-tag">ACTIVE NODE</span>
+			                            }
+		                            </div>
+	                            }
                                 else
                                 {
                                     <div class="empty-state">
@@ -245,6 +251,26 @@
     private IdleMonData? DraftCandidate = null;
     private double[] CurrentDeltas;
     private int? SelectedSlotIndex = null; 
+    private IdleMonDisplay[] NodeDisplays = new IdleMonDisplay[6];
+
+    protected override void OnUpdate()
+    {
+	    if ( Roster?.ActiveNodes == null || NodeDisplays == null ) return;
+
+	    // Use the smaller of the two to avoid IndexOutOfRange
+	    int count = Math.Min( Roster.ActiveNodes.Count, NodeDisplays.Length );
+
+	    for ( int i = 0; i < count; i++ )
+	    {
+		    // Direct array access is much cleaner here
+		    var display = NodeDisplays[i];
+
+		    if ( display != null && display.IsValid )
+		    {
+			    display.SetModel( "models/dev/box.vmdl" );
+		    }
+	    }
+    }
 
     RenderFragment RenderStats(IdleMonData data) => __builder => {
 	    <div class="stat-grid">
