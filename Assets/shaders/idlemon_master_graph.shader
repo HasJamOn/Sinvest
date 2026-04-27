@@ -53,7 +53,10 @@ struct PixelInput
 VS
 {
 	#include "common/vertex.hlsl"
-
+	
+	float g_flSubtraction < Attribute( "Subtraction" ); Default1( 0 ); >;
+	float g_flShaderTime < Attribute( "ShaderTime" ); Default1( 0 ); >;
+	
 	PixelInput MainVs( VertexInput v )
 	{
 		
@@ -65,6 +68,16 @@ VS
 		i.vTintColor = extraShaderData.vTint;
 		
 		VS_DecodeObjectSpaceNormalAndTangent( v, i.vNormalOs, i.vTangentUOs_flTangentVSign );
+		
+		float l_0 = g_flSubtraction;
+		float l_1 = g_flShaderTime;
+		float l_2 = l_0 * l_1;
+		float l_3 = sin( l_2 );
+		float3 l_4 = i.vPositionOs;
+		float3 l_5 = float3( l_3, l_3, l_3 ) * l_4;
+		float3 l_6 = l_5 * float3( 0.2, 0.2, 0.2 );
+		i.vPositionWs.xyz += l_6;
+		i.vPositionPs.xyzw = Position3WsToPs( i.vPositionWs.xyz );
 		return FinalizeVertex( i );
 		
 	}

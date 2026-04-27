@@ -27,10 +27,14 @@
       "DefaultMetalness": 0,
       "DefaultAmbientOcclusion": 1,
       "Identifier": "0",
-      "Position": "660,-492",
+      "Position": "1560,-384",
       "HandleOffsets": {},
       "Albedo": {
         "Identifier": "5",
+        "Output": "Result"
+      },
+      "PositionOffset": {
+        "Identifier": "24",
         "Output": "Result"
       }
     },
@@ -55,13 +59,13 @@
         }
       },
       "Identifier": "1",
-      "Position": "-528,-120",
+      "Position": "612,336",
       "HandleOffsets": {}
     },
     {
       "_class": "IdlemonColorNode",
       "Identifier": "2",
-      "Position": "0,-240",
+      "Position": "-732,-504",
       "HandleOffsets": {},
       "GenerationInput": {
         "Identifier": "11",
@@ -73,7 +77,7 @@
       "DefaultA": 0,
       "DefaultB": 2,
       "Identifier": "3",
-      "Position": "-324,24",
+      "Position": "-1056,-240",
       "HandleOffsets": {},
       "A": {
         "Identifier": "7",
@@ -110,7 +114,7 @@
         }
       },
       "Identifier": "4",
-      "Position": "-48,-468",
+      "Position": "132,-648",
       "HandleOffsets": {}
     },
     {
@@ -139,7 +143,7 @@
     {
       "_class": "Sine",
       "Identifier": "6",
-      "Position": "-48,24",
+      "Position": "-780,-240",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "3",
@@ -167,7 +171,7 @@
         }
       },
       "Identifier": "7",
-      "Position": "-624,0",
+      "Position": "-1356,-264",
       "HandleOffsets": {}
     },
     {
@@ -179,7 +183,7 @@
       "OutMax": 1,
       "Clamp": true,
       "Identifier": "8",
-      "Position": "180,-36",
+      "Position": "-552,-300",
       "HandleOffsets": {},
       "A": {
         "Identifier": "6",
@@ -192,7 +196,7 @@
       "CellDensity": 10,
       "Worley": false,
       "Identifier": "9",
-      "Position": "240,-204",
+      "Position": "-492,-468",
       "HandleOffsets": {},
       "Coords": {
         "Identifier": "12",
@@ -204,7 +208,7 @@
       "DefaultInput": 0,
       "DefaultEdge": 0,
       "Identifier": "10",
-      "Position": "468,-180",
+      "Position": "-264,-444",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "9",
@@ -236,7 +240,7 @@
         }
       },
       "Identifier": "11",
-      "Position": "-288,-192",
+      "Position": "-1020,-456",
       "HandleOffsets": {}
     },
     {
@@ -245,7 +249,7 @@
       "DefaultOffset": "0,0",
       "WrapTo01": false,
       "Identifier": "12",
-      "Position": "36,-144",
+      "Position": "-696,-408",
       "HandleOffsets": {},
       "Offset": {
         "Identifier": "11",
@@ -273,7 +277,7 @@
         }
       },
       "Identifier": "13",
-      "Position": "-528,-516",
+      "Position": "372,180",
       "HandleOffsets": {}
     },
     {
@@ -297,7 +301,7 @@
         }
       },
       "Identifier": "14",
-      "Position": "-528,-444",
+      "Position": "372,252",
       "HandleOffsets": {}
     },
     {
@@ -321,7 +325,7 @@
         }
       },
       "Identifier": "15",
-      "Position": "-528,-372",
+      "Position": "672,-168",
       "HandleOffsets": {}
     },
     {
@@ -345,7 +349,7 @@
         }
       },
       "Identifier": "16",
-      "Position": "-528,-300",
+      "Position": "396,84",
       "HandleOffsets": {}
     },
     {
@@ -369,7 +373,7 @@
         }
       },
       "Identifier": "17",
-      "Position": "-516,-240",
+      "Position": "624,216",
       "HandleOffsets": {}
     },
     {
@@ -393,8 +397,92 @@
         }
       },
       "Identifier": "18",
-      "Position": "-528,-180",
+      "Position": "612,276",
       "HandleOffsets": {}
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "ShaderTime",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "19",
+      "Position": "684,-72",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Sine",
+      "Identifier": "20",
+      "Position": "1056,-96",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "21",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Identifier": "21",
+      "Position": "912,-132",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "15",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "19",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Identifier": "22",
+      "Position": "1260,-108",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "20",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "23",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "ObjectPosition",
+      "Identifier": "23",
+      "Position": "1068,0",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 0.2,
+      "Identifier": "24",
+      "Position": "1392,-96",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "22",
+        "Output": "Result"
+      }
     }
   ]
 }
