@@ -10,8 +10,8 @@ public sealed partial class GameSaveSystem
 	/// </summary>
 	public void SetStoredString( string key, string val )
 	{
-		string slotKey = $"{key}{SlotSuffix}";
-		Game.Cookies.Set( slotKey, val );
+		string fileName = $"{key}{SlotSuffix}.json";
+		FileSystem.Data.WriteAllText( fileName, val ); // Save to actual local file
 		OnDataChanged?.Invoke();
 	}
 
@@ -20,8 +20,9 @@ public sealed partial class GameSaveSystem
 	/// </summary>
 	public string GetStoredString( string key, string defaultVal = "" )
 	{
-		string slotKey = $"{key}{SlotSuffix}";
-		return Game.Cookies.Get( slotKey, defaultVal );
+		string fileName = $"{key}{SlotSuffix}.json";
+		if ( !FileSystem.Data.FileExists( fileName ) ) return defaultVal;
+		return FileSystem.Data.ReadAllText( fileName );
 	}
 
 	/// <summary>

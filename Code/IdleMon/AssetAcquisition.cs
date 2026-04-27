@@ -59,7 +59,8 @@ public sealed class AssetAcquisition : Component
             Division = 1.0,
             TeamBonus = 1.0,
             RolledAt = DateTime.UtcNow,
-            MarketScaleAtBirth = sFactor
+            MarketScaleAtBirth = sFactor,
+            Generation = 1
         };
     }
 

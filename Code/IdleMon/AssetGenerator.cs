@@ -9,53 +9,57 @@ public sealed class AssetGenerator : Component
     [Property] public float BasePotential { get; set; } = 10.0f;
 
     public IdleMonData RollNewAsset()
-    {
-       var random = new Random();
+{
+    var random = new Random();
     
-       // 1. Calculate Market Scale (S)
-       double currentPrice = MarketService.CurrentPrice;
-       float S = (currentPrice > 0) ? (float)(currentPrice / 7126.0) : 1.0f;
+    // 1. Market Scale (S)
+    double currentPrice = MarketService.CurrentPrice;
+    float S = (currentPrice > 0) ? (float)(currentPrice / 7126.0) : 1.0f;
 
-       // 2. Dynamic Generation/Era Check
-       // Using the singleton pattern we established for the other systems
-       var marketSystem = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
-       int gen = 1;
-       
-       if (marketSystem.IsValid())
-       {
-          // If you ever add more Eras to your MarketServerSystem.EraHistory, 
-          // this will automatically increment the Generation of new rolls.
-          // gen = marketSystem.EraHistory.Count + 1; 
-          gen = 2; 
-       }
+    // 2. Name & Metadata
+    string[] prefixes = { "Alpha", "Beta", "Sigma", "Delta", "Omega", "Prime", "Cyber", "Nano", "Void", "Flux" };
+    string[] suffixes = { "Node", "Link", "Core", "Unit", "Asset", "Matrix", "Pulse", "Array", "Vault" };
+    string randomName = $"{prefixes[random.Next(prefixes.Length)]}-{random.Next(100, 999)} {suffixes[random.Next(suffixes.Length)]}";
 
-       // 3. Name Generation
-       string[] prefixes = { "Alpha", "Beta", "Sigma", "Delta", "Omega", "Prime", "Cyber", "Nano" };
-       string[] suffixes = { "Node", "Link", "Core", "Unit", "Asset", "Void", "Matrix", "Pulse" };
-       string randomName = $"{prefixes[random.Next(prefixes.Length)]}-{random.Next(100, 999)} {suffixes[random.Next(suffixes.Length)]}";
+    // 3. Stat Generation Logic
+    // Addition: Scaled by S
+    double addition = Math.Round(random.NextDouble() * (BasePotential * S), 2);
+    
+    // Multiplier: 1.0 + (0 to 0.5 * S)
+    double multiplier = 1.0 + Math.Round(random.NextDouble() * (0.5 * S), 2);
 
-       // 4. Scaled Stat Calculation
-       // The 'Addition' ceiling is now directly tied to the current market power.
-       double scaledPotential = BasePotential * S;
+    // Subtraction (Cursed A): 40% chance to roll a penalty
+    double subtraction = (random.NextDouble() < 0.4) 
+        ? Math.Round(random.NextDouble() * (BasePotential * 0.5 * S), 2) 
+        : 0;
 
-       return new IdleMonData
-       {
-          ID = Guid.NewGuid(),
-          Name = randomName,
-          RolledAt = DateTime.UtcNow,
-          MarketScaleAtBirth = S,
-          Generation = gen,
-           
-          // Stats: A and M ceilings grow with S.
-          Addition = Math.Round(random.NextDouble() * scaledPotential, 2),
-          Multiplier = 1.0 + Math.Round(random.NextDouble() * (0.5 * S), 2), 
-       
-          // Cursed Stats: 30% chance to roll a subtraction penalty
-          Subtraction = random.Next(0, 10) > 7 ? Math.Round(random.NextDouble() * (5.0 * S), 2) : 0,
-       
-          Division = 1.0,
-          TeamBonus = 1.0,
-          //Luck = 0 // Future: Tied to Egg Tiers
-       };
-    }
+    // Division (Cursed M): 20% chance to roll a divisor penalty (1.0 to 1.5)
+    double division = (random.NextDouble() < 0.2) 
+        ? 1.0 + Math.Round(random.NextDouble() * 0.5, 2) 
+        : 1.0;
+
+    // Team Bonus: 10% chance to roll a synergy boost (1.01 to 1.10)
+    double teamBonus = (random.NextDouble() < 0.1) 
+        ? 1.0 + Math.Round(random.NextDouble() * 0.1, 2) 
+        : 1.0;
+
+    return new IdleMonData
+    {
+        ID = Guid.NewGuid(),
+        Name = randomName,
+        RolledAt = DateTime.UtcNow,
+        MarketScaleAtBirth = S,
+        Generation = 2, // Era-linked in GDD
+        
+        Addition = addition,
+        Multiplier = multiplier,
+        Subtraction = subtraction,
+        Division = division,
+        TeamBonus = teamBonus,
+        
+        // Missing Utility Stats from GDD (Luck/Efficiency)
+        Luck = Math.Round(random.NextDouble() * S, 2),
+        CostEfficiency = (random.NextDouble() < 0.05) ? 0.05 : 0 // Rare 5% discount
+    };
+}
 }

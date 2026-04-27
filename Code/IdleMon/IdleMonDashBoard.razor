@@ -42,246 +42,254 @@
         </div>
 
         <div class="dashboard-body">
-    @* --- LEFT COLUMN: THE GRID --- *@
-    <div class="node-matrix">
-        @for ( int i = 0; i < 6; i += 2 )
-        {
-            <div class="matrix-row">
-                @for ( int j = 0; j < 2; j++ )
+            @* --- LEFT COLUMN: THE GRID --- *@
+            <div class="node-matrix">
+                @for ( int i = 0; i < 6; i += 2 )
                 {
-                    var index = i + j;
-                    var mon = (Roster.ActiveNodes != null && index < Roster.ActiveNodes.Count) 
-                        ? Roster.ActiveNodes[index] 
-                        : IdleMonData.Empty;
+                    <div class="matrix-row">
+                        @for ( int j = 0; j < 2; j++ )
+                        {
+                            var index = i + j;
+                            var mon = (Roster.ActiveNodes != null && index < Roster.ActiveNodes.Count) 
+                                ? Roster.ActiveNodes[index] 
+                                : IdleMonData.Empty;
 
-                    bool isEmpty = mon.ID == Guid.Empty;
-                    bool isSelected = SelectedSlotIndex == index;
+                            bool isEmpty = mon.ID == Guid.Empty;
+                            bool isSelected = SelectedSlotIndex == index;
 
-                    <div class="node-card @(isEmpty ? "empty" : "active") @(isSelected ? "selected" : "")" 
-                         onclick="@(() => OnNodeClick(index))">
-                        
+                            <div class="node-card @(isEmpty ? "empty" : "active") @(isSelected ? "selected" : "")" 
+                                 onclick="@(() => OnNodeClick(index))">
+                                
+                                @if ( !isEmpty )
+                                {
+                                    <div class="card-header">
+                                        <span class="name">@mon.Name</span>
+                                        <span class="gen-tag">G@mon.Generation</span>
+                                    </div>
+                                    <div class="card-footer">
+	                                    @if ( IsDrafting && CurrentDeltas != null )
+	                                    {
+		                                    var d = CurrentDeltas[index];
+		                                    <span class="yield-delta @(d >= 0 ? "pos" : "neg")">
+			                                    @(d >= 0 ? "+" : "")@d.ToString("F2") IB/s
+		                                    </span>
+	                                    }
+	                                    else if (!isEmpty)
+	                                    {
+		                                    <span class="status-tag">ACTIVE NODE</span>
+	                                    }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="empty-state">
+                                        <i class="icon">@(IsDrafting ? "publish" : "add")</i>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            @* --- RIGHT COLUMN: THE INSPECTOR --- *@
+            <div class="inspector-panel">
+                @if ( SelectedSlotIndex.HasValue )
+                {
+                    var selectedMon = Roster.ActiveNodes[SelectedSlotIndex.Value];
+                    bool isEmpty = selectedMon.ID == Guid.Empty;
+
+                    <div class="inspector-content">
+                        <div class="inspector-header">
+                            <label class="subtitle">NODE SLOT @(SelectedSlotIndex.Value + 1)</label>
+                            <h1 class="title">@(isEmpty ? "AVAILABLE SLOT" : selectedMon.Name)</h1>
+                        </div>
+
                         @if ( !isEmpty )
                         {
-                            <div class="card-header">
-                                <span class="name">@mon.Name</span>
-                                <span class="gen-tag">G@mon.Generation</span>
+                            <div class="inspector-scroll-area">
+                               <div class="detail-section">
+                                  <label class="section-label">PERFORMANCE DATA</label>
+                                  @RenderStats(selectedMon)
+                               </div>
+
+                               <div class="detail-section meta">
+                                  <div class="meta-row">
+                                     <span class="label">DATE ACQUIRED</span>
+                                     <span class="value">@selectedMon.RolledAt.ToString("f")</span>
+                                  </div>
+                               </div>
                             </div>
-                            <div class="card-footer">
-                                <span class="yield-contribution">@CalculateNet(mon).ToString("F2") IB/s</span>
+                            <button class="btn-purge" onclick="@(() => PurgeNode(SelectedSlotIndex.Value))">
+                               <i class="icon">delete_forever</i>
+                               <span>PURGE ASSET</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="inspector-empty">
+                                <i class="icon">info</i>
+                                <p>No asset installed. Compare a roll to this slot to see projected gains.</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="inspector-placeholder">
+                        <label>SELECT A NODE TO VIEW DATA</label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="footer">
+            @if ( !IsDrafting )
+            {
+                <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
+            }
+            else
+            {
+                <div class="draft-comparison-stage">
+                    <div class="current-slot">
+                        @if ( SelectedSlotIndex.HasValue )
+                        {
+                            var currentMon = Roster.ActiveNodes[SelectedSlotIndex.Value];
+                            <div class="node-card comparison-card current-target expanded">
+                                <div class="comparison-badge badge-current">CURRENT ASSET</div>
+                                <div class="card-header">
+                                    <span class="name">@currentMon.Name</span>
+                                </div>
+                                <div class="card-body">
+                                    @RenderStats(currentMon)
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="comparison-vs">
+                        <i class="icon">swap_horiz</i>
+                    </div>
+
+                    <div class="candidate-slot">
+	                    <div class="node-card comparison-card candidate-new expanded">
+		                    <div class="comparison-badge badge-candidate">NEW CANDIDATE</div>
+        
+		                    <div class="card-header">
+			                    <div class="name-group">
+				                    <span class="name">@DraftCandidate?.Name</span>
+			                    </div>
+			                    <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
+		                    </div>
+
+		                    <div class="card-body">
+			                    @if (DraftCandidate.HasValue) 
+			                    {
+				                    @RenderStats(DraftCandidate.Value)
+			                    }
+		                    </div>
+
+		                    @* THIS IS THE SPECIFIC STEP 4 ADDITION *@
+		                    <div class="card-footer">
+			                    @if ( SelectedSlotIndex.HasValue && CurrentDeltas != null )
+			                    {
+				                    var delta = CurrentDeltas[SelectedSlotIndex.Value];
+				                    <span class="yield-contribution @(delta >= 0 ? "positive" : "negative")">
+					                    @(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s Impact
+				                    </span>
+			                    }
+			                    else
+			                    {
+				                    <span class="instruction-dimmed">SELECT SLOT TO CALCULATE</span>
+			                    }
+		                    </div>
+	                    </div>
+                    </div>
+
+                    <div class="draft-actions">
+                        @if ( SelectedSlotIndex.HasValue )
+                        {
+                            var delta = CurrentDeltas[SelectedSlotIndex.Value];
+                            
+                            <button class="btn-primary @(delta < 0 ? "warning-btn" : "confirm-btn")" 
+                                    onclick="@(() => ConfirmSwap(SelectedSlotIndex.Value))">
+                                <i class="icon">@(delta < 0 ? "warning" : "check_circle")</i>
+                                <span>@(delta < 0 ? "FORCE OVERWRITE" : "CONFIRM INSTALL")</span>
+                            </button>
+                            
+                            <div class="delta-preview @(delta >= 0 ? "positive" : "negative")">
+                                <label>PROGECTED CHANGE</label>
+                                <span>@(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s</span>
                             </div>
                         }
                         else
                         {
-                            <div class="empty-state">
-                                <i class="icon">add</i>
+                            <div class="instruction-block">
+                                <i class="icon">mouse</i>
+                                <label>SELECT A GRID NODE TO COMPARE</label>
                             </div>
                         }
-                    </div>
-                }
-            </div>
-        }
-    </div>
-
-    @* --- RIGHT COLUMN: THE INSPECTOR --- *@
-    <div class="inspector-panel">
-        @if ( SelectedSlotIndex.HasValue )
-        {
-            var selectedMon = Roster.ActiveNodes[SelectedSlotIndex.Value];
-            bool isEmpty = selectedMon.ID == Guid.Empty;
-
-            <div class="inspector-content">
-                <div class="inspector-header">
-                    <label class="subtitle">NODE SLOT @(SelectedSlotIndex.Value + 1)</label>
-                    <h1 class="title">@(isEmpty ? "AVAILABLE SLOT" : selectedMon.Name)</h1>
-                </div>
-
-                @if ( !isEmpty )
-                {
-                    <div class="inspector-scroll-area">
-                        <div class="detail-section">
-                            <label class="section-label">PERFORMANCE DATA</label>
-                            @RenderStats(selectedMon)
-                        </div>
-
-                        <div class="detail-section meta">
-                            <div class="meta-row">
-                                <span class="label">DATE ACQUIRED</span>
-                                <span class="value">@selectedMon.RolledAt.ToString("f")</span>
-                            </div>
-                            <div class="meta-row">
-                                <span class="label">MARKET SCALE</span>
-                                <span class="value">@selectedMon.MarketScaleAtBirth.ToString("P2")</span>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="inspector-empty">
-                        <i class="icon">info</i>
-                        <p>No asset installed in this node. Roll for new assets to increase your yield.</p>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="inspector-placeholder">
-                <label>SELECT A NODE TO VIEW DATA</label>
-            </div>
-        }
-    </div>
-</div>
-
-       <div class="footer">
-    @if ( !IsDrafting )
-    {
-        <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
-    }
-    else
-    {
-        <div class="draft-comparison-stage">
-            
-            @* SLOT 1: THE CURRENT ASSET (Hidden but space reserved if null) *@
-            <div class="current-slot">
-                @if ( SelectedSlotIndex.HasValue )
-                {
-                    var currentMon = Roster.ActiveNodes[SelectedSlotIndex.Value];
-                    <div class="node-card comparison-card current-target expanded">
-                        <div class="comparison-badge badge-current">CURRENT ASSET</div>
-                        <div class="card-header">
-                            <div class="name-group">
-                                <span class="name">@currentMon.Name</span>
-                                <span class="birth-date">SLOT @(SelectedSlotIndex.Value + 1)</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            @RenderStats(currentMon)
-                        </div>
-                        <div class="card-footer">
-                            <span class="yield-contribution">@CalculateNet(currentMon).ToString("F2") IB/s</span>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            @* CENTER: THE VS INDICATOR *@
-            <div class="comparison-vs">
-                <i class="icon">@(SelectedSlotIndex.HasValue ? "swap_horiz" : "arrow_forward")</i>
-                <span>VS</span>
-            </div>
-
-            @* SLOT 2: THE NEW CANDIDATE (Locked to the right) *@
-            <div class="candidate-slot">
-                <div class="node-card comparison-card candidate-new expanded">
-                    <div class="comparison-badge badge-candidate">NEW CANDIDATE</div>
-                    <div class="card-header">
-                        <div class="name-group">
-                            <span class="name">@DraftCandidate?.Name</span>
-                        </div>
-                        <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
-                    </div>
-                    <div class="card-body">
-                        @RenderStats(DraftCandidate.Value)
-                    </div>
-                    <div class="card-footer">
-                        <span class="yield-contribution">@CalculateNet(DraftCandidate.Value).ToString("F2") IB/s</span>
+                        <button class="btn-discard" onclick="@CancelDraft">ABANDON ROLL</button>
                     </div>
                 </div>
-            </div>
-
-            @* ACTIONS PANEL *@
-            <div class="draft-actions">
-                @if ( SelectedSlotIndex.HasValue )
-                {
-                    var delta = CurrentDeltas[SelectedSlotIndex.Value];
-                    
-                    <button class="btn-primary @(delta < 0 ? "warning-btn" : "confirm-btn")" 
-                            onclick="@(() => ConfirmSwap(SelectedSlotIndex.Value))">
-                        <i class="icon">@(delta < 0 ? "warning" : "check_circle")</i>
-                        <span>@(delta < 0 ? "FORCE OVERWRITE" : "CONFIRM INSTALL")</span>
-                    </button>
-                    
-                    <div class="delta-preview @(delta >= 0 ? "positive" : "negative")">
-                        <label>NET CHANGE</label>
-                        <span>@(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s</span>
-                    </div>
-                }
-                else
-                {
-                    <div class="instruction-block">
-                        <i class="icon">mouse</i>
-                        <label>SELECT A GRID NODE TO COMPARE</label>
-                    </div>
-                }
-                <button class="btn-discard" onclick="@CancelDraft">ABANDON ROLL</button>
-            </div>
+            }
         </div>
-    }
-</div>
     }
 </root>
 
 @code {
-	[Property] public RosterManager Roster { get; set; }
-	[Property] public AssetGenerator Generator { get; set; }
+    [Property] public RosterManager Roster { get; set; }
+    [Property] public AssetGenerator Generator { get; set; }
     
-	private double CalculateNet(IdleMonData data) => (data.Addition - data.Subtraction) * data.Multiplier / data.Division;
+    private bool IsDrafting => DraftCandidate.HasValue;
+    private IdleMonData? DraftCandidate = null;
+    private double[] CurrentDeltas;
+    private int? SelectedSlotIndex = null; 
 
-	private bool IsDrafting => DraftCandidate.HasValue;
-	private IdleMonData? DraftCandidate = null;
-	private double[] CurrentDeltas;
-    
-	// ArmedSlotIndex is no longer needed - we use SelectedSlotIndex for both now
-	private int? SelectedSlotIndex = null; 
+    RenderFragment RenderStats(IdleMonData data) => __builder => {
+	    <div class="stat-grid">
+		    @* PRIMARY STATS *@
+		    <div class="stat-item @(data.Addition > 0 ? "active" : "dimmed")">
+			    <span class="label">ADD</span>
+			    <span class="value">@data.Addition.ToString("F1")</span>
+		    </div>
+		    <div class="stat-item @(data.Subtraction > 0 ? "warning" : "dimmed")">
+			    <span class="label">SUB</span>
+			    <span class="value">-@data.Subtraction.ToString("F1")</span>
+		    </div>
+		    <div class="stat-item @(data.Multiplier > 1.0 ? "active" : "dimmed")">
+			    <span class="label">MULT</span>
+			    <span class="value">@data.Multiplier.ToString("F2")x</span>
+		    </div>
+		    <div class="stat-item @(data.Division > 1.0 ? "warning" : "dimmed")">
+			    <span class="label">DIV</span>
+			    <span class="value">/@data.Division.ToString("F2")</span>
+		    </div>
 
-	// This replaces the @fragment that was failing
-	RenderFragment RenderStats(IdleMonData data) => __builder => {
-		<div class="stat-grid">
-			<div class="stat-item">
-				<span class="label">ADD</span>
-				<span class="value">@data.Addition.ToString("F1")</span>
-			</div>
-			<div class="stat-item @(data.Subtraction > 0 ? "warning" : "")">
-				<span class="label">SUB</span>
-				<span class="value">-@data.Subtraction.ToString("F1")</span>
-			</div>
-			<div class="stat-item">
-				<span class="label">MULT</span>
-				<span class="value">@data.Multiplier.ToString("F2")x</span>
-			</div>
-			<div class="stat-item @(data.Division > 1.0 ? "warning" : "")">
-				<span class="label">DIV</span>
-				<span class="value">/@data.Division.ToString("F2")</span>
-			</div>
-			<div class="stat-item bonus full-width">
-				<span class="label">TEAM BONUS</span>
-				<span class="value">@((data.TeamBonus * 100 - 100).ToString("+0.0"))%</span>
-			</div>
-		</div>
-	};
+		    @* TEAM BONUS (Now shown as a global synergy boost) *@
+		    <div class="stat-item bonus full-width @(data.TeamBonus > 1.0 ? "positive" : "dimmed")">
+			    <span class="label">TEAM SYNERGY</span>
+			    <span class="value">@((data.TeamBonus * 100 - 100).ToString("+0.0"))%</span>
+		    </div>
+	    </div>
+    };
 
     protected override int BuildHash() => System.HashCode.Combine( 
         Roster?.IdleBucks, 
         Roster?.CalculateTotalYield(), 
-        Roster?.IsDirty,
         IsDrafting, 
         DraftCandidate?.ID,
-        SelectedSlotIndex,
-        CurrentDeltas?.Sum() 
+        SelectedSlotIndex
     );
+    
+    private void PurgeNode(int index) => Roster?.SwapNode(index, IdleMonData.Empty);
 
     public void StartDraft()
     {
         if ( Generator == null || Roster == null ) return;
-        
-        // Clear any expanded views when starting a roll
         SelectedSlotIndex = null;
-        
         DraftCandidate = Generator.RollNewAsset();
         CurrentDeltas = Roster.GetSwapDeltas( DraftCandidate.Value );
-        
-        Log.Info( $"[UI] Draft Started: {DraftCandidate?.Name}" );
     }
 
     private void CancelDraft()
@@ -293,36 +301,20 @@
     private void ConfirmSwap( int slotIndex )
     {
         if ( !DraftCandidate.HasValue || Roster == null ) return;
-        
         Roster.SwapNode( slotIndex, DraftCandidate.Value );
         CancelDraft();
     }
 
     private void OnNodeClick( int index )
     {
-	    // Toggle logic: If we click the already selected slot, deselect it.
-	    // Otherwise, select the new index.
-	    if ( SelectedSlotIndex == index )
-	    {
-		    SelectedSlotIndex = null;
-	    }
-	    else
-	    {
-		    SelectedSlotIndex = index;
-	    }
-
-	    // Optional: Log the state change for debugging
-	    if ( IsDrafting && SelectedSlotIndex.HasValue )
-	    {
-		    Log.Info( $"[UI] Comparing Candidate with Slot {SelectedSlotIndex}" );
-	    }
+        SelectedSlotIndex = (SelectedSlotIndex == index) ? null : index;
     }
     
     private void CloseApp()
     {
+        if ( Roster.IsDirty ) Roster.SaveRoster();
         CancelDraft();
         SelectedSlotIndex = null;
         Enabled = false; 
-        Log.Info( "[UI] IdleMon Interface Terminated." );
     }
 }
