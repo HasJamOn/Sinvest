@@ -8,6 +8,7 @@ public struct IdleMonData
 {
 	public Guid ID;
 	public string Name;
+	public string ModelPath; // Added this
     
 	[Title("Addition (A)")] public double Addition;      
 	[Title("Multiplier (M)")] public double Multiplier;    
@@ -25,6 +26,7 @@ public struct IdleMonData
 	{ 
 		ID = Guid.Empty, 
 		Name = "Empty Node",
+		ModelPath = "",
 		Addition = 0,
 		Subtraction = 0,
 		Multiplier = 1.0, 

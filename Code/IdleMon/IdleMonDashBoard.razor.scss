@@ -105,50 +105,75 @@ IdleMonDashBoard {
     width: 100%;
   }
 
-  // UPDATED: Grid Cards are now permanently compact
   .node-card {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; // Change from column to row
     flex: 1;
     height: 85px;
     border-radius: 4px;
-    position: relative;
+    background-color: rgba(0, 0, 0, 0.3);
+    overflow: hidden; // Keeps the viewport from leaking out of corners
     transition: all 0.1s ease;
 
-    &.selected {
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      background-color: rgba(255, 255, 255, 0.05);
+    // The 3D square on the left
+    .portrait-viewport {
+      width: 85px;
+      height: 85px;
+      flex-shrink: 0;
+      overflow: hidden; // This is vital to keep the 3D render inside the square
+      background-color: rgba(0, 0, 0, 0.5);
+
+      IdleMonDisplay {
+        width: 100%;
+        height: 100%;
+      }
     }
 
-    &.active:hover {
-      background-color: rgba(255, 255, 255, 0.03);
+    // The info column on the right
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      padding: 8px 12px;
+      justify-content: space-between; // Name at top, Yield at bottom
     }
 
     .card-header {
       display: flex;
-      padding: 10px 15px;
       justify-content: space-between;
+      align-items: center;
+      padding: 0; // Remove old padding
 
       .name {
         font-weight: 800;
-        font-size: 12px;
+        font-size: 11px;
         text-transform: uppercase;
+        color: #fff;
       }
 
       .gen-tag {
-        font-size: 9px;
+        font-size: 8px;
         font-weight: 900;
-        opacity: 0.5;
+        opacity: 0.4;
       }
     }
 
     .card-footer {
-      padding: 8px 15px;
-      margin-top: auto;
+      display: flex;
+      padding: 0; // Remove old padding
 
-      .yield-contribution {
-        font-size: 12px;
+      .status-tag {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        opacity: 0.3;
+      }
+
+      .yield-delta {
+        font-size: 10px;
         font-weight: 800;
+        &.pos { color: #00ffcc; }
+        &.neg { color: #ff5555; }
       }
     }
   }

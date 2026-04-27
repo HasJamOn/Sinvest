@@ -1,94 +1,105 @@
 ﻿using Sandbox;
 using Sandbox.UI;
-using Sandbox.UI.Construct;
-using System;
 
 namespace Sinvest;
 
 public class IdleMonDisplay : ScenePanel
 {
-    private SceneWorld _privateWorld;
-    private SceneObject _monObject;
-    private SceneLight _light;
-    
-    private Label _debugStatus;
-    private Label _debugPath;
+    private GameObject _monInstance;
+    private CameraComponent _uiCamera;
+    private string _currentModelPath;
 
-    public IdleMonDisplay()
+    protected override void OnAfterTreeRender( bool firstTime )
     {
-        _privateWorld = new SceneWorld();
-        World = _privateWorld;
+	    base.OnAfterTreeRender( firstTime );
+	    if ( _uiCamera != null ) return;
 
-        // Camera Setup
-        Camera.Position = new Vector3( -120, 0, 30 );
-        Camera.Rotation = Rotation.LookAt( Vector3.Zero - Camera.Position );
-        Camera.FieldOfView = 30;
-        Camera.ZNear = 1;
-        Camera.ZFar = 5000;
+	    using ( RenderScene.Push() )
+	    {
+		    var camObj = new GameObject( true, "UI_Camera" );
 
-        // 1. FIX: Style.BackgroundColor expects a non-nullable Color
-        // We use a fallback (??) so if the parse fails, it defaults to Black
-        Style.BackgroundColor = Color.Parse( "#1a1a1a" ) ?? Color.Black;
+		    _uiCamera = camObj.Components.Create<CameraComponent>();
+		    _uiCamera.FieldOfView = 30;
+		    _uiCamera.BackgroundColor = Color.Transparent;
+		    _uiCamera.ZNear = 1f;
+		    _uiCamera.ZFar = 5000f;
 
-        // 2. FIX: SceneLight requires a non-nullable Color
-        var lightColor = Color.Parse( "#ffffff" ) ?? Color.White;
-        _light = new SceneLight( _privateWorld, new Vector3( -50, 50, 100 ), 500, lightColor * 1.5f );
+		    // MUST be true — ScenePanel renders via RenderScene.Camera,
+		    // which is only populated when a camera in the scene has IsMainCamera = true.
+		    // No conflict risk here since this is a private isolated scene.
+		    _uiCamera.IsMainCamera = true;
 
-        // Setup Debug Labels
-        _debugStatus = Add.Label( "Initializing...", "debug-text" );
-        _debugPath = Add.Label( "", "debug-text" );
-        
-        // 3. FIX: Style.FontColor and PositionMode Enum
-        _debugStatus.Style.FontColor = Color.Parse( "yellow" ) ?? Color.Yellow;
-        _debugStatus.Style.FontSize = 12;
-        _debugStatus.Style.Position = PositionMode.Absolute; // Use the Enum, not a string
-        _debugStatus.Style.Left = 5;
-        _debugStatus.Style.Top = 5;
-
-        _debugPath.Style.FontColor = Color.Parse( "cyan" ) ?? Color.Cyan;
-        _debugPath.Style.FontSize = 10;
-        _debugPath.Style.Position = PositionMode.Absolute; // Use the Enum, not a string
-        _debugPath.Style.Left = 5;
-        _debugPath.Style.Top = 20;
+		    var targetPoint = Vector3.Up * 20f;
+		    camObj.LocalPosition = new Vector3( -120, 0, 40 );
+		    camObj.LocalRotation = Rotation.LookAt( targetPoint - camObj.LocalPosition );
+	    }
     }
 
     public void SetModel( string modelPath )
     {
-        if ( string.IsNullOrEmpty( modelPath ) ) return;
-        if ( _monObject.IsValid() && _monObject.Model?.Name == modelPath ) return;
+	    if ( _uiCamera == null ) return;
 
-        _monObject?.Delete();
+	    // Use empty string if modelPath is null to avoid comparison issues
+	    var targetPath = modelPath ?? string.Empty;
 
-        var model = Model.Load( modelPath );
-        if ( model == null || model.IsError ) 
+	    if ( _monInstance.IsValid() && _currentModelPath == targetPath ) return;
+	    _currentModelPath = targetPath;
+
+	    _monInstance?.Destroy();
+    
+	    var prefab = ResourceLibrary.Get<PrefabFile>( "prefabs/idlemon/idlemon_template.prefab" );
+	    if ( prefab == null ) return;
+
+	    using ( RenderScene.Push() )
+	    {
+		    _monInstance = GameObject.Clone( prefab.ResourcePath, new CloneConfig
+		    {
+			    StartEnabled = true
+		    } );
+	    }
+
+	    if ( !_monInstance.IsValid() ) return;
+
+	    _monInstance.LocalPosition = Vector3.Zero;
+	    _monInstance.LocalRotation = Rotation.Identity;
+
+	    // ONLY override if a path is provided. 
+	    // If path is null or empty, it stays as the sphere defined in the prefab.
+	    if ( !string.IsNullOrEmpty( modelPath ) )
+	    {
+		    ApplyModelOverride( modelPath );
+	    }
+    }
+
+    private void ApplyModelOverride( string path )
+    {
+        if ( !_monInstance.IsValid() ) return;
+        var model = Model.Load( path );
+        if ( model == null ) return;
+
+        var visuals = _monInstance.Components.Get<IdleMonVisuals>( FindMode.EverythingInSelfAndDescendants );
+        if ( visuals.IsValid() && visuals.ModelVisual.IsValid() )
         {
-            _debugStatus.Text = "Model: ERROR";
-            _debugPath.Text = modelPath;
+            visuals.ModelVisual.Model = model;
             return;
         }
 
-        _monObject = new SceneObject( _privateWorld, model, Transform.Zero );
-        _debugStatus.Text = "Model: OK";
-        _debugPath.Text = modelPath;
+        var renderer = _monInstance.Components.Get<ModelRenderer>( FindMode.EverythingInSelfAndDescendants );
+        if ( renderer.IsValid() ) renderer.Model = model;
     }
 
     public override void Tick()
     {
         base.Tick();
-
-        if ( _monObject.IsValid() )
-        {
-            _monObject.Transform = _monObject.Transform.WithRotation( 
-                _monObject.Transform.Rotation * Rotation.FromYaw( Time.Delta * 40f ) 
-            );
-        }
+        if ( _monInstance.IsValid() )
+            _monInstance.LocalRotation *= Rotation.FromYaw( RealTime.Delta * 50f );
     }
 
     public override void OnDeleted()
     {
         base.OnDeleted();
-        _privateWorld?.Delete();
-        _monObject?.Delete();
-        _light?.Delete();
+        // Do NOT destroy _uiCamera manually — it lives in RenderScene which
+        // ScenePanel already destroys in its own Delete() because _ownsScene = true.
+        _monInstance?.Destroy();
     }
 }
