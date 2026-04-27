@@ -7,7 +7,7 @@
   "Category": null,
   "Icon": null,
   "AddToNodeLibrary": false,
-  "BlendMode": "Opaque",
+  "BlendMode": "Masked",
   "ShadingModel": "Lit",
   "Domain": "Surface",
   "PreviewSettings": {
@@ -22,19 +22,19 @@
   "nodes": [
     {
       "_class": "Result",
-      "DefaultOpacity": 1,
+      "DefaultOpacity": 0.9999693,
       "DefaultRoughness": 1,
       "DefaultMetalness": 0,
       "DefaultAmbientOcclusion": 1,
       "Identifier": "0",
       "Position": "1560,-384",
       "HandleOffsets": {},
-      "Albedo": {
-        "Identifier": "5",
+      "Opacity": {
+        "Identifier": "26",
         "Output": "Result"
       },
       "PositionOffset": {
-        "Identifier": "24",
+        "Identifier": "25",
         "Output": "Result"
       }
     },
@@ -325,7 +325,7 @@
         }
       },
       "Identifier": "15",
-      "Position": "672,-168",
+      "Position": "840,12",
       "HandleOffsets": {}
     },
     {
@@ -349,7 +349,7 @@
         }
       },
       "Identifier": "16",
-      "Position": "396,84",
+      "Position": "636,-276",
       "HandleOffsets": {}
     },
     {
@@ -373,7 +373,7 @@
         }
       },
       "Identifier": "17",
-      "Position": "624,216",
+      "Position": "792,396",
       "HandleOffsets": {}
     },
     {
@@ -421,13 +421,13 @@
         }
       },
       "Identifier": "19",
-      "Position": "684,-72",
+      "Position": "828,144",
       "HandleOffsets": {}
     },
     {
       "_class": "Sine",
       "Identifier": "20",
-      "Position": "1056,-96",
+      "Position": "1224,84",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "21",
@@ -439,7 +439,7 @@
       "DefaultA": 0,
       "DefaultB": 1,
       "Identifier": "21",
-      "Position": "912,-132",
+      "Position": "1080,48",
       "HandleOffsets": {},
       "A": {
         "Identifier": "15",
@@ -451,33 +451,91 @@
       }
     },
     {
+      "_class": "SimplexNoise",
+      "Identifier": "22",
+      "Position": "768,-408",
+      "HandleOffsets": {}
+    },
+    {
       "_class": "Multiply",
       "DefaultA": 0,
       "DefaultB": 1,
-      "Identifier": "22",
-      "Position": "1260,-108",
+      "Identifier": "23",
+      "Position": "1428,72",
       "HandleOffsets": {},
       "A": {
         "Identifier": "20",
         "Output": "Result"
       },
       "B": {
-        "Identifier": "23",
+        "Identifier": "24",
         "Output": "Result"
       }
     },
     {
       "_class": "ObjectPosition",
-      "Identifier": "23",
-      "Position": "1068,0",
+      "Identifier": "24",
+      "Position": "1236,180",
       "HandleOffsets": {}
     },
     {
       "_class": "Multiply",
       "DefaultA": 0,
       "DefaultB": 0.2,
-      "Identifier": "24",
-      "Position": "1392,-96",
+      "Identifier": "25",
+      "Position": "1560,84",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "23",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Step",
+      "DefaultInput": 0,
+      "DefaultEdge": 0,
+      "Identifier": "26",
+      "Position": "1260,-336",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "29",
+        "Output": "Result"
+      },
+      "Edge": {
+        "Identifier": "27",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 0.1,
+      "Identifier": "27",
+      "Position": "1044,-228",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "28",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Subtract",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Identifier": "28",
+      "Position": "888,-252",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "16",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Add",
+      "DefaultA": 0,
+      "DefaultB": 1.2,
+      "Identifier": "29",
+      "Position": "1008,-360",
       "HandleOffsets": {},
       "A": {
         "Identifier": "22",
