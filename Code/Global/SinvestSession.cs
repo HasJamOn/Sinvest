@@ -11,6 +11,24 @@ public static class SinvestSession
 {
 	// The currently selected character slot. Default to 1 to prevent uninitialized errors.
 	public static int ActiveSlot { get; set; } = 1;
+	private const int FallbackSalt = 9928341;
+	
+	/// <summary>
+	/// Generates a tamper-proof signature based on the core economy variables and a specific seed.
+	/// </summary>
+	public static string GenerateSignature( double money, double shares, double idleBucks, int seed )
+	{
+		// If somehow a 0 seed is passed, use the fallback to prevent zero-math errors
+		if ( seed == 0 ) seed = FallbackSalt;
+
+		long combined = (long)(money * 13.37) ^ 
+		                (long)(shares * 17.11) ^ 
+		                (long)(idleBucks * 19.99) ^ 
+		                (long)seed ^ 
+		                ActiveSlot; // Anchors the save to this specific slot
+
+		return combined.ToString( "X" );
+	}
 
 	/// <summary>
 	/// Appends the active slot suffix to a base cloud key.

@@ -240,7 +240,6 @@
     
     protected override void OnDestroy()
     {
-        if ( _isOpen ) SetMenuState( false );
         if ( Instance == this ) Instance = null;
     }
     
@@ -270,10 +269,16 @@
 
     public void Transaction( double moneyAmount, double sharesAmount = 0 )
     {
-	    var eco = Scene.GetAllComponents<EconomyManager>().FirstOrDefault();
+	    // Use the Singleton Instance for reliability
+	    var eco = EconomyManager.Instance;
+    
 	    if ( eco.IsValid() )
 	    {
 		    eco.CommitTransaction( moneyAmount, sharesAmount );
+	    }
+	    else
+	    {
+		    Log.Error("SinvestOS: Could not find EconomyManager Instance!");
 	    }
     }
 

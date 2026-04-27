@@ -9,7 +9,6 @@ namespace Sinvest;
 [Category( "Sinvest" )]
 public sealed class SinvestDebugManager : Component
 {
-    // --- THE FIX: Define the static instance ---
     public static SinvestDebugManager Instance { get; private set; }
 
     [Property, Group( "Economy" )] public double SetMoney { get; set; } = 1000;
@@ -22,7 +21,6 @@ public sealed class SinvestDebugManager : Component
 
     protected override void OnAwake()
     {
-        // 1. Singleton Guard
         if ( Instance.IsValid() && Instance != this )
         {
             GameObject.Destroy();
@@ -30,62 +28,76 @@ public sealed class SinvestDebugManager : Component
         }
 
         Instance = this;
-
-        // 2. Apply your specific persistence flags
         GameObject.Flags |= GameObjectFlags.DontDestroyOnLoad;
         GameObject.Flags |= GameObjectFlags.NotSaved;
         GameObject.Parent = null; 
     }
 
-    protected override void OnStart()
-    {
-        if ( IsProxy ) return;
+    // --- SAVE MANAGEMENT ---
 
-        if ( ResetStatsOnStart )
+    [Button( "Purge Current Slot" ), Group( "Save Management" )]
+    public void PurgeActive() => RequestPurge( SinvestSession.ActiveSlot );
+
+    [Button( "Wipe All Data" ), Group( "Save Management" )]
+    public void PurgeAll()
+    {
+        for ( int i = 1; i <= 3; i++ ) RequestPurge( i );
+        Log.Info( "DEBUG: All local and cloud slots have been reset." );
+    }
+
+    private void RequestPurge( int slot )
+    {
+        var saver = GameSaveSystem.Instance ?? Scene.GetAll<GameSaveSystem>().FirstOrDefault();
+        if ( saver.IsValid() )
         {
-            Log.Warning( "DEBUG: Resetting Cloud Stats for this session!" );
-            // Use your session keys
-            Stats.SetValue( SinvestSession.GetSlotKey( "money" ), 0 );
-            Stats.SetValue( SinvestSession.GetSlotKey( "fundino_shares" ), 0 );
-            Stats.SetValue( SinvestSession.GetSlotKey( "has_phone" ), 0 );
-            
-            SetMoney = 0;
-            SetShares = 0;
-            ForceHasPhone = false;
+            saver.DeleteSlot( slot );
+            Log.Info( $"DEBUG: Purged Slot {slot}" );
+        }
+        else
+        {
+            Log.Error( "DEBUG: Could not find GameSaveSystem to perform purge!" );
         }
     }
 
-    [Button( "Apply Debug Overrides" )]
+    // --- DYNAMIC OVERRIDES ---
+
+    [Button( "Apply Overrides to Active Slot" )]
     public void Apply()
     {
-        // Now 'EconomyManager.Instance' will work if EconomyManager also has this static setup
+        var save = GameSaveSystem.Instance;
+        if ( !save.IsValid() || save.CurrentCharacter == null )
+        {
+            Log.Warning( "DEBUG: Cannot apply overrides. No active character session found." );
+            return;
+        }
+
+        // 1. Update the live EconomyManager (instantly updates UI and Session)
         if ( EconomyManager.Instance.IsValid() )
         {
             EconomyManager.Instance.DebugSetValues( SetMoney, SetShares );
         }
-        else
-        {
-            Log.Warning( "DEBUG: EconomyManager.Instance is still NULL or not in scene!" );
-        }
+
+        // 2. IMPORTANT: Re-sign the save immediately
+        // Since we are hacking the numbers, we need a new valid signature 
+        // so the load doesn't fail next time the player starts the game.
+        save.UpdateSecuritySignature();
+        
+        Log.Info( $"DEBUG: Applied overrides to Slot {SinvestSession.ActiveSlot} and updated Security Signature." );
     }
 
     [ConCmd( "sv_sinvest_rich" )]
     public static void GiveMoney()
     {
-        // Option A: Use the newly created Instance
-        if ( Instance.IsValid() )
-        {
-            Instance.SetMoney = 9999999;
-            Instance.Apply();
-            return;
-        }
+        if ( !Instance.IsValid() ) return;
 
-        // Option B: Fallback search if Instance is somehow lost
-        var dbg = Game.ActiveScene.GetAll<SinvestDebugManager>().FirstOrDefault();
-        if ( dbg.IsValid() )
-        {
-            dbg.SetMoney = 9999999;
-            dbg.Apply();
-        }
+        Instance.SetMoney = 9999999;
+        Instance.Apply();
+    }
+
+    [Button( "Force Re-Sign Active Save" )]
+    public void ManualResign()
+    {
+        GameSaveSystem.Instance?.UpdateSecuritySignature();
+        Log.Info( "DEBUG: Manually triggered a security re-sign." );
     }
 }

@@ -167,9 +167,9 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "ResetStatsOnStart": false,
-          "SetMoney": 1000,
-          "SetShares": 0,
-          "UseLocalSaveOnly": true
+          "SetMoney": 53000,
+          "SetShares": 3,
+          "UseLocalSaveOnly": false
         }
       ],
       "Children": []
@@ -195,13 +195,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "10451406-e6c8-4ffa-aadb-5296f2df955e"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },

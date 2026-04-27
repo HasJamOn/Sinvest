@@ -22,16 +22,17 @@ public sealed class EconomyManager : Component
 
     protected override void OnStart()
     {
-        if ( IsProxy ) return;
+	    if ( IsProxy ) return;
 
-        if ( GameSaveSystem.Instance?.CurrentCharacter != null )
-        {
-            CurrentMoney = GameSaveSystem.Instance.CurrentCharacter.Money;
-            
-            string sharesKey = SinvestSession.GetSlotKey( "fundino_shares" );
-            var shareStat = Stats.LocalPlayer.Get( sharesKey );
-            CurrentShares = shareStat.Value;
-        }
+	    var save = GameSaveSystem.Instance;
+	    if ( save?.CurrentCharacter != null )
+	    {
+		    // ALWAYS use the values already loaded into the character session
+		    CurrentMoney = save.CurrentCharacter.Money;
+		    CurrentShares = save.CurrentCharacter.Shares;
+        
+		    Log.Info($"[ECONOMY] Initialized with ${CurrentMoney} and {CurrentShares} shares.");
+	    }
     }
 
     /// <summary>
@@ -56,51 +57,55 @@ public sealed class EconomyManager : Component
 	    }
     }
 
-    public async void CommitTransaction( double moneyDelta, double sharesDelta )
+    public void CommitTransaction( double moneyDelta, double sharesDelta )
     {
 	    if ( IsProxy ) return;
 
-	    // 1. Update local tracking immediately
+	    // 1. UPDATE LOCALLY IMMEDIATELY (Player sees this instantly)
 	    CurrentMoney += moneyDelta;
 	    CurrentShares += sharesDelta;
 
 	    var save = GameSaveSystem.Instance;
 	    if ( !save.IsValid() || save.CurrentCharacter == null ) return;
 
-	    // 2. CRITICAL: Update the Session reference for BOTH
 	    save.CurrentCharacter.Money = CurrentMoney;
 	    save.CurrentCharacter.Shares = CurrentShares;
+    
+	    // Notify the UI right now!
+	    GameSaveSystem.OnDataChanged?.Invoke();
 
-	    // 3. Handle Persistence
-	    if ( save.ShouldUseCloud )
+	    // 2. SYNC IN THE BACKGROUND
+	    // We remove 'await' here so the function finishes instantly
+	    _ = SyncToCloud( moneyDelta, sharesDelta ); 
+    }
+
+    private async Task SyncToCloud( double moneyDelta, double sharesDelta )
+    {
+	    var save = GameSaveSystem.Instance;
+	    if ( !save.ShouldUseCloud ) 
 	    {
-		    try 
-		    {
-			    string moneyKey = SinvestSession.GetSlotKey( "money" );
-			    string sharesKey = SinvestSession.GetSlotKey( "fundino_shares" );
-
-			    Stats.Increment( moneyKey, moneyDelta );
-			    Stats.Increment( sharesKey, sharesDelta );
-
-			    await Stats.FlushAsync();
-			    Log.Info( "[ECONOMY] Cloud Sync Success." );
-		    }
-		    catch ( System.Exception e )
-		    {
-			    Log.Error( $"[ECONOMY] Cloud Sync Failed: {e.Message}" );
-			    // Optional: Fallback to local save if cloud fails
-			    save.SetStoredStat( "money", CurrentMoney );
-			    save.SetStoredStat( "fundino_shares", CurrentShares );
-		    }
-	    }
-	    else
-	    {
-		    // 4. LOCAL PERSISTENCE: This ensures Local Mode actually saves to the dictionary
-		    // This will also trigger the OnDataChanged event for the UI!
+		    // If local mode, just save to cookies and exit
 		    save.SetStoredStat( "money", CurrentMoney );
 		    save.SetStoredStat( "fundino_shares", CurrentShares );
-        
-		    Log.Info( "[ECONOMY] Local Transaction Confirmed (Cloud Bypassed)." );
+		    return;
+	    }
+
+	    try 
+	    {
+		    string moneyKey = SinvestSession.GetSlotKey( "money" );
+		    string sharesKey = SinvestSession.GetSlotKey( "fundino_shares" );
+
+		    Stats.Increment( moneyKey, moneyDelta );
+		    Stats.Increment( sharesKey, sharesDelta );
+
+		    // We don't call FlushAsync every single flip. 
+		    // Steam handles batching automatically if we just set values.
+		    // Only flush every few minutes or on quit.
+		    Log.Info( "[ECONOMY] Cloud stats updated." );
+	    }
+	    catch ( System.Exception e )
+	    {
+		    Log.Error( $"[ECONOMY] Cloud background sync failed: {e.Message}" );
 	    }
     }
 }

@@ -36,6 +36,18 @@
       }
     }
   }
+  .btn-start.processing {
+    background-color: #555;
+    color: #888;
+    cursor: wait;
+    transform: scale(0.98);
+    filter: grayscale(1);
+  }
+
+  .btn-start:active:not(.processing) {
+    transform: translateY(2px);
+    background-color: #00ff00; /* Flash green on click */
+  }
 
   .mod-list {
     display: flex;

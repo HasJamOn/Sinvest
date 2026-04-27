@@ -34,8 +34,16 @@ using Sinvest;
     </div>
 
     <div class="footer">
-        <button class="btn-abort" onclick=@(() => OnCancel?.Invoke())>ABORT</button>
-        <button class="btn-start" onclick=@OnConfirm>START CAREER</button>
+	    <button class="btn-abort @(IsProcessing ? "disabled" : "")" 
+	            onclick=@(() => { if(!IsProcessing) OnCancel?.Invoke(); })>
+		    ABORT
+	    </button>
+    
+	    <button class="btn-start @(IsProcessing ? "processing" : "")" 
+	            onclick=@OnConfirm 
+	            disabled=@IsProcessing>
+		    @(IsProcessing ? "SYNCING WITH CLOUD..." : "START CAREER")
+	    </button>
     </div>
 </root>
 
@@ -48,42 +56,46 @@ using Sinvest;
 	string CharName = "";
 	StartingModifiers ActiveMods = StartingModifiers.None;
     
+	// --- NEW STATE ---
+	bool IsProcessing = false;
+    
 	protected override void OnParametersSet()
 	{
 		if ( SaveManager == null ) return;
-
-		// Use our new helper that respects the UseCloud toggle
-		bool hasGraduated = SaveManager.HasGraduated();
-
-		// If NOT graduated, force MentorDad ON. 
-		if ( !hasGraduated )
-		{
-			ActiveMods |= StartingModifiers.MentorDad;
-		}
+		if ( !SaveManager.HasGraduated() ) ActiveMods |= StartingModifiers.MentorDad;
 	}
 
 	void ToggleMod( StartingModifiers mod ) 
 	{
-		if ( SaveManager == null ) return;
-        
-		// Respect the local/cloud unlock status
+		if ( IsProcessing || SaveManager == null ) return; // Block input while saving
 		if ( !SaveManager.IsModifierUnlocked( mod ) ) return;
+		if ( mod == StartingModifiers.MentorDad && !SaveManager.HasGraduated() ) return; 
 
-		// Block unchecking MentorDad if they haven't graduated yet
-		if ( mod == StartingModifiers.MentorDad )
-		{
-			if ( !SaveManager.HasGraduated() ) return; 
-		}
-
-		if ( ActiveMods.HasFlag( mod ) ) 
-			ActiveMods &= ~mod;
-		else 
-			ActiveMods |= mod;
+		if ( ActiveMods.HasFlag( mod ) ) ActiveMods &= ~mod;
+		else ActiveMods |= mod;
 	}
 
-	void OnConfirm() 
+	async void OnConfirm() 
 	{
-		if ( string.IsNullOrWhiteSpace( CharName ) ) return;
-		OnCreate?.Invoke( CharName, ActiveMods );
+		if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
+
+		IsProcessing = true;
+		StateHasChanged();
+
+		try 
+		{
+			// We invoke the action and WAIT for it to finish 
+			// (Ensure your CharacterSelect.razor's CreateAndStart is also async/await)
+			if ( OnCreate != null )
+			{
+				OnCreate.Invoke( CharName, ActiveMods );
+			}
+		}
+		catch ( Exception e )
+		{
+			Log.Error( $"Failed to create character: {e.Message}" );
+			IsProcessing = false; // Re-enable if it fails
+			StateHasChanged();
+		}
 	}
 }

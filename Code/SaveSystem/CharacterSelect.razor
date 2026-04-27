@@ -21,7 +21,7 @@ using Sinvest;
 			@for ( int i = 1; i <= 3; i++ ) {
 				var slotIndex = i;
 				var charName = SaveManager?.GetStoredNameForSlot(slotIndex) ?? "Empty Slot";
-				var isOccupied = charName != "New Character" && charName != "Empty Slot";
+				var isOccupied = IsSlotActive(slotIndex);
 
 				<div class="slot-wrapper">
 					<div class="slot-card @(isOccupied ? "occupied" : "")" onclick=@(() => OnSelectSlot(slotIndex))>
@@ -105,17 +105,15 @@ using Sinvest;
     {
 	    if ( SaveManager == null ) return;
 
-	    // 1. Prepare data
 	    var charData = SaveManager.CurrentCharacter;
 	    charData.Name = name;
 	    charData.Modifiers = mods;
 	    charData.Money = mods.HasFlag(StartingModifiers.DevMode) ? 999999999 : 0;
 
-	    // 2. Wait for the cloud to say "Got it!"
-	    // You could show a "Saving..." spinner here if you wanted!
+	    // This is where the 401 error happens. 
+	    // We await it so the UI stays in the "Processing" state until it's done.
 	    await SaveManager.SaveActiveSlotAsync();
-    
-	    // 3. Now it is safe to leave the scene
+
 	    IsCreating = false;
 	    StartGame();
     }
@@ -132,5 +130,17 @@ using Sinvest;
 	    }
 
 	    SceneNavigator.TransitionTo( WorldScene );
+    }
+    bool IsSlotActive( int index )
+    {
+	    if ( SaveManager == null ) return false;
+
+	    var name = SaveManager.GetStoredNameForSlot( index );
+    
+	    // Peek at the "active" flag we just created, or the "money" stat
+	    var isActive = SaveManager.GetStoredStatForSlot( index, "active" ) > 0;
+	    var hasMoney = SaveManager.GetStoredStatForSlot( index, "money" ) > 0;
+
+	    return (name != "New Character" && name != "Empty Slot") || isActive || hasMoney;
     }
 }

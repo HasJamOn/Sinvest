@@ -2,6 +2,7 @@ using Sandbox;
 using Sinvest;
 using Sandbox.Services;
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -60,6 +61,29 @@ public sealed partial class GameSaveSystem : Component
     private Dictionary<string, string> _localCookies = new();
     private Dictionary<string, double> _localStats = new();
     private HashSet<string> _localAchievements = new();
+    
+    public async Task SyncAndVerify()
+    {
+	    // 1. Get the 'True' value from the Cloud
+	    double cloudMoney = GetStoredStat( "money" ); // This pulls from Sandbox.Services.Stats
+    
+	    // 2. Get the 'Fast' value from the local Cookie
+	    string cookieVal = Game.Cookies.Get( $"money{SlotSuffix}", "0" );
+	    double localMoney = double.TryParse(cookieVal, out double res) ? res : 0;
+
+	    // 3. The Security Check
+	    if ( Math.Abs(cloudMoney - localMoney) > 0.01 )
+	    {
+		    Log.Warning( "[SECURITY] Local money differs from Cloud! Resetting to Cloud value." );
+        
+		    // Force the local session to match the Cloud
+		    if ( CurrentCharacter != null )
+			    CurrentCharacter.Money = cloudMoney;
+            
+		    // Overwrite the 'dirty' local cookie with the 'clean' cloud data
+		    Game.Cookies.Set( $"money{SlotSuffix}", cloudMoney.ToString() );
+	    }
+    }
 
     protected override void OnAwake()
     {
@@ -87,18 +111,21 @@ public sealed partial class GameSaveSystem : Component
 
     public string SlotSuffix => $"_{ActiveSlot}";
 
-    public void LoadActiveSlot()
+    public async Task LoadActiveSlot() // Changed to async Task
     {
 	    CurrentCharacter = new CharacterSession
 	    {
 		    Name = GetStoredName(),
 		    Money = GetStoredStat( "money" ),
-		    Shares = GetStoredStat( "fundino_shares" ), // Load shares here
+		    Shares = GetStoredStat( "fundino_shares" ), 
 		    Modifiers = (StartingModifiers)(int)GetStoredStat( "modifiers" )
 	    };
+
+	    await SyncAndVerify(); // Now we can safely await the verification
+	    ValidateSaveIntegrity();
     }
 
-    public async System.Threading.Tasks.Task SaveActiveSlotAsync()
+    public async Task SaveActiveSlotAsync()
     {
        if ( CurrentCharacter == null ) return;
 
@@ -155,7 +182,6 @@ public sealed partial class GameSaveSystem : Component
     private void SetStoredName( string name )
     {
 	    string key = $"name{SlotSuffix}";
-	    // Always use Cookies so it persists on your PC, even if Cloud is off
 	    Game.Cookies.Set( key, name );
     }
 
@@ -168,57 +194,121 @@ public sealed partial class GameSaveSystem : Component
     public void SetStoredStat( string statName, double val )
     {
 	    string key = $"{statName}{SlotSuffix}";
-   
+
+	    // 1. UPDATE THE LIVE SESSION (So UI sees it instantly)
+	    if ( CurrentCharacter != null )
+	    {
+		    if ( statName == "money" ) CurrentCharacter.Money = val;
+		    if ( statName == "fundino_shares" ) CurrentCharacter.Shares = val;
+	    }
+
+	    // 2. PERSISTENCE
 	    if ( ShouldUseCloud ) 
 		    Stats.SetValue( key, val );
-    
-	    // Always save a local copy to the cookie file so it survives Editor reloads
+
 	    Game.Cookies.Set( key, val.ToString() );
 
+	    // 3. ALERT THE UI
 	    OnDataChanged?.Invoke();
     }
 
     public double GetStoredStat( string statName )
     {
 	    string key = $"{statName}{SlotSuffix}";
-   
+
+	    // If Cloud is active, pull from Steam/Facepunch stats
 	    if ( ShouldUseCloud ) 
 	    {
 		    return (double)Stats.LocalPlayer.Get( key ).Value;
 	    }
 
-	    // Pull from cookie file and parse back to double
+	    // Otherwise pull from local cookie file
 	    string val = Game.Cookies.Get( key, "0" );
 	    return double.TryParse(val, out double result) ? result : 0;
     }
     
     public string GetStoredNameForSlot( int slot )
     {
-       string key = $"name_{slot}";
-       if ( ShouldUseCloud ) return Game.Cookies.Get( key, "New Character" );
-       return _localCookies.GetValueOrDefault( key, "New Character" );
+	    string key = $"name_{slot}";
+
+	    if ( ShouldUseCloud ) 
+	    {
+		    // 1. Peek at existing competitive stats instead of a dedicated "active" flag
+		    var moneyVal = Stats.LocalPlayer.Get( $"money_{slot}" ).Value;
+		    var yieldVal = Stats.LocalPlayer.Get( $"current_yield_pps_{slot}" ).Value;
+		    var bucksVal = Stats.LocalPlayer.Get( $"idlemon_bucks_{slot}" ).Value;
+        
+		    // 2. If any of these are > 0, the slot is used. 
+		    // We pull the name from Cookies (which are synced via Steam Cloud).
+		    if ( moneyVal > 0 || yieldVal > 0 || bucksVal > 0 )
+		    {
+			    return Game.Cookies.Get( key, "Active Career" );
+		    }
+
+		    return "New Character";
+	    }
+
+	    // Local fallback
+	    return _localCookies.GetValueOrDefault( key, "New Character" );
+    }
+    
+    /// <summary>
+    /// Peeks at a specific slot's stat without switching the active session.
+    /// </summary>
+    public double GetStoredStatForSlot( int slot, string statName )
+    {
+	    // Redirect legacy 'active' requests to check yield instead of the retired occupation flag.
+	    // If yield is > 0, the game logic considers the slot "Active".
+	    string key = (statName == "active") ? $"current_yield_pps_{slot}" : $"{statName}_{slot}";
+
+	    if ( ShouldUseCloud )
+	    {
+		    return (double)Stats.LocalPlayer.Get( key ).Value;
+	    }
+
+	    // Local Fallback
+	    string val = Game.Cookies.Get( key, "0" );
+	    return double.TryParse( val, out double result ) ? result : 0;
     }
 
     public void DeleteSlot( int slot )
     {
 	    string suffix = $"_{slot}";
+    
 	    if ( ShouldUseCloud )
 	    {
+		    // 1. Reset the Name in Cloud Cookies
 		    Game.Cookies.Set( $"name{suffix}", "New Character" );
+
+		    // 2. Wipe all Competitive Stats
+		    // Zeroing these out ensures GetStoredNameForSlot recognizes the slot as empty.
 		    Stats.SetValue( $"money{suffix}", 0 );
+		    Stats.SetValue( $"idlemon_bucks{suffix}", 0 );
+		    Stats.SetValue( $"current_yield_pps{suffix}", 0 );
+		    Stats.SetValue( $"roster_max_luck{suffix}", 0 );
+
+		    // 3. Wipe Internal Progression Stats
 		    Stats.SetValue( $"modifiers{suffix}", 0 );
 		    Stats.SetValue( $"fundino_shares{suffix}", 0 );
 		    Stats.SetValue( $"claimed_startup{suffix}", 0 );
 
+		    // 4. Force immediate sync
 		    Sandbox.Services.Stats.Flush();
+        
+		    // 5. Clear IdleMon JSON Data from Cookies
+		    Game.Cookies.Set( $"idlemon_roster{suffix}", "" );
+		    Game.Cookies.Set( $"idlemon_last_timestamp{suffix}", "" );
 	    }
-       else
-       {
-          _localCookies[$"name{suffix}"] = "New Character";
-          _localStats[$"money{suffix}"] = 0;
-          _localStats[$"modifiers{suffix}"] = 0;
-       }
-       Log.Info( $"[SAVE SYSTEM] Wiped Slot {slot}" );
+	    else
+	    {
+		    // Local Fallback
+		    _localCookies[$"name{suffix}"] = "New Character";
+		    _localStats[$"money{suffix}"] = 0;
+		    _localStats[$"modifiers{suffix}"] = 0;
+		    _localStats[$"idlemon_bucks{suffix}"] = 0;
+	    }
+
+	    Log.Info( $"[SAVE SYSTEM] Wiped Slot {slot}. Occupation flag (Stats) and Roster (Cookies) cleared." );
     }
 
     public bool HasGraduated()
@@ -234,4 +324,70 @@ public sealed partial class GameSaveSystem : Component
        
        return _localAchievements.Contains( id );
     }
+    
+    public bool IsSaveTrusted { get; private set; } = true;
+    
+    /// <summary>
+/// Called whenever Money, Shares, or IdleBucks are saved.
+/// Generates the signature and saves both the signature AND the seed used.
+/// </summary>
+public void UpdateSecuritySignature()
+{
+    if ( CurrentCharacter == null ) return;
+
+    // 1. Gather the current state from the managers
+    double m = CurrentCharacter.Money;
+    double s = CurrentCharacter.Shares;
+    
+    // Safely get IdleBucks (defaults to 0 if manager isn't awake yet)
+    double ib = RosterManager.Instance?.IdleBucks ?? 0;
+
+    // 2. Determine the seed to use
+    int currentSeed = 9928341; // Default
+    if ( MarketServerSystem.Instance != null && MarketServerSystem.Instance.CurrentSeed != 0 )
+    {
+        currentSeed = MarketServerSystem.Instance.CurrentSeed;
+    }
+
+    // 3. Generate and store
+    string sig = SinvestSession.GenerateSignature( m, s, ib, currentSeed );
+    
+    // Store in Cookies so it stays private and doesn't eat your Stat quota
+    Game.Cookies.Set( $"save_signature{SlotSuffix}", sig );
+    Game.Cookies.Set( $"save_seed{SlotSuffix}", currentSeed.ToString() );
+}
+
+/// <summary>
+/// Called immediately after loading a character's stats.
+/// </summary>
+public void ValidateSaveIntegrity()
+{
+    double m = GetStoredStat( "money" );
+    double s = GetStoredStat( "fundino_shares" );
+    double ib = GetStoredStat( "idlemon_bucks" );
+    
+    string storedSig = Game.Cookies.Get( $"save_signature{SlotSuffix}", "" );
+    string seedStr = Game.Cookies.Get( $"save_seed{SlotSuffix}", "9928341" );
+    int storedSeed = int.TryParse( seedStr, out int res ) ? res : 9928341;
+
+    // If it's a brand new character, trust it automatically
+    if ( string.IsNullOrEmpty( storedSig ) && m == 0 && s == 0 && ib == 0 )
+    {
+        IsSaveTrusted = true;
+        return;
+    }
+
+    // Calculate what the signature SHOULD be, using the seed they saved with
+    string calculatedSig = SinvestSession.GenerateSignature( m, s, ib, storedSeed );
+
+    if ( storedSig != calculatedSig )
+    {
+        Log.Warning( $"[SECURITY] Checksum mismatch on Slot {ActiveSlot}. Flagging save as Untrusted." );
+        IsSaveTrusted = false;
+    }
+    else
+    {
+        IsSaveTrusted = true;
+    }
+}
 }

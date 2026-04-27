@@ -9,6 +9,8 @@ namespace Sinvest;
 
 public sealed class MarketServerSystem : Component
 {
+	public static MarketServerSystem Instance { get; private set; }
+	
     private const string OracleUrl = "https://b4block.org/";
     private const int SecretSalt = 9928341; 
     private const double BasePrice = 7126.0;
@@ -27,6 +29,11 @@ public sealed class MarketServerSystem : Component
     [Sync] public DateTime CurrentEraStart { get; set; }
     
     private TimeUntil _nextSync = 0;
+    
+    protected override void OnAwake()
+    {
+	    Instance = this;
+    }
 
     protected override void OnUpdate()
     {

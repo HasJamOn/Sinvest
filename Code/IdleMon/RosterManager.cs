@@ -187,17 +187,24 @@ public sealed class RosterManager : Component
 	    var save = GameSaveSystem.Instance;
 	    if ( !save.IsValid() ) return;
 
-	    // Use _jsonOptions (which you defined at the top of the class)
+	    // 1. COMPLEX DATA (Cookies)
 	    string json = JsonSerializer.Serialize( ActiveNodes, _jsonOptions );
-
 	    save.SetStoredString( "idlemon_roster", json );
+
+	    // 2. COMPETITIVE STATS (Numeric Stats for Leaderboards)
+	    double yield = CalculateTotalYield();
 	    save.SetStoredStat( "idlemon_bucks", IdleBucks );
+	    save.SetStoredStat( "current_yield_pps", yield ); // Global Yield Ranking
+    
+	    // Track the highest Luck in the roster for a "Luckiest Player" board
+	    double maxLuck = ActiveNodes.Max( x => x.Luck );
+	    save.SetStoredStat( "roster_max_luck", maxLuck );
+
 	    save.SetStoredString( "idlemon_last_timestamp", DateTime.UtcNow.ToString("O") );
-    
-	    // Explicitly tell the system to commit to disk
+	    
+	    save.UpdateSecuritySignature();
+	    
 	    _ = save.SaveActiveSlotAsync();
-    
-	    Log.Info( "[ROSTER] Local/Cloud Sync complete." );
     }
 
     public void LoadRoster()
@@ -264,4 +271,6 @@ public sealed class RosterManager : Component
 		    Log.Info( "[ROSTER] Emergency Save triggered on Component Disable." );
 	    }
     }
+    
+    
 }
