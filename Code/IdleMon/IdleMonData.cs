@@ -15,10 +15,9 @@ public struct IdleMonData
 	[Title("Division (D)")] public double Division;      
 	[Title("Team Bonus (T)")] public double TeamBonus;     
     
-	// --- Birth Certificate Metadata ---
 	public DateTime RolledAt;
-	public float MarketScaleAtBirth { get; set; } // The 'S' factor when created
-	public int Generation { get; set; }           // Derived from Era/Seed history
+	public float MarketScaleAtBirth { get; set; } 
+	public int Generation { get; set; }           
 
 	public static IdleMonData Empty => new IdleMonData 
 	{ 
@@ -27,8 +26,9 @@ public struct IdleMonData
 		Addition = 0,
 		Subtraction = 0,
 		Multiplier = 1.0, 
-		Division = 1.0,   
+		Division = 1.0, 
 		TeamBonus = 1.0,
-		Generation = 0
+		Generation = 0,
+		RolledAt = DateTime.MinValue
 	};
 }

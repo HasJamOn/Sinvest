@@ -55,43 +55,62 @@
                         bool isEmpty = mon.ID == Guid.Empty;
 
                         <div class="node-card @(isEmpty ? "empty" : "active") @(ArmedSlotIndex == index ? "armed" : "")" onclick="@(() => OnNodeClick(index))">
-                            @if (!isEmpty)
-                            {
-                                <div class="card-header">
-                                    <span class="name">@mon.Name</span>
-                                    <span class="gen-tag">GEN @mon.Generation</span>
-                                </div>
-                                
-                                <div class="card-body">
-                                    <div class="stat-row">
-                                        <span class="stat-label">ADDITION (A)</span>
-                                        <span class="stat-value">@mon.Addition.ToString("F1")</span>
-                                    </div>
-                                    <div class="stat-row">
-                                        <span class="stat-label">MULTIPLIER (M)</span>
-                                        <span class="stat-value">@mon.Multiplier.ToString("F2")x</span>
-                                    </div>
-                                    <div class="stat-row @(mon.Subtraction > 0 ? "warning" : "")">
-                                        <span class="stat-label">SUBTRACTION (S)</span>
-                                        <span class="stat-value">@mon.Subtraction.ToString("F1")</span>
-                                    </div>
-                                    <div class="stat-row secondary">
-                                        <span class="stat-label">MARKET SCALE</span>
-                                        <span class="stat-value">@mon.MarketScaleAtBirth.ToString("F2")x</span>
-                                    </div>
-                                </div>
+						    @if (!isEmpty)
+						    {
+						        <div class="card-header">
+						            <div class="name-group">
+						                <span class="name">@mon.Name</span>
+						                <span class="birth-date">@mon.RolledAt.ToString("MMM dd")</span>
+						            </div>
+						            <span class="gen-tag">GEN @mon.Generation</span>
+						        </div>
+						        
+						        <div class="card-body">
+						            <div class="stat-row">
+						                <span class="stat-label">ADD (+)</span>
+						                <span class="stat-value">@mon.Addition.ToString("F1")</span>
+						            </div>
+						            <div class="stat-row @(mon.Subtraction > 0 ? "warning" : "")">
+						                <span class="stat-label">SUB (-)</span>
+						                <span class="stat-value">@mon.Subtraction.ToString("F1")</span>
+						            </div>
+						            <div class="stat-row">
+						                <span class="stat-label">MULT (×)</span>
+						                <span class="stat-value">@mon.Multiplier.ToString("F2")x</span>
+						            </div>
+						            <div class="stat-row @(mon.Division > 1.0 ? "warning" : "")">
+						                <span class="stat-label">DIV (÷)</span>
+						                <span class="stat-value">@mon.Division.ToString("F2")x</span>
+						            </div>
 
-                                <div class="card-footer">
-                                    <span class="yield-contribution">+@(((mon.Addition - mon.Subtraction) * mon.Multiplier).ToString("F2")) IB/s</span>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="empty-state">
-                                    <i class="icon">add_circle_outline</i>
-                                    <span>EMPTY NODE</span>
-                                </div>
-                            }
+						            <div class="stat-divider"></div>
+
+						            <div class="stat-row bonus">
+						                <span class="stat-label">TEAM (T)</span>
+						                <span class="stat-value">@((mon.TeamBonus * 100 - 100).ToString("+0.0"))%</span>
+						            </div>
+						            <div class="stat-row secondary">
+						                <span class="stat-label">MARKET SCALE</span>
+						                <span class="stat-value">@mon.MarketScaleAtBirth.ToString("P0")</span>
+						            </div>
+						        </div>
+
+						        <div class="card-footer">
+						            @{
+						                // (A - S) * M / D
+						                var net = (mon.Addition - mon.Subtraction) * mon.Multiplier / mon.Division;
+						            }
+						            <span class="yield-contribution">@net.ToString("F2") IB/s</span>
+						        </div>
+						    }
+						    else
+						    {
+						        <div class="empty-state">
+						            <i class="icon">add_circle_outline</i>
+						            <span>EMPTY NODE</span>
+						        </div>
+						    }
+						    
 
                             @if ( IsDrafting )
                             {
@@ -121,45 +140,64 @@
         </div>
 
         <div class="footer">
-            @if ( !IsDrafting )
-            {
-                <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
-            }
-            else
-            {
-                <div class="draft-controls">
-                    <div class="node-card candidate-card">
-                        <div class="card-header">
-                            <span class="name">@DraftCandidate?.Name</span>
-                            <span class="gen-tag">CANDIDATE</span>
-                        </div>
-        
-                        <div class="card-body">
-                            <div class="stat-row">
-                                <span class="stat-label">ADDITION (A)</span>
-                                <span class="stat-value">@DraftCandidate?.Addition.ToString("F1")</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">MULTIPLIER (M)</span>
-                                <span class="stat-value">@DraftCandidate?.Multiplier.ToString("F2")x</span>
-                            </div>
-                            <div class="stat-row @(DraftCandidate?.Subtraction > 0 ? "warning" : "")">
-                                <span class="stat-label">SUBTRACTION (S)</span>
-                                <span class="stat-value">@DraftCandidate?.Subtraction.ToString("F1")</span>
-                            </div>
-                        </div>
+		    @if ( !IsDrafting )
+		    {
+		        <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
+		    }
+		    else
+		    {
+		        <div class="draft-controls">
+		            <div class="node-card candidate-card">
+		                <div class="card-header">
+		                    <div class="name-group">
+		                        <span class="name">@DraftCandidate?.Name</span>
+		                        <span class="birth-date">NEW ROLL</span>
+		                    </div>
+		                    <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
+		                </div>
+		        
+		                <div class="card-body">
+		                    <div class="stat-row">
+		                        <span class="stat-label">ADD (+)</span>
+		                        <span class="stat-value">@DraftCandidate?.Addition.ToString("F1")</span>
+		                    </div>
+		                    <div class="stat-row @(DraftCandidate?.Subtraction > 0 ? "warning" : "")">
+		                        <span class="stat-label">SUB (-)</span>
+		                        <span class="stat-value">@DraftCandidate?.Subtraction.ToString("F1")</span>
+		                    </div>
+		                    <div class="stat-row">
+		                        <span class="stat-label">MULT (×)</span>
+		                        <span class="stat-value">@DraftCandidate?.Multiplier.ToString("F2")x</span>
+		                    </div>
+		                    <div class="stat-row @(DraftCandidate?.Division > 1.0 ? "warning" : "")">
+		                        <span class="stat-label">DIV (÷)</span>
+		                        <span class="stat-value">@DraftCandidate?.Division.ToString("F2")x</span>
+		                    </div>
 
-                        <div class="card-footer">
-                            <span class="yield-contribution">POTENTIAL ASSET</span>
-                        </div>
-                    </div>
+		                    <div class="stat-divider"></div>
 
-                    <div class="draft-actions">
-	                    <button class="btn-discard" onclick="@CancelDraft">DISCARD ASSET</button>
-                    </div>
-                </div>
-            }
-        </div>
+		                    <div class="stat-row bonus">
+		                        <span class="stat-label">TEAM (T)</span>
+		                        <span class="stat-value">@(((DraftCandidate?.TeamBonus ?? 1.0) * 100 - 100).ToString("+0.0"))%</span>
+		                    </div>
+		                    <div class="stat-row secondary">
+		                        <span class="stat-label">MARKET SCALE</span>
+		                        <span class="stat-value">@DraftCandidate?.MarketScaleAtBirth.ToString("P0")</span>
+		                    </div>
+		                </div>
+
+		                <div class="card-footer">
+		                    <span class="yield-contribution">POTENTIAL ASSET</span>
+		                </div>
+		            </div>
+
+		            <div class="draft-actions">
+		                <button class="btn-discard" onclick="@CancelDraft">DISCARD ASSET</button>
+		                <div class="instruction-label">SELECT SLOT TO INSTALL</div>
+		            </div>
+		        </div>
+		    }
+		</div>
     }
 </root>
 
