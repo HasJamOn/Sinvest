@@ -1,6 +1,13 @@
-@import "idlemon_vars";
-@import "idlemon_theme";
+// ==============================
+// IMPORTS (must be relative)
+// ==============================
+@import "./idlemon_vars";
+@import "./idlemon_theme";
 
+
+// ==============================
+// ROOT
+// ==============================
 IdleMonDashBoard {
   pointer-events: all;
   width: 100%;
@@ -9,8 +16,13 @@ IdleMonDashBoard {
   flex-direction: column;
   padding: 20px;
 
+  // APPLY THEME
   @include idlemon-theme;
 
+
+  // ============================
+  // HEADER LAYOUT (no styling overrides)
+  // ============================
   .header {
     display: flex;
     flex-direction: row;
@@ -33,71 +45,75 @@ IdleMonDashBoard {
     }
   }
 
-  // THE MAIN CONTAINER
+
+  // ============================
+  // MAIN BODY
+  // ============================
   .dashboard-body {
     display: flex;
     flex-direction: row;
     gap: 30px;
     flex-grow: 1;
     width: 100%;
-    min-height: 0; // Essential for internal scrolling
+    min-height: 0;
 
-    // --- LEFT COLUMN ---
+    // LEFT COLUMN
     .node-matrix {
-      flex: 1 1 0; // Take exactly 50%
+      flex: 1 1 0;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      padding: 0;
       overflow-y: scroll;
     }
 
-    // --- RIGHT COLUMN ---
+    // RIGHT COLUMN (converted to OS panel)
     .inspector-panel {
-      flex: 1 1 0; // Take exactly 50%
-      background-color: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 4px;
+      flex: 1 1 0;
       display: flex;
       flex-direction: column;
-      padding: 25px;
-
-      // Ensure content doesn't overflow the 50% width
+      padding: 16px;
       overflow: hidden;
-      
+
+      @include bevel-out;
+
       .inspector-header {
-        margin-bottom: 20px;
-        flex-direction: column; // S&box elements are flex by default
+        margin-bottom: 16px;
+        flex-direction: column;
 
         .subtitle {
           font-size: 10px;
           font-weight: 900;
-          opacity: 0.4;
+          color: $gtk-shadow;
           letter-spacing: 1px;
         }
 
         .title {
-          font-size: 24px;
+          font-size: 20px;
           font-weight: 800;
           text-transform: uppercase;
           margin: 0;
+          color: $gtk-text;
         }
       }
 
       .detail-section {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         flex-direction: column;
 
         .section-label {
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 900;
-          opacity: 0.3;
-          margin-bottom: 10px;
+          color: $gtk-shadow;
+          margin-bottom: 8px;
         }
       }
     }
   }
 
+
+  // ============================
+  // NODE GRID
+  // ============================
   .matrix-row {
     display: flex;
     flex-direction: row;
@@ -107,21 +123,17 @@ IdleMonDashBoard {
 
   .node-card {
     display: flex;
-    flex-direction: row; // Change from column to row
+    flex-direction: row;
     flex: 1;
     height: 85px;
-    border-radius: 4px;
-    background-color: rgba(0, 0, 0, 0.3);
-    overflow: hidden; // Keeps the viewport from leaking out of corners
-    transition: all 0.1s ease;
+    overflow: hidden;
 
-    // The 3D square on the left
+    // 3D viewport stays untouched
     .portrait-viewport {
       width: 85px;
       height: 85px;
       flex-shrink: 0;
-      overflow: hidden; // This is vital to keep the 3D render inside the square
-      background-color: rgba(0, 0, 0, 0.5);
+      overflow: hidden;
 
       IdleMonDisplay {
         width: 100%;
@@ -129,64 +141,69 @@ IdleMonDashBoard {
       }
     }
 
-    // The info column on the right
+    // info column
     .card-info {
       display: flex;
       flex-direction: column;
       flex-grow: 1;
       padding: 8px 12px;
-      justify-content: space-between; // Name at top, Yield at bottom
+      justify-content: space-between;
     }
 
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0; // Remove old padding
+      padding: 0;
 
       .name {
         font-weight: 800;
         font-size: 11px;
         text-transform: uppercase;
-        color: #fff;
       }
 
       .gen-tag {
         font-size: 8px;
         font-weight: 900;
-        opacity: 0.4;
       }
     }
 
     .card-footer {
       display: flex;
-      padding: 0; // Remove old padding
+      padding: 0;
+      justify-content: space-between;
+      align-items: center;
 
       .status-tag {
         font-size: 9px;
         font-weight: 900;
         letter-spacing: 1px;
-        opacity: 0.3;
+        color: $gtk-shadow;
       }
 
       .yield-delta {
         font-size: 10px;
         font-weight: 800;
-        &.pos { color: #00ffcc; }
-        &.neg { color: #ff5555; }
+
+        &.pos { color: $accent-money; }
+        &.neg { color: #cc0000; }
       }
     }
   }
 
-  // FOOTER REMAINS FOR DRAFTING COMPARISON
+
+  // ============================
+  // FOOTER (comparison stage)
+  // ============================
   .footer {
     display: flex;
     padding: 20px 0;
     flex-shrink: 0;
     justify-content: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
     margin-top: 20px;
     min-height: 280px;
+
+    @include bevel-out;
 
     .draft-comparison-stage {
       display: flex;
@@ -196,8 +213,8 @@ IdleMonDashBoard {
       width: 100%;
       gap: 10px;
 
-      // Fixed slots prevent horizontal shifting
-      .current-slot, .candidate-slot {
+      .current-slot,
+      .candidate-slot {
         flex: 0 0 310px;
         display: flex;
         justify-content: center;
@@ -208,7 +225,8 @@ IdleMonDashBoard {
         display: flex;
         flex-direction: column;
         align-items: center;
-        opacity: 0.2;
+        opacity: 0.3;
+
         .icon { font-size: 32px; }
         span { font-size: 10px; font-weight: 900; letter-spacing: 2px; }
       }
@@ -218,16 +236,18 @@ IdleMonDashBoard {
         display: flex;
         flex-direction: column;
         gap: 12px;
-        padding-left: 25px;
-        margin-left: 15px;
-        border-left: 1px solid rgba(255, 255, 255, 0.05);
+        padding-left: 20px;
+        margin-left: 10px;
+
+        border-left: 1px solid $gtk-shadow;
 
         .instruction-block {
           display: flex;
           flex-direction: column;
           align-items: center;
-          opacity: 0.4;
           gap: 5px;
+          color: $gtk-shadow;
+
           .icon { font-size: 20px; }
           label { font-size: 9px; font-weight: 900; text-align: center; }
         }
@@ -236,77 +256,92 @@ IdleMonDashBoard {
           display: flex;
           flex-direction: column;
           padding: 8px;
-          background-color: rgba(0,0,0,0.2);
-          border-radius: 2px;
 
-          label { font-size: 8px; opacity: 0.5; font-weight: 900; }
-          span { font-size: 14px; font-weight: 900; }
+          @include bevel-in;
 
-          &.positive { color: #00ffcc; border-left: 2px solid #00ffcc; }
-          &.negative { color: #ff5555; border-left: 2px solid #ff5555; }
+          label {
+            font-size: 8px;
+            font-weight: 900;
+            color: $gtk-shadow;
+          }
+
+          span {
+            font-size: 14px;
+            font-weight: 900;
+          }
+
+          &.positive {
+            color: $accent-money;
+            border-left: 2px solid $accent-money;
+          }
+
+          &.negative {
+            color: #cc0000;
+            border-left: 2px solid #cc0000;
+          }
         }
       }
 
       .comparison-card {
         width: 300px;
-        height: 240px; // Slightly taller to accommodate the grid
-        background-color: rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: 240px;
         display: flex;
         flex-direction: column;
 
+        @include bevel-out;
+
         .card-body {
-          padding: 20px 15px; // Give the stats room to breathe
+          padding: 16px;
           flex-grow: 1;
 
           .stat-grid {
             display: flex;
-            flex-wrap: wrap; // Allows wrapping if the card gets squished
+            flex-wrap: wrap;
             gap: 10px;
 
             .stat-item {
-              flex: 1 1 40%; // Two items per row
+              flex: 1 1 40%;
               display: flex;
               flex-direction: column;
 
               .label {
                 font-size: 8px;
                 font-weight: 900;
-                opacity: 0.4;
+                color: $gtk-shadow;
                 letter-spacing: 1px;
               }
 
               .value {
-                font-size: 14px; // Larger, readable numbers
+                font-size: 14px;
                 font-weight: 700;
-                font-family: monospace;
+                font-family: $font-mono;
               }
 
               &.full-width {
                 flex: 1 1 100%;
-                border-top: 1px solid rgba(255, 255, 255, 0.05);
+                border-top: 1px solid $gtk-shadow;
                 padding-top: 8px;
                 margin-top: 5px;
+
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
               }
 
-              &.warning .value { color: #ff5555; }
-              &.bonus .value { color: #00ffcc; }
+              &.warning .value { color: #cc0000; }
+              &.bonus .value { color: $accent-money; }
             }
           }
         }
 
         .card-footer {
-          background-color: rgba(255, 255, 255, 0.03);
           padding: 10px 15px;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          border-top: 1px solid $gtk-shadow;
 
           .yield-contribution {
             font-size: 16px;
             font-weight: 900;
-            color: #00ffcc;
+            color: $accent-money;
           }
         }
       }

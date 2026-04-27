@@ -1,4 +1,8 @@
-﻿// Brand Colors
+﻿// ==============================
+// IDLEMON / SINVEST SHARED TOKENS
+// ==============================
+
+// --- Base palette (your original) ---
 $bg-main: rgba(20, 24, 28, 0.95);
 $bg-card: rgba(25, 30, 35, 0.95);
 $cyan: #00ffff;
@@ -6,20 +10,98 @@ $accent-green: #00ffaa;
 $danger-red: #ff4444;
 $warning-orange: #ffaa00;
 
-// Keyframes
+
+// ==============================
+// GTK / SYSTEM LAYER (mapped)
+// ==============================
+
+$gtk-bg: #c0c0c0;
+$gtk-text: #000000;
+$gtk-shadow: #808080;
+$gtk-highlight: #ffffff;
+$gtk-blue: #000080;
+
+$accent-money: #008000;
+
+
+// ==============================
+// TYPOGRAPHY
+// ==============================
+
+$font-ui: "MS Sans Serif", Arial;
+$font-mono: monospace;
+
+
+// ==============================
+// MIXINS (REQUIRED BY THEME)
+// ==============================
+
+// Raised surface
+@mixin bevel-out {
+  border-top: 1px solid $gtk-highlight;
+  border-left: 1px solid $gtk-highlight;
+  border-bottom: 1px solid $gtk-shadow;
+  border-right: 1px solid $gtk-shadow;
+  background-color: $gtk-bg;
+}
+
+// Pressed surface
+@mixin bevel-in {
+  border-top: 1px solid $gtk-shadow;
+  border-left: 1px solid $gtk-shadow;
+  border-bottom: 1px solid $gtk-highlight;
+  border-right: 1px solid $gtk-highlight;
+  background-color: $gtk-bg;
+}
+
+// Flat panel (used for empty / disabled states)
+@mixin panel-flat {
+  background-color: $gtk-bg;
+  border: 1px solid $gtk-shadow;
+}
+
+// Base button
+@mixin btn-gtk-base {
+  @include bevel-out;
+  padding: 4px 10px;
+  background-color: $gtk-bg;
+  color: $gtk-text;
+  font-family: $font-ui;
+  font-size: 11px;
+
+  &:active {
+    @include bevel-in;
+  }
+}
+
+
+// ==============================
+// ANIMATIONS (FROM ORIGINAL)
+// ==============================
+
 @keyframes pulse-red {
-  from { text-shadow: 0 0 5px #ff0000; transform: scale(1); }
-  to { text-shadow: 0 0 20px #ff0000; transform: scale(1.1); }
+  from {
+    text-shadow: 0 0 5px #ff0000;
+    transform: scale(1);
+  }
+  to {
+    text-shadow: 0 0 20px #ff0000;
+    transform: scale(1.1);
+  }
 }
 
 @keyframes pulse-border {
-  from { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
-  to { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); }
+  from {
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.3);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
+  }
 }
 
 @keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  75% { transform: translateX(2px); }
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-2px); }
+  75%  { transform: translateX(2px); }
   100% { transform: translateX(0); }
 }
