@@ -35,9 +35,9 @@
                 </div>
             </div>
 
-            <button class="btn-terminate" onclick="@CloseApp">
-                <i class="icon">power_settings_new</i>
-                <span>EXIT</span>
+            <button class="btn-terminate" onclick="@ExitIdleMon">
+	            <i class="icon">power_settings_new</i>
+	            <span>EXIT</span>
             </button>
         </div>
 
@@ -247,6 +247,7 @@
 </root>
 
 @code {
+	[Property] public GameObject IdleMonSystem { get; set; }
 	[Property] public RosterManager Roster { get; set; }
 	[Property] public AssetGenerator Generator { get; set; }
     
@@ -261,6 +262,13 @@
 	// s&box equivalent to OnParametersSet
 	protected override void OnEnabled()
 	{
+		// If the prefab lost its reference, find it in the children/scene
+		if ( Roster == null ) 
+			Roster = Scene.GetAllComponents<RosterManager>().FirstOrDefault();
+        
+		if ( Generator == null )
+			Generator = Scene.GetAllComponents<AssetGenerator>().FirstOrDefault();
+
 		if (CurrentDeltas == null) CurrentDeltas = new double[6];
 	}
 
@@ -352,11 +360,29 @@
         SelectedSlotIndex = (SelectedSlotIndex == index) ? null : index;
     }
     
-    private void CloseApp()
+    private void ExitIdleMon()
     {
-        if ( Roster.IsDirty ) Roster.SaveRoster();
-        CancelDraft();
-        SelectedSlotIndex = null;
-        Enabled = false; 
+	    var player = Scene.GetAllComponents<PlayerController>()
+		    .FirstOrDefault(x => !x.IsProxy);
+
+	    if ( player.IsValid() )
+	    {
+		    player.UseLookControls = true;
+		    player.UseInputControls = true;
+	    }
+
+	    // Save data before closing
+	    Roster?.SaveRoster();
+	    CancelDraft();
+	    SelectedSlotIndex = null;
+
+	    // Instead of Destroy, we disable the ScreenPanel so it can be re-enabled by SinvestOS
+	    GameObject.Enabled = false; 
+    
+	    // Notify SinvestOS to show its main menu again
+	    if (SinvestOS.Instance != null)
+	    {
+		    SinvestOS.Instance.GoBack();
+	    }
     }
 }

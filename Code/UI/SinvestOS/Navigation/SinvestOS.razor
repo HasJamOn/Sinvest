@@ -32,7 +32,7 @@
 	</div>
 
 	<div class="hud-content">
-		@if ( _activeViewPanel == null )
+		@if ( _mode == AppMode.None )
 		{
 			<div class="menu">
 				<button class="app-icon sincash" @onclick="@( () => SetView<CasinoMenu>() )">
@@ -43,6 +43,11 @@
 				<button class="app-icon" @onclick=@( () => SetView<InvestMenu>() )>
 					<img src="ui/casino/navigation/fundino_icon.png" />
 					<label>Fund.ino</label>
+				</button>
+				
+				<button class="app-icon" @onclick=@( () => OpenIdleMon() )>
+					<img src="ui/casino/navigation/idlemon.png" />
+					<label>IdleMon.ino</label>
 				</button>
 
 				<button class="app-icon sincash" @onclick="@CloseAndDestroy">
@@ -63,7 +68,7 @@
 		}
 	</div>
 	<div class="navigation_menu">
-		@if ( _activeViewPanel != null )
+		@if ( _mode == AppMode.UI )
 		{
 			<button class="back-button" @onclick="@GoBack">
 				@if ( _history.Count > 0 )
@@ -87,6 +92,8 @@
     /* --- Global Sounds --- */
     [Property, Group("Audio"), ResourceType("sound")] 
     public string ClickSound { get; set; } = "sounds/ui/click.sound";
+    
+    [Property] public GameObject IdleMonObject { get; set; }
     
 	/* --- CoinFlip Sounds --- */
     [Property, Group("Audio"), ResourceType("sound")] 
@@ -159,9 +166,12 @@
     
     private string GetActiveAppName()
     {
-	    if (_activeViewPanel == null) return "";
+	    if (_mode == AppMode.Scene)
+		    return "IdleMon.ino";
 
-	    // Get the type name of the current panel
+	    if (_mode == AppMode.None)
+		    return "";
+
 	    var typeName = _activeViewPanel.GetType().Name;
 
 	    return typeName switch
@@ -169,7 +179,7 @@
 		    nameof(CasinoMenu) => "Sincash.ino",
 		    nameof(InvestMenu) => "Fund.ino",
 		    nameof(CoinFlip)   => "Coin Flip",
-		    _ => "to Menu" // Fallback
+		    _ => "to Menu"
 	    };
     }
     
@@ -196,32 +206,34 @@
     {
 	    var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
     
+	    // Safety Net: Save IdleMon progress if it's currently open during shutdown
+	    if (_mode == AppMode.Scene && IdleMonObject.IsValid())
+	    {
+		    var roster = IdleMonObject.Components.GetInChildren<RosterManager>();
+		    roster?.SaveRoster();
+	    }
+
 	    if ( player.IsValid() )
 	    {
-		    // 1. Identify the chair
 		    var chair = player.GameObject.Parent?.Components.GetInAncestors<BaseChair>();
-        
+    
 		    if ( chair.IsValid() )
 		    {
-			    // 2. Tell the chair to eject us normally
 			    chair.AskToLeave( player );
-
-			    // 3. FORCE RESTORE (The Safety Net)
-			    // If the chair script fails to re-enable these, we do it here.
-			    player.GameObject.SetParent( null ); // Ensure we aren't parented to the chair anymore
+			    player.GameObject.SetParent( null ); 
 			    player.Body.Enabled = true;
 			    player.ColliderObject.Enabled = true;
 		    }
 
-		    // 4. Restore Input
 		    player.UseLookControls = true;
 		    player.UseInputControls = true;
 	    }
 
 	    SetMenuState( false );
-    
-	    // 5. Cleanup
+
 	    if ( Instance == this ) Instance = null;
+    
+	    // This destroys SinvestOS and the IdleMon child object simultaneously
 	    GameObject.Root.Destroy();
     }
     
@@ -266,29 +278,51 @@
 
     public void SetView<T>(bool saveToHistory = true) where T : Panel, new()
     {
-        if (saveToHistory && _activeViewPanel != null)
-        {
-            _history.Push(_activeViewPanel.GetType());
-        }
+	    if (saveToHistory && _activeViewPanel != null)
+	    {
+		    _history.Push(_activeViewPanel.GetType());
+	    }
 
-        CreateViewByType(typeof(T));
+	    _mode = AppMode.UI;
+	    CreateViewByType(typeof(T));
     }
 
     public void GoBack()
     {
-        if (_history.Count > 0)
-        {
-           var previousType = _history.Pop();
-           CreateViewByType(previousType);
-        }
-        else if (_activeViewPanel != null)
-        {
-           ClearView();
-        }
-        else
-        {
-           CloseAndDestroy();
-        }
+	    if (_mode == AppMode.UI && _history.Count > 0)
+	    {
+		    var previousType = _history.Pop();
+		    CreateViewByType(previousType);
+		    return;
+	    }
+
+	    if (_mode == AppMode.UI)
+	    {
+		    ClearView();
+		    return;
+	    }
+
+	    if (_mode == AppMode.Scene)
+	    {
+		    if (IdleMonObject.IsValid())
+		    {
+			    var roster = IdleMonObject.Components.GetInChildren<RosterManager>();
+			    roster?.SaveRoster();
+			    IdleMonObject.Enabled = false;
+		    }
+
+		    // Restore OS Input
+		    if (Panel.IsValid())
+		    {
+			    Panel.Style.PointerEvents = PointerEvents.All;
+		    }
+
+		    _mode = AppMode.None;
+		    StateHasChanged();
+		    return;
+	    }
+
+	    CloseAndDestroy();
     }
 
     private void CreateViewByType(Type t)
@@ -311,10 +345,16 @@
 
     public void ClearView()
     {
-        _activeViewPanel?.Delete();
-        _activeViewPanel = null;
-        _history.Clear();
-        StateHasChanged();
+	    _activeViewPanel?.Delete();
+	    _activeViewPanel = null;
+	    _history.Clear();
+
+	    if (_mode == AppMode.UI)
+	    {
+		    _mode = AppMode.None;
+	    }
+
+	    StateHasChanged();
     }
 
     public void Open() => SetMenuState(true);
@@ -336,10 +376,41 @@
         }
     }
     
+    public void OpenIdleMon()
+    {
+	    ClearView();
+	    _mode = AppMode.None; // Reset first
+	    StateHasChanged();
+
+	    if ( IdleMonObject.IsValid() )
+	    {
+		    _mode = AppMode.Scene;
+		    IdleMonObject.Enabled = true;
+
+		    // IMPORTANT: Stop the OS Panel from blocking the child's input
+		    if (Panel.IsValid())
+		    {
+			    Panel.Style.PointerEvents = PointerEvents.None;
+		    }
+	    }
+    
+	    Mouse.Visibility = MouseVisibility.Visible;
+	    StateHasChanged();
+    }
+    
     public void OpenInteraction<T>() where T : Panel, new()
     {
         _history.Clear(); 
         SetMenuState(true);
         CreateViewByType(typeof(T));
     }
+    
+    private enum AppMode
+    {
+	    None,
+	    UI,
+	    Scene
+    }
+
+    private AppMode _mode = AppMode.None;
 }

@@ -1,0 +1,163 @@
+{
+  "RootObject": {
+    "__guid": "6cf93e02-382d-48b3-a8b7-ba2b9a5d2474",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "idlemon_system",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "514d6f05-5bae-4557-a688-260fcc95db2e",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "IdleMonUI",
+        "Position": "186.40271,187.516449,-50.6898651",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ScreenPanel",
+            "__guid": "e1ecbca0-99c8-4992-8503-2e2575b09369",
+            "__enabled": true,
+            "Flags": 0,
+            "AutoScreenScale": true,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Opacity": 1,
+            "Scale": 1,
+            "ScaleStrategy": "ConsistentHeight",
+            "TargetCamera": null,
+            "ZIndex": 100
+          },
+          {
+            "__type": "Sinvest.IdleMonDashBoard",
+            "__guid": "36c42c3a-3d08-4300-a0f9-3d34a0817c28",
+            "__enabled": true,
+            "Flags": 0,
+            "Generator": {
+              "_type": "component",
+              "component_id": "b3176b8a-1a88-4863-bf2a-21a250c58b27",
+              "go": "d4bafd5b-7929-407f-bbb0-28189676eb16",
+              "component_type": "AssetGenerator"
+            },
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Roster": {
+              "_type": "component",
+              "component_id": "a23b4cd2-8965-45e6-b46e-10bf65519842",
+              "go": "d4bafd5b-7929-407f-bbb0-28189676eb16",
+              "component_type": "RosterManager"
+            }
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "d4bafd5b-7929-407f-bbb0-28189676eb16",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "App_RosterManager",
+        "Position": "186.40271,187.516449,-50.6898651",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sinvest.RosterManager",
+            "__guid": "a23b4cd2-8965-45e6-b46e-10bf65519842",
+            "__enabled": true,
+            "Flags": 0,
+            "ActiveNodes": [
+              {
+                "MarketScaleAtBirth": 0,
+                "Generation": 0
+              },
+              {
+                "MarketScaleAtBirth": 0,
+                "Generation": 0
+              },
+              {
+                "MarketScaleAtBirth": 0,
+                "Generation": 0
+              },
+              {
+                "MarketScaleAtBirth": 0,
+                "Generation": 0
+              },
+              {
+                "MarketScaleAtBirth": 0,
+                "Generation": 0
+              },
+              {
+                "MarketScaleAtBirth": 0,
+                "Generation": 0
+              }
+            ],
+            "BaseGeneration": 0,
+            "FlushInterval": 2,
+            "IdleBucks": 0,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "ShowDebugHUD": false
+          },
+          {
+            "__type": "Sinvest.AssetGenerator",
+            "__guid": "b3176b8a-1a88-4863-bf2a-21a250c58b27",
+            "__enabled": true,
+            "Flags": 0,
+            "BasePotential": 10,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}

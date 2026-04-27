@@ -2,108 +2,6 @@
   "__guid": "b2f09f9e-5e68-4fb3-b4cd-0f57a2e83882",
   "GameObjects": [
     {
-      "__guid": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "App_RosterManager",
-      "Position": "0,0,100",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sinvest.RosterManager",
-          "__guid": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
-          "__enabled": true,
-          "Flags": 0,
-          "ActiveNodes": [
-            {
-              "MarketScaleAtBirth": 0,
-              "Generation": 0
-            },
-            {
-              "MarketScaleAtBirth": 0,
-              "Generation": 0
-            },
-            {
-              "MarketScaleAtBirth": 0,
-              "Generation": 0
-            },
-            {
-              "MarketScaleAtBirth": 0,
-              "Generation": 0
-            },
-            {
-              "MarketScaleAtBirth": 0,
-              "Generation": 0
-            },
-            {
-              "MarketScaleAtBirth": 0,
-              "Generation": 0
-            }
-          ],
-          "BaseGeneration": 0,
-          "FlushInterval": 2,
-          "IdleBucks": 0,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "ShowDebugHUD": false
-        },
-        {
-          "__type": "Sinvest.AssetGenerator",
-          "__guid": "69128f78-e4dc-4a76-8e49-3f57b83919cf",
-          "__enabled": true,
-          "Flags": 0,
-          "BasePotential": 10,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null
-        },
-        {
-          "__type": "Sinvest.TestInputHandler",
-          "__guid": "99b05d66-4b7c-4194-9b4a-28ee1f8ddf3d",
-          "__enabled": true,
-          "Flags": 0,
-          "DashboardRoot": {
-            "_type": "gameobject",
-            "go": "c64ac180-94a3-4f16-8806-4eb03ed607bf"
-          },
-          "Generator": {
-            "_type": "component",
-            "component_id": "69128f78-e4dc-4a76-8e49-3f57b83919cf",
-            "go": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
-            "component_type": "AssetGenerator"
-          },
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "Roster": {
-            "_type": "component",
-            "component_id": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
-            "go": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
-            "component_type": "RosterManager"
-          }
-        }
-      ],
-      "Children": []
-    },
-    {
       "__guid": "ba3838c9-bfd6-439a-ae35-9dd06cfe8bb8",
       "__version": 2,
       "Flags": 0,
@@ -176,49 +74,16 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null
-        }
-      ],
-      "Children": []
-    },
-    {
-      "__guid": "c64ac180-94a3-4f16-8806-4eb03ed607bf",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "IdleMonUI",
-      "Position": "0,0,100",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sandbox.ScreenPanel",
-          "__guid": "9928e10b-d036-4863-80ec-e60f9212ed3b",
-          "__enabled": true,
-          "Flags": 0,
-          "AutoScreenScale": true,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "Opacity": 1,
-          "Scale": 1,
-          "ScaleStrategy": "ConsistentHeight",
-          "TargetCamera": null,
-          "ZIndex": 100
         },
         {
-          "__type": "Sinvest.IdleMonDashBoard",
-          "__guid": "d5856fc0-e320-47d9-9aa6-0e690a7d3238",
+          "__type": "Sinvest.TestInputHandler",
+          "__guid": "5b3452e7-4190-4e6b-a175-71b8a80c5149",
           "__enabled": true,
           "Flags": 0,
+          "DashboardRoot": {
+            "_type": "gameobject",
+            "go": "c64ac180-94a3-4f16-8806-4eb03ed607bf"
+          },
           "Generator": {
             "_type": "component",
             "component_id": "69128f78-e4dc-4a76-8e49-3f57b83919cf",
@@ -288,6 +153,35 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "f70a1260-e70f-4339-b612-d2cbc4b970dd",
+      "__version": 2,
+      "__Prefab": "prefabs/idlemon_system.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "6cf93e02-382d-48b3-a8b7-ba2b9a5d2474"
+            },
+            "Property": "Position",
+            "Value": "-186.40271,-187.516449,150.689865"
+          }
+        ],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "6cf93e02-382d-48b3-a8b7-ba2b9a5d2474": "f70a1260-e70f-4339-b612-d2cbc4b970dd",
+        "514d6f05-5bae-4557-a688-260fcc95db2e": "c64ac180-94a3-4f16-8806-4eb03ed607bf",
+        "e1ecbca0-99c8-4992-8503-2e2575b09369": "9928e10b-d036-4863-80ec-e60f9212ed3b",
+        "36c42c3a-3d08-4300-a0f9-3d34a0817c28": "d5856fc0-e320-47d9-9aa6-0e690a7d3238",
+        "d4bafd5b-7929-407f-bbb0-28189676eb16": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
+        "a23b4cd2-8965-45e6-b46e-10bf65519842": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
+        "b3176b8a-1a88-4863-bf2a-21a250c58b27": "69128f78-e4dc-4a76-8e49-3f57b83919cf"
+      }
     }
   ],
   "SceneProperties": {
@@ -312,11 +206,6 @@
     "GameObjectSystems": {
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
-      },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "5865e4ab-5814-4745-8ae8-2216b6c38bf8"
-        }
       }
     }
   },

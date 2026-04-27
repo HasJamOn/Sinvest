@@ -3,7 +3,7 @@
     "__guid": "598e729a-2cfb-43e3-840d-c95b6c3499f3",
     "__version": 2,
     "Flags": 0,
-    "Name": "SinvestOS",
+    "Name": "sinvestos",
     "Position": "0,0,0",
     "Rotation": "0,0,0,1",
     "Scale": "1,1,1",
@@ -109,65 +109,6 @@
             "SkyIndirectLighting": true,
             "SkyMaterial": "materials/skybox/skybox_workshop.vmat",
             "Tint": "1,1,1,1"
-          }
-        ],
-        "Children": []
-      },
-      {
-        "__guid": "efbb8ef2-2202-4706-bb2e-df1d46097412",
-        "__version": 2,
-        "Flags": 0,
-        "Name": "Test_icon",
-        "Position": "0,0,0",
-        "Rotation": "1,0,0,-4.37113883E-08",
-        "Scale": "1,1,1",
-        "Tags": "",
-        "Enabled": true,
-        "NetworkMode": 2,
-        "NetworkFlags": 0,
-        "NetworkOrphaned": 0,
-        "NetworkTransmit": true,
-        "OwnerTransfer": 1,
-        "Components": [
-          {
-            "__type": "Sandbox.SpriteRenderer",
-            "__guid": "e32f7032-cec1-4f67-b7f2-c11a48ca37e8",
-            "__enabled": true,
-            "Flags": 0,
-            "__version": 2,
-            "Additive": false,
-            "AlphaCutoff": 0.5,
-            "Billboard": "None",
-            "Color": "1,1,1,1",
-            "DepthFeather": 0,
-            "FlipHorizontal": false,
-            "FlipVertical": false,
-            "FogStrength": 1,
-            "IsSorted": true,
-            "Lighting": false,
-            "OnAnimationEnd": null,
-            "OnAnimationStart": null,
-            "OnBroadcastMessage": null,
-            "OnComponentDestroy": null,
-            "OnComponentDisabled": null,
-            "OnComponentEnabled": null,
-            "OnComponentFixedUpdate": null,
-            "OnComponentStart": null,
-            "OnComponentUpdate": null,
-            "Opaque": false,
-            "OverlayColor": "1,1,1,0",
-            "PlaybackSpeed": 1,
-            "RenderOptions": {
-              "GameLayer": true,
-              "OverlayLayer": false,
-              "BloomLayer": false,
-              "AfterUILayer": false
-            },
-            "Shadows": false,
-            "Size": "100,100",
-            "Sprite": "flipper2d_standalone/avatar.sprite",
-            "StartingAnimationName": "Default",
-            "TextureFilter": "Bilinear"
           }
         ],
         "Children": []
@@ -289,6 +230,10 @@
                 "Flags": 0,
                 "ClickSound": "sounds/ui/click.sound",
                 "CoinSpinSound": "sounds/ui/coin_spin.sound",
+                "IdleMonObject": {
+                  "_type": "gameobject",
+                  "go": "e4a205af-2889-47ce-a236-aa2edc381678"
+                },
                 "LoseSound": "sounds/ui/lose.sound",
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
@@ -304,132 +249,41 @@
         ]
       },
       {
-        "__guid": "59d05aad-ab99-4c49-adea-8244ca2a13d9",
+        "__guid": "e4a205af-2889-47ce-a236-aa2edc381678",
         "__version": 2,
-        "Flags": 0,
-        "Name": "CardTest",
-        "Position": "-17.1221581,-974.973389,372.525208",
-        "Rotation": "0,0,0,1",
-        "Scale": "1,1,1",
-        "Tags": "",
-        "Enabled": true,
-        "NetworkMode": 2,
-        "NetworkFlags": 0,
-        "NetworkOrphaned": 0,
-        "NetworkTransmit": true,
-        "OwnerTransfer": 1,
-        "Components": [
-          {
-            "__type": "Sandbox.SpriteRenderer",
-            "__guid": "f35a3b3c-2e2d-4841-8313-b6f2b908724a",
-            "__enabled": true,
-            "Flags": 0,
-            "__version": 2,
-            "Additive": false,
-            "AlphaCutoff": 0.5,
-            "Billboard": "Always",
-            "Color": "1,1,1,1",
-            "DepthFeather": 0,
-            "FlipHorizontal": false,
-            "FlipVertical": false,
-            "FogStrength": 1,
-            "IsSorted": true,
-            "Lighting": false,
-            "OnAnimationEnd": null,
-            "OnAnimationStart": null,
-            "OnBroadcastMessage": null,
-            "OnComponentDestroy": null,
-            "OnComponentDisabled": null,
-            "OnComponentEnabled": null,
-            "OnComponentFixedUpdate": null,
-            "OnComponentStart": null,
-            "OnComponentUpdate": null,
-            "Opaque": false,
-            "OverlayColor": "1,1,1,0",
-            "PlaybackSpeed": 1,
-            "RenderOptions": {
-              "GameLayer": true,
-              "OverlayLayer": false,
-              "BloomLayer": false,
-              "AfterUILayer": false
+        "__Prefab": "prefabs/idlemon_system.prefab",
+        "__PrefabInstancePatch": {
+          "AddedObjects": [],
+          "RemovedObjects": [],
+          "PropertyOverrides": [
+            {
+              "Target": {
+                "Type": "GameObject",
+                "IdValue": "6cf93e02-382d-48b3-a8b7-ba2b9a5d2474"
+              },
+              "Property": "Enabled",
+              "Value": false
             },
-            "Shadows": false,
-            "Size": "100,100",
-            "Sprite": null,
-            "StartingAnimationName": "Default",
-            "TextureFilter": "Bilinear"
-          },
-          {
-            "__type": "Sandbox.UI.Casino.Games.Cards.CardDisplay",
-            "__guid": "207f6220-fc0b-4fc2-83fe-5f8f382511fa",
-            "__enabled": true,
-            "Flags": 0,
-            "Data": "ui/casino/cards/data/ace_clubs.card",
-            "OnComponentDestroy": null,
-            "OnComponentDisabled": null,
-            "OnComponentEnabled": null,
-            "OnComponentFixedUpdate": null,
-            "OnComponentStart": null,
-            "OnComponentUpdate": null,
-            "Renderer": {
-              "_type": "component",
-              "component_id": "f35a3b3c-2e2d-4841-8313-b6f2b908724a",
-              "go": "59d05aad-ab99-4c49-adea-8244ca2a13d9",
-              "component_type": "SpriteRenderer"
+            {
+              "Target": {
+                "Type": "Component",
+                "IdValue": "36c42c3a-3d08-4300-a0f9-3d34a0817c28"
+              },
+              "Property": "IdleMonSystem",
+              "Value": null
             }
-          }
-        ],
-        "Children": []
-      },
-      {
-        "__guid": "36040969-efb6-4d81-8916-745497082338",
-        "__version": 2,
-        "Flags": 0,
-        "Name": "CoinTest",
-        "Position": "-22.0514908,-1081.68787,110.924042",
-        "Rotation": "-0.707106829,1.37678782E-07,0.707106769,1.37678782E-07",
-        "Scale": "10000,10000,10000",
-        "Tags": "",
-        "Enabled": true,
-        "NetworkMode": 2,
-        "NetworkFlags": 0,
-        "NetworkOrphaned": 0,
-        "NetworkTransmit": true,
-        "OwnerTransfer": 1,
-        "Components": [
-          {
-            "__type": "Sandbox.ModelRenderer",
-            "__guid": "04d81953-8500-413e-a5be-ea8e1a28d2a9",
-            "__enabled": true,
-            "Flags": 0,
-            "BodyGroups": 18446744073709551615,
-            "CreateAttachments": false,
-            "LodOverride": null,
-            "MaterialGroup": null,
-            "MaterialOverride": null,
-            "Materials": {
-              "indexed": {
-                "0": "ui/casino/coinflip/coin.vmat"
-              }
-            },
-            "Model": "ui/casino/coinflip/coin.vmdl",
-            "OnComponentDestroy": null,
-            "OnComponentDisabled": null,
-            "OnComponentEnabled": null,
-            "OnComponentFixedUpdate": null,
-            "OnComponentStart": null,
-            "OnComponentUpdate": null,
-            "RenderOptions": {
-              "GameLayer": true,
-              "OverlayLayer": false,
-              "BloomLayer": false,
-              "AfterUILayer": false
-            },
-            "RenderType": "On",
-            "Tint": "1,1,1,1"
-          }
-        ],
-        "Children": []
+          ],
+          "MovedObjects": []
+        },
+        "__PrefabIdToInstanceId": {
+          "6cf93e02-382d-48b3-a8b7-ba2b9a5d2474": "e4a205af-2889-47ce-a236-aa2edc381678",
+          "514d6f05-5bae-4557-a688-260fcc95db2e": "a74b5d29-3222-4859-9ed5-1a0e64d03d38",
+          "e1ecbca0-99c8-4992-8503-2e2575b09369": "b3847b33-8d29-4949-8cf4-7d0ba04bd2aa",
+          "36c42c3a-3d08-4300-a0f9-3d34a0817c28": "f99f1adf-cc5a-4bcc-a571-a9756d2df392",
+          "d4bafd5b-7929-407f-bbb0-28189676eb16": "500a2af2-65bb-4b75-993a-e199c83112c9",
+          "a23b4cd2-8965-45e6-b46e-10bf65519842": "f3f27fc9-230b-4d0b-9d56-1d42cc139148",
+          "b3176b8a-1a88-4863-bf2a-21a250c58b27": "7bdc7bdb-df3c-4658-86fe-2de6e24d9c27"
+        }
       }
     ],
     "__properties": {
