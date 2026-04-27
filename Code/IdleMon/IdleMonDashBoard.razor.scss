@@ -37,7 +37,7 @@ IdleMonDashBoard {
   .node-matrix {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px; // Slightly tighter gap for vertical density
     padding: 20px;
     width: 800px;
     margin: 0 auto;
@@ -56,15 +56,21 @@ IdleMonDashBoard {
     display: flex;
     flex-direction: column;
     width: 380px;
-    height: 190px;
+    height: 85px; // COMPACT DEFAULT HEIGHT
     flex: none;
     border-radius: 4px;
     position: relative;
     overflow: hidden;
-    transition: transform 0.1s ease-out, border-color 0.1s ease;
+    transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.1s ease;
     transform-origin: center center;
 
-    &.active:hover { transform: scale(1.02); z-index: 10; }
+    &.active:hover { transform: scale(1.01); z-index: 10; }
+
+    // EXPANDED STATE
+    &.expanded {
+      height: 240px;
+      z-index: 5;
+    }
 
     &.empty {
       justify-content: center;
@@ -73,45 +79,80 @@ IdleMonDashBoard {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
-        .icon { font-size: 32px; }
-        span { font-size: 11px; letter-spacing: 2px; font-weight: bold; }
+        gap: 8px;
+        .icon { font-size: 24px; }
+        span { font-size: 10px; letter-spacing: 1px; font-weight: bold; opacity: 0.6; }
       }
     }
 
     .card-header {
       display: flex;
-      padding: 12px;
+      padding: 10px 15px;
       justify-content: space-between;
-      align-items: center;
-      .name { font-weight: 800; font-size: 14px; text-transform: uppercase; }
-      .gen-tag { font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+      align-items: flex-start;
+      flex-shrink: 0;
+
+      .name-group {
+        display: flex;
+        flex-direction: column;
+        .name { font-weight: 800; font-size: 13px; text-transform: uppercase; }
+        .birth-date { font-size: 9px; opacity: 0.4; font-weight: bold; text-transform: uppercase; }
+      }
+
+      .gen-tag { font-size: 9px; font-weight: 900; opacity: 0.8; }
     }
 
     .card-body {
       display: flex;
       flex-direction: column;
-      padding: 12px 15px;
-      gap: 6px;
+      padding: 0 15px 10px 15px;
+      gap: 4px;
       flex-grow: 1;
+      overflow: hidden;
+
+      &.details-view {
+        animation: fade-in 0.3s ease;
+      }
+
       .stat-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        .stat-label { font-size: 10px; font-weight: bold; }
-        .stat-value { font-size: 13px; font-weight: 600; }
-        &.secondary { margin-top: 4px; padding-top: 4px; .stat-label, .stat-value { font-size: 9px; } }
+        .stat-label { font-size: 9px; font-weight: bold; opacity: 0.6; }
+        .stat-value { font-size: 11px; font-weight: 600; }
+
+        &.warning { .stat-value { color: #ff5555; } }
+        &.bonus { .stat-value { color: #00ffcc; font-weight: 800; } }
+      }
+
+      .stat-divider {
+        height: 1px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.08);
+        margin: 4px 0;
       }
     }
 
     .card-footer {
       display: flex;
-      padding: 10px 15px;
-      .yield-contribution { text-align: right; width: 100%; font-size: 12px; font-weight: 800; }
+      padding: 8px 15px;
+      background-color: rgba(0, 0, 0, 0.15);
+      margin-top: auto;
+
+      .meta-preview {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+
+        .market-tag { font-size: 9px; font-weight: 900; opacity: 0.5; }
+        .yield-contribution { font-size: 12px; font-weight: 800; }
+      }
     }
 
     .swap-overlay {
       position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -122,23 +163,24 @@ IdleMonDashBoard {
         display: flex;
         flex-direction: column;
         align-items: center;
-        .delta-value { font-size: 32px; font-weight: 900; }
-        .delta-unit { font-size: 11px; color: rgba(255, 255, 255, 0.4); }
+        .delta-value { font-size: 24px; font-weight: 900; }
+        .delta-unit { font-size: 9px; color: rgba(255, 255, 255, 0.4); }
       }
 
       .action-hint {
-        font-size: 10px; font-weight: 900; margin-top: 15px; padding: 4px 12px;
+        font-size: 9px; font-weight: 900; margin-top: 8px; padding: 2px 8px;
         border-radius: 2px; text-transform: uppercase;
+        &.danger-flash { animation: flash-red 1s infinite; }
       }
     }
 
     &.candidate-card {
       width: 350px !important;
-      height: 220px !important;
+      height: 240px !important; // Candidate is always expanded
       pointer-events: none;
       transform: none;
       .card-header .gen-tag { padding: 0 6px; }
-      .card-footer .yield-contribution { text-align: center; }
+      .card-body { overflow: visible; }
     }
   }
 
@@ -149,7 +191,7 @@ IdleMonDashBoard {
     align-items: center;
     padding: 20px 40px;
     flex-shrink: 0;
-    min-height: 280px;
+    min-height: 300px;
     width: 100%;
 
     .draft-controls {
@@ -161,40 +203,46 @@ IdleMonDashBoard {
     }
 
     .draft-actions {
-      margin-top: 10px;
+      margin-top: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+
+      .instruction-label {
+        font-size: 9px;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 1.2px;
+      }
+
       .btn-discard {
         color: white;
-        padding: 10px 30px;
-        font-size: 12px;
+        padding: 8px 25px;
+        font-size: 10px;
         text-transform: uppercase;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        &:hover { background: rgba(255, 255, 255, 0.05); }
       }
     }
 
     .btn-primary {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
-      padding: 12px 40px;
-      border: none;
+      padding: 10px 35px;
       border-radius: 2px;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      transition: all 0.05s ease;
-      margin: auto 0;
-      &:hover { transform: translateY(-2px); }
-      &:active { transform: translateY(2px); }
-    }
-
-    .btn-danger {
-      color: white;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 10px 24px;
-      border: none;
-      border-radius: 2px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      &:hover { transform: translateY(-1px); }
-      &:active { transform: translateY(2px); }
+      letter-spacing: 1.5px;
     }
   }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flash-red {
+  0%, 100% { background-color: rgba(255, 0, 0, 0.1); color: white; }
+  50% { background-color: rgba(255, 0, 0, 0.6); color: white; }
 }
