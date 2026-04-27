@@ -27,8 +27,12 @@
       "DefaultMetalness": 0,
       "DefaultAmbientOcclusion": 1,
       "Identifier": "0",
-      "Position": "1560,-384",
+      "Position": "2424,-348",
       "HandleOffsets": {},
+      "Albedo": {
+        "Identifier": "5",
+        "Output": "Result"
+      },
       "Opacity": {
         "Identifier": "26",
         "Output": "Result"
@@ -59,13 +63,13 @@
         }
       },
       "Identifier": "1",
-      "Position": "612,336",
+      "Position": "1560,120",
       "HandleOffsets": {}
     },
     {
       "_class": "IdlemonColorNode",
       "Identifier": "2",
-      "Position": "-732,-504",
+      "Position": "-156,-828",
       "HandleOffsets": {},
       "GenerationInput": {
         "Identifier": "11",
@@ -77,7 +81,7 @@
       "DefaultA": 0,
       "DefaultB": 2,
       "Identifier": "3",
-      "Position": "-1056,-240",
+      "Position": "-480,-564",
       "HandleOffsets": {},
       "A": {
         "Identifier": "7",
@@ -114,7 +118,7 @@
         }
       },
       "Identifier": "4",
-      "Position": "132,-648",
+      "Position": "264,-1008",
       "HandleOffsets": {}
     },
     {
@@ -125,7 +129,7 @@
       "BlendMode": "Multiply",
       "Clamp": true,
       "Identifier": "5",
-      "Position": "360,-480",
+      "Position": "480,-888",
       "HandleOffsets": {},
       "A": {
         "Identifier": "4",
@@ -143,7 +147,7 @@
     {
       "_class": "Sine",
       "Identifier": "6",
-      "Position": "-780,-240",
+      "Position": "-204,-564",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "3",
@@ -171,7 +175,7 @@
         }
       },
       "Identifier": "7",
-      "Position": "-1356,-264",
+      "Position": "-780,-588",
       "HandleOffsets": {}
     },
     {
@@ -183,7 +187,7 @@
       "OutMax": 1,
       "Clamp": true,
       "Identifier": "8",
-      "Position": "-552,-300",
+      "Position": "24,-624",
       "HandleOffsets": {},
       "A": {
         "Identifier": "6",
@@ -196,7 +200,7 @@
       "CellDensity": 10,
       "Worley": false,
       "Identifier": "9",
-      "Position": "-492,-468",
+      "Position": "84,-792",
       "HandleOffsets": {},
       "Coords": {
         "Identifier": "12",
@@ -208,7 +212,7 @@
       "DefaultInput": 0,
       "DefaultEdge": 0,
       "Identifier": "10",
-      "Position": "-264,-444",
+      "Position": "312,-768",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "9",
@@ -240,7 +244,7 @@
         }
       },
       "Identifier": "11",
-      "Position": "-1020,-456",
+      "Position": "-444,-780",
       "HandleOffsets": {}
     },
     {
@@ -249,7 +253,7 @@
       "DefaultOffset": "0,0",
       "WrapTo01": false,
       "Identifier": "12",
-      "Position": "-696,-408",
+      "Position": "-120,-732",
       "HandleOffsets": {},
       "Offset": {
         "Identifier": "11",
@@ -277,7 +281,7 @@
         }
       },
       "Identifier": "13",
-      "Position": "372,180",
+      "Position": "1548,228",
       "HandleOffsets": {}
     },
     {
@@ -301,7 +305,7 @@
         }
       },
       "Identifier": "14",
-      "Position": "372,252",
+      "Position": "1548,300",
       "HandleOffsets": {}
     },
     {
@@ -325,7 +329,7 @@
         }
       },
       "Identifier": "15",
-      "Position": "840,12",
+      "Position": "576,12",
       "HandleOffsets": {}
     },
     {
@@ -349,7 +353,7 @@
         }
       },
       "Identifier": "16",
-      "Position": "636,-276",
+      "Position": "564,-228",
       "HandleOffsets": {}
     },
     {
@@ -373,7 +377,7 @@
         }
       },
       "Identifier": "17",
-      "Position": "792,396",
+      "Position": "1740,180",
       "HandleOffsets": {}
     },
     {
@@ -397,7 +401,7 @@
         }
       },
       "Identifier": "18",
-      "Position": "612,276",
+      "Position": "1560,60",
       "HandleOffsets": {}
     },
     {
@@ -421,13 +425,13 @@
         }
       },
       "Identifier": "19",
-      "Position": "828,144",
+      "Position": "564,144",
       "HandleOffsets": {}
     },
     {
       "_class": "Sine",
       "Identifier": "20",
-      "Position": "1224,84",
+      "Position": "960,84",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "21",
@@ -439,7 +443,7 @@
       "DefaultA": 0,
       "DefaultB": 1,
       "Identifier": "21",
-      "Position": "1080,48",
+      "Position": "816,48",
       "HandleOffsets": {},
       "A": {
         "Identifier": "15",
@@ -453,7 +457,7 @@
     {
       "_class": "SimplexNoise",
       "Identifier": "22",
-      "Position": "768,-408",
+      "Position": "696,-360",
       "HandleOffsets": {}
     },
     {
@@ -461,7 +465,7 @@
       "DefaultA": 0,
       "DefaultB": 1,
       "Identifier": "23",
-      "Position": "1428,72",
+      "Position": "1164,72",
       "HandleOffsets": {},
       "A": {
         "Identifier": "20",
@@ -475,7 +479,7 @@
     {
       "_class": "ObjectPosition",
       "Identifier": "24",
-      "Position": "1236,180",
+      "Position": "972,180",
       "HandleOffsets": {}
     },
     {
@@ -483,7 +487,7 @@
       "DefaultA": 0,
       "DefaultB": 0.2,
       "Identifier": "25",
-      "Position": "1560,84",
+      "Position": "1296,84",
       "HandleOffsets": {},
       "A": {
         "Identifier": "23",
@@ -495,7 +499,7 @@
       "DefaultInput": 0,
       "DefaultEdge": 0,
       "Identifier": "26",
-      "Position": "1260,-336",
+      "Position": "1188,-288",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "29",
@@ -511,7 +515,7 @@
       "DefaultA": 0,
       "DefaultB": 0.1,
       "Identifier": "27",
-      "Position": "1044,-228",
+      "Position": "972,-180",
       "HandleOffsets": {},
       "A": {
         "Identifier": "28",
@@ -523,7 +527,7 @@
       "DefaultA": 0,
       "DefaultB": 1,
       "Identifier": "28",
-      "Position": "888,-252",
+      "Position": "816,-204",
       "HandleOffsets": {},
       "A": {
         "Identifier": "16",
@@ -535,12 +539,45 @@
       "DefaultA": 0,
       "DefaultB": 1.2,
       "Identifier": "29",
-      "Position": "1008,-360",
+      "Position": "936,-312",
       "HandleOffsets": {},
       "A": {
         "Identifier": "22",
         "Output": "Result"
       }
+    },
+    {
+      "_class": "CommentNode",
+      "Size": "1480,632",
+      "Color": "Green",
+      "Title": "CaseTexture and Generation",
+      "Description": "",
+      "Layer": 2,
+      "Identifier": "30",
+      "Position": "-816,-1080",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "CommentNode",
+      "Size": "844,356",
+      "Color": "Green",
+      "Title": "Division",
+      "Description": "",
+      "Layer": 1,
+      "Identifier": "31",
+      "Position": "528,-432",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "CommentNode",
+      "Size": "868,320",
+      "Color": "Green",
+      "Title": "Subtraction",
+      "Description": "",
+      "Layer": 3,
+      "Identifier": "32",
+      "Position": "528,-60",
+      "HandleOffsets": {}
     }
   ]
 }
