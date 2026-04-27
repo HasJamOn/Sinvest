@@ -45,21 +45,33 @@ public sealed class TestInputHandler : Component
     [Button( "DEBUG: Nuke App Data", "delete_forever" )]
     public void ResetAppData()
     {
-        var saveSystem = Scene.GetAllComponents<GameSaveSystem>().FirstOrDefault();
+	    var saveSystem = GameSaveSystem.Instance; // Using Instance is cleaner if available
+	    var roster = Roster ?? Scene.GetAllComponents<RosterManager>().FirstOrDefault();
 
-        if ( saveSystem.IsValid() )
-        {
-           saveSystem.ClearIdleMonData();
-           var roster = Scene.GetAllComponents<RosterManager>().FirstOrDefault();
-           roster?.LoadRoster();
+	    if ( saveSystem.IsValid() && roster.IsValid() )
+	    {
+		    // 1. Wipe the underlying storage
+		    saveSystem.ClearIdleMonData();
 
-           _hasCandidate = false;
-           Log.Info( "--- EDITOR-SIDE WIPE COMPLETE ---" );
-        }
-        else
-        {
-           Log.Warning( "Could not find GameSaveSystem in the active scene." );
-        }
+		    // 2. FORCE the Roster memory to reset immediately
+		    // This prevents the old memory from being re-saved over the blank file
+		    roster.ActiveNodes.Clear();
+		    for ( int i = 0; i < 6; i++ ) 
+		    {
+			    roster.ActiveNodes.Add( IdleMonData.Empty );
+		    }
+
+		    // 3. Reset currency and state
+		    // We bypass the standard 'SwapNode' to avoid partial syncs
+		    roster.SaveRoster(); 
+
+		    _hasCandidate = false;
+		    Log.Info( "--- APP DATA NUKED & MEMORY PURGED ---" );
+	    }
+	    else
+	    {
+		    Log.Warning( "Nuke failed: Ensure RosterManager and GameSaveSystem are present." );
+	    }
     }
     
     [Button( "PRINT: Roster Audit", "assignment" )]
