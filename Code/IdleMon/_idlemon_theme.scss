@@ -1,0 +1,116 @@
+﻿@mixin idlemon-theme {
+  background-color: $bg-main;
+  font-family: 'Consolas', monospace;
+  color: white;
+
+  .header {
+    border-bottom: 2px solid rgba($cyan, 0.2);
+    .label { color: rgba($cyan, 0.6); }
+    .value { color: $cyan; }
+    .positive { color: $accent-green; }
+
+    .btn-terminate {
+      background-color: rgba($danger-red, 0.1);
+      border: 1px solid rgba($danger-red, 0.4);
+      color: $danger-red;
+      &:hover { background-color: $danger-red; color: black; }
+    }
+  }
+
+  .node-card {
+    background-color: $bg-card;
+    border: 1px solid rgba($cyan, 0.15);
+
+    &.active:hover {
+      border: 1px solid $cyan;
+      background-color: rgba($cyan, 0.08);
+    }
+
+    &.armed {
+      border: 2px solid #ff0000;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+      animation: pulse-border 0.5s infinite alternate;
+    }
+
+    &.empty {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.2);
+      .icon { color: rgba(255, 255, 255, 0.1); }
+    }
+
+    .card-header {
+      background-color: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      .gen-tag { color: $cyan; }
+    }
+
+    .card-body .stat-row {
+      .stat-label { color: rgba(255, 255, 255, 0.4); }
+      &.warning .stat-value { color: #ff5555; }
+      &.secondary {
+        border-top: 1px solid rgba(255, 255, 255, 0.03);
+        .stat-label { color: rgba($cyan, 0.3); }
+        .stat-value { color: rgba($cyan, 0.7); }
+      }
+    }
+
+    .card-footer {
+      background-color: rgba($cyan, 0.03);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      .yield-contribution {
+        color: $accent-green;
+        text-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
+      }
+    }
+
+    .swap-overlay {
+      background-color: rgba(10, 12, 14, 0.98);
+      &.positive { border: 2px solid $accent-green; .delta-value { color: $accent-green; } }
+      &.negative {
+        border: 2px solid $danger-red;
+        .delta-value { color: $danger-red; }
+        &.is-armed {
+          background-color: rgba(60, 10, 10, 0.95);
+          border: 3px solid #ff0000;
+          .delta-value { animation: pulse-red 0.5s infinite alternate; }
+          .action-hint.danger-flash { background-color: #ff0000; color: white; animation: shake 0.2s infinite; }
+        }
+      }
+    }
+
+    &.candidate-card {
+      border: 1px solid $cyan;
+      background-color: rgba($cyan, 0.05);
+      box-shadow: 0 0 25px rgba($cyan, 0.15);
+      .card-header { background-color: rgba($cyan, 0.1); .gen-tag { background-color: $cyan; color: #000; } }
+      .card-body .stat-row .stat-label { color: rgba($cyan, 0.5); }
+      .card-footer .yield-contribution { color: $cyan; }
+    }
+  }
+
+  .footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(15, 18, 22, 0.9);
+
+    .btn-discard {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      &:hover { border-color: $cyan; background-color: rgba($cyan, 0.05); }
+    }
+
+    .btn-primary {
+      background-color: $cyan;
+      color: #000;
+      box-shadow: 0 4px 0 #008888;
+      &:hover { background-color: #fff; box-shadow: 0 4px 0 #cccccc; }
+      &:active { box-shadow: 0 0px 0 #008888; }
+    }
+
+    .btn-danger {
+      background-color: $danger-red;
+      box-shadow: 0 3px 0 #882222;
+      &:hover { background-color: #ff6666; }
+      &:active { box-shadow: 0 0px 0 #882222; }
+    }
+  }
+}

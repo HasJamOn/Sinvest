@@ -1,0 +1,25 @@
+﻿// Brand Colors
+$bg-main: rgba(20, 24, 28, 0.95);
+$bg-card: rgba(25, 30, 35, 0.95);
+$cyan: #00ffff;
+$accent-green: #00ffaa;
+$danger-red: #ff4444;
+$warning-orange: #ffaa00;
+
+// Keyframes
+@keyframes pulse-red {
+  from { text-shadow: 0 0 5px #ff0000; transform: scale(1); }
+  to { text-shadow: 0 0 20px #ff0000; transform: scale(1.1); }
+}
+
+@keyframes pulse-border {
+  from { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
+  to { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
