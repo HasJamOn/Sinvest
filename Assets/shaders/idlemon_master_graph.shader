@@ -92,6 +92,8 @@ PS
 	Texture2D g_tArtwork < Attribute( "Artwork" ); >;
 	float g_flshadertime < Attribute( "shadertime" ); Default1( 0 ); >;
 	float g_flShaderTime < Attribute( "ShaderTime" ); Default1( 0 ); >;
+	float g_flAddition < Attribute( "Addition" ); Default1( 0 ); >;
+	float g_flMultiplier < Attribute( "Multiplier" ); Default1( 0 ); >;
 	float g_flDivision < Attribute( "Division" ); Default1( 0 ); >;
 	
 	float4 MainPs( PixelInput i ) : SV_Target0
@@ -135,15 +137,29 @@ PS
 		float l_8 = VoronoiNoise( l_7, 3.1415925, 10 );
 		float l_9 = step( l_6, l_8 );
 		float4 l_10 = saturate( lerp( l_0, l_0*float4( l_2, 0 ), l_9 ) );
-		float l_11 = g_flDivision;
-		float l_12 = l_11 - 1;
-		float l_13 = l_12 * 0.1;
-		float l_14 = Simplex2D( i.vTextureCoords.xy );
-		float l_15 = l_14 + 1.2;
-		float l_16 = step( l_13, l_15 );
+		float3 l_11 = float3( 0.2126, 0.7152, 0.0722 );
+		float l_12 = dot( l_0, float4( l_11, 0 ) );
+		float l_13 = pow( l_12, 2 );
+		float l_14 = g_flAddition;
+		float l_15 = sqrt( l_14 );
+		float l_16 = saturate( ( l_15 - 0 ) / ( 1000 - 0 ) ) * ( 150 - 0 ) + 0;
+		float l_17 = l_13 * l_16;
+		float l_18 = g_flMultiplier;
+		float l_19 = g_flShaderTime;
+		float l_20 = l_18 * l_19;
+		float l_21 = sin( l_20 );
+		float l_22 = lerp( 0.2, 1, l_21 );
+		float l_23 = l_17 * l_22;
+		float l_24 = g_flDivision;
+		float l_25 = l_24 - 1;
+		float l_26 = l_25 * 0.1;
+		float l_27 = Simplex2D( i.vTextureCoords.xy );
+		float l_28 = l_27 + 1.2;
+		float l_29 = step( l_26, l_28 );
 		
 		m.Albedo = l_10.xyz;
-		m.Opacity = l_16;
+		m.Emission = float3( l_23, l_23, l_23 );
+		m.Opacity = l_29;
 		m.Roughness = 1;
 		m.Metalness = 0;
 		m.AmbientOcclusion = 1;

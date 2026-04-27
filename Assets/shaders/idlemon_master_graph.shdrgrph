@@ -33,6 +33,10 @@
         "Identifier": "5",
         "Output": "Result"
       },
+      "Emission": {
+        "Identifier": "39",
+        "Output": "Result"
+      },
       "Opacity": {
         "Identifier": "26",
         "Output": "Result"
@@ -63,7 +67,7 @@
         }
       },
       "Identifier": "1",
-      "Position": "1560,120",
+      "Position": "1416,312",
       "HandleOffsets": {}
     },
     {
@@ -281,7 +285,7 @@
         }
       },
       "Identifier": "13",
-      "Position": "1548,228",
+      "Position": "1944,228",
       "HandleOffsets": {}
     },
     {
@@ -305,7 +309,7 @@
         }
       },
       "Identifier": "14",
-      "Position": "1548,300",
+      "Position": "1728,264",
       "HandleOffsets": {}
     },
     {
@@ -377,7 +381,7 @@
         }
       },
       "Identifier": "17",
-      "Position": "1740,180",
+      "Position": "1404,564",
       "HandleOffsets": {}
     },
     {
@@ -401,7 +405,7 @@
         }
       },
       "Identifier": "18",
-      "Position": "1560,60",
+      "Position": "1404,492",
       "HandleOffsets": {}
     },
     {
@@ -578,6 +582,188 @@
       "Identifier": "32",
       "Position": "528,-60",
       "HandleOffsets": {}
+    },
+    {
+      "_class": "Float",
+      "Min": 0,
+      "Max": 1,
+      "Value": 0,
+      "Name": "ShaderTime",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "33",
+      "Position": "1656,360",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Identifier": "34",
+      "Position": "1932,300",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "14",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "33",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Sine",
+      "Identifier": "35",
+      "Position": "2076,312",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "34",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Lerp",
+      "DefaultA": 0.2,
+      "DefaultB": 1,
+      "Fraction": 0.5,
+      "Identifier": "36",
+      "Position": "2304,276",
+      "HandleOffsets": {},
+      "C": {
+        "Identifier": "35",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "RemapValue",
+      "In": 0.5,
+      "InMin": 0,
+      "InMax": 1000,
+      "OutMin": 0,
+      "OutMax": 150,
+      "Clamp": true,
+      "Identifier": "37",
+      "Position": "2136,144",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "44",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Identifier": "38",
+      "Position": "2340,120",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "43",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "37",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Multiply",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Identifier": "39",
+      "Position": "2496,180",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "38",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "36",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "CommentNode",
+      "Size": "976,440",
+      "Color": "Green",
+      "Title": "Addition and Multiplier",
+      "Description": "",
+      "Layer": 4,
+      "Identifier": "40",
+      "Position": "1620,-0",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "DotProduct",
+      "Identifier": "41",
+      "Position": "1848,36",
+      "HandleOffsets": {},
+      "InputA": {
+        "Identifier": "4",
+        "Output": "Result"
+      },
+      "InputB": {
+        "Identifier": "42",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Float3",
+      "Min": "0,0,0",
+      "Max": "1,1,1",
+      "Value": "0.212599993,0.715200007,0.0722000003",
+      "Name": "",
+      "IsAttribute": false,
+      "UI": {
+        "Type": "Default",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "42",
+      "Position": "1800,132",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Power",
+      "DefaultA": 1,
+      "DefaultB": 2,
+      "Identifier": "43",
+      "Position": "2124,36",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "41",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "Sqrt",
+      "Identifier": "44",
+      "Position": "2004,144",
+      "HandleOffsets": {},
+      "Input": {
+        "Identifier": "13",
+        "Output": "Result"
+      }
     }
   ]
 }
