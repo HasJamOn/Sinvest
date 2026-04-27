@@ -18,7 +18,8 @@ public enum StartingModifiers : int
     Internity = 8,
     BrownNose = 16,
     MentorDad = 32,
-    DevMode = 64
+    DevMode = 64,
+    Destitute = 128
 }
 
 public class CharacterSession
@@ -127,22 +128,50 @@ public sealed partial class GameSaveSystem : Component
 
     public async Task SaveActiveSlotAsync()
     {
-       if ( CurrentCharacter == null ) return;
+	    if ( CurrentCharacter == null ) return;
 
-       SetStoredName( CurrentCharacter.Name );
-       SetStoredStat( "money", CurrentCharacter.Money );
-       SetStoredStat( "modifiers", (int)CurrentCharacter.Modifiers );
+	    // 1. Save the specific slot data
+	    SetStoredName( CurrentCharacter.Name );
+	    SetStoredStat( "money", CurrentCharacter.Money );
+	    SetStoredStat( "modifiers", (int)CurrentCharacter.Modifiers );
+	    // Ensure IdleBucks or other stats are saved here too if needed
 
-       // Explicitly only flush if we are in cloud mode
-       if ( ShouldUseCloud )
-       {
-          await Sandbox.Services.Stats.FlushAsync();
-          Log.Info( $"[SAVE SYSTEM] Cloud Sync Complete for {CurrentCharacter.Name}" );
-       }
-       else
-       {
-          Log.Info( $"[SAVE SYSTEM] Local Save Confirmed for {CurrentCharacter.Name}" );
-       }
+	    // 2. UPDATE TOTALS (Aggregate across all slots)
+	    UpdateGlobalTotals();
+
+	    if ( ShouldUseCloud )
+	    {
+		    await Sandbox.Services.Stats.FlushAsync();
+		    Log.Info( $"[SAVE SYSTEM] Cloud Sync Complete (Totals Updated)" );
+	    }
+    }
+
+    private void UpdateGlobalTotals()
+    {
+	    double totalMoney = 0;
+	    double totalShares = 0;
+	    double totalBucks = 0;
+
+	    // Iterate through your available slots (assuming 1-3 based on standard UI)
+	    for ( int i = 1; i <= 3; i++ )
+	    {
+		    totalMoney += GetStoredStatForSlot( i, "money" );
+		    totalShares += GetStoredStatForSlot( i, "fundino_shares" );
+		    totalBucks += GetStoredStatForSlot( i, "idlemon_bucks" );
+	    }
+
+	    // Save these to a "Global" key (no suffix)
+	    if ( ShouldUseCloud )
+	    {
+		    Stats.SetValue( "total_money", totalMoney );
+		    Stats.SetValue( "total_shares", totalShares );
+		    Stats.SetValue( "total_idlemon_bucks", totalBucks );
+	    }
+
+	    // Also update local cookies for immediate retrieval
+	    Game.Cookies.Set( "total_money", totalMoney.ToString() );
+	    Game.Cookies.Set( "total_shares", totalShares.ToString() );
+	    Game.Cookies.Set( "total_idlemon_bucks", totalBucks.ToString() );
     }
 
     public bool IsModifierUnlocked( StartingModifiers modifier )
@@ -157,6 +186,7 @@ public sealed partial class GameSaveSystem : Component
           StartingModifiers.Phoney => "disconnected",
           StartingModifiers.Internity => "career_maniac",
           StartingModifiers.BrownNose => "employee_of_the_month",
+          StartingModifiers.Destitute => "rock_bottom",
           _ => null
        };
 
@@ -168,6 +198,22 @@ public sealed partial class GameSaveSystem : Component
        }
        
        return _localAchievements.Contains( achievementId );
+    }
+    
+    /// <summary>
+    /// Returns the combined value across all character slots.
+    /// </summary>
+    public double GetGlobalTotal( string statName )
+    {
+	    string key = $"total_{statName}";
+
+	    if ( ShouldUseCloud )
+	    {
+		    return (double)Stats.LocalPlayer.Get( key ).Value;
+	    }
+
+	    string val = Game.Cookies.Get( key, "0" );
+	    return double.TryParse( val, out double result ) ? result : 0;
     }
 
     public void DebugUnlockAchievement( string id )
@@ -308,7 +354,9 @@ public sealed partial class GameSaveSystem : Component
 		    _localStats[$"idlemon_bucks{suffix}"] = 0;
 	    }
 
-	    Log.Info( $"[SAVE SYSTEM] Wiped Slot {slot}. Occupation flag (Stats) and Roster (Cookies) cleared." );
+	    UpdateGlobalTotals();
+    
+	    Log.Info( $"[SAVE SYSTEM] Wiped Slot {slot} and recalculated global totals." );
     }
 
     public bool HasGraduated()
@@ -360,34 +408,34 @@ public void UpdateSecuritySignature()
 /// <summary>
 /// Called immediately after loading a character's stats.
 /// </summary>
-public void ValidateSaveIntegrity()
-{
-    double m = GetStoredStat( "money" );
-    double s = GetStoredStat( "fundino_shares" );
-    double ib = GetStoredStat( "idlemon_bucks" );
-    
-    string storedSig = Game.Cookies.Get( $"save_signature{SlotSuffix}", "" );
-    string seedStr = Game.Cookies.Get( $"save_seed{SlotSuffix}", "9928341" );
-    int storedSeed = int.TryParse( seedStr, out int res ) ? res : 9928341;
+	public void ValidateSaveIntegrity()
+	{
+	    double m = GetStoredStat( "money" );
+	    double s = GetStoredStat( "fundino_shares" );
+	    double ib = GetStoredStat( "idlemon_bucks" );
+	    
+	    string storedSig = Game.Cookies.Get( $"save_signature{SlotSuffix}", "" );
+	    string seedStr = Game.Cookies.Get( $"save_seed{SlotSuffix}", "9928341" );
+	    int storedSeed = int.TryParse( seedStr, out int res ) ? res : 9928341;
 
-    // If it's a brand new character, trust it automatically
-    if ( string.IsNullOrEmpty( storedSig ) && m == 0 && s == 0 && ib == 0 )
-    {
-        IsSaveTrusted = true;
-        return;
-    }
+	    // If it's a brand new character, trust it automatically
+	    if ( string.IsNullOrEmpty( storedSig ) && m == 0 && s == 0 && ib == 0 )
+	    {
+	        IsSaveTrusted = true;
+	        return;
+	    }
 
-    // Calculate what the signature SHOULD be, using the seed they saved with
-    string calculatedSig = SinvestSession.GenerateSignature( m, s, ib, storedSeed );
+	    // Calculate what the signature SHOULD be, using the seed they saved with
+	    string calculatedSig = SinvestSession.GenerateSignature( m, s, ib, storedSeed );
 
-    if ( storedSig != calculatedSig )
-    {
-        Log.Warning( $"[SECURITY] Checksum mismatch on Slot {ActiveSlot}. Flagging save as Untrusted." );
-        IsSaveTrusted = false;
-    }
-    else
-    {
-        IsSaveTrusted = true;
-    }
-}
+	    if ( storedSig != calculatedSig )
+	    {
+	        Log.Warning( $"[SECURITY] Checksum mismatch on Slot {ActiveSlot}. Flagging save as Untrusted." );
+	        IsSaveTrusted = false;
+	    }
+	    else
+	    {
+	        IsSaveTrusted = true;
+	    }
+	}	
 }

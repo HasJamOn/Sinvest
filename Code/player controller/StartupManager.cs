@@ -70,47 +70,63 @@ public sealed class StartupManager : Component
 
     private void ApplyModifiers( StartingModifiers mods, string claimKey )
     {
-       if ( !_economy.IsValid() )
-       {
-          Log.Error( "[STARTUP] EconomyManager not found on Player Prefab!" );
-          return;
-       }
+	    if ( !_economy.IsValid() )
+	    {
+		    Log.Error( "[STARTUP] EconomyManager not found on Player Prefab!" );
+		    return;
+	    }
 
-       Log.Info( $"[STARTUP] Initializing modifiers for {SinvestSession.ActiveSlot}..." );
+	    Log.Info( $"[STARTUP] Initializing modifiers for {SinvestSession.ActiveSlot}..." );
 
-       // 1. Nepokid: Starts with $500k in S&P 500
-       if ( mods.HasFlag( StartingModifiers.Nepokid ) )
-       {
-          _economy.CommitTransaction( 0, 500000 ); 
-          Log.Info( "Modifier Applied: Nepokid ($500k shares)" );
-       }
+	    // --- DEFAULT STARTER KIT ---
+	    // Only grant if the player does NOT have the Destitute modifier
+	    if ( !mods.HasFlag( StartingModifiers.Destitute ) )
+	    {
+		    _economy.CommitTransaction( 1000, 1 ); 
+		    Log.Info( "Standard Issue: $1000 and 1 Share granted." );
+	    }
+	    else
+	    {
+		    Log.Warning( "Modifier Active: Destitute. Starting with $0 and 0 shares. Good luck." );
+	    }
 
-       // 2. Phoney: Start with a Phone
-       if ( mods.HasFlag( StartingModifiers.Phoney ) )
-       {
-          GrantItem( "item_phone" );
-       }
+	    // --- CONDITIONAL MODIFIERS ---
+   
+	    // Nepokid: Starts with $500k in shares 
+	    // (Note: If a player is both Destitute AND Nepokid, they'd get 500k but not the base 1000)
+	    if ( mods.HasFlag( StartingModifiers.Nepokid ) )
+	    {
+		    _economy.CommitTransaction( 0, 500000 ); 
+		    Log.Info( "Modifier Applied: Nepokid (+ $500k shares)" );
+	    }
 
-       // 3. Internity: Unlock all jobs
-       if ( mods.HasFlag( StartingModifiers.Internity ) )
-       {
-          UnlockAllJobs();
-       }
+	    // 2. Phoney: Start with a Phone
+	    if ( mods.HasFlag( StartingModifiers.Phoney ) )
+	    {
+		    GrantItem( "item_phone" );
+	    }
 
-       // 4. DevMode: For testing
-       if ( mods.HasFlag( StartingModifiers.DevMode ) )
-       {
-          _economy.CommitTransaction( 100000000, 0 );
-       }
+	    // 3. Internity: Unlock all jobs
+	    if ( mods.HasFlag( StartingModifiers.Internity ) )
+	    {
+		    UnlockAllJobs();
+	    }
 
-       // --- FINALIZE CLAIM ---
-       if ( GameSaveSystem.Instance.ShouldUseCloud )
-       {
-           Stats.SetValue( claimKey, 1 );
-           _ = Stats.FlushAsync();
-       }
-       
-       Log.Info( "[STARTUP] Character initialization complete." );
+	    // 4. DevMode: For testing huge amounts
+	    if ( mods.HasFlag( StartingModifiers.DevMode ) )
+	    {
+		    _economy.CommitTransaction( 100000000, 0 );
+	    }
+
+	    // --- FINALIZE CLAIM ---
+	    // We mark this slot as "Initialized" so they can't get the $1000 again on reload.
+	    if ( GameSaveSystem.Instance.ShouldUseCloud )
+	    {
+		    Stats.SetValue( claimKey, 1 );
+		    _ = Stats.FlushAsync();
+	    }
+   
+	    Log.Info( "[STARTUP] Character initialization complete." );
     }
 
     private void GrantItem( string itemTag )
