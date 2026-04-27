@@ -2,7 +2,7 @@ using Sandbox;
 using System;
 using Sinvest;
 
-public sealed class IdlemonDebugger : Component
+public sealed class IdlemonDebuggerMaterialtestDebugger : Component
 {
 	[Property, Group( "Target" )] public IdlemonCase TargetCase { get; set; }
 

@@ -6,85 +6,55 @@ namespace Sinvest;
 
 public sealed class AssetAcquisition : Component
 {
-    [Property] public double StandardEggCost { get; set; } = 10000;
+	[Property] public double StandardEggCost { get; set; } = 10000;
+	// Link this in the inspector to the GameObject that has AssetGenerator
+	[Property] public AssetGenerator Generator { get; set; } 
     
-    // The Base Price from your MarketServerSystem
-    private const double MarketBasePrice = 7126.0;
+	private const double MarketBasePrice = 7126.0;
 
-    public void RollStandardEgg()
-    {
-        var econ = EconomyManager.Instance;
-        var roster = RosterManager.Instance;
+	public void RollStandardEgg()
+	{
+		var roster = RosterManager.Instance;
 
-        // 1. Check Funds (Using IdleBucks from RosterManager)
-        if ( roster.IdleBucks < StandardEggCost )
-        {
-            Log.Warning( "Insufficient IdleBucks!" );
-            return;
-        }
+		if ( roster.IdleBucks < StandardEggCost )
+		{
+			Log.Warning( "Insufficient IdleBucks!" );
+			return;
+		}
 
-        // 2. Deduct Cost
-        roster.ConsumeIdleBucks( StandardEggCost );
+		// Use the Generator component if we have it
+		if ( !Generator.IsValid() )
+		{
+			Log.Error( "AssetAcquisition: Generator property is not assigned!" );
+			return;
+		}
 
-        // 3. Calculate Market Scale (S)
-        float currentS = (float)(MarketService.CurrentPrice / MarketBasePrice);
+		roster.ConsumeIdleBucks( StandardEggCost );
 
-        // 4. Generate the "Candidate"
-        IdleMonData candidate = GenerateRandomNode( currentS );
+		// FIX: Call the actual Generator that reads from bootstrap_ids.txt
+		IdleMonData candidate = Generator.RollNewAsset();
 
-        // 5. Open the Draft UI
-        // We'll hook this into your UI layer next
-        Log.Info( $"Rolled: {candidate.Name} with S Factor: {currentS:F2}" );
+		Log.Info( $"Rolled: {candidate.Name} (SteamID: {candidate.SteamId})" );
         
-        // For now, let's just force add it if there's space, or trigger Draft
-        OpenDraftOverlay( candidate );
-    }
+		OpenDraftOverlay( candidate );
+	}
 
-    private IdleMonData GenerateRandomNode( float sFactor )
-    {
-        var random = new Random();
-        
-        // Use S to scale the "Potential" of the roll
-        // High S = Higher ceiling for Addition and Multiplier
-        double potentialA = (random.NextDouble() * 5.0 + 1.0) * sFactor;
-        double potentialM = (random.NextDouble() * 0.5 + 1.0) * sFactor;
+	[Property] public bool IsDrafting { get; private set; }
+	public IdleMonData CurrentCandidate { get; private set; }
 
-        return new IdleMonData
-        {
-            ID = Guid.NewGuid(),
-            Name = "Node-" + random.Next( 1000, 9999 ),
-            Addition = potentialA,
-            Multiplier = potentialM,
-            Subtraction = random.NextDouble() > 0.8 ? random.NextDouble() * 2.0 : 0, // 20% chance for "Cursed"
-            Division = 1.0,
-            TeamBonus = 1.0,
-            RolledAt = DateTime.UtcNow,
-            MarketScaleAtBirth = sFactor,
-            Generation = 1
-        };
-    }
+	private void OpenDraftOverlay( IdleMonData candidate )
+	{
+		CurrentCandidate = candidate;
+		IsDrafting = true;
+		GameSaveSystem.OnDataChanged?.Invoke(); 
+	}
 
-    [Property] public bool IsDrafting { get; private set; }
-    public IdleMonData CurrentCandidate { get; private set; }
-
-    private void OpenDraftOverlay( IdleMonData candidate )
-    {
-	    CurrentCandidate = candidate;
-	    IsDrafting = true;
-    
-	    // Trigger a UI refresh
-	    GameSaveSystem.OnDataChanged?.Invoke(); 
-    }
-
-    public void FinalizeDraft( int slotIndex )
-    {
-	    if ( !IsDrafting ) return;
-    
-	    // Swap the node into the roster
-	    RosterManager.Instance.ActiveNodes[slotIndex] = CurrentCandidate;
-    
-	    // Cleanup
-	    IsDrafting = false;
-	    CurrentCandidate = IdleMonData.Empty;
-    }
+	public void FinalizeDraft( int slotIndex )
+	{
+		if ( !IsDrafting ) return;
+		RosterManager.Instance.ActiveNodes[slotIndex] = CurrentCandidate;
+		IsDrafting = false;
+		// Reset to a blank state
+		CurrentCandidate = default; 
+	}
 }
