@@ -392,17 +392,6 @@
     </div>
 };
 
-// Helper to keep the main fragment clean and ensure consistent layout
-RenderFragment RenderStatItem(string icon, string label, string value, string cssClass) => __builder => {
-    <div class="stat-item @cssClass">
-        <i class="icon">@icon</i>
-        <div class="stat-info">
-            <label>@label</label>
-            <span class="value">@value</span>
-        </div>
-    </div>
-};
-
     protected override int BuildHash() => System.HashCode.Combine( 
         Roster?.IdleBucks ?? 0, 
         Roster?.ActiveNodes?.Count ?? 0,
@@ -457,4 +446,14 @@ RenderFragment RenderStatItem(string icon, string label, string value, string cs
            SinvestOS.Instance.GoBack();
         }
     }
+    RenderFragment RenderStatItem(string icon, string label, string value, string cssClass) => __builder => {
+	    <div class="stat-item @cssClass">
+		    <div class="stat-icon-wrapper">
+			    <i class="icon">@icon</i>
+		    </div>
+		    <div class="stat-details">
+			    <span class="stat-value">@value</span>
+		    </div>
+	    </div>
+    };
 }
