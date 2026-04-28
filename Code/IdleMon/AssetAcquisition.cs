@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sinvest;
 
@@ -31,12 +32,18 @@ public sealed class AssetAcquisition : Component
 
 		roster.ConsumeIdleBucks( StandardEggCost );
 
-		// FIX: Call the actual Generator that reads from bootstrap_ids.txt
-		IdleMonData candidate = Generator.RollNewAsset();
+		// We change the method signature to async so we can use 'await'
+		_ = HandleRoll();
 
-		Log.Info( $"Rolled: {candidate.Name} (SteamID: {candidate.SteamId})" );
-        
-		OpenDraftOverlay( candidate );
+		async Task HandleRoll()
+		{
+			// FIX: Now we 'await' the task to get the actual IdleMonData
+			IdleMonData candidate = await Generator.RollNewAsset();
+
+			Log.Info( $"Rolled: {candidate.Name} (SteamID: {candidate.SteamId})" );
+    
+			OpenDraftOverlay( candidate );
+		}
 	}
 
 	[Property] public bool IsDrafting { get; private set; }

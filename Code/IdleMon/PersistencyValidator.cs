@@ -10,14 +10,15 @@ public sealed class PersistenceValidator : Component
 	[Property] public RosterManager Roster { get; set; }
 
 	[Button( "TEST: High-Market Roll" )]
-	public void TestHighMarket()
+	public async void TestHighMarket() // Added 'async'
 	{
 		Log.Info( "--- STARTING VALIDATION: BULL MARKET ---" );
-        
+    
 		// 1. Simulate a high market price in MarketService
 		MarketService.UpdatePrice( 15000.0 ); // ~2.1x Market Scale
-        
-		var node = Generator.RollNewAsset();
+    
+		// FIX: Added 'await' to resolve the Task into actual IdleMonData
+		var node = await Generator.RollNewAsset();
 		float expectedMinS = 2.0f;
 
 		if ( node.MarketScaleAtBirth >= expectedMinS )
@@ -28,7 +29,7 @@ public sealed class PersistenceValidator : Component
 		// 2. Test Delta Math
 		var deltas = Roster.GetSwapDeltas( node );
 		Log.Info( $"Delta for Slot 0: {deltas[0]:F2} IB/s" );
-        
+    
 		Log.Info( "--- VALIDATION COMPLETE ---" );
 	}
 

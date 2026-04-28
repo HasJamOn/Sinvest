@@ -101,12 +101,15 @@ public sealed class TestInputHandler : Component
     }
 
     [Button( "Manual Roll", "casino" )]
-    public void ManualRoll()
+    public async void ManualRoll() // Added 'async'
     {
-        if ( !Generator.IsValid() ) return;
-        _currentCandidate = Generator.RollNewAsset();
-        _hasCandidate = true;
-        Log.Info( $"Drafting: {_currentCandidate.Name}" );
+	    if ( !Generator.IsValid() ) return;
+    
+	    // FIX: Await the task to get the data before assigning it to the field
+	    _currentCandidate = await Generator.RollNewAsset();
+	    _hasCandidate = true;
+    
+	    Log.Info( $"Drafting: {_currentCandidate.Name}" );
     }
 
     protected override void OnUpdate()

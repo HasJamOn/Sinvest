@@ -402,12 +402,23 @@
     
     private void PurgeNode(int index) => Roster?.SwapNode(index, IdleMonData.Empty);
 
-    public void StartDraft()
+    public async void StartDraft()
     {
-        if ( Generator == null || Roster == null ) return;
-        SelectedSlotIndex = null;
-        DraftCandidate = Generator.RollNewAsset();
-        CurrentDeltas = Roster.GetSwapDeltas( DraftCandidate.Value );
+	    if ( Generator == null || Roster == null ) return;
+    
+	    SelectedSlotIndex = null;
+    
+	    // 1. Await the Task to get the actual IdleMonData
+	    var rolledAsset = await Generator.RollNewAsset();
+    
+	    // 2. Assign the result to your candidate variable
+	    DraftCandidate = rolledAsset;
+    
+	    // 3. Calculate deltas now that we have the data
+	    CurrentDeltas = Roster.GetSwapDeltas( DraftCandidate.Value );
+    
+	    // 4. Tell the UI to refresh since an async task finished
+	    StateHasChanged();
     }
 
     private void CancelDraft()

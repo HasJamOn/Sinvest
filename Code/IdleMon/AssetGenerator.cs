@@ -2,6 +2,7 @@ using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sinvest;
 
@@ -40,7 +41,30 @@ public sealed class AssetGenerator : Component
 			_cachedSteamIds = new List<int> { 4000 }; 
 		}
 	}
-    public IdleMonData RollNewAsset()
+	private async Task<(string Title, string Price)> GetSteamMetadata( int steamId )
+	{
+		try
+		{
+			var response = await Http.RequestStringAsync( $"https://store.steampowered.com/api/appdetails?appids={steamId}" );
+			if ( string.IsNullOrEmpty( response ) ) return (null, null);
+
+			var nameMatch = System.Text.RegularExpressions.Regex.Match( response, @"""name"":\s*""([^""]+)""" );
+			var priceMatch = System.Text.RegularExpressions.Regex.Match( response, @"""final_formatted"":\s*""([^""]+)""" );
+
+			string title = nameMatch.Success ? nameMatch.Groups[1].Value : null;
+        
+			// If priceMatch fails, it's likely a free game or unpriced asset
+			string price = priceMatch.Success ? priceMatch.Groups[1].Value : "PRICELESS";
+
+			return (title, price);
+		}
+		catch ( Exception e )
+		{
+			Log.Warning( $"[AssetGenerator] Metadata Fetch Fail: {e.Message}" );
+			return (null, "PRICELESS");
+		}
+	}
+	public async Task<IdleMonData> RollNewAsset()
 {
     // 1. Emergency Reload Check
     // If the list is empty, try to load it right now before proceeding.
@@ -64,15 +88,25 @@ public sealed class AssetGenerator : Component
         Log.Error( "[AssetGenerator] Logic Error: Rolled 4000 but it's not in the list!" );
     }
 
-    // 3. Market Scale (S)
-    double currentPrice = MarketService.CurrentPrice;
-    float S = (currentPrice > 0) ? (float)(currentPrice / 7126.0) : 1.0f;
+    // 3. Market Scale (S) - Driven by the Global Market System
+    float S = MarketServerSystem.GetCurrentScale();
 
-    // 4. Name & Metadata
-    string[] prefixes = { "Alpha", "Beta", "Sigma", "Delta", "Omega", "Prime", "Cyber", "Nano", "Void", "Flux" };
-    string[] suffixes = { "Node", "Link", "Core", "Unit", "Asset", "Matrix", "Pulse", "Array", "Vault" };
-    string randomName = $"{prefixes[random.Next(prefixes.Length)]}-{random.Next(100, 999)} {suffixes[random.Next(suffixes.Length)]}";
+    // 4. Dynamic Name & Price Generation (Flavor Only)
+    var metadata = await GetSteamMetadata( rolledSteamId );
+    string finalName;
 
+    if ( !string.IsNullOrEmpty( metadata.Title ) )
+    {
+	    // Example: "Garry's Mod $9.99 #4000"
+	    finalName = $"{metadata.Title} {metadata.Price} #{rolledSteamId}";
+    }
+    else
+    {
+	    // Fallback for missing data
+	    string[] prefixes = { "Alpha", "Beta", "Sigma", "Delta", "Omega", "Prime", "Cyber", "Nano", "Void", "Flux" };
+	    finalName = $"{prefixes[random.Next( prefixes.Length )]}-{random.Next( 100, 999 )} Node";
+    }
+    
     // 5. Stat Generation Logic
     double addition = Math.Round(random.NextDouble() * (BasePotential * S), 2);
     double multiplier = 1.0 + Math.Round(random.NextDouble() * (0.5 * S), 2);
@@ -86,12 +120,12 @@ public sealed class AssetGenerator : Component
         ? 1.0 + Math.Round(random.NextDouble() * 0.1, 2) 
         : 1.0;
 
-    Log.Info( $" [AssetGenerator] Successfully rolled {randomName} with SteamID: {rolledSteamId}" );
+    Log.Info( $" [AssetGenerator] Successfully rolled {finalName} with SteamID: {rolledSteamId}" );
 
     return new IdleMonData
     {
         ID = Guid.NewGuid(),
-        Name = randomName,
+        Name = finalName,
         SteamId = rolledSteamId,
         ModelPath = "models/dev/box.vmdl",
         RolledAt = DateTime.UtcNow,
