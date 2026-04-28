@@ -73,7 +73,9 @@
                                    
                                    <div class="card-info">
 	                                   <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-		                                   <span class="name">@mon.Name</span>
+		                                   <span class="name" style="font-size: @(mon.Name.Length > 14 ? "9px" : mon.Name.Length > 10 ? "11px" : mon.Name.Length > 7 ? "13px" : "15px")">
+			                                   @mon.Name
+		                                   </span>
 		                                   <span class="gen-tag">G@(mon.Generation)</span>
 	                                   </div>
 	                                   
@@ -172,7 +174,9 @@
                                    <IdleMonDisplay @ref="ComparisonCurrentDisplay" style="width: 100%; height: 100%;" />
                                 </div>
                                 <div class="card-header">
-                                   <span class="name">@currentMon.Name</span>
+	                                <span class="name" style="font-size: @(currentMon.Name.Length > 14 ? "9px" : currentMon.Name.Length > 10 ? "11px" : currentMon.Name.Length > 7 ? "13px" : "15px")">
+		                                @currentMon.Name
+	                                </span>
                                 </div>
                                 <div class="card-body">
                                    @RenderStats(currentMon)
@@ -193,10 +197,12 @@
                               <IdleMonDisplay @ref="ComparisonCandidateDisplay" style="width: 100%; height: 100%;" />
                            </div>
                            <div class="card-header">
-                              <div class="name-group">
-                                 <span class="name">@DraftCandidate?.Name</span>
-                              </div>
-                              <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
+	                           <div class="name-group">
+		                           <span class="name" style="font-size: @(DraftCandidate.HasValue ? (DraftCandidate.Value.Name.Length > 14 ? "9px" : DraftCandidate.Value.Name.Length > 10 ? "11px" : DraftCandidate.Value.Name.Length > 7 ? "13px" : "15px") : "15px")">
+			                           @DraftCandidate?.Name
+		                           </span>
+	                           </div>
+	                           <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
                            </div>
 
                            <div class="card-body">
