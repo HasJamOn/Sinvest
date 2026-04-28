@@ -125,13 +125,13 @@ IdleMonDashBoard {
     display: flex;
     flex-direction: row;
     flex: 1;
-    height: 85px;
+    height: 185px;
     overflow: hidden;
 
     // 3D viewport stays untouched
     .portrait-viewport {
-      width: 85px;
-      height: 85px;
+      width: 185px;
+      height: 185px;
       flex-shrink: 0;
       overflow: hidden;
 

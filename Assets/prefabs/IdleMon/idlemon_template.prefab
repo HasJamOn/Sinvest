@@ -124,7 +124,7 @@
         "__version": 2,
         "Flags": 0,
         "Name": "Point Light (1)",
-        "Position": "411.933533,-5.08149719,-206.136063",
+        "Position": "224,96,-206.136063",
         "Rotation": "-0.0990457311,-0.239117548,0.369643837,0.892399132",
         "Scale": "1,1,1",
         "Tags": "light_point,light",
@@ -234,7 +234,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "SkyIndirectLighting": true,
-            "SkyMaterial": "materials/skybox/skybox_day_01.vmat",
+            "SkyMaterial": "materials/skybox/skybox_workshop.vmat",
             "Tint": "1,1,1,1"
           }
         ],
