@@ -36,8 +36,8 @@
             </div>
 
             <button class="btn-terminate" onclick="@ExitIdleMon">
-	            <i class="icon">power_settings_new</i>
-	            <span>EXIT</span>
+                <i class="icon">power_settings_new</i>
+                <span>EXIT</span>
             </button>
         </div>
 
@@ -60,41 +60,44 @@
                             <div class="node-card @(isEmpty ? "empty" : "active") @(isSelected ? "selected" : "")" 
                                  onclick="@(() => OnNodeClick(index))">
     
-	                            @if ( !isEmpty )
-	                            {
-		                            @* --- 3D VIEWPORT (Now the first element for left-side alignment) --- *@
-		                            <div class="portrait-viewport">
-			                            <IdleMonDisplay @ref="NodeDisplays[index]" style="width: 100%; height: 100%; min-width: 85px; min-height: 85px;" />
-		                            </div>
-		                            
-		                            @* --- CONTENT COLUMN (Right side) --- *@
-		                            <div class="card-info">
-			                            <div class="card-header">
-				                            <span class="name">@mon.Name</span>
-				                            <span class="gen-tag">G@mon.Generation</span>
-			                            </div>
+                                @if ( !isEmpty )
+                                {
+                                    <div class="portrait-viewport">
+                                      @if(index == 0) { <IdleMonDisplay @ref="Display0" style="width: 100%; height: 100%; min-width: 85px; min-height: 85px;" /> }
+                                      else if(index == 1) { <IdleMonDisplay @ref="Display1" style="width: 100%; height: 100%; min-width: 85px; min-height: 85px;" /> }
+                                      else if(index == 2) { <IdleMonDisplay @ref="Display2" style="width: 100%; height: 100%; min-width: 85px; min-height: 85px;" /> }
+                                      else if(index == 3) { <IdleMonDisplay @ref="Display3" style="width: 100%; height: 100%; min-width: 85px; min-height: 85px;" /> }
+                                      else if(index == 4) { <IdleMonDisplay @ref="Display4" style="width: 100%; height: 100%; min-width: 85px; min-height: 85px;" /> }
+                                      else if(index == 5) { <IdleMonDisplay @ref="Display5" style="width: 100%; height: 100%; min-width: 85px; min-height: 85px;" /> }
+                                   </div>
+                                   
+                                   <div class="card-info">
+	                                   <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+		                                   <span class="name">@mon.Name</span>
+		                                   <span class="gen-tag">G@(mon.Generation)</span>
+	                                   </div>
 
-			                            <div class="card-footer">
-				                            @if ( IsDrafting && CurrentDeltas != null )
-				                            {
-					                            var d = CurrentDeltas[index];
-					                            <span class="yield-delta @(d >= 0 ? "pos" : "neg")">
-						                            @(d >= 0 ? "+" : "")@d.ToString("F2") IB/s
-					                            </span>
-				                            }
-				                            else
-				                            {
-					                            <span class="status-tag">ACTIVE</span>
-				                            }
-			                            </div>
-		                            </div>
-	                            }
-	                            else
-	                            {
-		                            <div class="empty-state">
-			                            <i class="icon">@(IsDrafting ? "publish" : "add")</i>
-		                            </div>
-	                            }
+                                      <div class="card-footer">
+                                         @if ( IsDrafting && CurrentDeltas != null && index < CurrentDeltas.Length )
+                                         {
+                                            var d = CurrentDeltas[index];
+                                            <span class="yield-delta @(d >= 0 ? "pos" : "neg")">
+                                               @(d >= 0 ? "+" : "")@d.ToString("F2") IB/s
+                                            </span>
+                                         }
+                                         else
+                                         {
+                                            <span class="status-tag">ACTIVE</span>
+                                         }
+                                      </div>
+                                   </div>
+                                }
+                                else
+                                {
+                                   <div class="empty-state">
+                                      <i class="icon">@(IsDrafting ? "publish" : "add")</i>
+                                   </div>
+                                }
                             </div>
                         }
                     </div>
@@ -110,36 +113,34 @@
 
                     <div class="inspector-content">
                         <div class="inspector-header">
-                            <label class="subtitle">NODE SLOT @(SelectedSlotIndex.Value + 1)</label>
-                            <h1 class="title">@(isEmpty ? "AVAILABLE SLOT" : selectedMon.Name)</h1>
+                            @if (!isEmpty)
+                            {
+                                <div class="inspector-portrait">
+                                    <IdleMonDisplay @ref="InspectorDisplay" style="width: 100%; height: 100%;" />
+                                </div>
+                                
+                                <div class="performance-data">
+	                                <div class="perf-header">
+		                                <label>PERFORMANCE DATA</label>
+		                                <label>DATE @DateTime.Now.ToString("dd/MM/yyyy") - GENERATION: @selectedMon.Generation</label>
+	                                </div>
+	                                @RenderStats(selectedMon)
+                                </div>
+                            }
+                        </div>
+
+                        <div class="inspector-identity">
+                            <label class="subtitle">SLOT @(SelectedSlotIndex.Value + 1)</label>
+                            <h1 class="title">@(isEmpty ? "VACANT SLOT" : selectedMon.Name)</h1>
                         </div>
 
                         @if ( !isEmpty )
                         {
-                            <div class="inspector-scroll-area">
-                               <div class="detail-section">
-                                  <label class="section-label">PERFORMANCE DATA</label>
-                                  @RenderStats(selectedMon)
-                               </div>
 
-                               <div class="detail-section meta">
-                                  <div class="meta-row">
-                                     <span class="label">DATE ACQUIRED</span>
-                                     <span class="value">@selectedMon.RolledAt.ToString("f")</span>
-                                  </div>
-                               </div>
-                            </div>
                             <button class="btn-purge" onclick="@(() => PurgeNode(SelectedSlotIndex.Value))">
-                               <i class="icon">delete_forever</i>
-                               <span>PURGE ASSET</span>
+                                <i class="icon">delete_forever</i>
+                                <span>PURGE ASSET</span>
                             </button>
-                        }
-                        else
-                        {
-                            <div class="inspector-empty">
-                                <i class="icon">info</i>
-                                <p>No asset installed. Compare a roll to this slot to see projected gains.</p>
-                            </div>
                         }
                     </div>
                 }
@@ -149,10 +150,7 @@
                         <label>SELECT A NODE TO VIEW DATA</label>
                     </div>
                 }
-            </div>
-        </div>
-
-        <div class="footer">
+            </div> </div> <div class="footer">
             @if ( !IsDrafting )
             {
                 <button class="btn-primary" onclick="@StartDraft">ACQUIRE ASSET (ROLL)</button>
@@ -166,11 +164,14 @@
                             var currentMon = Roster.ActiveNodes[SelectedSlotIndex.Value];
                             <div class="node-card comparison-card current-target expanded">
                                 <div class="comparison-badge badge-current">CURRENT ASSET</div>
+                                <div class="comparison-portrait">
+                                   <IdleMonDisplay @ref="ComparisonCurrentDisplay" style="width: 100%; height: 100%;" />
+                                </div>
                                 <div class="card-header">
-                                    <span class="name">@currentMon.Name</span>
+                                   <span class="name">@currentMon.Name</span>
                                 </div>
                                 <div class="card-body">
-                                    @RenderStats(currentMon)
+                                   @RenderStats(currentMon)
                                 </div>
                             </div>
                         }
@@ -178,41 +179,43 @@
 
                     <div class="comparison-vs">
                         <i class="icon">swap_horiz</i>
+                        <span>VS</span>
                     </div>
 
                     <div class="candidate-slot">
-	                    <div class="node-card comparison-card candidate-new expanded">
-		                    <div class="comparison-badge badge-candidate">NEW CANDIDATE</div>
-        
-		                    <div class="card-header">
-			                    <div class="name-group">
-				                    <span class="name">@DraftCandidate?.Name</span>
-			                    </div>
-			                    <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
-		                    </div>
+                        <div class="node-card comparison-card candidate-new expanded">
+                           <div class="comparison-badge badge-candidate">NEW CANDIDATE</div>
+                           <div class="comparison-candidate-portrait">
+                              <IdleMonDisplay @ref="ComparisonCandidateDisplay" style="width: 100%; height: 100%;" />
+                           </div>
+                           <div class="card-header">
+                              <div class="name-group">
+                                 <span class="name">@DraftCandidate?.Name</span>
+                              </div>
+                              <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
+                           </div>
 
-		                    <div class="card-body">
-			                    @if (DraftCandidate.HasValue) 
-			                    {
-				                    @RenderStats(DraftCandidate.Value)
-			                    }
-		                    </div>
+                           <div class="card-body">
+                              @if (DraftCandidate.HasValue) 
+                              {
+                                 @RenderStats(DraftCandidate.Value)
+                              }
+                           </div>
 
-		                    @* THIS IS THE SPECIFIC STEP 4 ADDITION *@
-		                    <div class="card-footer">
-			                    @if ( SelectedSlotIndex.HasValue && CurrentDeltas != null )
-			                    {
-				                    var delta = CurrentDeltas[SelectedSlotIndex.Value];
-				                    <span class="yield-contribution @(delta >= 0 ? "positive" : "negative")">
-					                    @(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s Impact
-				                    </span>
-			                    }
-			                    else
-			                    {
-				                    <span class="instruction-dimmed">SELECT SLOT TO CALCULATE</span>
-			                    }
-		                    </div>
-	                    </div>
+                           <div class="card-footer">
+                              @if ( SelectedSlotIndex.HasValue && CurrentDeltas != null )
+                              {
+                                 var delta = CurrentDeltas[SelectedSlotIndex.Value];
+                                 <span class="yield-contribution @(delta >= 0 ? "positive" : "negative")">
+                                    @(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s Impact
+                                 </span>
+                              }
+                              else
+                              {
+                                 <span class="instruction-dimmed">SELECT SLOT TO CALCULATE</span>
+                              }
+                           </div>
+                        </div>
                     </div>
 
                     <div class="draft-actions">
@@ -227,7 +230,7 @@
                             </button>
                             
                             <div class="delta-preview @(delta >= 0 ? "positive" : "negative")">
-                                <label>PROGECTED CHANGE</label>
+                                <label>PROJECTED CHANGE</label>
                                 <span>@(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s</span>
                             </div>
                         }
@@ -247,105 +250,161 @@
 </root>
 
 @code {
-	[Property] public GameObject IdleMonSystem { get; set; }
-	[Property] public RosterManager Roster { get; set; }
-	[Property] public AssetGenerator Generator { get; set; }
+    [Property] public GameObject IdleMonSystem { get; set; }
+    [Property] public RosterManager Roster { get; set; }
+    [Property] public AssetGenerator Generator { get; set; }
     
-	private bool IsDrafting => DraftCandidate.HasValue;
-	private IdleMonData? DraftCandidate = null;
-	private double[] CurrentDeltas;
-	private int? SelectedSlotIndex = null; 
+    private bool IsDrafting => DraftCandidate.HasValue;
+    private IdleMonData? DraftCandidate = null;
+    private double[] CurrentDeltas;
+    private int? SelectedSlotIndex = null; 
     
-	// Explicitly typed array
-	private IdleMonDisplay[] NodeDisplays = new IdleMonDisplay[6];
+    // Explicit properties bypass the compiler array-indexer crash
+    private IdleMonDisplay Display0;
+    private IdleMonDisplay Display1;
+    private IdleMonDisplay Display2;
+    private IdleMonDisplay Display3;
+    private IdleMonDisplay Display4;
+    private IdleMonDisplay Display5;
 
-	// s&box equivalent to OnParametersSet
-	protected override void OnEnabled()
-	{
-		// Existing reference logic
-		if ( Roster == null ) 
-			Roster = Scene.GetAllComponents<RosterManager>().FirstOrDefault();
+    private IdleMonDisplay InspectorDisplay;
+    private IdleMonDisplay ComparisonCurrentDisplay;
+    private IdleMonDisplay ComparisonCandidateDisplay;
+
+    protected override void OnEnabled()
+    {
+       if ( Roster == null ) 
+          Roster = Scene.GetAllComponents<RosterManager>().FirstOrDefault();
     
-		if ( Generator == null )
-			Generator = Scene.GetAllComponents<AssetGenerator>().FirstOrDefault();
+       if ( Generator == null )
+          Generator = Scene.GetAllComponents<AssetGenerator>().FirstOrDefault();
 
-		if (CurrentDeltas == null) CurrentDeltas = new double[6];
-		
-		if ( Panel.IsValid() )
-		{
-			// Panel is the Sandbox.UI.Panel instance
-			Panel.Style.PointerEvents = PointerEvents.All;
-      
-			// This allows the panel to become the active input target
-			Panel.AcceptsFocus = true; 
-			Panel.Focus();
-		}
-	}
+       if (CurrentDeltas == null || CurrentDeltas.Length != 6) 
+          CurrentDeltas = new double[6];
+       
+       if ( Panel.IsValid() )
+       {
+          Panel.Style.PointerEvents = PointerEvents.All;
+          Panel.AcceptsFocus = true; 
+          Panel.Focus();
+       }
+    }
 
-	// s&box equivalent to OnAfterTreeRender
-	protected override void OnTreeBuilt()
-	{
-		if ( Roster?.ActiveNodes == null ) return;
+    protected override void OnTreeBuilt()
+    {
+       if ( Roster?.ActiveNodes == null ) return;
 
-		for ( int i = 0; i < 6; i++ )
-		{
-			if ( i >= NodeDisplays.Length ) break;
-    
-			var display = NodeDisplays[i] as IdleMonDisplay;
-			if ( display == null ) continue; 
+       // Group the references dynamically at runtime instead of compile-time
+       var gridDisplays = new[] { Display0, Display1, Display2, Display3, Display4, Display5 };
+       int count = Math.Min(gridDisplays.Length, Roster.ActiveNodes.Count);
 
-			var mon = (i < Roster.ActiveNodes.Count) ? Roster.ActiveNodes[i] : IdleMonData.Empty;
-    
-			if ( mon.ID != Guid.Empty )
-			{
-				display.SetModel( mon.ModelPath );
-         
-				// This is the line that makes the UI icons 
-				// pull from your bootstrap_ids.txt!
-				display.UpdateStats( mon, mon.SteamId ); 
-			}
-		}
-	}
+       for ( int i = 0; i < count; i++ )
+       {
+          var display = gridDisplays[i];
+          if ( display == null ) continue; 
 
-	RenderFragment RenderStats(IdleMonData data) => __builder => {
-		if (data.ID == Guid.Empty) {
-			<div class="empty-stats-msg">NO DATA DETECTED</div>
-			return;
-		}
+          var mon = Roster.ActiveNodes[i];
+          if ( mon.ID != Guid.Empty )
+          {
+             display.SetModel( mon.ModelPath );
+             display.UpdateStats( mon, mon.SteamId ); 
+          }
+       }
 
-		<div class="stat-grid">
-		    @* PRIMARY STATS *@
-		    <div class="stat-item @(data.Addition > 0 ? "active" : "dimmed")">
-			    <span class="label">ADD</span>
-			    <span class="value">@data.Addition.ToString("F1")</span>
-		    </div>
-		    <div class="stat-item @(data.Subtraction > 0 ? "warning" : "dimmed")">
-			    <span class="label">SUB</span>
-			    <span class="value">-@data.Subtraction.ToString("F1")</span>
-		    </div>
-		    <div class="stat-item @(data.Multiplier > 1.0 ? "active" : "dimmed")">
-			    <span class="label">MULT</span>
-			    <span class="value">@data.Multiplier.ToString("F2")x</span>
-		    </div>
-		    <div class="stat-item @(data.Division > 1.0 ? "warning" : "dimmed")">
-			    <span class="label">DIV</span>
-			    <span class="value">/@data.Division.ToString("F2")</span>
-		    </div>
+       // 2. REFRESH THE INSPECTOR PORTRAIT
+       if (SelectedSlotIndex.HasValue && InspectorDisplay != null)
+       {
+          var mon = Roster.ActiveNodes[SelectedSlotIndex.Value];
+          if (mon.ID != Guid.Empty)
+          {
+             InspectorDisplay.SetModel(mon.ModelPath);
+             InspectorDisplay.UpdateStats(mon, mon.SteamId);
+          }
+       }
 
-		    @* TEAM BONUS (Now shown as a global synergy boost) *@
-		    <div class="stat-item bonus full-width @(data.TeamBonus > 1.0 ? "positive" : "dimmed")">
-			    <span class="label">TEAM SYNERGY</span>
-			    <span class="value">@((data.TeamBonus * 100 - 100).ToString("+0.0"))%</span>
-		    </div>
-	    </div>
-    };
+       // 3. REFRESH THE COMPARISON PORTRAITS
+       if (IsDrafting)
+       {
+          if (SelectedSlotIndex.HasValue && ComparisonCurrentDisplay != null)
+          {
+             var cur = Roster.ActiveNodes[SelectedSlotIndex.Value];
+             if (cur.ID != Guid.Empty)
+             {
+                ComparisonCurrentDisplay.SetModel(cur.ModelPath);
+                ComparisonCurrentDisplay.UpdateStats(cur, cur.SteamId);
+             }
+          }
+
+          if (ComparisonCandidateDisplay != null && DraftCandidate.HasValue)
+          {
+             ComparisonCandidateDisplay.SetModel(DraftCandidate.Value.ModelPath);
+             ComparisonCandidateDisplay.UpdateStats(DraftCandidate.Value, DraftCandidate.Value.SteamId);
+          }
+       }
+    }
+
+    RenderFragment RenderStats(IdleMonData data) => __builder => {
+    if (data.ID == Guid.Empty) {
+        <div class="empty-stats-msg">
+            <i class="icon">sensors_off</i>
+            <span>NO DATA DETECTED</span>
+        </div>
+        return;
+    }
+
+    <div class="stats-container">
+        @* --- PRIMARY METRICS --- *@
+        <div class="stats-section">
+            <div class="section-label">PRIMARY CALCULATIONS</div>
+            <div class="stats-grid">
+                @RenderStatItem("add_circle", "ADDITION", data.Addition.ToString("F1"), "positive")
+                @RenderStatItem("close", "MULTIPLIER", $"x{data.Multiplier:F1}", "positive")
+                @RenderStatItem("groups", "TEAM BONUS", $"+{(data.TeamBonus * 100 - 100):0}%", "synergy")
+            </div>
+        </div>
+
+        @* --- OPERATIONAL DRAG --- *@
+        <div class="stats-section">
+            <div class="section-label">SYSTEM OVERHEAD</div>
+            <div class="stats-grid">
+                @RenderStatItem("remove_circle", "SUBTRACTION", $"-{data.Subtraction:F1}", "negative")
+                @RenderStatItem("horizontal_rule", "DIVISION", $"/{data.Division:F1}", "negative")
+            </div>
+        </div>
+
+        @* --- UTILITY & SYNERGY --- *@
+        <div class="stats-section">
+            <div class="section-label">UTILITY PARAMETERS</div>
+            <div class="stats-grid">
+                @RenderStatItem("bolt", "EFFICIENCY", data.CostEfficiency.ToString("F1"), "utility")
+                @RenderStatItem("auto_fix_high", "LUCK", data.Luck.ToString("F1"), "utility")
+                
+                @{
+                    bool active = data.TeamBonus > 1.0;
+                    @RenderStatItem(active ? "sync" : "sync_disabled", "SYNERGY", active ? "STABLE" : "OFFLINE", active ? "synergy-active" : "synergy-dim")
+                }
+            </div>
+        </div>
+    </div>
+};
+
+// Helper to keep the main fragment clean and ensure consistent layout
+RenderFragment RenderStatItem(string icon, string label, string value, string cssClass) => __builder => {
+    <div class="stat-item @cssClass">
+        <i class="icon">@icon</i>
+        <div class="stat-info">
+            <label>@label</label>
+            <span class="value">@value</span>
+        </div>
+    </div>
+};
 
     protected override int BuildHash() => System.HashCode.Combine( 
-	    Roster?.IdleBucks ?? 0, 
-	    Roster?.ActiveNodes?.Count ?? 0,
-	    IsDrafting, 
-	    DraftCandidate?.ID ?? Guid.Empty,
-	    SelectedSlotIndex ?? -1
+        Roster?.IdleBucks ?? 0, 
+        Roster?.ActiveNodes?.Count ?? 0,
+        IsDrafting, 
+        DraftCandidate?.ID ?? Guid.Empty,
+        SelectedSlotIndex ?? -1
     );
     
     private void PurgeNode(int index) => Roster?.SwapNode(index, IdleMonData.Empty);
@@ -378,24 +437,20 @@
     
     private void ExitIdleMon()
     {
-	    // 1. Restore player controls immediately for responsiveness
-	    var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
-	    if ( player.IsValid() )
-	    {
-		    player.UseLookControls = true;
-		    player.UseInputControls = true;
-	    }
+        var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault(x => !x.IsProxy);
+        if ( player.IsValid() )
+        {
+           player.UseLookControls = true;
+           player.UseInputControls = true;
+        }
 
-	    // 2. Local Cleanup
-	    Roster?.SaveRoster();
-	    CancelDraft();
-	    SelectedSlotIndex = null;
+        Roster?.SaveRoster();
+        CancelDraft();
+        SelectedSlotIndex = null;
 
-	    // 3. Hand over control to the OS
-	    // Do NOT use GameObject.Enabled = false here!
-	    if (SinvestOS.Instance != null)
-	    {
-		    SinvestOS.Instance.GoBack();
-	    }
+        if (SinvestOS.Instance != null)
+        {
+           SinvestOS.Instance.GoBack();
+        }
     }
 }
