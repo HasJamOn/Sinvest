@@ -76,6 +76,10 @@
 		                                   <span class="name">@mon.Name</span>
 		                                   <span class="gen-tag">G@(mon.Generation)</span>
 	                                   </div>
+	                                   
+	                                   <div class="card-stats">
+		                                   @RenderStats(mon)
+	                                   </div>
 
                                       <div class="card-footer">
                                          @if ( IsDrafting && CurrentDeltas != null && index < CurrentDeltas.Length )

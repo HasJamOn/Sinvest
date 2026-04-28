@@ -18,12 +18,105 @@ IdleMonDashBoard {
 
   @include idlemon-theme;
 
+  // ============================
+  // SHARED STAT SYSTEM
+  // Defined at root so RenderStats works everywhere
+  // ============================
+  .stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .stats-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .section-label {
+        font-size: 9px;
+        font-weight: 900;
+        color: rgba($gtk-text, 0.4);
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba($gtk-shadow, 0.2);
+        padding-bottom: 2px;
+      }
+
+      .stats-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+    }
+  }
+
+  .stat-item {
+    flex: 1 1 30%;
+    min-width: 85px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 4px 8px;
+    border-radius: 2px;
+    border-left: 2px solid $gtk-shadow;
+    transition: all 0.1s ease;
+
+    .icon {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        font-size: 7px;
+        opacity: 0.5;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .value {
+        font-size: 11px;
+        font-family: $font-mono;
+        font-weight: 700;
+        color: $gtk-text;
+      }
+    }
+
+    &.positive { border-left-color: $accent-money; }
+    &.negative { border-left-color: $danger-red; }
+
+    &.synergy {
+      border-left-color: #2196F3;
+      .icon, .value { color: #64B5F6; }
+    }
+
+    &.synergy-active {
+      border-left-color: #00E5FF;
+      .icon, .value { color: #00E5FF; }
+    }
+
+    &.synergy-dim {
+      opacity: 0.4;
+      filter: grayscale(1);
+    }
+
+    &.utility {
+      border-left-color: #FFC107;
+      .icon, .value { color: #FFD54F; }
+    }
+  }
+
+  // ============================
+  // HEADER
+  // ============================
   .header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    // Spacing only - styling is in theme
     padding-bottom: 15px;
     margin-bottom: 20px;
     flex-shrink: 0;
@@ -46,7 +139,7 @@ IdleMonDashBoard {
     width: 100%;
     min-height: 0;
 
-    // LEFT COLUMN - Let this fill the remaining space
+    // LEFT COLUMN
     .node-matrix {
       flex: 1;
       display: flex;
@@ -70,11 +163,10 @@ IdleMonDashBoard {
       display: flex;
       flex-direction: column;
       padding: 16px;
-      min-height: 0;        // ADD: lets the flex child honour overflow-y
-      overflow-y: auto;     // KEEP, but now it will actually work
+      min-height: 0;
+      overflow-y: auto;
       @include bevel-out;
 
-      // ADD: the wrapping div in the razor needs to behave as a flex column
       .inspector-content {
         display: flex;
         flex-direction: column;
@@ -82,14 +174,12 @@ IdleMonDashBoard {
         min-height: 0;
       }
 
-      // ADD: the scroll area is the part that should grow and scroll
       .inspector-scroll-area {
         flex: 1;
         min-height: 0;
         overflow-y: auto;
       }
 
-      // ADD: placeholder needs to centre itself inside the panel
       .inspector-placeholder {
         flex: 1;
         display: flex;
@@ -122,129 +212,23 @@ IdleMonDashBoard {
             display: flex;
             justify-content: space-between;
             border-bottom: 1px solid $gtk-shadow;
-            margin-bottom: 12px; // Increased for cleaner separation
+            margin-bottom: 12px;
             label {
               font-size: 9px;
               font-weight: 900;
               color: $gtk-shadow;
             }
           }
-
-          // --- NEW STATS SYSTEM ---
-          .stats-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-
-            .stats-section {
-              display: flex;
-              flex-direction: column;
-              gap: 6px;
-
-              .section-label {
-                font-size: 9px;
-                font-weight: 900;
-                color: rgba($gtk-text, 0.4);
-                letter-spacing: 0.5px;
-                border-bottom: 1px solid rgba($gtk-shadow, 0.2);
-                padding-bottom: 2px;
-              }
-
-              .stats-grid {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-              }
-            }
-          }
-
-          .stat-item {
-            flex: 1 1 30%; // Allows 3 per row roughly
-            min-width: 85px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.15);
-            padding: 4px 8px;
-            border-radius: 2px;
-            border-left: 2px solid $gtk-shadow;
-            transition: all 0.1s ease;
-
-            .icon {
-              font-size: 14px;
-              opacity: 0.7;
-            }
-
-            .stat-info {
-              display: flex;
-              flex-direction: column;
-
-              label {
-                font-size: 7px;
-                opacity: 0.5;
-                font-weight: 900;
-                text-transform: uppercase;
-              }
-
-              .value {
-                font-size: 11px;
-                font-family: $font-mono;
-                font-weight: 700;
-                color: $gtk-text;
-              }
-            }
-
-            // Semantic Color Coding using your vars
-            &.positive {
-              border-left-color: $accent-money;
-
-
-            }
-
-            &.negative {
-              border-left-color: $danger-red;
-
-
-            }
-
-            &.synergy {
-              border-left-color: #2196F3;
-
-              .icon, .value {
-                color: #64B5F6;
-              }
-            }
-
-            &.synergy-active {
-              border-left-color: #00E5FF;
-
-              .icon, .value {
-                color: #00E5FF;
-              }
-            }
-
-            &.synergy-dim {
-              opacity: 0.4;
-              filter: grayscale(1);
-            }
-
-            &.utility {
-              border-left-color: #FFC107;
-
-              .icon, .value {
-                color: #FFD54F;
-              }
-            }
-          }
+          // Stats layout inherited from root — no overrides needed here
         }
       }
+
       .inspector-identity {
         margin-bottom: 16px;
         .subtitle { font-size: 10px; font-weight: 900; color: $gtk-shadow; }
-        .title { font-size: 22px; font-weight: 800; color: $gtk-text; margin: 0; }
+        .title    { font-size: 22px; font-weight: 800; color: $gtk-text; margin: 0; }
       }
 
-      // Moved OUT of header to match your HTML structure
       .btn-purge {
         margin-top: auto;
         padding: 8px;
@@ -263,6 +247,9 @@ IdleMonDashBoard {
     }
   }
 
+  // ============================
+  // NODE CARD (left grid slots)
+  // ============================
   .node-card {
     display: flex;
     flex-direction: row;
@@ -273,7 +260,7 @@ IdleMonDashBoard {
       width: 185px;
       height: 185px;
       flex-shrink: 0;
-      @include bevel-in; // Portraits usually need this for the "cutout" look
+      @include bevel-in;
 
       IdleMonDisplay {
         width: 100%;
@@ -287,18 +274,42 @@ IdleMonDashBoard {
       flex-grow: 1;
       padding: 8px 12px;
       justify-content: space-between;
+
+      .card-stats {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+
+        // Compact overrides
+        .stats-container { gap: 4px; }
+        .stats-section   { gap: 3px; }
+        .stats-grid      { gap: 3px; }
+
+        .stat-item {
+          flex: 0 0 auto;
+          min-width: unset;
+          padding: 3px 5px;
+          gap: 3px;
+
+          .icon          { font-size: 10px; }
+          .stat-info label { display: none; }   // name label only
+          .value         { font-size: 9px; }
+        }
+      }
     }
   }
 
+  // ============================
+  // FOOTER
+  // ============================
   .footer {
     display: flex;
     padding: 20px;
     flex-shrink: 0;
     justify-content: center;
     margin-top: 20px;
-    min-height: 320px; // Increased slightly to account for internal padding
+    min-height: 320px;
 
-    // Ensure the theme's bevel-out is active
     @include bevel-out;
 
     .draft-comparison-stage {
@@ -307,40 +318,39 @@ IdleMonDashBoard {
       align-items: center;
       justify-content: center;
       width: 100%;
-      gap: 20px; // More breathing room
+      gap: 20px;
 
-      // Slots ensure the cards don't fight for space
       .current-slot,
       .candidate-slot {
-        flex: 0 0 300px; // Strict width: Don't grow, don't shrink
+        flex: 0 0 300px;
         display: flex;
         justify-content: center;
       }
 
       .comparison-vs {
-        flex-shrink: 0; // Prevent the VS text from squishing
+        flex-shrink: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
         opacity: 0.5;
 
         .icon { font-size: 24px; }
-        span { font-size: 10px; font-weight: 900; }
+        span  { font-size: 10px; font-weight: 900; }
       }
 
       .comparison-card {
         width: 300px;
-        height: 280px; // Increased height to prevent internal overlap
+        height: 340px;
         display: flex;
         flex-direction: column;
-        flex-shrink: 0; // CRITICAL: Stop the card from squishing
+        flex-shrink: 0;
 
         @include bevel-out;
 
         .comparison-portrait,
         .comparison-candidate-portrait {
           width: 100%;
-          height: 140px; // Fixed height for the 3D viewport
+          height: 140px;
           flex-shrink: 0;
           @include bevel-in;
           background-color: rgba(0, 0, 0, 0.1);
@@ -353,29 +363,35 @@ IdleMonDashBoard {
         }
 
         .card-body {
-          padding: 12px;
+          padding: 10px 12px;
           flex-grow: 1;
           display: flex;
           flex-direction: column;
+          min-height: 0;
+          overflow-y: auto;
 
-          .stat-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+          // Compact overrides
+          .stats-container { gap: 8px; }
+          .stats-section   { gap: 4px; }
+          .stats-grid      { gap: 4px; }
 
-            .stat-item {
-              flex: 1 1 40%;
+          .section-label { font-size: 7px; }
 
-              .label { font-size: 8px; color: $gtk-shadow; }
-              .value { font-size: 12px; font-family: $font-mono; }
-            }
+          .stat-item {
+            flex: 1 1 40%;
+            min-width: 70px;
+            padding: 3px 6px;
+            gap: 4px;
+
+            .icon            { font-size: 11px; }
+            .stat-info label { display: none; }  // name label only
+            .value           { font-size: 9px; }
           }
         }
       }
 
-      // Fix for the actions panel on the right
       .draft-actions {
-        flex: 0 0 200px; // Give actions a fixed area
+        flex: 0 0 200px;
         display: flex;
         flex-direction: column;
         gap: 10px;
