@@ -83,19 +83,15 @@
 		                                   @RenderStats(mon)
 	                                   </div>
 
-                                      <div class="card-footer">
-                                         @if ( IsDrafting && CurrentDeltas != null && index < CurrentDeltas.Length )
-                                         {
-                                            var d = CurrentDeltas[index];
-                                            <span class="yield-delta @(d >= 0 ? "pos" : "neg")">
-                                               @(d >= 0 ? "+" : "")@d.ToString("F2") IB/s
-                                            </span>
-                                         }
-                                         else
-                                         {
-                                            <span class="status-tag">ACTIVE</span>
-                                         }
-                                      </div>
+	                                   <div class="card-footer">
+		                                   @if ( IsDebugMode && IsDrafting && CurrentDeltas != null && index < CurrentDeltas.Length )
+		                                   {
+			                                   var d = CurrentDeltas[index];
+			                                   <span class="yield-delta @(d >= 0 ? "pos" : "neg")">
+				                                   @(d >= 0 ? "+" : "")@d.ToString("F2") IB/s
+			                                   </span>
+		                                   }
+	                                   </div>
                                    </div>
                                 }
                                 else
@@ -211,39 +207,39 @@
                                  @RenderStats(DraftCandidate.Value)
                               }
                            </div>
-
-                           <div class="card-footer">
-                              @if ( SelectedSlotIndex.HasValue && CurrentDeltas != null )
-                              {
-                                 var delta = CurrentDeltas[SelectedSlotIndex.Value];
-                                 <span class="yield-contribution @(delta >= 0 ? "positive" : "negative")">
-                                    @(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s Impact
-                                 </span>
-                              }
-                              else
-                              {
-                                 <span class="instruction-dimmed">SELECT SLOT TO CALCULATE</span>
-                              }
-                           </div>
+                           @if ( IsDebugMode && SelectedSlotIndex.HasValue && CurrentDeltas != null )
+                           {
+	                           <div class="card-footer">
+		                           @{
+			                           var delta = CurrentDeltas[SelectedSlotIndex.Value];
+			                           <span class="yield-contribution @(delta >= 0 ? "positive" : "negative")">
+				                           @(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s Impact
+			                           </span>
+		                           }
+	                           </div>
+                           }
                         </div>
                     </div>
 
                     <div class="draft-actions">
-                        @if ( SelectedSlotIndex.HasValue )
-                        {
-                            var delta = CurrentDeltas[SelectedSlotIndex.Value];
-                            
-                            <button class="btn-primary @(delta < 0 ? "warning-btn" : "confirm-btn")" 
-                                    onclick="@(() => ConfirmSwap(SelectedSlotIndex.Value))">
-                                <i class="icon">@(delta < 0 ? "warning" : "check_circle")</i>
-                                <span>@(delta < 0 ? "FORCE OVERWRITE" : "CONFIRM INSTALL")</span>
-                            </button>
-                            
-                            <div class="delta-preview @(delta >= 0 ? "positive" : "negative")">
-                                <label>PROJECTED CHANGE</label>
-                                <span>@(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s</span>
-                            </div>
-                        }
+	                    @if ( SelectedSlotIndex.HasValue )
+	                    {
+		                    var delta = CurrentDeltas[SelectedSlotIndex.Value];
+    
+		                    <button class="btn-primary @(delta < 0 ? "warning-btn" : "confirm-btn")" 
+		                            onclick="@(() => ConfirmSwap(SelectedSlotIndex.Value))">
+			                    <i class="icon">@(delta < 0 ? "warning" : "check_circle")</i>
+			                    <span>@(delta < 0 ? "FORCE OVERWRITE" : "CONFIRM INSTALL")</span>
+		                    </button>
+    
+		                    @if ( IsDebugMode )
+		                    {
+			                    <div class="delta-preview @(delta >= 0 ? "positive" : "negative")">
+				                    <label>DEBUG: PROJECTED CHANGE</label>
+				                    <span>@(delta >= 0 ? "+" : "")@delta.ToString("F2") IB/s</span>
+			                    </div>
+		                    }
+	                    }
                         else
                         {
                             <div class="instruction-block">
@@ -260,6 +256,11 @@
 </root>
 
 @code {
+	[ConVar( "sinvest_debug" )]
+	public static bool ShowDebug { get; set; } = false;
+
+	private bool IsDebugMode => ShowDebug;
+	
     [Property] public GameObject IdleMonSystem { get; set; }
     [Property] public RosterManager Roster { get; set; }
     [Property] public AssetGenerator Generator { get; set; }

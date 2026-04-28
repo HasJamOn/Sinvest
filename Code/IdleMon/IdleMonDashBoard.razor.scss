@@ -164,7 +164,6 @@ IdleMonDashBoard {
       flex-direction: column;
       padding: 16px;
       min-height: 0;
-      overflow-y: auto;
       @include bevel-out;
 
       .inspector-content {
@@ -177,7 +176,6 @@ IdleMonDashBoard {
       .inspector-scroll-area {
         flex: 1;
         min-height: 0;
-        overflow-y: auto;
       }
 
       .inspector-placeholder {
@@ -287,7 +285,6 @@ IdleMonDashBoard {
 
         .stat-item {
           flex: 0 0 auto;
-          min-width: unset;
           padding: 3px 5px;
           gap: 3px;
 
@@ -308,7 +305,7 @@ IdleMonDashBoard {
     flex-shrink: 0;
     justify-content: center;
     margin-top: 20px;
-    min-height: 320px;
+    min-height: 20px;
 
     @include bevel-out;
 
@@ -317,15 +314,37 @@ IdleMonDashBoard {
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      width: 1000px;
+      width: 1500px;
       gap: 20px;
+
+      .yield-contribution {
+        font-size: 11px;
+        font-weight: 800;
+        font-family: $font-mono;
+        padding: 4px 8px;
+        border-radius: 2px;
+        text-align: center;
+        width: 100%;
+
+        &.positive {
+          color: $accent-money;
+          background-color: rgba($accent-money, 0.05);
+        }
+
+        &.negative {
+          color: $danger-red;
+          background-color: rgba($danger-red, 0.05);
+          // Optional: Add a slight pulse or bold to warn the player
+          font-weight: 900;
+        }
+      }
 
       .current-slot,
       .candidate-slot {
         flex: 1;
         display: flex;
         justify-content: center;
-        min-width: 0; 
+        min-width: 0;
       }
 
       .comparison-vs {
@@ -341,7 +360,7 @@ IdleMonDashBoard {
 
       .comparison-card {
         width: 300px;
-        height: 340px;
+        height: 440px;
         display: flex;
         flex-direction: column;
         flex-shrink: 0;
@@ -369,7 +388,6 @@ IdleMonDashBoard {
           display: flex;
           flex-direction: column;
           min-height: 0;
-          overflow-y: auto;
 
           // Compact overrides
           .stats-container { gap: 8px; }
