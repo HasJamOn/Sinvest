@@ -37,6 +37,7 @@ SinvestOS {
       .content {
         display: flex;
         flex-direction: column;
+        width: 100px;
 
         .label {
           font-family: "MS Sans Serif", Arial;
@@ -51,12 +52,14 @@ SinvestOS {
           font-size: 18px;
           font-weight: bold;
           color: $gtk-text;
+          white-space: nowrap;
         }
 
         .value-row {
           display: flex;
           align-items: baseline;
           gap: 6px;
+          min-width: 140px;
 
           .valuation {
             font-family: monospace;
