@@ -365,6 +365,37 @@ IdleMonDashBoard {
         flex-direction: column;
         flex-shrink: 0;
 
+        .card-header {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between; // This pushes Name to left and Gen to right
+          align-items: center;
+          padding: 8px 12px;
+          height: 45px;
+          flex-shrink: 0;
+          border-bottom: 1px solid rgba($gtk-shadow, 0.1);
+
+          .name {
+            font-weight: 800;
+            color: $gtk-text;
+            text-transform: uppercase;
+            // Prevent long names from squishing the gen-tag
+            flex: 1;
+            margin-right: 8px;
+          }
+
+          .gen-tag {
+            font-family: $font-mono;
+            font-size: 10px;
+            font-weight: 900;
+            color: $gtk-shadow;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 2px;
+            flex-shrink: 0; // Ensures the G# tag never shrinks
+          }
+        }
+
         @include bevel-out;
 
         .comparison-portrait,

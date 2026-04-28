@@ -95,7 +95,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Spawn Points",
-      "Position": "272.136139,115.057037,158.179672",
+      "Position": "672,-352,352",
       "Rotation": "0,0,-1,1.94707184E-07",
       "Scale": "1,1,1",
       "Tags": "",
@@ -4965,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "62cfd1eb-b945-47ca-b3cf-62e621829976",
+                  "__guid": "fb2ebd28-5050-4e33-b553-eea31c6078b1",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4982,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "4e67b69b-d7fa-4f21-9f23-949dac2660d7",
+                      "__guid": "023d49d3-e37b-4e96-99bf-61ca6579012a",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5034,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "2a4f8d3b-7d69-45ac-af36-0990ccfdbc6d",
+                  "__guid": "964d1314-513f-4a86-afc2-2fd9a07b1912",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5051,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "1db89f0b-555f-4833-a998-1a62980b342b",
+                      "__guid": "2f29d4c2-8531-4741-bd94-459edf8030aa",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5103,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "e0be9c09-fefc-49cb-afb7-a68009f3d626",
+                  "__guid": "be732949-337d-4f26-aa10-d9eb63ce8ccc",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5120,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "91ae0a88-ab1f-4f92-93bd-a4488f35e4ae",
+                      "__guid": "426b8771-4ba3-4be9-8b3c-54657610c2a0",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5172,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "2a0f5a16-48b4-446a-a8e6-f76ab186d798",
+                  "__guid": "3cb90b9c-10b0-4a3f-8156-929b72b20dd0",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5189,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "2dd36d6b-ba11-4dd6-b399-3b0d112d61d7",
+                      "__guid": "a337de80-2fbd-425a-ae4f-47ed80c5cfde",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -6095,7 +6095,7 @@
                       "IdValue": "dd39dca4-9c0a-412c-bd1d-72f02f8c1d0e"
                     },
                     "Property": "Rotation",
-                    "Value": "-0.49999997,0,0,0.866025448"
+                    "Value": "-2.18556941E-08,0.5,0.866025388,-3.78551732E-08"
                   },
                   {
                     "Target": {
@@ -11709,13 +11709,18 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1ff7db61-0293-4529-be2b-9f606b7c33ea"
         }
       },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
       }
     }
   },

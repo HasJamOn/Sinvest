@@ -117,8 +117,8 @@
           "ZIndex": 100
         },
         {
-          "__type": "Sandbox.SaveSystem.CharacterSelect",
-          "__guid": "850a5191-3944-45e9-ab14-e166a56ef572",
+          "__type": "Sandbox.SaveSystem.CharacterSelect.CharacterSelect",
+          "__guid": "c004d4ea-1379-47b0-8a8d-5c986dc3c6fb",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
@@ -170,29 +170,6 @@
           "SetMoney": 53000,
           "SetShares": 3,
           "UseLocalSaveOnly": false
-        },
-        {
-          "__type": "Sinvest.IdlemonDebugger_finishline",
-          "__guid": "c83d40fe-2724-4901-9d25-fd7076981e85",
-          "__enabled": true,
-          "Flags": 0,
-          "Addition": 0,
-          "CostEfficiency": 0,
-          "Division": 1,
-          "Generation": 1,
-          "Luck": 0,
-          "Multiplier": 1,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "SteamId": 4000,
-          "Subtraction": 0,
-          "TargetCase": null,
-          "TargetVisuals": null,
-          "TeamBonus": 1
         }
       ],
       "Children": []
@@ -218,13 +195,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "10451406-e6c8-4ffa-aadb-5296f2df955e"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       },
       "Sandbox.SelectionSetsSystem": {
         "Data": {

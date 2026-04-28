@@ -23,7 +23,7 @@
     "PerMapRanking": false,
     "LeaderboardType": "None",
     "CsProjName": "",
-    "StartupScene": "scenes/test_mechanics.scene",
+    "StartupScene": "scenes/character_select.scene",
     "ControlModes": {
       "Keyboard": true,
       "VR": false,

@@ -73,9 +73,16 @@
                                    
                                    <div class="card-info">
 	                                   <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-		                                   <span class="name" style="font-size: @(mon.Name.Length > 14 ? "9px" : mon.Name.Length > 10 ? "11px" : mon.Name.Length > 7 ? "13px" : "15px")">
-			                                   @mon.Name
-		                                   </span>
+		                                   <div style="display: flex; flex-direction: column;">
+			                                   <span class="name" style="font-size: @(mon.Name.Length > 14 ? "9px" : mon.Name.Length > 10 ? "11px" : mon.Name.Length > 7 ? "13px" : "15px")">
+				                                   @mon.Name
+			                                   </span>
+			                                   @* New Synergy status line *@
+			                                   <span class="synergy-status-mini @(mon.TeamBonus > 1.0 ? "active" : "offline")" style="font-size: 8px; font-weight: 900; opacity: 0.8; color: @(mon.TeamBonus > 1.0 ? "#00E5FF" : "rgba(255,255,255,0.2)")">
+				                                   <i class="icon" style="font-size: 8px;">@(mon.TeamBonus > 1.0 ? "sync" : "sync_disabled")</i>
+				                                   @(mon.TeamBonus > 1.0 ? "STABLE" : "OFFLINE")
+			                                   </span>
+		                                   </div>
 		                                   <span class="gen-tag">G@(mon.Generation)</span>
 	                                   </div>
 	                                   
@@ -193,11 +200,9 @@
                               <IdleMonDisplay @ref="ComparisonCandidateDisplay" style="width: 100%; height: 100%;" />
                            </div>
                            <div class="card-header">
-	                           <div class="name-group">
-		                           <span class="name" style="font-size: @(DraftCandidate.HasValue ? (DraftCandidate.Value.Name.Length > 14 ? "9px" : DraftCandidate.Value.Name.Length > 10 ? "11px" : DraftCandidate.Value.Name.Length > 7 ? "13px" : "15px") : "15px")">
-			                           @DraftCandidate?.Name
-		                           </span>
-	                           </div>
+	                           <span class="name" style="font-size: @(DraftCandidate.HasValue ? (DraftCandidate.Value.Name.Length > 14 ? "9px" : DraftCandidate.Value.Name.Length > 10 ? "11px" : DraftCandidate.Value.Name.Length > 7 ? "13px" : "15px") : "15px")">
+		                           @DraftCandidate?.Name
+	                           </span>
 	                           <span class="gen-tag">GEN @DraftCandidate?.Generation</span>
                            </div>
 
