@@ -317,14 +317,15 @@ IdleMonDashBoard {
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      width: 100%;
+      width: 1000px;
       gap: 20px;
 
       .current-slot,
       .candidate-slot {
-        flex: 0 0 300px;
+        flex: 1;
         display: flex;
         justify-content: center;
+        min-width: 0; 
       }
 
       .comparison-vs {
