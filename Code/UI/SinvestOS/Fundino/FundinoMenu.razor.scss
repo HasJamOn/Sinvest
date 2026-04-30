@@ -1,4 +1,4 @@
-@import "../_base.scss";
+@import "../../Shared/_base.scss";
 
 // ============================================================================
 // LAYOUT CONSTANTS — mirror these in MarketGraph.cs as properties.
@@ -13,7 +13,7 @@ $graph-h-padding : 0px;    // horizontal inset for graph line start/end
 $graph-v-padding : 10px;   // vertical inset — matches y-axis padding-top/bottom
 $y-axis-width    : 65px;
 
-InvestMenu {
+FundinoMenu {
   display: flex;
   flex-direction: column;
   width: 550px;

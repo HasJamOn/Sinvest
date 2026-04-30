@@ -336,20 +336,22 @@
 
     private void CreateViewByType(Type t)
     {
-        _activeViewPanel?.Delete();
-        
-        var contentArea = Panel.Descendants.OfType<Panel>().FirstOrDefault(x => x.HasClass("hud-content"));
-        if (contentArea == null) return;
+	    _activeViewPanel?.Delete();
+    
+	    var contentArea = Panel.Descendants.OfType<Panel>().FirstOrDefault(x => x.HasClass("hud-content"));
+	    if (contentArea == null) return;
 
-        _activeViewPanel = t.Name switch
-        {
-            nameof(FundinoMenu) => contentArea.AddChild<FundinoMenu>(),
-            nameof(SinCashMenu) => contentArea.AddChild<SinCashMenu>(),
-            nameof(CoinFlip)   => contentArea.AddChild<CoinFlip>(),
-            _ => null
-        };
+	    // 1. Use the Create<T> extension method via the Type
+	    // This bypasses the Activator whitelist block because it's an engine-safe call.
+	    var newPanel = TypeLibrary.Create<Panel>( t );
 
-        StateHasChanged();
+	    if ( newPanel != null )
+	    {
+		    // 2. Parent it using the instance-based AddChild you saw in your decompile
+		    _activeViewPanel = contentArea.AddChild( newPanel );
+	    }
+
+	    StateHasChanged();
     }
 
     public void ClearView()
