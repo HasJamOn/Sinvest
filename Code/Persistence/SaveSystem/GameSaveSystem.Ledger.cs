@@ -81,6 +81,8 @@ public partial class GameSaveSystem
           }
           else if ( parts[0] == "IN" ) CurrentCharacter.Money += double.Parse( parts[1] );
           else if ( parts[0] == "OUT" ) CurrentCharacter.Money -= double.Parse( parts[1] );
+          else if ( parts[0] == "SHARE_BUY" ) CurrentCharacter.Shares += double.Parse( parts[1] );
+          else if ( parts[0] == "SHARE_SELL" ) CurrentCharacter.Shares -= double.Parse( parts[1] );
        }
     }
 }

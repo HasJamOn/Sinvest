@@ -20,7 +20,7 @@ public sealed class AssetGenerator : Component
 
 	private void LoadBootstrapIds()
 	{
-		string path = "SteamLibrary_Case/data/bootstrap_ids.txt";
+		string path = "Code/Gameplay/Steam/SteamIDData/bootstrap_ids.txt";
        
 		if ( FileSystem.Mounted.FileExists( path ) )
 		{

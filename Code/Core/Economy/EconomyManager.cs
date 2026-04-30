@@ -1,111 +1,78 @@
 using Sandbox;
-using Sinvest;
-using Sandbox.Services;
-using System.Threading.Tasks;
-using System.Linq;
+using System;
 
 namespace Sinvest;
 
 public sealed class EconomyManager : Component
 {
     public static EconomyManager Instance { get; private set; }
-    
-    public double CurrentSharePrice => FundinoMarketService.CurrentPrice;
 
-    [Property, ReadOnly] public double CurrentMoney { get; private set; }
-    [Property, ReadOnly] public double CurrentShares { get; private set; }
+    // Logic-driven getters: The EconomyManager no longer "owns" the data
+    public double CurrentMoney => GameSaveSystem.Instance?.CurrentCharacter?.Money ?? 0;
+    public double CurrentShares => GameSaveSystem.Instance?.CurrentCharacter?.Shares ?? 0;
+    public double CurrentSharePrice => FundinoMarketService.CurrentPrice;
 
     protected override void OnAwake()
     {
-	    if ( !IsProxy ) Instance = this;
-    }
-
-    protected override void OnStart()
-    {
-	    if ( IsProxy ) return;
-
-	    var save = GameSaveSystem.Instance;
-	    if ( save?.CurrentCharacter != null )
-	    {
-		    // ALWAYS use the values already loaded into the character session
-		    CurrentMoney = save.CurrentCharacter.Money;
-		    CurrentShares = save.CurrentCharacter.Shares;
-        
-		    Log.Info($"[ECONOMY] Initialized with ${CurrentMoney} and {CurrentShares} shares.");
-	    }
+        if ( !IsProxy ) Instance = this;
     }
 
     /// <summary>
-    /// Debug helper to force specific values from the Debug Manager.
+    /// Processes a purchase of Fundino shares using the Ledger.
     /// </summary>
-    public void DebugSetValues( double targetMoney, double targetShares )
+    public TransactionResult BuyShares( int amount )
     {
-	    var save = GameSaveSystem.Instance;
-	    if ( !save.IsValid() || save.CurrentCharacter == null ) return;
+        if ( amount <= 0 ) return TransactionResult.SystemError;
 
-	    // Use the SaveSystem as the source of truth for the calculation
-	    double currentMoney = save.CurrentCharacter.Money;
-	    double currentShares = save.CurrentCharacter.Shares;
+        double totalCost = amount * CurrentSharePrice;
 
-	    double moneyDelta = targetMoney - currentMoney;
-	    double sharesDelta = targetShares - currentShares;
+        // Commit the outflow to the ledger
+        var result = GameSaveSystem.Instance.CommitTransaction( 
+            "OUT", 
+            totalCost, 
+            $"Bought {amount} Shares @ {CurrentSharePrice}" 
+        );
 
-	    if ( moneyDelta != 0 || sharesDelta != 0 )
-	    {
-		    Log.Info( $"[DEBUG] Adjusting: Money Δ{moneyDelta}, Shares Δ{sharesDelta}" );
-		    CommitTransaction( moneyDelta, sharesDelta );
-	    }
+        if ( result == TransactionResult.Success )
+        {
+            // Update the state in the session (Shares aren't currently in your Ledger logic)
+            GameSaveSystem.Instance.CurrentCharacter.Shares += amount;
+            Log.Info( $"[ECONOMY] Purchased {amount} shares for ${totalCost}" );
+        }
+
+        return result;
     }
 
-    public void CommitTransaction( double moneyDelta, double sharesDelta )
+    /// <summary>
+    /// Sells Fundino shares and records the inflow in the ledger.
+    /// </summary>
+    public TransactionResult SellShares( int amount )
     {
-	    if ( IsProxy ) return;
+        var character = GameSaveSystem.Instance?.CurrentCharacter;
+        if ( character == null || character.Shares < amount ) return TransactionResult.InsufficientFunds;
 
-	    // 1. UPDATE LOCALLY IMMEDIATELY (Player sees this instantly)
-	    CurrentMoney += moneyDelta;
-	    CurrentShares += sharesDelta;
+        double totalGain = amount * CurrentSharePrice;
 
-	    var save = GameSaveSystem.Instance;
-	    if ( !save.IsValid() || save.CurrentCharacter == null ) return;
+        var result = GameSaveSystem.Instance.CommitTransaction( 
+            "IN", 
+            totalGain, 
+            $"Sold {amount} Shares @ {CurrentSharePrice}" 
+        );
 
-	    save.CurrentCharacter.Money = CurrentMoney;
-	    save.CurrentCharacter.Shares = CurrentShares;
-    
-	    // Notify the UI right now!
-	    GameSaveSystem.OnDataChanged?.Invoke();
+        if ( result == TransactionResult.Success )
+        {
+            character.Shares -= amount;
+            Log.Info( $"[ECONOMY] Sold {amount} shares for ${totalGain}" );
+        }
 
-	    // 2. SYNC IN THE BACKGROUND
-	    // We remove 'await' here so the function finishes instantly
-	    _ = SyncToCloud( moneyDelta, sharesDelta ); 
+        return result;
     }
 
-    private async Task SyncToCloud( double moneyDelta, double sharesDelta )
+    /// <summary>
+    /// Records income from jobs (Labor).
+    /// </summary>
+    public void AddLaborIncome( double amount, string jobName )
     {
-	    var save = GameSaveSystem.Instance;
-	    if ( !save.ShouldUseCloud ) 
-	    {
-		    // If local mode, just save to cookies and exit
-		    save.SetStoredStat( "money", CurrentMoney );
-		    save.SetStoredStat( "fundino_shares", CurrentShares );
-		    return;
-	    }
-
-	    try 
-	    {
-		    string moneyKey = SinvestSession.GetSlotKey( "money" );
-		    string sharesKey = SinvestSession.GetSlotKey( "fundino_shares" );
-
-		    Stats.Increment( moneyKey, moneyDelta );
-		    Stats.Increment( sharesKey, sharesDelta );
-
-		    // We don't call FlushAsync every single flip. 
-		    // Steam handles batching automatically if we just set values.
-		    // Only flush every few minutes or on quit.
-		    Log.Info( "[ECONOMY] Cloud stats updated." );
-	    }
-	    catch ( System.Exception e )
-	    {
-		    Log.Error( $"[ECONOMY] Cloud background sync failed: {e.Message}" );
-	    }
+        GameSaveSystem.Instance.CommitTransaction( "IN", amount, $"Job: {jobName}" );
     }
 }
