@@ -25,14 +25,14 @@ public sealed class PhoneKeyHandler : Component
 	private void TryTogglePhone()
 	{
 		// 2. Safety: Is the InventoryManager ready?
-		if ( InventoryManager.Instance == null )
+		if ( PlayerInventoryManager.Instance == null )
 		{
 			Log.Warning( "PhoneKeyHandler: InventoryManager.Instance is not ready yet." );
 			return;
 		}
 
 		// 3. Logic: Does the player have the phone?
-		if ( !InventoryManager.Instance.HasPhone )
+		if ( !PlayerInventoryManager.Instance.HasPhone )
 		{
 			Log.Info( "Phone: You don't have a device to open." );
 			return;

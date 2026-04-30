@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Sinvest;
 
-public class MarketGraph : Panel
+public class FundinoMarketGraph : Panel
 {
     public List<double> History { get; set; } = new();
     public float MinVal { get; set; }

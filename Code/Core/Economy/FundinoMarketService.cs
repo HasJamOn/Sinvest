@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Sinvest;
 
-public static class MarketService
+public static class FundinoMarketService
 {
 	/// <summary>
 	/// The current price synced from the MarketServerSystem.

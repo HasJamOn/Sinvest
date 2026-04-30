@@ -15,7 +15,7 @@ public sealed class PersistenceValidator : Component
 		Log.Info( "--- STARTING VALIDATION: BULL MARKET ---" );
     
 		// 1. Simulate a high market price in MarketService
-		MarketService.UpdatePrice( 15000.0 ); // ~2.1x Market Scale
+		FundinoMarketService.UpdatePrice( 15000.0 ); // ~2.1x Market Scale
     
 		// FIX: Added 'await' to resolve the Task into actual IdleMonData
 		var node = await Generator.RollNewAsset();

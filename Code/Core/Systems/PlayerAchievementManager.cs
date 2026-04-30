@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Sinvest;
 
-public sealed class AchievementManager : Component
+public sealed class PlayerAchievementManager : Component
 {
 	[Property] public bool DebugLogUnlocks { get; set; } = true;
 

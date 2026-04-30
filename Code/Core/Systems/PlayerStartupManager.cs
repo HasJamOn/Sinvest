@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sinvest;
 
-public sealed class StartupManager : Component
+public sealed class PlayerStartupManager : Component
 {
     // Local sibling reference
     private EconomyManager _economy => Components.Get<EconomyManager>( FindMode.EverythingInSelfAndAncestors );
@@ -133,7 +133,7 @@ public sealed class StartupManager : Component
     {
        if ( itemTag == "item_phone" )
        {
-          var inv = Components.Get<InventoryManager>( FindMode.EverythingInSelfAndAncestors );
+          var inv = Components.Get<PlayerInventoryManager>( FindMode.EverythingInSelfAndAncestors );
           if ( inv.IsValid() )
           {
              inv.UnlockPhone();

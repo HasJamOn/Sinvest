@@ -10,7 +10,7 @@ public sealed class EconomyManager : Component
 {
     public static EconomyManager Instance { get; private set; }
     
-    public double CurrentSharePrice => MarketService.CurrentPrice;
+    public double CurrentSharePrice => FundinoMarketService.CurrentPrice;
 
     [Property, ReadOnly] public double CurrentMoney { get; private set; }
     [Property, ReadOnly] public double CurrentShares { get; private set; }

@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Sinvest;
 
-public sealed class InventoryManager : Component
+public sealed class PlayerInventoryManager : Component
 {
-	public static InventoryManager Instance { get; private set; }
+	public static PlayerInventoryManager Instance { get; private set; }
 
 	// We keep the property but allow the debug manager to influence the getter
 	private bool _hasPhone;

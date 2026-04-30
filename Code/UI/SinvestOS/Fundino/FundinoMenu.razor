@@ -11,10 +11,10 @@
 <root>
     <div class="header">
        <label>FUND.INO INDEX</label>
-       <div class="status @(MarketService.IsReady ? "online" : "offline")"></div>
+       <div class="status @(FundinoMarketService.IsReady ? "online" : "offline")"></div>
     </div>
 
-    @if ( !MarketService.IsReady )
+    @if ( !FundinoMarketService.IsReady )
     {
        <div class="loading">SYNCING WITH B4BLOCK.ORG...</div>
     }
@@ -33,7 +33,7 @@
 
             <div class="chart-container">
                 <div class="graph-window">
-                    <MarketGraph @ref="GraphCanvas" class="graph-painter" />
+                    <FundinoMarketGraph @ref="GraphCanvas" class="graph-painter" />
                 </div>
 
                 <div class="y-axis">
@@ -49,7 +49,7 @@
                         tag never clips under the header or footer of the y-axis.
                     --%>
                     <div class="current-price-tag" style="top: @(CurrentPricePixelY)px">
-                        @MarketService.CurrentPrice.ToString("N2")
+                        @FundinoMarketService.CurrentPrice.ToString("N2")
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
 
            <div class="data-point">
               <span class="label">EQUITY</span>
-              <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * MarketService.CurrentPrice)</span>
+              <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * FundinoMarketService.CurrentPrice)</span>
            </div>
 
            <div class="divider"></div>
@@ -96,7 +96,7 @@
                     $@Math.Abs(PriceDelta).ToString("N2")
                  </span>
 
-                 <span class="price">$@MarketService.CurrentPrice.ToString("N2") / UNIT</span>
+                 <span class="price">$@FundinoMarketService.CurrentPrice.ToString("N2") / UNIT</span>
               </div>
            </div>
 
@@ -116,7 +116,7 @@
 </root>
 
 @code {
-    private MarketGraph GraphCanvas;
+    private FundinoMarketGraph GraphCanvas;
     private bool IsProcessing = false;
     private double LastPrice;
     private double PreviousPrice;
@@ -134,7 +134,7 @@
     // Increase if your font/padding makes the tag taller.
     private const float TagHalfHeight = 9f;
 
-    private double PriceDelta => MarketService.CurrentPrice - PreviousPrice;
+    private double PriceDelta => FundinoMarketService.CurrentPrice - PreviousPrice;
 
     private readonly Dictionary<string, int> TimeRanges = new()
     {
@@ -149,7 +149,7 @@
     };
 
     private bool CanAfford => SinvestOS.Instance != null && 
-                              SinvestOS.Instance.CurrentMoney >= MarketService.CurrentPrice;
+                              SinvestOS.Instance.CurrentMoney >= FundinoMarketService.CurrentPrice;
 
     private bool CanSell => SinvestOS.Instance != null && 
                             SinvestOS.Instance.CurrentShares >= 1;
@@ -170,10 +170,10 @@
     {
         if ( !firstTime ) return;
 
-        LastPrice     = MarketService.CurrentPrice;
-        PreviousPrice = MarketService.CurrentPrice;
+        LastPrice     = FundinoMarketService.CurrentPrice;
+        PreviousPrice = FundinoMarketService.CurrentPrice;
 
-        if ( MarketService.PriceHistory.Count < 2 )
+        if ( FundinoMarketService.PriceHistory.Count < 2 )
             PreFillHistory();
 
         // RequestUpdate() handles the zero-rect race internally:
@@ -188,10 +188,10 @@
     {
         // Only act when the live price changes; RefreshGraph() handles
         // both the graph redraw and the price-tag repositioning.
-        if ( MarketService.CurrentPrice == LastPrice ) return;
+        if ( FundinoMarketService.CurrentPrice == LastPrice ) return;
 
         PreviousPrice = LastPrice;
-        LastPrice     = MarketService.CurrentPrice;
+        LastPrice     = FundinoMarketService.CurrentPrice;
 
         RefreshGraph();
         StateHasChanged();
@@ -212,7 +212,7 @@
             var time  = now.AddMinutes(-i);
             int seed  = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
             double px = MarketServerSystem.CalculatePrice(time, seed, false);
-            MarketService.UpdatePrice(px);
+            FundinoMarketService.UpdatePrice(px);
         }
     }
 
@@ -273,7 +273,7 @@
 
         if (dataRange <= 0)
         {
-            dataRange = MarketService.CurrentPrice * 0.1;
+            dataRange = FundinoMarketService.CurrentPrice * 0.1;
             if (dataRange <= 0) dataRange = 1.0;
         }
 
@@ -310,7 +310,7 @@
         // We ask the graph for the Y pixel that corresponds to the live price.
         // This uses the exact same MapPriceToY() math as the drawn line, so
         // the tag and the line tip are always on the same horizontal scanline.
-        float rawY = GraphCanvas.GetCurrentPriceY((float)MarketService.CurrentPrice);
+        float rawY = GraphCanvas.GetCurrentPriceY((float)FundinoMarketService.CurrentPrice);
 
         // Clamp so the tag label never overflows the top or bottom of the panel.
         float maxY = GraphCanvas.LastKnownRect.Height > 0
@@ -339,11 +339,11 @@
 
     private async void DoTrade(int amount)
     {
-        if (IsProcessing || !MarketService.IsReady) return;
+        if (IsProcessing || !FundinoMarketService.IsReady) return;
         IsProcessing = true;
         StateHasChanged();
     
-        double totalCost = MarketService.CurrentPrice * amount;
+        double totalCost = FundinoMarketService.CurrentPrice * amount;
         if (amount < 0 && (SinvestOS.Instance?.CurrentShares ?? 0) < Math.Abs(amount))
         {
             IsProcessing = false;
@@ -360,7 +360,7 @@
     protected override int BuildHash()
     {
         return HashCode.Combine(
-            MarketService.CurrentPrice,
+            FundinoMarketService.CurrentPrice,
             IsProcessing,
             SinvestOS.Instance?.CurrentMoney,
             CurrentRange

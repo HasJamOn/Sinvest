@@ -55,9 +55,9 @@ public sealed class MarketServerSystem : Component
 	    if ( IsProxy ) 
 	    {
 		    // Only update if the networked price changed
-		    if ( MarketService.CurrentPrice != SyncedPrice )
+		    if ( FundinoMarketService.CurrentPrice != SyncedPrice )
 		    {
-			    MarketService.UpdatePrice( SyncedPrice );
+			    FundinoMarketService.UpdatePrice( SyncedPrice );
 		    }
 		    return;
 	    }
@@ -97,7 +97,7 @@ public sealed class MarketServerSystem : Component
             double price = CalculatePrice( serverTime, CurrentSeed, true );
 
             SyncedPrice = price;
-            MarketService.UpdatePrice( price );
+            FundinoMarketService.UpdatePrice( price );
 
              Log.Info( $"[Market] Live: ${SyncedPrice}" );
         }
