@@ -1,5 +1,6 @@
 using System;
-using System.IO;
+using System.Collections.Generic; // Added for HashSet
+using Sandbox; // Ensure Sandbox namespace is used for FileSystem
 
 namespace Sinvest;
 
@@ -8,19 +9,19 @@ public sealed partial class GameSaveSystem : Component
 	public static GameSaveSystem Instance { get; private set; }
 
 	[Property] public int ActiveSlot { get; set; } = 1;
+	public CharacterSession CurrentCharacter { get; private set; } = new();
 	[Property] public SceneFile WorldScene { get; set; }
-	
+    
 	[Property, Group("Phase 2")] public bool ShouldUseCloud { get; set; } = false;
-	
-	// Action to notify systems like achievements when money/shares change
+    
 	public static System.Action OnDataChanged { get; set; }
 
 	public void NotifyDataChanged() => OnDataChanged?.Invoke();
 
-	// Local achievement tracking for the current session
 	public HashSet<string> UnlockedAchievements { get; private set; } = new();
     
-	public CharacterSession CurrentCharacter { get; private set; } = new();
+	// Note: Ensure CharacterSession is defined elsewhere in your project
+	// public CharacterSession CurrentCharacter { get; private set; } = new();
     
 	private string GetPath( int slot ) => $"slot_{slot}.txt";
 
@@ -38,20 +39,19 @@ public sealed partial class GameSaveSystem : Component
 			Log.Info( $"Deleted save file: {path}" );
 		}
 	}
-	
+    
 	public void LocalUnlockAchievement( string id )
 	{
 		if ( UnlockedAchievements.Add( id ) )
 		{
-			// In Phase 1, you can append this to your ledger file
 			var path = GetPath( ActiveSlot );
 			var entry = $"ACH|{id}|0|{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}\n";
             
-			using ( var stream = FileSystem.Data.OpenWrite( path, System.IO.FileMode.Append ) )
-			using ( var writer = new StreamWriter( stream ) )
-			{
-				writer.Write( entry );
-			}
+			// Read existing text (returns empty string if file doesn't exist)
+			string existingData = FileSystem.Data.ReadAllText( path ) ?? "";
+        
+			// Write it all back
+			FileSystem.Data.WriteAllText( path, existingData + entry );
             
 			Log.Info( $"[ACHIEVEMENT] Locally Unlocked: {id}" );
 		}

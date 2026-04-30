@@ -202,8 +202,6 @@ public sealed class RosterManager : Component
 
 	    save.SetStoredString( "idlemon_last_timestamp", DateTime.UtcNow.ToString("O") );
 	    
-	    save.UpdateSecuritySignature();
-	    
 	    _ = save.SaveActiveSlotAsync();
     }
 
