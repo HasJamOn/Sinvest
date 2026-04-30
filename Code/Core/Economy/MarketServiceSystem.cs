@@ -30,6 +30,13 @@ public sealed class MarketServerSystem : Component
     
     private TimeUntil _nextSync = 0;
     
+    protected override void OnStart()
+    {
+	    // Pre-calculate a price immediately using the Epoch so we aren't at $0
+	    double initialPrice = CalculatePrice( DateTime.UtcNow, SecretSalt, false );
+	    FundinoMarketService.UpdatePrice( initialPrice );
+    }
+    
     protected override void OnAwake()
     {
 	    Instance = this;

@@ -56,4 +56,14 @@ public sealed partial class GameSaveSystem : Component
 			Log.Info( $"[ACHIEVEMENT] Locally Unlocked: {id}" );
 		}
 	}
+	public void StartGame()
+	{
+		if ( WorldScene == null )
+		{
+			Log.Error( "WorldScene is not assigned in the GameSaveSystem Inspector!" );
+			return;
+		}
+		
+		Game.ActiveScene.Load( WorldScene );
+	}
 }

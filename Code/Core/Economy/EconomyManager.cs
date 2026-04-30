@@ -23,10 +23,9 @@ public sealed class EconomyManager : Component
     public TransactionResult BuyShares( int amount )
     {
 	    if ( amount <= 0 ) return TransactionResult.SystemError;
-
 	    double totalCost = amount * CurrentSharePrice;
-	    
-	    var result = GameSaveSystem.Instance.CommitTransaction( 
+    
+	    var result = GameSaveSystem.Instance.CommitMoneyTransaction( 
 		    "OUT", 
 		    totalCost, 
 		    $"Bought {amount} Shares" 
@@ -34,8 +33,8 @@ public sealed class EconomyManager : Component
 
 	    if ( result == TransactionResult.Success )
 	    {
-		    GameSaveSystem.Instance.CurrentCharacter.Shares += amount;
-		    GameSaveSystem.Instance.NotifyDataChanged();
+		    // Use the transaction method instead of direct +=
+		    GameSaveSystem.Instance.CommitShareTransaction( amount, "Market Purchase" );
 	    }
 
 	    return result;
@@ -46,24 +45,24 @@ public sealed class EconomyManager : Component
     /// </summary>
     public TransactionResult SellShares( int amount )
     {
-        var character = GameSaveSystem.Instance?.CurrentCharacter;
-        if ( character == null || character.Shares < amount ) return TransactionResult.InsufficientFunds;
+	    var character = GameSaveSystem.Instance?.CurrentCharacter;
+	    if ( character == null || character.Shares < amount ) return TransactionResult.InsufficientFunds;
 
-        double totalGain = amount * CurrentSharePrice;
+	    double totalGain = amount * CurrentSharePrice;
 
-        var result = GameSaveSystem.Instance.CommitTransaction( 
-            "IN", 
-            totalGain, 
-            $"Sold {amount} Shares @ {CurrentSharePrice}" 
-        );
+	    var result = GameSaveSystem.Instance.CommitMoneyTransaction( 
+		    "IN", 
+		    totalGain, 
+		    $"Sold {amount} Shares @ {CurrentSharePrice}" 
+	    );
 
-        if ( result == TransactionResult.Success )
-        {
-            character.Shares -= amount;
-            Log.Info( $"[ECONOMY] Sold {amount} shares for ${totalGain}" );
-        }
+	    if ( result == TransactionResult.Success )
+	    {
+		    // Use the transaction method instead of direct -=
+		    GameSaveSystem.Instance.CommitShareTransaction( -amount, "Market Sale" );
+	    }
 
-        return result;
+	    return result;
     }
 
     /// <summary>
@@ -71,7 +70,7 @@ public sealed class EconomyManager : Component
     /// </summary>
     public void AddLaborIncome( double amount, string jobName )
     {
-        GameSaveSystem.Instance.CommitTransaction( "IN", amount, $"Job: {jobName}" );
+        GameSaveSystem.Instance.CommitMoneyTransaction( "IN", amount, $"Job: {jobName}" );
     }
     
     /// <summary>
@@ -90,12 +89,12 @@ public sealed class EconomyManager : Component
 
 	    if ( moneyDiff > 0 )
 	    {
-		    save.CommitTransaction( "IN", moneyDiff, "DEBUG_OVERRIDE" );
+		    save.CommitMoneyTransaction( "IN", moneyDiff, "DEBUG_OVERRIDE" );
 	    }
 	    else if ( moneyDiff < 0 )
 	    {
 		    // Use absolute value for OUT transaction
-		    save.CommitTransaction( "OUT", Math.Abs( moneyDiff ), "DEBUG_OVERRIDE" );
+		    save.CommitMoneyTransaction( "OUT", Math.Abs( moneyDiff ), "DEBUG_OVERRIDE" );
 	    }
 
 	    // 2. Correct Shares

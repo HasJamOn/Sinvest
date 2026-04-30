@@ -3,6 +3,7 @@
 @using Sandbox.UI;
 @using System;
 @using System.Collections.Generic;
+@using System.Threading.Tasks; @* FIXED: Added for Task support[cite: 1] *@
 
 @inherits PanelComponent
 
@@ -99,39 +100,32 @@
     }
 
     /// <summary>
-    /// Matches the Action<string, StartingModifiers> signature for the child component
+    /// FIXED: Returns Task instead of async void to allow CharacterCreator to await completion[cite: 1]
     /// </summary>
-    async void CreateAndStart( string name, StartingModifiers mods )
+    async Task CreateAndStart( string name, StartingModifiers mods )
     {
 	    if ( SaveManager == null ) return;
 
 	    var charData = SaveManager.CurrentCharacter;
 	    charData.Name = name;
 	    charData.Modifiers = mods;
-	    charData.Money = mods.HasFlag(StartingModifiers.DevMode) ? 999999999 : 0;
+    
+	    // Set memory balance to 0; the PlayerStartupManager/Ledger handle actual IN transactions[cite: 1]
+	    charData.Money = 0; 
+	    charData.Shares = 0;
 
-	    // This is where the 401 error happens. 
-	    // We await it so the UI stays in the "Processing" state until it's done.
+	    // Save the META line first so the StartupManager knows who this is[cite: 1]
 	    await SaveManager.SaveActiveSlotAsync();
 
 	    IsCreating = false;
 	    StartGame();
     }
 
-    // Add this property so you can pick the scene in the Inspector
-    [Property] public SceneFile WorldScene { get; set; }
-
     void StartGame()
     {
-	    if ( WorldScene == null )
-	    {
-		    Log.Error( "WorldScene is not assigned in the Inspector!" );
-		    return;
-	    }
-
-	    
-	    Game.ActiveScene.Load( WorldScene );
+	    SaveManager?.StartGame();
     }
+
     bool IsSlotActive( int index )
     {
 	    if ( SaveManager == null ) return false;

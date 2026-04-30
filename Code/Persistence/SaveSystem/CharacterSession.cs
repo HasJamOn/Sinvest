@@ -29,6 +29,8 @@ public class CharacterSession
 	public double Money { get; set; }
 	public double Shares { get; set; }
 	public StartingModifiers Modifiers { get; set; }
+	
+	public HashSet<string> UnlockedItems { get; set; } = new();
     
 	// Cache for IdleMon Data
 	public Dictionary<string, double> IdleMonStats { get; set; } = new();

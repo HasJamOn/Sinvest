@@ -1,7 +1,8 @@
 ﻿@using Sandbox; 
-using Sinvest;
+@using Sinvest;
 @using Sandbox.UI;
 @using System;
+@using System.Threading.Tasks; @* FIXED: Added for Task support *@
 
 @inherits Panel
 
@@ -34,68 +35,69 @@ using Sinvest;
     </div>
 
     <div class="footer">
-	    <button class="btn-abort @(IsProcessing ? "disabled" : "")" 
-	            onclick=@(() => { if(!IsProcessing) OnCancel?.Invoke(); })>
-		    ABORT
-	    </button>
+        <button class="btn-abort @(IsProcessing ? "disabled" : "")" 
+                onclick=@(() => { if(!IsProcessing) OnCancel?.Invoke(); })>
+           ABORT
+        </button>
     
-	    <button class="btn-start @(IsProcessing ? "processing" : "")" 
-	            onclick=@OnConfirm 
-	            disabled=@IsProcessing>
-		    @(IsProcessing ? "SYNCING WITH CLOUD..." : "START CAREER")
-	    </button>
+        <button class="btn-start @(IsProcessing ? "processing" : "")" 
+                onclick=@OnConfirm 
+                disabled=@IsProcessing>
+           @(IsProcessing ? "SYNCING WITH CLOUD..." : "START CAREER")
+        </button>
     </div>
 </root>
 
 @code {
-	[Property] public GameSaveSystem SaveManager { get; set; }
-	[Property] public int SlotIndex { get; set; }
-	public Action OnCancel { get; set; }
-	public Action<string, StartingModifiers> OnCreate { get; set; }
-
-	string CharName = "";
-	StartingModifiers ActiveMods = StartingModifiers.None;
+    [Property] public GameSaveSystem SaveManager { get; set; }
+    [Property] public int SlotIndex { get; set; }
+    public Action OnCancel { get; set; }
     
-	// --- NEW STATE ---
-	bool IsProcessing = false;
+    // FIXED: Changed to Func<..., Task> to allow the UI to await the save completion
+    [Property] public Func<string, StartingModifiers, Task> OnCreate { get; set; }
+
+    string CharName = "";
+    StartingModifiers ActiveMods = StartingModifiers.None;
     
-	protected override void OnParametersSet()
-	{
-		if ( SaveManager == null ) return;
-		if ( !SaveManager.HasGraduated() ) ActiveMods |= StartingModifiers.MentorDad;
-	}
+    bool IsProcessing = false;
+    
+    protected override void OnParametersSet()
+    {
+       if ( SaveManager == null ) return;
+       // Logic for default modifiers based on graduation status
+       if ( !SaveManager.HasGraduated() ) ActiveMods |= StartingModifiers.MentorDad;
+    }
 
-	void ToggleMod( StartingModifiers mod ) 
-	{
-		if ( IsProcessing || SaveManager == null ) return; // Block input while saving
-		if ( !SaveManager.IsModifierUnlocked( mod ) ) return;
-		if ( mod == StartingModifiers.MentorDad && !SaveManager.HasGraduated() ) return; 
+    void ToggleMod( StartingModifiers mod ) 
+    {
+       if ( IsProcessing || SaveManager == null ) return; 
+       if ( !SaveManager.IsModifierUnlocked( mod ) ) return;
+       if ( mod == StartingModifiers.MentorDad && !SaveManager.HasGraduated() ) return; 
 
-		if ( ActiveMods.HasFlag( mod ) ) ActiveMods &= ~mod;
-		else ActiveMods |= mod;
-	}
+       if ( ActiveMods.HasFlag( mod ) ) ActiveMods &= ~mod;
+       else ActiveMods |= mod;
+    }
 
-	async void OnConfirm() 
-	{
-		if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
+    async void OnConfirm() 
+    {
+       if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
 
-		IsProcessing = true;
-		StateHasChanged();
+       IsProcessing = true;
+       StateHasChanged();
 
-		try 
-		{
-			// We invoke the action and WAIT for it to finish 
-			// (Ensure your CharacterSelect.razor's CreateAndStart is also async/await)
-			if ( OnCreate != null )
-			{
-				OnCreate.Invoke( CharName, ActiveMods );
-			}
-		}
-		catch ( Exception e )
-		{
-			Log.Error( $"Failed to create character: {e.Message}" );
-			IsProcessing = false; // Re-enable if it fails
-			StateHasChanged();
-		}
-	}
+       try 
+       {
+          if ( OnCreate != null )
+          {
+             // This now properly awaits the parent's SaveActiveSlotAsync
+             await OnCreate.Invoke( CharName, ActiveMods );
+          }
+       }
+       catch ( Exception e )
+       {
+          Log.Error( $"[UI] Failed to create: {e.Message}" );
+          IsProcessing = false; 
+          StateHasChanged();
+       }
+    }
 }

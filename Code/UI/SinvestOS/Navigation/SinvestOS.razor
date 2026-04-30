@@ -277,7 +277,7 @@
 		    if ( moneyAmount != 0 )
 		    {
 			    string type = moneyAmount > 0 ? "IN" : "OUT";
-			    save.CommitTransaction( type, Math.Abs(moneyAmount), "OS Transaction" );
+			    save.CommitMoneyTransaction( type, Math.Abs(moneyAmount), "OS Transaction" );
 		    }
 		    
 	    }

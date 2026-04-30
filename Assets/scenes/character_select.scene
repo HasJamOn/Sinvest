@@ -55,7 +55,14 @@
       "__Prefab": "prefabs/gamesavesystem.prefab",
       "__PrefabInstancePatch": {
         "AddedObjects": [],
-        "RemovedObjects": [],
+        "RemovedObjects": [
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "6f508414-1c22-4550-93f3-8e58266b17b0"
+            }
+          }
+        ],
         "PropertyOverrides": [
           {
             "Target": {
@@ -72,13 +79,35 @@
             },
             "Property": "Position",
             "Value": "-31.6374931,-209.698029,-47.6753845"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "8611e950-dee8-401f-950f-459361d63675"
+            },
+            "Property": "WorldScene",
+            "Value": "scenes/sinvest_world.scene"
           }
         ],
-        "MovedObjects": []
+        "MovedObjects": [
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "8611e950-dee8-401f-950f-459361d63675"
+            },
+            "NewParent": {
+              "Type": "GameObject",
+              "IdValue": "df2b829f-cfb7-4e38-85c7-5676c84e706c"
+            },
+            "NewContainerProperty": "Components",
+            "IsNewContainerArray": true,
+            "NewPreviousElement": null
+          }
+        ]
       },
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "0dc3de13-61df-432f-9a4d-0174925c3d38",
-        "6f508414-1c22-4550-93f3-8e58266b17b0": "b455b53c-afbd-441f-abf0-80417bd5ff7a",
+        "65266759-bca7-4037-a77c-431e9fc416a1": "378324d8-5a57-4e4a-ae35-1826b1ce7842",
         "8611e950-dee8-401f-950f-459361d63675": "ba39a522-a8aa-4b3e-be35-a8c10979f8d0"
       }
     },
@@ -117,7 +146,7 @@
           "ZIndex": 100
         },
         {
-          "__type": "Sandbox.SaveSystem.CharacterSelect.CharacterSelect",
+          "__type": "Sandbox.UI.Menus.CharacterSelect",
           "__guid": "c004d4ea-1379-47b0-8a8d-5c986dc3c6fb",
           "__enabled": true,
           "Flags": 0,
@@ -132,8 +161,7 @@
             "component_id": "ba39a522-a8aa-4b3e-be35-a8c10979f8d0",
             "go": "0dc3de13-61df-432f-9a4d-0174925c3d38",
             "component_type": "GameSaveSystem"
-          },
-          "WorldScene": "scenes/sinvest_world.scene"
+          }
         }
       ],
       "Children": []
@@ -170,6 +198,19 @@
           "SetMoney": 53000,
           "SetShares": 3,
           "UseLocalSaveOnly": false
+        },
+        {
+          "__type": "Sinvest.Utility.Debug.StartupDebugger",
+          "__guid": "c9542222-e15b-458e-a44b-a8ea10e5927c",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "TestSlot": 99
         }
       ],
       "Children": []

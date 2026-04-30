@@ -40,70 +40,88 @@ public sealed class PlayerStartupManager : Component
 
     private void RunStartupLogic( GameSaveSystem saveSystem )
     {
-       var session = saveSystem.CurrentCharacter;
+	    var path = $"slot_{saveSystem.ActiveSlot}.txt";
+    
+	    // 1. Check if the file exists. If it doesn't, the SaveSystem hasn't initialized yet.
+	    if ( !FileSystem.Data.FileExists( path ) )
+	    {
+		    Log.Warning( $"[STARTUP] Ledger {path} not found. Waiting for SaveSystem initialization..." );
+		    return; 
+	    }
 
-       // 2. CHECK: Only apply modifiers if this is a fresh character (Balance = 0)
-       // This prevents re-injecting the $1000 every time the scene is reloaded.
-       if ( session.Money == 0 && session.Shares == 0 )
-       {
-          ApplyModifiers( session.Modifiers );
-       }
-       else
-       {
-          Log.Info( $"[STARTUP] Active character {session.Name} already has history. Skipping modifier injection." );
-       }
+	    // 2. Read the ledger content to check for the 'Starter Kit' transaction
+	    var content = FileSystem.Data.ReadAllText( path );
+    
+	    // We check for the specific string used in ApplyModifiers
+	    if ( !content.Contains( "Starter Kit" ) )
+	    {
+		    Log.Info( "[STARTUP] Fresh ledger detected (No Starter Kit). Applying modifiers..." );
+        
+		    // This will call CommitMoneyTransaction and CommitShareTransaction
+		    ApplyModifiers( saveSystem.CurrentCharacter.Modifiers );
+        
+		    // No need to call SaveActiveSlotAsync here because the Commit methods 
+		    // already write directly to the disk via the FileStream.
+	    }
+	    else
+	    {
+		    Log.Info( $"[STARTUP] Character {saveSystem.CurrentCharacter.Name} is already initialized in the ledger." );
+	    }
     }
 
     private void ApplyModifiers( StartingModifiers mods )
     {
-        var save = GameSaveSystem.Instance;
+	    var save = GameSaveSystem.Instance;
 
-        if ( !_economy.IsValid() )
-        {
-           Log.Error( "[STARTUP] EconomyManager not found on Player Prefab!" );
-           return;
-        }
+	    if ( !_economy.IsValid() )
+	    {
+		    Log.Error( "[STARTUP] EconomyManager not found on Player Prefab!" );
+		    return;
+	    }
 
-        Log.Info( $"[STARTUP] Initializing modifiers for Slot {save.ActiveSlot}..." );
+	    Log.Info( $"[STARTUP] Initializing modifiers for Slot {save.ActiveSlot}..." );
 
-        // --- DEFAULT STARTER KIT ---
-        if ( !mods.HasFlag( StartingModifiers.Destitute ) )
-        {
-           save.CommitTransaction( "IN", 1000, "Starter Kit: Cash" );
-           save.CurrentCharacter.Shares += 1; 
-           Log.Info( "Standard Issue: $1000 and 1 Share granted." );
-        }
-        else
-        {
-           Log.Warning( "Modifier Active: Destitute. Starting with $0 and 0 shares." );
-        }
+	    // --- DEFAULT STARTER KIT ---
+	    if ( !mods.HasFlag( StartingModifiers.Destitute ) )
+	    {
+		    // Use Commit for both to ensure they write to slot_x.txt
+		    save.CommitMoneyTransaction( "IN", 1000, "Starter Kit: Cash" );
+		    save.CommitShareTransaction( 1, "Starter Kit: Share" ); 
+       
+		    Log.Info( "Standard Issue: $1000 and 1 Share granted." );
+	    }
+	    else
+	    {
+		    Log.Warning( "Modifier Active: Destitute. Starting with $0 and 0 shares." );
+	    }
 
-        // --- CONDITIONAL MODIFIERS ---
-        if ( mods.HasFlag( StartingModifiers.Nepokid ) )
-        {
-           save.CurrentCharacter.Shares += 500000; 
-           Log.Info( "Modifier Applied: Nepokid (+ 500k shares)" );
-        }
+	    // --- CONDITIONAL MODIFIERS ---
+	    if ( mods.HasFlag( StartingModifiers.Nepokid ) )
+	    {
+		    // Fixed: Use transaction so the 500k shares actually save to the ledger
+		    save.CommitShareTransaction( 500000, "Modifier: Nepokid" );
+		    Log.Info( "Modifier Applied: Nepokid (+ 500k shares)" );
+	    }
 
-        if ( mods.HasFlag( StartingModifiers.Phoney ) )
-        {
-           GrantItem( "item_phone" );
-        }
+	    if ( mods.HasFlag( StartingModifiers.Phoney ) )
+	    {
+		    GrantItem( "item_phone" );
+	    }
 
-        if ( mods.HasFlag( StartingModifiers.Internity ) )
-        {
-           UnlockAllJobs();
-        }
+	    if ( mods.HasFlag( StartingModifiers.Internity ) )
+	    {
+		    UnlockAllJobs();
+	    }
 
-        if ( mods.HasFlag( StartingModifiers.DevMode ) )
-        {
-           save.CommitTransaction( "IN", 100000000, "DevMode Injection" );
-        }
+	    if ( mods.HasFlag( StartingModifiers.DevMode ) )
+	    {
+		    save.CommitMoneyTransaction( "IN", 100000000, "DevMode Injection" );
+	    }
 
-        // 3. FINALIZE: Trigger a data change event so UI updates immediately
-        save.NotifyDataChanged();
-   
-        Log.Info( "[STARTUP] Character initialization complete." );
+	    // 3. FINALIZE: Trigger a data change event so UI updates immediately
+	    save.NotifyDataChanged();
+
+	    Log.Info( "[STARTUP] Character initialization complete." );
     }
 
     private void GrantItem( string itemTag )
