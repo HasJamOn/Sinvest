@@ -47,10 +47,13 @@ public sealed class SteamGameCase : Component
 
     protected override void OnStart()
     {
-        LoadBootstrapFromFile( "SteamLibrary_Case/data/bootstrap_ids.txt" );
-        _bootstrapIds = _bootstrapIds.OrderBy( x => Guid.NewGuid() ).ToList();
+	    string internalPath = "shaders/data/bootstrap_ids.txt";
+    
+	    LoadBootstrapFromFile( internalPath );
+	    
+	    _bootstrapIds = _bootstrapIds.OrderBy( x => Guid.NewGuid() ).ToList();
 
-        _ = InitializeSystem();
+	    _ = InitializeSystem();
     }
 
     private bool _isInitialized = false;
