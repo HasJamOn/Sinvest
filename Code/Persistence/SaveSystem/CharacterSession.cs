@@ -30,5 +30,9 @@ public class CharacterSession
 	public double Shares { get; set; }
 	public StartingModifiers Modifiers { get; set; }
     
+	// Cache for IdleMon Data
+	public Dictionary<string, double> IdleMonStats { get; set; } = new();
+	public Dictionary<string, string> IdleMonMetadata { get; set; } = new();
+
 	public bool HasModifier( StartingModifiers mod ) => Modifiers.HasFlag( mod );
 }

@@ -73,4 +73,39 @@ public sealed class EconomyManager : Component
     {
         GameSaveSystem.Instance.CommitTransaction( "IN", amount, $"Job: {jobName}" );
     }
+    
+    /// <summary>
+    /// Debug override to force a specific balance.
+    /// Calculated as a ledger correction to maintain authoritative integrity.
+    /// </summary>
+    public void DebugSetValues( double targetMoney, double targetShares )
+    {
+	    var save = GameSaveSystem.Instance;
+	    if ( !save.IsValid() || save.CurrentCharacter == null ) return;
+
+	    // 1. Correct Money via Ledger
+	    // We calculate the delta so the Inflow/Outflow sum matches the target
+	    double currentMoney = save.CurrentCharacter.Money;
+	    double moneyDiff = targetMoney - currentMoney;
+
+	    if ( moneyDiff > 0 )
+	    {
+		    save.CommitTransaction( "IN", moneyDiff, "DEBUG_OVERRIDE" );
+	    }
+	    else if ( moneyDiff < 0 )
+	    {
+		    // Use absolute value for OUT transaction
+		    save.CommitTransaction( "OUT", Math.Abs( moneyDiff ), "DEBUG_OVERRIDE" );
+	    }
+
+	    // 2. Correct Shares
+	    // Note: If you want shares to be ledger-authoritative, 
+	    // you'd add SHARE_BUY/SELL logic here. For now, we set the session value.
+	    save.CurrentCharacter.Shares = targetShares;
+        
+	    Log.Info( $"[ECONOMY] Debug Override: Adjusted Money by {moneyDiff:+0.##;-0.##}. Shares set to {targetShares}." );
+        
+	    // Notify UI and Achievements
+	    save.NotifyDataChanged();
+    }
 }
