@@ -35,6 +35,31 @@ public partial class GameSaveSystem
        }
        catch { return TransactionResult.SystemError; }
     }
+    
+    public async Task SaveActiveSlotAsync()
+    {
+	    var path = GetPath( ActiveSlot );
+        
+	    // Prepare the Meta header
+	    var metaEntry = $"META|{CurrentCharacter.Name}|{CurrentCharacter.Modifiers}|{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}\n";
+
+	    // If it's a new file, we write META first. 
+	    // For a simple authoritative ledger, we can overwrite the whole file 
+	    // or just append. Let's ensure META is at the top or present.
+	    if ( !FileSystem.Data.FileExists( path ) )
+	    {
+		    FileSystem.Data.WriteAllText( path, metaEntry );
+            
+		    // If they started with money (DevMode), log the initial transaction
+		    if ( CurrentCharacter.Money > 0 )
+		    {
+			    CommitTransaction( "IN", CurrentCharacter.Money, "Initial Balance" );
+		    }
+	    }
+
+	    // Simulate async work for the UI "Processing" state
+	    await Task.Delay( 100 ); 
+    }
 
     public void LoadActiveSlot()
     {

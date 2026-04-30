@@ -76,11 +76,6 @@ public sealed class SinvestDebugManager : Component
         {
             EconomyManager.Instance.DebugSetValues( SetMoney, SetShares );
         }
-
-        // 2. IMPORTANT: Re-sign the save immediately
-        // Since we are hacking the numbers, we need a new valid signature 
-        // so the load doesn't fail next time the player starts the game.
-        save.UpdateSecuritySignature();
         
         Log.Info( $"DEBUG: Applied overrides to Slot {SinvestSession.ActiveSlot} and updated Security Signature." );
     }
@@ -97,7 +92,6 @@ public sealed class SinvestDebugManager : Component
     [Button( "Force Re-Sign Active Save" )]
     public void ManualResign()
     {
-        GameSaveSystem.Instance?.UpdateSecuritySignature();
         Log.Info( "DEBUG: Manually triggered a security re-sign." );
     }
 }

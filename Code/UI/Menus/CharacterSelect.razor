@@ -129,18 +129,16 @@
 		    return;
 	    }
 
-	    SceneNavigator.TransitionTo( WorldScene );
+	    
+	    Game.ActiveScene.Load( WorldScene );
     }
     bool IsSlotActive( int index )
     {
 	    if ( SaveManager == null ) return false;
 
 	    var name = SaveManager.GetStoredNameForSlot( index );
-    
-	    // Peek at the "active" flag we just created, or the "money" stat
-	    var isActive = SaveManager.GetStoredStatForSlot( index, "active" ) > 0;
-	    var hasMoney = SaveManager.GetStoredStatForSlot( index, "money" ) > 0;
+	    var hasMeta = SaveManager.GetStoredStatForSlot( index, "active" ) > 0;
 
-	    return (name != "New Character" && name != "Empty Slot") || isActive || hasMoney;
+	    return name != "Empty Slot" && hasMeta;
     }
 }
