@@ -22,25 +22,23 @@ public sealed class EconomyManager : Component
     /// </summary>
     public TransactionResult BuyShares( int amount )
     {
-        if ( amount <= 0 ) return TransactionResult.SystemError;
+	    if ( amount <= 0 ) return TransactionResult.SystemError;
 
-        double totalCost = amount * CurrentSharePrice;
+	    double totalCost = amount * CurrentSharePrice;
+	    
+	    var result = GameSaveSystem.Instance.CommitTransaction( 
+		    "OUT", 
+		    totalCost, 
+		    $"Bought {amount} Shares" 
+	    );
 
-        // Commit the outflow to the ledger
-        var result = GameSaveSystem.Instance.CommitTransaction( 
-            "OUT", 
-            totalCost, 
-            $"Bought {amount} Shares @ {CurrentSharePrice}" 
-        );
+	    if ( result == TransactionResult.Success )
+	    {
+		    GameSaveSystem.Instance.CurrentCharacter.Shares += amount;
+		    GameSaveSystem.Instance.NotifyDataChanged();
+	    }
 
-        if ( result == TransactionResult.Success )
-        {
-            // Update the state in the session (Shares aren't currently in your Ledger logic)
-            GameSaveSystem.Instance.CurrentCharacter.Shares += amount;
-            Log.Info( $"[ECONOMY] Purchased {amount} shares for ${totalCost}" );
-        }
-
-        return result;
+	    return result;
     }
 
     /// <summary>

@@ -10,6 +10,8 @@ public sealed partial class GameSaveSystem : Component
 	[Property] public int ActiveSlot { get; set; } = 1;
 	[Property] public SceneFile WorldScene { get; set; }
 	
+	[Property, Group("Phase 2")] public bool ShouldUseCloud { get; set; } = false;
+	
 	// Action to notify systems like achievements when money/shares change
 	public static System.Action OnDataChanged { get; set; }
 

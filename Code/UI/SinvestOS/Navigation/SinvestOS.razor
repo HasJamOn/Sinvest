@@ -264,21 +264,22 @@
     
     private double GetSharesFromSave()
     {
-	    return GameSaveSystem.Instance.GetStoredStat("fundino_shares");
+	    return GameSaveSystem.Instance?.CurrentCharacter?.Shares ?? 0;
     }
 
     public void Transaction( double moneyAmount, double sharesAmount = 0 )
     {
-	    // Use the Singleton Instance for reliability
-	    var eco = EconomyManager.Instance;
-    
-	    if ( eco.IsValid() )
+	    var save = GameSaveSystem.Instance;
+
+	    if ( save.IsValid() )
 	    {
-		    eco.CommitTransaction( moneyAmount, sharesAmount );
-	    }
-	    else
-	    {
-		    Log.Error("SinvestOS: Could not find EconomyManager Instance!");
+		    // For simple money transactions (like Casino or Jobs)
+		    if ( moneyAmount != 0 )
+		    {
+			    string type = moneyAmount > 0 ? "IN" : "OUT";
+			    save.CommitTransaction( type, Math.Abs(moneyAmount), "OS Transaction" );
+		    }
+		    
 	    }
     }
 
