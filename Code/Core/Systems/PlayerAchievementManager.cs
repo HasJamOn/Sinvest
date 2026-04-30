@@ -1,5 +1,4 @@
 ﻿using Sandbox;
-using Sandbox.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,7 @@ public sealed class PlayerAchievementManager : Component
 		// Hook into the Save System's data event
 		GameSaveSystem.OnDataChanged += OnStatsUpdated;
         
-		Log.Info( "[ACHIEVEMENTS] Manager initialized on Player." );
+		Log.Info( "[ACHIEVEMENTS] Manager initialized locally." );
 	}
 
 	protected override void OnDestroy()
@@ -43,25 +42,13 @@ public sealed class PlayerAchievementManager : Component
 		var save = GameSaveSystem.Instance;
 		if ( save == null ) return;
 
-		if ( save.ShouldUseCloud )
+		// Check if already unlocked this session to prevent spamming the ledger
+		if ( !save.UnlockedAchievements.Contains( achievementId ) )
 		{
-			// According to the decompiled source, we can check 'All' 
-			// to see if it's already unlocked before firing the RPC/Service call.
-			var ach = Achievements.All.FirstOrDefault( x => x.Name == achievementId );
+			save.LocalUnlockAchievement( achievementId );
             
-			if ( ach != null && !ach.IsUnlocked )
-			{
-				// Call the static Unlock method from the decompiled source
-				Achievements.Unlock( achievementId );
-                
-				if ( DebugLogUnlocks ) 
-					Log.Info( $"[ACHIEVEMENT] Cloud Unlock Triggered: {achievementId}" );
-			}
-		}
-		else
-		{
-			// Local fallback for dev/offline mode
-			save.DebugUnlockAchievement( achievementId );
+			if ( DebugLogUnlocks ) 
+				Log.Info( $"[ACHIEVEMENT] Local Unlock Triggered: {achievementId}" );
 		}
 	}
 }

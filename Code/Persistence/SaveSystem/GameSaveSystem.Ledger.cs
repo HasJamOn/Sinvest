@@ -8,33 +8,40 @@ namespace Sinvest;
 
 public partial class GameSaveSystem
 {
-    public TransactionResult CommitTransaction( string type, double amount, string note = "" )
-    {
-       if ( amount <= 0 ) return TransactionResult.SystemError;
-       
-       // Calculate current balance check
-       if ( type == "OUT" && CurrentCharacter.Money < amount ) 
-           return TransactionResult.InsufficientFunds;
+	public TransactionResult CommitTransaction( string type, double amount, string note = "" )
+	{
+		if ( amount <= 0 ) return TransactionResult.SystemError;
+    
+		// Calculate current balance check
+		if ( type == "OUT" && CurrentCharacter.Money < amount ) 
+			return TransactionResult.InsufficientFunds;
 
-       try
-       {
-          var path = GetPath( ActiveSlot );
-          var entry = $"{type}|{amount}|{note}|{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}\n";
+		try
+		{
+			var path = GetPath( ActiveSlot );
+			var entry = $"{type}|{amount}|{note}|{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}\n";
 
-          // FIX: Use FileMode.Append instead of a boolean
-          using ( var stream = FileSystem.Data.OpenWrite( path, System.IO.FileMode.Append ) )
-          using ( var writer = new StreamWriter( stream ) )
-          {
-             writer.Write( entry );
-          }
+			// Append to the authoritative ledger
+			using ( var stream = FileSystem.Data.OpenWrite( path, System.IO.FileMode.Append ) )
+			using ( var writer = new StreamWriter( stream ) )
+			{
+				writer.Write( entry );
+			}
 
-          if ( type == "IN" ) CurrentCharacter.Money += amount;
-          else if ( type == "OUT" ) CurrentCharacter.Money -= amount;
+			// Update local state
+			if ( type == "IN" ) CurrentCharacter.Money += amount;
+			else if ( type == "OUT" ) CurrentCharacter.Money -= amount;
 
-          return TransactionResult.Success;
-       }
-       catch { return TransactionResult.SystemError; }
-    }
+			// Trigger the event for achievements and UI observers
+			NotifyDataChanged();
+
+			return TransactionResult.Success;
+		}
+		catch 
+		{ 
+			return TransactionResult.SystemError; 
+		}
+	}
     
     public async Task SaveActiveSlotAsync()
     {
