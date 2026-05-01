@@ -1,0 +1,41 @@
+﻿// ============================================================
+// theme.scss - Design Tokens (Bright & Inviting)
+// ============================================================
+$color-bg: #f8fafc;        // Clean, soft white
+$color-surface: #ffffff;   // Pure white for cards
+$color-border: #e2e8f0;    // Soft light gray
+$color-accent: #3b82f6;    // Vibrant "Success Blue"
+$color-accent-dim: #2563eb;
+$color-danger: #ef4444;    // Modern Red
+$color-text: #1e293b;      // Deep slate for readability
+$color-muted: #94a3b8;     // Mid-gray
+
+$font-main: 'Inter', sans-serif;
+// Modern, soft shadow for a "floating" look
+$shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.05);
+$shadow-hard: 0 20px 50px rgba(0, 0, 0, 0.1);
+
+.text-title { font-weight: 800; letter-spacing: -0.5px; color: $color-text; }
+.text-label { font-size: 11px; font-weight: 700; color: $color-muted; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.btn {
+  padding: 14px 24px;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 8px; // Rounded corners are more "inviting"
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+
+  &.primary {
+    background: $color-accent; color: #fff;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    &:hover { background: $color-accent-dim; transform: translateY(-2px); }
+  }
+  &.secondary {
+    background: #fff8f8; color: $color-text;
+    border: 1px solid $color-border;
+    &:hover { background: $color-bg; border-color: $color-muted; }
+  }
+  &.disabled { opacity: 0.4; pointer-events: none; filter: grayscale(0.5); }
+}

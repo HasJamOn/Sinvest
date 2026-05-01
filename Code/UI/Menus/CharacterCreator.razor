@@ -2,49 +2,55 @@
 @using Sinvest;
 @using Sandbox.UI;
 @using System;
-@using System.Threading.Tasks; @* FIXED: Added for Task support *@
+@using System.Threading.Tasks;
 
 @inherits Panel
 
 <root>
-    <div class="header">
-        <label class="title">NEW CAREER: SLOT @SlotIndex</label>
+    <div class="cc-header">
+        <label class="text-label">NEW CAREER: SLOT @SlotIndex</label>
+        <label class="text-title">CREATE CHARACTER</label>
     </div>
 
-    <div class="body">
-        <div class="field">
-            <label class="field-label">LEGAL NAME</label>
-            <TextEntry Value:bind=@CharName placeholder="Enter name..." />
-        </div>
+    <div class="body column">
+	    <div class="input-group">
+		    <label class="input-label">LEGAL NAME</label>
+		    <TextEntry Value:bind=@CharName placeholder="Enter name..." />
+	    </div>
 
-        <div class="modifiers-section">
-            <label class="field-label">SELECT STARTING MODIFIERS</label>
-            <div class="mod-list">
+	    <div class="input-group">
+		    <label class="input-label">STARTING MODIFIERS</label>
+		    <div class="mod-list">
                 @foreach ( StartingModifiers mod in Enum.GetValues( typeof( StartingModifiers ) ) )
                 {
                     if ( mod == StartingModifiers.None ) continue;
                     var unlocked = SaveManager?.IsModifierUnlocked( mod ) ?? false;
+                    var isActive = ActiveMods.HasFlag(mod);
                     
-                    <div class="mod-row @(unlocked ? "" : "locked")" onclick=@(() => ToggleMod(mod))>
-                        <label class="mod-name">@mod</label>
-                        <label class="mod-status">@(ActiveMods.HasFlag(mod) ? "SELECTED" : unlocked ? "AVAILABLE" : "LOCKED")</label>
+                    <div class="mod-row @(unlocked ? "" : "locked") @(isActive ? "active" : "")" onclick=@(() => ToggleMod(mod))>
+                        <div class="column">
+                            <label class="mod-name">@mod</label>
+                            <label class="mod-status">@(unlocked ? "AVAILABLE" : "LOCKED")</label>
+                        </div>
+                        <div class="mod-checkbox @(isActive ? "active" : "")">
+                            @if(isActive) { <label>✓</label> }
+                        </div>
                     </div>
                 }
             </div>
         </div>
     </div>
 
-    <div class="footer">
-        <button class="btn-abort @(IsProcessing ? "disabled" : "")" 
-                onclick=@(() => { if(!IsProcessing) OnCancel?.Invoke(); })>
+    <div class="cc-footer">
+        <div class="btn secondary @(IsProcessing ? "disabled" : "")" 
+             onclick=@(() => { if(!IsProcessing) OnCancel?.Invoke(); })>
            ABORT
-        </button>
+        </div>
     
-        <button class="btn-start @(IsProcessing ? "processing" : "")" 
-                onclick=@OnConfirm 
-                disabled=@IsProcessing>
-           @(IsProcessing ? "SYNCING WITH CLOUD..." : "START CAREER")
-        </button>
+        <div class="btn primary @(IsProcessing ? "processing" : "")" 
+             onclick=@OnConfirm>
+           @(IsProcessing ? "SYNCING..." : "START CAREER")
+        </div>
     </div>
 </root>
 
@@ -52,19 +58,16 @@
     [Property] public GameSaveSystem SaveManager { get; set; }
     [Property] public int SlotIndex { get; set; }
     public Action OnCancel { get; set; }
-    
-    // FIXED: Changed to Func<..., Task> to allow the UI to await the save completion
     [Property] public Func<string, StartingModifiers, Task> OnCreate { get; set; }
 
     string CharName = "";
     StartingModifiers ActiveMods = StartingModifiers.None;
-    
     bool IsProcessing = false;
     
     protected override void OnParametersSet()
     {
        if ( SaveManager == null ) return;
-       // Logic for default modifiers based on graduation status
+       // Forced MentorDad if user hasn't graduated yet
        if ( !SaveManager.HasGraduated() ) ActiveMods |= StartingModifiers.MentorDad;
     }
 
@@ -72,6 +75,8 @@
     {
        if ( IsProcessing || SaveManager == null ) return; 
        if ( !SaveManager.IsModifierUnlocked( mod ) ) return;
+       
+       // Cannot remove MentorDad if it's forced by progression
        if ( mod == StartingModifiers.MentorDad && !SaveManager.HasGraduated() ) return; 
 
        if ( ActiveMods.HasFlag( mod ) ) ActiveMods &= ~mod;
@@ -80,37 +85,34 @@
 
     async void OnConfirm() 
     {
-	    if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
+        if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
 
-	    IsProcessing = true;
-	    StateHasChanged();
+        IsProcessing = true;
+        StateHasChanged();
 
-	    try 
-	    {
-		    if ( OnCreate != null )
-		    {
-			    // The scene likely changes during this await
-			    await OnCreate.Invoke( CharName, ActiveMods );
-		    }
-	    }
-	    catch ( TaskCanceledException )
-	    {
-		    // This is expected if the scene changes during the save
-		    Log.Info( "[UI] Task canceled - Scene likely changed." );
-		    return; 
-	    }
-	    catch ( Exception e )
-	    {
-		    Log.Error( $"[UI] Failed to create: {e.Message}" );
-	    }
-	    finally
-	    {
-		    // CRITICAL: Only update state if the UI hasn't been destroyed
-		    if ( this.IsValid() )
-		    {
-			    IsProcessing = false; 
-			    StateHasChanged();
-		    }
-	    }
+        try 
+        {
+           if ( OnCreate != null )
+           {
+              await OnCreate.Invoke( CharName, ActiveMods );
+           }
+        }
+        catch ( TaskCanceledException )
+        {
+           Log.Info( "[UI] Creation task finalized via scene transition." );
+           return; 
+        }
+        catch ( Exception e )
+        {
+           Log.Error( $"[UI] Character Creation Error: {e.Message}" );
+        }
+        finally
+        {
+           if ( this.IsValid() )
+           {
+              IsProcessing = false; 
+              StateHasChanged();
+           }
+        }
     }
 }

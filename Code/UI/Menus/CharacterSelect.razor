@@ -3,44 +3,49 @@
 @using Sandbox.UI;
 @using System;
 @using System.Collections.Generic;
-@using System.Threading.Tasks; @* FIXED: Added for Task support[cite: 1] *@
+@using System.Threading.Tasks;
 
 @inherits PanelComponent
 
 <root>
-	<div class="title">SINVEST</div>
+    <div class="vignette"></div>
 
-	@if ( IsCreating ) {
-		<CharacterCreator 
-			SaveManager=@SaveManager 
-			SlotIndex=@selectedSlot 
-			OnCancel=@CancelCreation
-			OnCreate=@CreateAndStart />
-	}
-	else {
-		<div class="slot-container">
-			@for ( int i = 1; i <= 3; i++ ) {
-				var slotIndex = i;
-				var charName = SaveManager?.GetStoredNameForSlot(slotIndex) ?? "Empty Slot";
-				var isOccupied = IsSlotActive(slotIndex);
+    @if ( IsCreating ) {
+       <CharacterCreator 
+          SaveManager=@SaveManager 
+          SlotIndex=@selectedSlot 
+          OnCancel=@CancelCreation
+          OnCreate=@CreateAndStart />
+    }
+    else {
+       <div class="cs-header">
+           <div class="main-logo">SINVEST</div>
+           <div class="text-label">SELECT YOUR TIMELINE</div>
+       </div>
 
-				<div class="slot-wrapper">
-					<div class="slot-card @(isOccupied ? "occupied" : "")" onclick=@(() => OnSelectSlot(slotIndex))>
-						<label class="slot-number">SLOT @slotIndex</label>
-						<div class="char-name">@charName</div>
-						<div class="select-hint">@(isOccupied ? "CONTINUE" : "CREATE NEW")</div>
-					</div>
+       <div class="slot-container">
+          @for ( int i = 1; i <= 3; i++ ) {
+             var slotIndex = i;
+             var charName = SaveManager?.GetStoredNameForSlot(slotIndex) ?? "Empty Slot";
+             var isOccupied = IsSlotActive(slotIndex);
 
-					@if ( isOccupied ) {
-						<div class="delete-btn" onmousedown=@(() => StartDeleteTimer(slotIndex)) onmouseup=@StopDeleteTimer onmouseleave=@StopDeleteTimer>
-							<label>@(DeletingSlot == slotIndex ? "REMOVING..." : "HOLD TO DELETE")</label>
-							<div class="fill-bar" style="width: @((DeletingSlot == slotIndex ? DeleteProgress : 0).ToString())%;"></div>
-						</div>
-					}
-				</div>
-			}
-		</div>
-	}
+             <div class="slot-wrapper">
+                <div class="slot-card @(isOccupied ? "occupied" : "")" onclick=@(() => OnSelectSlot(slotIndex))>
+                   <div class="status-dot @(isOccupied ? "occupied" : "")"></div>
+                   <div class="char-name">@charName</div>
+                   <div class="select-hint">@(isOccupied ? "CONTINUE" : "CREATE NEW")</div>
+                </div>
+
+                @if ( isOccupied ) {
+                   <div class="delete-strip" onmousedown=@(() => StartDeleteTimer(slotIndex)) onmouseup=@StopDeleteTimer onmouseleave=@StopDeleteTimer>
+                      <label>@(DeletingSlot == slotIndex ? "REMOVING..." : "HOLD TO DELETE")</label>
+                      <div class="fill-bar" style="width: @((DeletingSlot == slotIndex ? DeleteProgress : 0).ToString())%;"></div>
+                   </div>
+                }
+             </div>
+          }
+       </div>
+    }
 </root>
 
 @code {
@@ -49,7 +54,6 @@
     bool IsCreating = false;
     int selectedSlot = 1;
     
-    // Delete Logic State
     int DeletingSlot = -1;
     float DeleteProgress = 0;
     const float DeleteTime = 1.5f;
@@ -62,7 +66,6 @@
         SaveManager.ActiveSlot = index;
         SaveManager.LoadActiveSlot();
         
-        // If the slot is empty, switch to the Creator view
         if ( SaveManager.CurrentCharacter.Name == "New Character" )
         {
            IsCreating = true;
@@ -73,13 +76,7 @@
         }
     }
 
-    /// <summary>
-    /// Explicit helper to handle the back/abort action from the CharacterCreator
-    /// </summary>
-    void CancelCreation()
-    {
-        IsCreating = false;
-    }
+    void CancelCreation() => IsCreating = false;
 
     void StartDeleteTimer( int index ) => DeletingSlot = index;
     void StopDeleteTimer() { DeletingSlot = -1; DeleteProgress = 0; }
@@ -99,57 +96,40 @@
         }
     }
 
-    /// <summary>
-    /// FIXED: Returns Task instead of async void to allow CharacterCreator to await completion[cite: 1]
-    /// </summary>
     async Task CreateAndStart( string name, StartingModifiers mods )
     {
-	    if ( SaveManager == null ) return;
+        if ( SaveManager == null ) return;
 
-	    var charData = SaveManager.CurrentCharacter;
-	    charData.Name = name;
-	    charData.Modifiers = mods;
+        var charData = SaveManager.CurrentCharacter;
+        charData.Name = name;
+        charData.Modifiers = mods;
+        charData.Money = 0; 
+        charData.Shares = 0;
 
-	    charData.Money = 0; 
-	    charData.Shares = 0;
+        await SaveManager.SaveActiveSlotAsync();
 
-	    // 1. Save the file. 
-	    // This is the "Awaiting" point where the UI log says "Task Canceled"
-	    await SaveManager.SaveActiveSlotAsync();
+        IsCreating = false;
+        StateHasChanged();
 
-	    // 2. Clear the UI state BEFORE shifting scenes
-	    IsCreating = false;
-	    StateHasChanged();
-
-	    // 3. Add a tiny delay to allow the Task to resolve before the scene dies
-	    await Task.Delay( 100 );
-
-	    // 4. Fire the transition
-	    StartGame();
+        await Task.Delay( 100 );
+        StartGame();
     }
     
     protected override void OnStart()
     {
-	    // If the Inspector reference is missing or was destroyed by the Singleton logic,
-	    // grab the persistent global instance.
-	    if ( SaveManager == null )
-	    {
-		    SaveManager = GameSaveSystem.Instance;
-	    }
+        if ( SaveManager == null )
+        {
+           SaveManager = GameSaveSystem.Instance;
+        }
     }
 
-    void StartGame()
-    {
-	    SaveManager?.StartGame();
-    }
+    void StartGame() => SaveManager?.StartGame();
 
     bool IsSlotActive( int index )
     {
-	    if ( SaveManager == null ) return false;
-
-	    var name = SaveManager.GetStoredNameForSlot( index );
-	    var hasMeta = SaveManager.GetStoredStatForSlot( index, "active" ) > 0;
-
-	    return name != "Empty Slot" && hasMeta;
+        if ( SaveManager == null ) return false;
+        var name = SaveManager.GetStoredNameForSlot( index );
+        var hasMeta = SaveManager.GetStoredStatForSlot( index, "active" ) > 0;
+        return name != "Empty Slot" && hasMeta;
     }
 }

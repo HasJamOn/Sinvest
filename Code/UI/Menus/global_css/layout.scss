@@ -1,0 +1,23 @@
+﻿// ============================================================
+// layout.scss - Spatial Primitives (Mixins)
+// ============================================================
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin full-screen {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.flex-center { @include flex-center; }
+.column { display: flex; flex-direction: column; }
+.row { display: flex; flex-direction: row; }
+.gap-md { gap: 20px; }
+.full-screen { @include full-screen; }
