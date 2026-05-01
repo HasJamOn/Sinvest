@@ -109,16 +109,33 @@
 	    var charData = SaveManager.CurrentCharacter;
 	    charData.Name = name;
 	    charData.Modifiers = mods;
-    
-	    // Set memory balance to 0; the PlayerStartupManager/Ledger handle actual IN transactions[cite: 1]
+
 	    charData.Money = 0; 
 	    charData.Shares = 0;
 
-	    // Save the META line first so the StartupManager knows who this is[cite: 1]
+	    // 1. Save the file. 
+	    // This is the "Awaiting" point where the UI log says "Task Canceled"
 	    await SaveManager.SaveActiveSlotAsync();
 
+	    // 2. Clear the UI state BEFORE shifting scenes
 	    IsCreating = false;
+	    StateHasChanged();
+
+	    // 3. Add a tiny delay to allow the Task to resolve before the scene dies
+	    await Task.Delay( 100 );
+
+	    // 4. Fire the transition
 	    StartGame();
+    }
+    
+    protected override void OnStart()
+    {
+	    // If the Inspector reference is missing or was destroyed by the Singleton logic,
+	    // grab the persistent global instance.
+	    if ( SaveManager == null )
+	    {
+		    SaveManager = GameSaveSystem.Instance;
+	    }
     }
 
     void StartGame()

@@ -80,24 +80,37 @@
 
     async void OnConfirm() 
     {
-       if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
+	    if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
 
-       IsProcessing = true;
-       StateHasChanged();
+	    IsProcessing = true;
+	    StateHasChanged();
 
-       try 
-       {
-          if ( OnCreate != null )
-          {
-             // This now properly awaits the parent's SaveActiveSlotAsync
-             await OnCreate.Invoke( CharName, ActiveMods );
-          }
-       }
-       catch ( Exception e )
-       {
-          Log.Error( $"[UI] Failed to create: {e.Message}" );
-          IsProcessing = false; 
-          StateHasChanged();
-       }
+	    try 
+	    {
+		    if ( OnCreate != null )
+		    {
+			    // The scene likely changes during this await
+			    await OnCreate.Invoke( CharName, ActiveMods );
+		    }
+	    }
+	    catch ( TaskCanceledException )
+	    {
+		    // This is expected if the scene changes during the save
+		    Log.Info( "[UI] Task canceled - Scene likely changed." );
+		    return; 
+	    }
+	    catch ( Exception e )
+	    {
+		    Log.Error( $"[UI] Failed to create: {e.Message}" );
+	    }
+	    finally
+	    {
+		    // CRITICAL: Only update state if the UI hasn't been destroyed
+		    if ( this.IsValid() )
+		    {
+			    IsProcessing = false; 
+			    StateHasChanged();
+		    }
+	    }
     }
 }

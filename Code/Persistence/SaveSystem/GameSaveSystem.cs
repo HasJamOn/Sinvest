@@ -27,7 +27,27 @@ public sealed partial class GameSaveSystem : Component
 
 	protected override void OnAwake()
 	{
+		// 1. Singleton Check
+		if ( Instance.IsValid() && Instance != this )
+		{
+			Log.Info( $"[SAVE] Persistent instance found. Destroying duplicate on {GameObject.Name}" );
+			GameObject.Destroy(); 
+			return;
+		}
+
 		Instance = this;
+
+		// 2. Persistence
+		GameObject.Flags |= GameObjectFlags.DontDestroyOnLoad;
+
+		// 3. Initialization
+		// We ONLY load. If the file doesn't exist, LoadActiveSlot should just 
+		// result in a default/empty CharacterSession in RAM.
+		if ( ActiveSlot > 0 )
+		{
+			LoadActiveSlot();
+			Log.Info( $"[SAVE] Initialized Session for Slot {ActiveSlot}" );
+		}
 	}
 
 	public void DeleteSlot( int slot )

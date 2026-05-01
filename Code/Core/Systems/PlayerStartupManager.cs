@@ -41,31 +41,27 @@ public sealed class PlayerStartupManager : Component
     private void RunStartupLogic( GameSaveSystem saveSystem )
     {
 	    var path = $"slot_{saveSystem.ActiveSlot}.txt";
+	    bool fileExists = FileSystem.Data.FileExists( path );
     
-	    // 1. Check if the file exists. If it doesn't, the SaveSystem hasn't initialized yet.
-	    if ( !FileSystem.Data.FileExists( path ) )
-	    {
-		    Log.Warning( $"[STARTUP] Ledger {path} not found. Waiting for SaveSystem initialization..." );
-		    return; 
-	    }
+	    // 1. Read existing content if it exists, otherwise empty string
+	    string content = fileExists ? FileSystem.Data.ReadAllText( path ) : "";
 
-	    // 2. Read the ledger content to check for the 'Starter Kit' transaction
-	    var content = FileSystem.Data.ReadAllText( path );
-    
-	    // We check for the specific string used in ApplyModifiers
-	    if ( !content.Contains( "Starter Kit" ) )
+	    // 2. If the file is missing OR does not contain the Starter Kit, run initialization
+	    if ( !fileExists || !content.Contains( "Starter Kit" ) )
 	    {
-		    Log.Info( "[STARTUP] Fresh ledger detected (No Starter Kit). Applying modifiers..." );
+		    Log.Info( "[STARTUP] New ledger or missing kit detected. Initializing..." );
         
-		    // This will call CommitMoneyTransaction and CommitShareTransaction
+		    // Ensure the META header is written if it's a brand new file
+		    if ( !fileExists )
+		    {
+			    _ = saveSystem.SaveActiveSlotAsync();
+		    }
+
 		    ApplyModifiers( saveSystem.CurrentCharacter.Modifiers );
-        
-		    // No need to call SaveActiveSlotAsync here because the Commit methods 
-		    // already write directly to the disk via the FileStream.
 	    }
 	    else
 	    {
-		    Log.Info( $"[STARTUP] Character {saveSystem.CurrentCharacter.Name} is already initialized in the ledger." );
+		    Log.Info( $"[STARTUP] Character {saveSystem.CurrentCharacter.Name} verified in ledger." );
 	    }
     }
 
