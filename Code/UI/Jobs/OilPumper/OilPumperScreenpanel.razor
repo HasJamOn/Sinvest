@@ -1,0 +1,183 @@
+@using Sandbox;
+@using Sinvest;
+@using Sandbox.UI;
+@using System;
+@using System.Linq;
+@inherits PanelComponent
+@namespace Sinvest
+
+<root>
+    <div class="OilPumperScreen @(IsInSeat ? "operator-mode" : "spectator-mode")">
+        
+        <div class="top-bar">
+            <div class="stat-block wallet">
+                <span class="label">MY CASH</span>
+                <span class="value">$@FormatValue(_displayCash)</span>
+            </div>
+
+            <div class="stat-block pool">
+                <span class="label">BONUS POOL</span>
+                <span class="value">$@FormatValue(Matchmaker?.BonusPool ?? 0)</span>
+            </div>
+
+            @* Simple status text only *@
+            <span class="status">@Matchmaker?.CurrentState.ToString().ToUpper()</span>
+        </div>
+        
+        <div class="main-view" ref="PayoutContainer">
+            @* ALL WAITING LOGIC IS NOW HERE *@
+            @if ( Matchmaker?.CurrentState == OilPumperMatchmaker.GameState.Waiting )
+            {
+               <div class="waiting-prompt">
+                  <div class="spinner"></div>
+                  <label>SYSTEM IDLE</label>
+                  <p class="sub-text">WAITING FOR OPERATORS...</p>
+               </div>
+            }
+            else if ( Matchmaker?.CurrentState == OilPumperMatchmaker.GameState.Choosing )
+            {
+               <div class="decision-zone">
+                  @if ( IsInSeat )
+                  {
+                     <div class="role-tag">@(IsSeatA ? "OPERATOR A" : "OPERATOR B")</div>
+                     <div class="btn-group">
+                        <button type="button" class="choice-btn share @(GetMyChoice() == 1 ? "selected" : "")" @onclick="@(() => SetChoice(1))">
+                           <span class="key">1</span> <span class="text">SHARE</span>
+                        </button>
+
+                        <button type="button" class="choice-btn steal @(GetMyChoice() == 2 ? "selected" : "")" @onclick="@(() => SetChoice(2))">
+                           <span class="key">2</span> <span class="text">STEAL</span>
+                        </button>
+                     </div>
+                  }
+                  else
+                  {
+                     <div class="spectator-view">
+                        <label>NEGOTIATION IN PROGRESS</label>
+                        <div class="ready-check">
+                           <div class="dot @(Matchmaker.PlayerAChoice != 0 ? "ready" : "")">A</div>
+                           <div class="dot @(Matchmaker.PlayerBChoice != 0 ? "ready" : "")">B</div>
+                        </div>
+                     </div>
+                  }
+               </div>
+            }
+            else if ( Matchmaker?.CurrentState == OilPumperMatchmaker.GameState.Countdown || Matchmaker?.CurrentState == OilPumperMatchmaker.GameState.Playing )
+            {
+               <div class="active-game-hud">
+                  @if (Matchmaker.CurrentState == OilPumperMatchmaker.GameState.Countdown)
+                  {
+                     <div class="countdown-overlay">
+                        <span class="num">@Math.Ceiling(Matchmaker.CountdownTime)</span>
+                        <span class="sub">PREPARING PUMP...</span>
+                     </div>
+                  }
+                  else
+                  {
+                     <div class="turn-indicator @(Matchmaker.IsTurnA ? "is-a" : "is-b")">
+                        @(Matchmaker.IsTurnA ? "<< OPERATOR A TURN" : "OPERATOR B TURN >>")
+                     </div>
+                  }
+               </div>
+            }
+        </div>
+    </div>
+</root>
+
+@code {
+    [Property] public OilPumperMatchmaker Matchmaker { get; set; }
+    
+    private Panel PayoutContainer { get; set; }
+
+    private double _displayCash = 0;
+    
+    // Auth context
+    private Guid? LocalId => Connection.Local?.Id;
+
+    bool IsSeatA => Matchmaker?.SeatA?.Occupant?.Network?.OwnerId != null && 
+                    Matchmaker.SeatA.Occupant.Network.OwnerId == LocalId;
+
+    bool IsSeatB => Matchmaker?.SeatB?.Occupant?.Network?.OwnerId != null && 
+                    Matchmaker.SeatB.Occupant.Network.OwnerId == LocalId;
+
+    bool IsInSeat => IsSeatA || IsSeatB;
+
+    protected override void OnUpdate()
+    {
+        // 1. Resolve Matchmaker if not set via Property
+        if ( Matchmaker == null ) 
+        {
+            Matchmaker = Components.GetInAncestors<OilPumperMatchmaker>();
+            return; 
+        }
+
+        // 2. DIRECT DECOUPLED SYNC
+        // We bypass SinvestOS entirely and go straight to the EconomyManager.
+        // This ensures the money moves even if the OS isn't running or was never created.
+        if ( EconomyManager.Instance.IsValid() )
+        {
+            double target = EconomyManager.Instance.CurrentMoney;
+            
+            // Internal Lerp handles the "rolling number" effect locally in this component
+            _displayCash = MathX.Lerp( (float)_displayCash, (float)target, Time.Delta * 8.0f );
+        }
+
+        // 3. Input Handling
+        if ( Matchmaker.CurrentState == OilPumperMatchmaker.GameState.Choosing && IsInSeat )
+        {
+            if ( Input.Pressed("Slot1") ) SetChoice(1);
+            if ( Input.Pressed("Slot2") ) SetChoice(2);
+        }
+    }
+
+    public void TriggerPayoutEffect(float amount)
+    {
+        if (PayoutContainer == null) return;
+
+        var p = PayoutContainer.AddChild<Label>("payout-float");
+        p.Text = $"+${amount:N0}";
+        p.Style.Left = Length.Percent( 45 + Random.Shared.Next(-10, 10) );
+        
+        _ = DeleteAfterDelay(p);
+    }
+
+    private async System.Threading.Tasks.Task DeleteAfterDelay( Panel p )
+    {
+        await System.Threading.Tasks.Task.Delay( 1200 );
+        p?.Delete();
+    }
+
+    void SetChoice(int choice)
+    {
+        if ( Matchmaker == null ) return;
+        if ( IsSeatA ) Matchmaker.MakeChoice( true, choice );
+        else if ( IsSeatB ) Matchmaker.MakeChoice( false, choice );
+    }
+
+    int GetMyChoice()
+    {
+        if ( Matchmaker == null ) return 0;
+        if ( IsSeatA ) return Matchmaker.PlayerAChoice;
+        if ( IsSeatB ) return Matchmaker.PlayerBChoice;
+        return 0;
+    }
+
+    // Since we aren't part of SinvestOS, we just disable the GameObject
+    void CloseAndDestroy() => GameObject.Enabled = false;
+
+    private string FormatValue(double value) => value.ToString("N0");
+
+    protected override int BuildHash()
+    {
+	    return System.HashCode.Combine( 
+		    (int)(Matchmaker?.CurrentState ?? 0), 
+		    Matchmaker?.PlayerAChoice, 
+		    Matchmaker?.PlayerBChoice, 
+		    Matchmaker?.BonusPool,
+		    (float)Math.Ceiling(Matchmaker?.CountdownTime ?? 0),
+		    EconomyManager.Instance?.CurrentMoney,
+		    _displayCash,
+		    Matchmaker?.IsTurnA
+	    );
+    }
+}

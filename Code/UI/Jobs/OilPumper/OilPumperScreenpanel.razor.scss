@@ -1,0 +1,219 @@
+// =========================================================
+// SinvestOS - Oil Pumper UI (S&box Sanitized)
+// =========================================================
+$gtk-bg:            #d4d0c8;
+$gtk-highlight:     #ffffff;
+$gtk-shadow:        #808080;
+$gtk-dark-shadow:   #404040;
+$gtk-blue:          #000080;
+$gtk-text:          #000000;
+$gtk-yellow:        #ffff00;
+$gtk-green:         #00ff00;
+$gtk-red:           #ff0000;
+
+@mixin bevel-out {
+  background-color: $gtk-bg;
+  border: 2px solid; // Define border shorthand first
+  border-color: $gtk-highlight $gtk-dark-shadow $gtk-dark-shadow $gtk-highlight;
+}
+
+@mixin bevel-in {
+  background-color: #ffffff;
+  border: 2px solid;
+  border-color: $gtk-shadow $gtk-highlight $gtk-highlight $gtk-shadow;
+}
+
+.OilPumperScreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #3a6ea5;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  font-family: Arial;
+  overflow: hidden;
+
+  .top-bar {
+    @include bevel-out;
+    display: flex;
+    justify-content: space-between;
+    padding: 6px;
+    margin-bottom: 8px;
+
+    .stat-block {
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        font-size: 8px;
+        color: $gtk-shadow;
+        font-weight: bold;
+      }
+
+      .value {
+        font-size: 14px;
+        font-weight: bold;
+        color: $gtk-text;
+      }
+
+      &.pool .value {
+        color: $gtk-blue;
+      }
+
+      &.wallet .value {
+        color: #006400;
+      }
+    }
+
+    .status {
+      @include bevel-in;
+      background-color: #000000;
+      color: $gtk-yellow;
+      padding: 4px 8px;
+      font-size: 10px;
+      height: 20px;
+      text-align: center;
+    }
+  }
+
+  .main-view {
+    flex-grow: 1;
+    @include bevel-in;
+    background-color: #000000;
+    display: flex;
+    flex-direction: column; // Added to help centering
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+
+    .waiting-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: $gtk-green;
+
+      .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(0, 255, 0, 0.1);
+        border-top: 3px solid #00ff00;
+        border-radius: 50%;
+        margin-bottom: 15px;
+      }
+
+      label {
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .sub-text {
+        font-size: 9px;
+        color: $gtk-shadow;
+      }
+    }
+
+    .decision-zone {
+      width: 85%;
+
+      .role-tag {
+        background-color: $gtk-blue;
+        color: white;
+        text-align: center;
+        font-size: 10px;
+        padding: 4px;
+        margin-bottom: 12px;
+      }
+
+      .btn-group {
+        display: flex;
+        flex-direction: column;
+
+        .choice-btn {
+          @include bevel-out;
+          margin-bottom: 4px; // Replaces gap
+          padding: 10px;
+          display: flex;
+          align-items: center;
+
+          .key {
+            background-color: $gtk-dark-shadow;
+            color: white;
+            padding: 2px 6px;
+            margin-right: 12px;
+            font-size: 10px;
+          }
+
+          .text { font-size: 14px; font-weight: bold; color: $gtk-text; }
+
+          &.selected {
+            @include bevel-in;
+            background-color: #fbffce;
+            border: 2px solid $gtk-blue;
+            .text { color: $gtk-blue; }
+            .key { background-color: $gtk-blue; }
+          }
+        }
+      }
+
+      .ready-check {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+
+        .dot {
+          @include bevel-out;
+          width: 32px;
+          height: 32px;
+          margin: 0 8px;
+          text-align: center;
+          font-size: 12px;
+          font-weight: bold;
+          color: $gtk-shadow;
+
+          &.ready {
+            background-color: $gtk-green;
+            color: #000000;
+          }
+        }
+      }
+    }
+
+    .active-game-hud {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .countdown-overlay {
+        .num {
+          font-size: 48px;
+          color: $gtk-red;
+          font-weight: bold;
+          text-align: center;
+        }
+        .sub { font-size: 10px; color: $gtk-highlight; }
+      }
+
+      .turn-indicator {
+        font-size: 14px;
+        font-weight: bold;
+        padding: 12px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3); // CHANGED: dashed to solid
+
+        &.is-a { color: $gtk-yellow; border-color: $gtk-yellow; }
+        &.is-b { color: #00ffff; border-color: #00ffff; }
+      }
+    }
+
+    .payout-float {
+      position: absolute;
+      color: $gtk-green;
+      font-size: 28px;
+      font-weight: bold;
+      pointer-events: none;
+    }
+  }
+}
