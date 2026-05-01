@@ -30,7 +30,7 @@
 {
 	private void Navigate<T>() where T : Panel, new()
 	{
-		// Talk directly to the HUD instance we created earlier
+		Log.Info( $"Attempting to navigate to: {typeof(T).Name}" );
 		SinvestOS.Instance?.SetView<T>();
 	}
 }

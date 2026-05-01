@@ -86,7 +86,7 @@ SinvestOS {
     align-items: center;
     gap: 20px;
     pointer-events: none;
-    .menu, .app-icon, .back-button, CasinoMenu {
+    .menu, .app-icon, .back-button, SinCashMenu, CoinFlip {
       pointer-events: all;
     }
   }
