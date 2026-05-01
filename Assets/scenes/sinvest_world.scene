@@ -4965,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "fb2ebd28-5050-4e33-b553-eea31c6078b1",
+                  "__guid": "2ada08e6-b015-4a40-a892-76b2369e967b",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4982,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "023d49d3-e37b-4e96-99bf-61ca6579012a",
+                      "__guid": "45634ec4-e67a-4992-9cb1-2ea4830368d4",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5034,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "964d1314-513f-4a86-afc2-2fd9a07b1912",
+                  "__guid": "e92df9cc-dc82-4117-a86d-cd8f70a1d033",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5051,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "2f29d4c2-8531-4741-bd94-459edf8030aa",
+                      "__guid": "09b4a639-f156-4fc9-ae0b-999cac2c52fd",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5103,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "be732949-337d-4f26-aa10-d9eb63ce8ccc",
+                  "__guid": "b9806361-b2b8-4b36-b4bb-39985603f069",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5120,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "426b8771-4ba3-4be9-8b3c-54657610c2a0",
+                      "__guid": "9ca5c512-c0bb-4d51-b57d-4179784455e6",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5172,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "3cb90b9c-10b0-4a3f-8156-929b72b20dd0",
+                  "__guid": "8e0de733-af58-4ea8-8739-2ea258502b46",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5189,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "a337de80-2fbd-425a-ae4f-47ed80c5cfde",
+                      "__guid": "1c94d3c3-2b5c-488b-a5b0-2a411d0d451e",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -11687,6 +11687,63 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "c1a3f757-ca6f-4cb3-ae50-ce69f176d9a6",
+      "__version": 2,
+      "__Prefab": "prefabs/oil pumper.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "a421d1dd-c3cc-4322-8520-b4047a25d706"
+            },
+            "Property": "Position",
+            "Value": "860.499756,-2828.31445,199"
+          }
+        ],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "a421d1dd-c3cc-4322-8520-b4047a25d706": "c1a3f757-ca6f-4cb3-ae50-ce69f176d9a6",
+        "8cb76e38-1da4-47c9-8429-5d219763a8a3": "7619deec-9dd5-436d-b6b7-271f287c0042",
+        "c16c7564-fa08-4b6b-ad8e-1824d5456732": "52e429ef-59b5-4d94-bade-6b950bef626a",
+        "3292090e-7172-441c-9ec4-7b817d45b14a": "5b6ab0a3-3356-4bdd-a69d-957df1e874a9",
+        "4a8f811a-4af7-4625-9a1c-beee140d1d46": "0c65b597-87b8-422c-98ca-67606709798c",
+        "cbbe4051-b6d6-4b81-8ad0-6ce03404b600": "9c4348c6-c4e7-439b-afe0-eef83f03621d",
+        "f39a3b9f-126e-4b0f-8b0e-9a74092c9295": "86db80ff-a06f-44be-968b-5a92a85fdb97",
+        "7112fbcd-092b-4d11-b301-e7148cc2aded": "ff0b157d-ec96-4617-a7b2-6262934c6016",
+        "5cc18273-bb9b-4605-884c-b9b538c6cee9": "768843fa-e91c-404a-8789-033ac2e7b241",
+        "5b339530-c90c-475f-831a-b6556507fdce": "5a408fb5-c3e5-4922-bd6d-cb4e6b7f7ff9",
+        "d5d22ada-9664-4088-a32a-af06dd9eb720": "f9b07677-980b-425a-b772-950e66960ca4",
+        "d29c02d0-9e4a-4e08-8778-7628ac23d9b7": "09bf1845-853e-4fd8-921e-b649c35149ba",
+        "3f12bc86-c101-444c-ab36-04c0f7d202a5": "370a71e9-1fda-44bb-8943-a8f4ec85c026",
+        "d1f8b4da-73c2-41d1-851d-91fac010a976": "e02a0de0-e71a-4df5-b9ac-49a8eaf998a3",
+        "98dd1e95-d1e4-463d-95aa-1c3226283b88": "493406dc-96e6-40bc-a275-af4e40ff1caa",
+        "0114ac65-91a4-450b-b978-094e414215e7": "88ceaca3-59ba-4760-8a8b-42ca986cefb2",
+        "f2a4d2ef-1865-4586-b9b2-d8f40263508d": "498ef995-cb5f-4847-b8a8-c4dca31fdbe8",
+        "ca93858e-029e-41fc-906b-1aa8535eeee7": "a5a043ae-49b4-4176-9520-3919f0f86989",
+        "03b67590-e688-4c2b-aeee-a508c789efe9": "0e688b93-d5f0-4358-8398-8ebb3b60bce4",
+        "36ab2af9-b741-4532-903f-9a9a4319a3ae": "ef82169a-9ff1-49eb-bf38-65092f35ecd6",
+        "5f7e17df-0630-4a51-be55-f68d1fbcda97": "5bca8595-3cb4-44c6-9dd2-d170000ddcbc",
+        "6bd85831-5ad5-41bf-b58c-dab310771b12": "9e65f8e1-a582-4c38-a4a4-d1c2fdd9e9cb",
+        "70580348-12e9-4611-b87d-af4444cae4b5": "6db33702-6375-4465-bb59-b7f053483449",
+        "4a2cd124-1f61-4901-a988-2a9b8d8e46d0": "ade69c5e-095c-4201-8af3-c774d808b621",
+        "82632fab-40c8-4185-9904-3381059d7304": "00360a57-d9eb-4b30-ad96-3aab652a2aac",
+        "68e2c520-86ea-4188-b0a5-f65e4ce0c1c1": "5c8e10d3-23fb-48b5-84cc-332d6f5dceb8",
+        "da284395-5b1a-43cb-9652-e25818473e12": "d57bde50-892c-443c-9ff6-0edb0c0aade2",
+        "5356c5c1-5d94-41db-89fd-632b2fc04f89": "1c79c1ff-f837-4d51-862f-2e31578b3af9",
+        "870456ae-951d-4e9c-8d42-31dde096085d": "026cc60f-d672-419d-9212-b2a027c2f5b2",
+        "9a78cd37-9378-436e-80d2-0de685f4b70f": "b6bb4ed9-a1ea-42fc-aff0-9e278c22b0e9",
+        "b194820e-b295-4174-8598-79249b0ca10d": "a17b9d91-b3df-4d94-b1ff-c6ca856ca758",
+        "5596cbd1-83cd-4e8e-9b38-1f0a1c1394c3": "d8360ca5-6e82-4a7e-a936-d91d6a470a5c",
+        "5ea84dc8-7783-4ad6-9a0e-e50d301c8d0f": "239a35ba-2acd-4358-86de-6bb16093b7d6",
+        "235a87d8-e5f3-47d8-9854-7f1a30c87576": "d4fa9d35-b2d4-45d7-a80b-a2039b1388f6",
+        "0873098d-8506-459a-802d-111173f32e93": "d4010f0b-3813-4378-96a4-de61ee6dece8"
+      }
     }
   ],
   "SceneProperties": {
@@ -11709,18 +11766,18 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
       },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1ff7db61-0293-4529-be2b-9f606b7c33ea"
         }
       },
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
-        }
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },
