@@ -1,0 +1,41 @@
+{
+  "RootObject": {
+    "__guid": "a50ea8a1-3ba8-49c4-88c5-533d35db1a4b",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "StampLandChunk",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "StampLandChunk",
+        "__guid": "35798942-3e20-49ea-811f-e6395098dd85",
+        "__enabled": true,
+        "Flags": 0,
+        "ChunkCoords": "0,0",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}

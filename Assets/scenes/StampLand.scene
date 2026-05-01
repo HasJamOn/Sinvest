@@ -96,13 +96,34 @@
       "__Prefab": "prefabs/gamesavesystem.prefab",
       "__PrefabInstancePatch": {
         "AddedObjects": [],
-        "RemovedObjects": [],
+        "RemovedObjects": [
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "6f508414-1c22-4550-93f3-8e58266b17b0"
+            }
+          }
+        ],
         "PropertyOverrides": [],
-        "MovedObjects": []
+        "MovedObjects": [
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "8611e950-dee8-401f-950f-459361d63675"
+            },
+            "NewParent": {
+              "Type": "GameObject",
+              "IdValue": "df2b829f-cfb7-4e38-85c7-5676c84e706c"
+            },
+            "NewContainerProperty": "Components",
+            "IsNewContainerArray": true,
+            "NewPreviousElement": null
+          }
+        ]
       },
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "02c6f8c8-ad69-418a-b0ea-f9954c827f96",
-        "cb82f584-af11-4f68-8566-81a60545b986": "83b89977-32b8-4361-8406-70dc9c48cb79",
+        "aa15c81d-c854-4a65-bf3f-0f1a02f5b61c": "b6803f1f-35d9-4e3d-8cf1-5e7ddb33bf4b",
         "8611e950-dee8-401f-950f-459361d63675": "be2d0a46-8577-4b5b-9823-833e2d9e2d8f"
       }
     },
@@ -127,18 +148,22 @@
           "__guid": "0dcea945-4376-46e0-8cde-f330250f5349",
           "__enabled": true,
           "Flags": 0,
+          "ChunkPrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/stampland/stamplandchunk.prefab"
+          },
+          "ChunkSizeInCubes": "16,16",
           "CubePrefab": {
             "_type": "gameobject",
             "prefab": "prefabs/stampland/cube.prefab"
           },
-          "GridSize": "100,100",
-          "GridSpacing": 64,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null
+          "OnComponentUpdate": null,
+          "WorldSizeInChunks": "5,5"
         },
         {
           "__type": "StampLandDebugManager",
@@ -150,8 +175,7 @@
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "RunIdentityDiagnostics": false
+          "OnComponentUpdate": null
         }
       ],
       "Children": []
@@ -161,7 +185,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Spawn Points",
-      "Position": "0,0,161.806915",
+      "Position": "0,0,274.282043",
       "Rotation": "0,0,-1,1.94707184E-07",
       "Scale": "1,1,1",
       "Tags": "",
@@ -173,7 +197,7 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Sinvest.NetworkHelper",
+          "__type": "Sinvest.StampLandNetworkHelper",
           "__guid": "a391010f-98b6-46d5-8280-d9a19082d289",
           "__enabled": true,
           "Flags": 0,
@@ -187,12 +211,6 @@
             "_type": "gameobject",
             "prefab": "templates/gameobject/player controller.prefab"
           },
-          "SpawnPoints": [
-            {
-              "_type": "gameobject",
-              "go": "2bcbbe33-1855-4fa6-aafb-cfcf278cb41f"
-            }
-          ],
           "StartServer": true
         }
       ],
@@ -1116,18 +1134,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "0bf001c0-2b33-4c2d-a809-5326862a6898"
-        }
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },

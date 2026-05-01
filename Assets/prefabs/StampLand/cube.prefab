@@ -63,7 +63,7 @@
         "OnTriggerEnter": null,
         "OnTriggerExit": null,
         "RollingResistance": null,
-        "Scale": "64,64,64",
+        "Scale": "50,50,50",
         "Static": false,
         "Surface": null,
         "SurfaceVelocity": "0,0,0"
@@ -90,25 +90,6 @@
           "component_id": "c127f1e2-dad2-43d4-a6a1-528e78cf84a5",
           "go": "87866f65-a473-46ec-b4fd-fa6caebb318f",
           "component_type": "TextRenderer"
-        }
-      },
-      {
-        "__type": "Sinvest.ModelScaler",
-        "__guid": "f52d085b-e6bc-4bd5-abc6-812f292a755a",
-        "__enabled": true,
-        "Flags": 0,
-        "ModelScale": "1.27999973,1.27999997,1.27999997",
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null,
-        "TargetRenderer": {
-          "_type": "component",
-          "component_id": "a190612f-3d0c-4673-9085-618a002fc2db",
-          "go": "f81bc5b9-3638-4032-aab9-686999f24ef3",
-          "component_type": "ModelRenderer"
         }
       }
     ],

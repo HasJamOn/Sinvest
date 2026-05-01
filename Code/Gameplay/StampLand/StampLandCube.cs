@@ -11,57 +11,38 @@ public sealed class StampLandCube : Component
 
 	protected override void OnUpdate()
 	{
-		if ( TextComponent.IsValid() )
-			TextComponent.Text = Value.ToString();
+		if ( !Renderer.Enabled ) return;
 
-		if ( Renderer.IsValid() )
-			UpdateVisuals();
+		if ( TextComponent.IsValid() )
+			TextComponent.Text = Value > 0 ? Value.ToString() : "";
+
+		UpdateVisuals();
 	}
 
 	private void UpdateVisuals()
 	{
 		if ( Value == 0 )
 		{
-			Renderer.Tint = Color.Gray; 
+			// Using explicit float values for rgba consistency
+			Renderer.Tint = new Color( 0.5f, 0.5f, 0.5f, 1.0f ); 
 			return;
 		}
 
-		// CORRECTED: Use Connection.Local.Id to identify the local client
-		if ( OwnerId == Connection.Local.Id )
-		{
-			Renderer.Tint = Color.Green; 
-		}
-		else
-		{
-			Renderer.Tint = Color.Red; 
-		}
+		// Local vs Remote Player coloring
+		Renderer.Tint = (OwnerId == Connection.Local.Id) 
+			? new Color( 0.0f, 1.0f, 0.0f, 1.0f ) // Green
+			: new Color( 1.0f, 0.0f, 0.0f, 1.0f ); // Red
 	}
 
 	public void ProcessTouch( Guid playerId )
 	{
-		// Ensure only the Host handles the logic to prevent "Ghost Claims"
 		if ( !Networking.IsHost ) return;
 
-		if ( Value == 0 )
-		{
-			// Log the attempt to see if the Guid is arriving correctly
-			Log.Info( $"Claiming cube for player: {playerId}" );
-        
-			OwnerId = playerId;
-			Value = 1;
-		}
-		else if ( OwnerId == playerId ) 
-		{
-			Value++;
-		}
-		else
-		{
+		if ( Value == 0 ) { OwnerId = playerId; Value = 1; }
+		else if ( OwnerId == playerId ) { Value++; }
+		else {
 			Value--;
-			if ( Value <= 0 )
-			{
-				Value = 0;
-				OwnerId = Guid.Empty;
-			}
+			if ( Value <= 0 ) { Value = 0; OwnerId = Guid.Empty; }
 		}
 	}
 }

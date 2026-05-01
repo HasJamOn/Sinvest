@@ -7,7 +7,7 @@ public sealed class StampLandPlayer : Component, Component.ITriggerListener
 
 	public void OnTriggerEnter( Collider other )
 	{
-		// We only want the local player's inputs to trigger the RPC
+		// Only the local player (the one actually walking) initiates the labor
 		if ( IsProxy ) return;
 
 		var cube = other.GameObject.Components.Get<StampLandCube>();
@@ -16,28 +16,26 @@ public sealed class StampLandPlayer : Component, Component.ITriggerListener
 		{
 			_lastTouchedCube = cube;
             
-			// FIX: Use Connection.Local.Id. This is the persistent Guid 
-			// that matches Connection.Local.Id in the cube's UpdateVisuals check.
-			Guid myPlayerId = Connection.Local.Id;
+			// Send the request to the Host. 
+			// In s&box, [Rpc.Broadcast] with a Host check is a standard way 
+			// to ensure the Host receives the signal from a Client.
+			NotifyHostOfLabor( cube.GameObject, Connection.Local.Id );
             
-			// Notify the Host to process the labor
-			UpdateCubeOnHost( cube.GameObject, myPlayerId );
-            
-			Log.Info( $"[LABOR] Entered {cube.GameObject.Name} with ID: {myPlayerId}" );
+			Log.Info( $"[LABOR] Transaction Initiated: {cube.GameObject.Name}" );
 		}
 	}
 
-	// Broadcast ensures the call reaches the Host from any client
 	[Rpc.Broadcast]
-	public void UpdateCubeOnHost( GameObject cubeObj, Guid playerId )
+	public void NotifyHostOfLabor( GameObject cubeObj, Guid playerId )
 	{
-		// Only the Host modifies the 'Ledger' (the synced Value and OwnerId)
+		// Internal Firewall: Only the Host modifies the authoritative state
 		if ( !Networking.IsHost ) return;
 		if ( !cubeObj.IsValid() ) return;
 
 		var cube = cubeObj.Components.Get<StampLandCube>();
 		if ( cube.IsValid() )
 		{
+			// This is the bridge to your Ledger logic
 			cube.ProcessTouch( playerId );
 		}
 	}
@@ -48,7 +46,7 @@ public sealed class StampLandPlayer : Component, Component.ITriggerListener
 
 		if ( _lastTouchedCube.IsValid() && _lastTouchedCube.GameObject == other.GameObject )
 		{
-			Log.Info( $"[LABOR] Left {_lastTouchedCube.GameObject.Name}" );
+			Log.Info( $"[LABOR] Transaction Finalized: {_lastTouchedCube.GameObject.Name}" );
 			_lastTouchedCube = null;
 		}
 	}
