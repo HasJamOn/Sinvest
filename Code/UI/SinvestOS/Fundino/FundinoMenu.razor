@@ -62,26 +62,26 @@
             </div>
         </div>
 
-       <div class="market-data-strip">
-           <div class="data-point">
-              <span class="label">HOLDINGS</span>
-              <span class="value">@FormatValue(SinvestOS.Instance?.CurrentShares ?? 0) UNITS</span>
-           </div>
-    
-           <div class="divider"></div>
+        <div class="market-data-strip">
+	        <div class="data-point">
+		        <span class="label">HOLDINGS</span>
+		        <span class="value">@FormatValue(SinvestOS.Instance?.CurrentShares ?? 0) UNITS</span>
+	        </div>
 
-           <div class="data-point">
-              <span class="label">EQUITY</span>
-              <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * FundinoMarketService.CurrentPrice)</span>
-           </div>
+	        <div class="divider"></div>
 
-           <div class="divider"></div>
+	        <div class="data-point">
+		        <span class="label">EQUITY</span>
+		        <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * FundinoMarketService.CurrentPrice)</span>
+	        </div>
 
-           <div class="data-point">
-              <span class="label">BUY POWER</span>
-              <span class="value">$@FormatValue(SinvestOS.Instance?.CurrentMoney ?? 0)</span>
-           </div>
-       </div>
+	        <div class="divider"></div>
+
+	        <div class="data-point">
+		        <span class="label">BUY POWER</span>
+		        <span class="value">$@FormatValue(SinvestOS.Instance?.CurrentMoney ?? 0)</span>
+	        </div>
+        </div>
 
        <div class="actions-container">
            <div class="cost-preview">
@@ -337,33 +337,59 @@
         };
     }
 
+    /// <summary>
+    /// Executes a trade through the SinvestOS, which handles the Ledger write.
+    /// </summary>
     private async void DoTrade(int amount)
     {
-        if (IsProcessing || !FundinoMarketService.IsReady) return;
-        IsProcessing = true;
-        StateHasChanged();
-    
-        double totalCost = FundinoMarketService.CurrentPrice * amount;
-        if (amount < 0 && (SinvestOS.Instance?.CurrentShares ?? 0) < Math.Abs(amount))
-        {
-            IsProcessing = false;
-            StateHasChanged();
-            return;
-        }
+	    // 1. Basic Validation
+	    if (IsProcessing || !FundinoMarketService.IsReady) return;
+	    if (SinvestOS.Instance == null || EconomyManager.Instance == null) return;
 
-        SinvestOS.Instance?.Transaction(-totalCost, (double)amount);
-        await GameTask.Delay(100); 
-        IsProcessing = false;
-        StateHasChanged();
+	    IsProcessing = true;
+	    StateHasChanged();
+    
+	    double unitPrice = FundinoMarketService.CurrentPrice;
+	    double totalMoneyDelta = -(unitPrice * amount); // Negative if buying, Positive if selling
+
+	    // 2. Pre-flight check (EconomyManager is the source of truth)
+	    if (amount > 0 && EconomyManager.Instance.CurrentMoney < (unitPrice * amount))
+	    {
+		    Log.Warning("[FUND.INO] Insufficient Cash for purchase.");
+		    IsProcessing = false;
+		    StateHasChanged();
+		    return;
+	    }
+
+	    if (amount < 0 && EconomyManager.Instance.CurrentShares < Math.Abs(amount))
+	    {
+		    Log.Warning("[FUND.INO] Insufficient Units for sale.");
+		    IsProcessing = false;
+		    StateHasChanged();
+		    return;
+	    }
+
+	    // 3. Execute via OS
+	    // This triggers GameSaveSystem.CommitMoneyTransaction and CommitShareTransaction
+	    SinvestOS.Instance.Transaction(totalMoneyDelta, (double)amount);
+
+	    // 4. Cool-down to prevent double-click file-stream contention
+	    await GameTask.Delay(100); 
+        
+	    IsProcessing = false;
+	    StateHasChanged();
     }
 
     protected override int BuildHash()
     {
-        return HashCode.Combine(
-            FundinoMarketService.CurrentPrice,
-            IsProcessing,
-            SinvestOS.Instance?.CurrentMoney,
-            CurrentRange
-        );
+	    // Include CurrentMoney and CurrentShares from the OS so the 
+	    // UI re-renders as the values lerp/tick.
+	    return HashCode.Combine(
+		    FundinoMarketService.CurrentPrice,
+		    IsProcessing,
+		    SinvestOS.Instance?.CurrentMoney,
+		    SinvestOS.Instance?.CurrentShares,
+		    CurrentRange
+	    );
     }
 }

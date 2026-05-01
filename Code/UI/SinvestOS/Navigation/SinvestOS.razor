@@ -25,7 +25,7 @@
 				<span class="label">SHARES</span>
 				<div class="value-row">
 					<span class="value">@FormatValue(_displayShares)</span>
-					<span class="valuation">[$@FormatValue(_displayShares * GetSharePrice())]</span>
+					<span class="valuation">[$@FormatValue(_targetShares * GetSharePrice())]</span>
 				</div>
 			</div>
 		</div>
@@ -269,17 +269,21 @@
 
     public void Transaction( double moneyAmount, double sharesAmount = 0 )
     {
-	    var save = GameSaveSystem.Instance;
+	    var economy = EconomyManager.Instance;
+	    if ( economy == null ) return;
 
-	    if ( save.IsValid() )
+	    // Handle Money via Ledger
+	    if ( moneyAmount != 0 )
 	    {
-		    // For simple money transactions (like Casino or Jobs)
-		    if ( moneyAmount != 0 )
-		    {
-			    string type = moneyAmount > 0 ? "IN" : "OUT";
-			    save.CommitMoneyTransaction( type, Math.Abs(moneyAmount), "OS Transaction" );
-		    }
-		    
+		    string type = moneyAmount > 0 ? "IN" : "OUT";
+		    GameSaveSystem.Instance.CommitMoneyTransaction( type, Math.Abs(moneyAmount), "OS Transaction" );
+	    }
+
+	    // Handle Shares via Ledger
+	    if ( sharesAmount != 0 )
+	    {
+		    // This ensures shares are also recorded in the authoritative plaintext file
+		    GameSaveSystem.Instance.CommitShareTransaction( sharesAmount, "OS Transaction" );
 	    }
     }
 
