@@ -273,626 +273,582 @@
     {
       "__guid": "5b757a10-c6b2-410a-89db-bc43c20a516e",
       "__version": 2,
-      "Flags": 0,
-      "Name": "Oil Pumper",
-      "Position": "159.771988,17.1153793,32",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [],
-      "Children": [
-        {
-          "__guid": "0073b963-d2c8-471e-8435-582213c305cc",
-          "__version": 2,
-          "Flags": 0,
-          "Name": "Base",
-          "Position": "0,0,0",
-          "Rotation": "0,0,0,1",
-          "Scale": "1,1,1",
-          "Tags": "",
-          "Enabled": true,
-          "NetworkMode": 2,
-          "NetworkFlags": 0,
-          "NetworkOrphaned": 0,
-          "NetworkTransmit": true,
-          "OwnerTransfer": 1,
-          "Components": [
-            {
-              "__type": "Sandbox.ModelRenderer",
-              "__guid": "2f4f2450-abb4-480e-9bda-30596b0b1ec4",
-              "__enabled": true,
-              "Flags": 0,
-              "BodyGroups": 18446744073709551615,
-              "CreateAttachments": false,
-              "LodOverride": null,
-              "MaterialGroup": null,
-              "MaterialOverride": null,
-              "Materials": null,
-              "Model": "models/dev/box.vmdl",
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "RenderType": "On",
-              "Tint": "1,1,1,1"
+      "__Prefab": "prefabs/oil pumper.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "37aedecd-45dd-491c-a7cf-a9c6fc9646db"
             },
-            {
-              "__type": "Sinvest.ModelScaler",
-              "__guid": "0caff7bb-cf5c-43f8-ab8a-352323fc3e07",
-              "__enabled": true,
-              "Flags": 0,
-              "ModelScale": "1,1,1",
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "TargetRenderer": {
-                "_type": "component",
-                "component_id": "2f4f2450-abb4-480e-9bda-30596b0b1ec4",
-                "go": "0073b963-d2c8-471e-8435-582213c305cc",
-                "component_type": "ModelRenderer"
+            "Parent": {
+              "Type": "GameObject",
+              "IdValue": "5cc18273-bb9b-4605-884c-b9b538c6cee9"
+            },
+            "PreviousElement": null,
+            "ContainerProperty": "Children",
+            "IsContainerArray": true,
+            "Data": {
+              "__guid": "37aedecd-45dd-491c-a7cf-a9c6fc9646db",
+              "__version": 2,
+              "__Prefab": "prefabs/work_oil_pumper/oilpumper_chair.prefab",
+              "__PrefabInstancePatch": {
+                "AddedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "302bdf9f-3fea-43ba-b790-1305d87925a0"
+                    },
+                    "Parent": {
+                      "Type": "GameObject",
+                      "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
+                    },
+                    "PreviousElement": {
+                      "Type": "Component",
+                      "IdValue": "d924019f-a1ef-43e6-a256-2ab657e93554"
+                    },
+                    "ContainerProperty": "Components",
+                    "IsContainerArray": true,
+                    "Data": {
+                      "__type": "Sinvest.PumperSeat",
+                      "__guid": "302bdf9f-3fea-43ba-b790-1305d87925a0",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null,
+                      "SeatPoint": {
+                        "_type": "gameobject",
+                        "go": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
+                      }
+                    }
+                  }
+                ],
+                "RemovedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "c1e8f360-317c-4f4f-bd3e-61ea5488c3a8"
+                    }
+                  }
+                ],
+                "PropertyOverrides": [
+                  {
+                    "Target": {
+                      "Type": "GameObject",
+                      "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
+                    },
+                    "Property": "Position",
+                    "Value": "-123.155609,0,-11.6962967"
+                  },
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f"
+                    },
+                    "Property": "IsTrigger",
+                    "Value": true
+                  }
+                ],
+                "MovedObjects": []
+              },
+              "__PrefabIdToInstanceId": {
+                "2293fecf-6bc5-4656-9c8e-1893c39c6b1a": "37aedecd-45dd-491c-a7cf-a9c6fc9646db",
+                "976de82d-645a-4f98-8d3d-b524e274533d": "ec833153-db37-44a5-bd94-c3a1b849c0a8",
+                "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f": "b29a8cae-b8f2-404c-8048-803998d3f448",
+                "d924019f-a1ef-43e6-a256-2ab657e93554": "20251ae7-897f-479d-8102-3fc571205711",
+                "69beda16-d978-4af5-8025-c1c92bab0c0f": "34458e8c-93bb-497d-8f80-fa7efebdb42f",
+                "21d974a4-451a-47cd-bf59-0060f259b86a": "750c99f8-1055-4ad6-b62e-9446b675439f"
               }
             }
-          ],
-          "Children": []
-        },
-        {
-          "__guid": "ed43d856-8e9f-4775-a9b8-0cebc9c019fa",
-          "__version": 2,
-          "Flags": 0,
-          "Name": "Plank",
-          "Position": "0.370880127,0.914699554,27.9529839",
-          "Rotation": "0,0,0,1",
-          "Scale": "1,1,1",
-          "Tags": "",
-          "Enabled": true,
-          "NetworkMode": 2,
-          "NetworkFlags": 0,
-          "NetworkOrphaned": 0,
-          "NetworkTransmit": true,
-          "OwnerTransfer": 1,
-          "Components": [
-            {
-              "__type": "Sandbox.BoxCollider",
-              "__guid": "155af18a-0e45-4047-bcbf-044f5f6ee2e9",
-              "__enabled": true,
-              "Flags": 0,
-              "Center": "0,0,-1.65999079",
-              "ColliderFlags": 0,
-              "Elasticity": null,
-              "Friction": null,
-              "IsTrigger": false,
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "OnObjectTriggerEnter": null,
-              "OnObjectTriggerExit": null,
-              "OnTriggerEnter": null,
-              "OnTriggerExit": null,
-              "RollingResistance": null,
-              "Scale": "266.059631,13.109726,5.4000206",
-              "Static": false,
-              "Surface": null,
-              "SurfaceVelocity": "0,0,0"
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e"
             },
-            {
-              "__type": "Sandbox.Rigidbody",
-              "__guid": "8ddb2283-c61e-4f09-816e-0ffab35b8113",
-              "__enabled": true,
-              "Flags": 0,
-              "AngularDamping": 0,
-              "EnableImpactDamage": true,
-              "EnhancedCcd": false,
-              "Gravity": true,
-              "GravityScale": 1,
-              "ImpactDamage": 0,
-              "LinearDamping": 0,
-              "Locking": {
-                "X": true,
-                "Y": true,
-                "Z": true,
-                "Pitch": false,
-                "Yaw": false,
-                "Roll": true
-              },
-              "MassCenterOverride": "0,0,0",
-              "MassOverride": 0,
-              "MinImpactDamageSpeed": 500,
-              "MotionEnabled": true,
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "OverrideMassCenter": false,
-              "RigidbodyFlags": 0,
-              "StartAsleep": false
+            "Parent": {
+              "Type": "GameObject",
+              "IdValue": "5cc18273-bb9b-4605-884c-b9b538c6cee9"
             },
-            {
-              "__type": "Sinvest.RotationLimiter",
-              "__guid": "e33858e3-10fb-4044-b68a-30ef8ee1ae45",
-              "__enabled": true,
-              "Flags": 0,
-              "BrakeStrength": 15,
-              "FeatherZone": 0.2,
-              "MaxDegreesPerSecond": 30,
-              "MaxYaw": 15,
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null
-            }
-          ],
-          "Children": [
-            {
-              "__guid": "45d1c326-d2bf-41aa-ac28-d13915cbfe63",
+            "PreviousElement": {
+              "Type": "GameObject",
+              "IdValue": "37aedecd-45dd-491c-a7cf-a9c6fc9646db"
+            },
+            "ContainerProperty": "Children",
+            "IsContainerArray": true,
+            "Data": {
+              "__guid": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e",
               "__version": 2,
-              "Flags": 0,
-              "Name": "oilpumper_matchmaker",
-              "Position": "0,0,0",
-              "Rotation": "0,0,0,1",
-              "Scale": "1,1,1",
-              "Tags": "",
-              "Enabled": true,
-              "NetworkMode": 2,
-              "NetworkFlags": 0,
-              "NetworkOrphaned": 0,
-              "NetworkTransmit": true,
-              "OwnerTransfer": 1,
-              "Components": [
-                {
-                  "__type": "Sandbox.ModelRenderer",
-                  "__guid": "12047456-589e-4898-9c90-3b52ea8bea1f",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "BodyGroups": 18446744073709551615,
-                  "CreateAttachments": false,
-                  "LodOverride": null,
-                  "MaterialGroup": null,
-                  "MaterialOverride": null,
-                  "Materials": null,
-                  "Model": "items/resources/plank/plank.vmdl",
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null,
-                  "RenderOptions": {
-                    "GameLayer": true,
-                    "OverlayLayer": false,
-                    "BloomLayer": false,
-                    "AfterUILayer": false
-                  },
-                  "RenderType": "On",
-                  "Tint": "1,1,1,1"
-                },
-                {
-                  "__type": "Sandbox.BoxCollider",
-                  "__guid": "bd6e2608-dad6-4def-9898-5e5a1c038a8a",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "Center": "0,0,-1.71999884",
-                  "ColliderFlags": 0,
-                  "Elasticity": null,
-                  "Friction": 0.89285713,
-                  "IsTrigger": false,
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null,
-                  "OnObjectTriggerEnter": null,
-                  "OnObjectTriggerExit": null,
-                  "OnTriggerEnter": null,
-                  "OnTriggerExit": null,
-                  "RollingResistance": null,
-                  "Scale": "263.529968,12.969986,5.9199481",
-                  "Static": false,
-                  "Surface": null,
-                  "SurfaceVelocity": "0,0,0"
-                },
-                {
-                  "__type": "Sinvest.ModelScaler",
-                  "__guid": "c9f34572-e6c9-49bd-848e-0c8a657e2805",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "ModelScale": "4.07998657,2.049999,1",
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null,
-                  "TargetRenderer": {
-                    "_type": "component",
-                    "component_id": "12047456-589e-4898-9c90-3b52ea8bea1f",
-                    "go": "45d1c326-d2bf-41aa-ac28-d13915cbfe63",
-                    "component_type": "ModelRenderer"
+              "__Prefab": "prefabs/work_oil_pumper/oilpumper_chair.prefab",
+              "__PrefabInstancePatch": {
+                "AddedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "a83ff57b-0ee1-496f-abe1-a5afea9e1ae1"
+                    },
+                    "Parent": {
+                      "Type": "GameObject",
+                      "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
+                    },
+                    "PreviousElement": {
+                      "Type": "Component",
+                      "IdValue": "d924019f-a1ef-43e6-a256-2ab657e93554"
+                    },
+                    "ContainerProperty": "Components",
+                    "IsContainerArray": true,
+                    "Data": {
+                      "__type": "Sinvest.PumperSeat",
+                      "__guid": "a83ff57b-0ee1-496f-abe1-a5afea9e1ae1",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null,
+                      "SeatPoint": {
+                        "_type": "gameobject",
+                        "go": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
+                      }
+                    }
                   }
-                },
-                {
-                  "__type": "Sinvest.OilPumperMatchmaker",
-                  "__guid": "7bcdcffa-f97d-46b6-99f7-dc2d6f9cf21a",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "Body": {
-                    "_type": "component",
-                    "component_id": "8ddb2283-c61e-4f09-816e-0ffab35b8113",
-                    "go": "ed43d856-8e9f-4775-a9b8-0cebc9c019fa",
-                    "component_type": "Rigidbody"
-                  },
-                  "MaxTiltAngle": 20,
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null,
-                  "SeatA": {
-                    "_type": "component",
-                    "component_id": "a83ff57b-0ee1-496f-abe1-a5afea9e1ae1",
-                    "go": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e",
-                    "component_type": "PumperSeat"
-                  },
-                  "SeatB": {
-                    "_type": "component",
-                    "component_id": "302bdf9f-3fea-43ba-b790-1305d87925a0",
-                    "go": "37aedecd-45dd-491c-a7cf-a9c6fc9646db",
-                    "component_type": "PumperSeat"
-                  },
-                  "TiltSmoothness": 10
-                }
-              ],
-              "Children": [
-                {
-                  "__guid": "37aedecd-45dd-491c-a7cf-a9c6fc9646db",
-                  "__version": 2,
-                  "__Prefab": "prefabs/work_oil_pumper/oilpumper_chair.prefab",
-                  "__PrefabInstancePatch": {
-                    "AddedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "302bdf9f-3fea-43ba-b790-1305d87925a0"
-                        },
-                        "Parent": {
-                          "Type": "GameObject",
-                          "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
-                        },
-                        "PreviousElement": {
-                          "Type": "Component",
-                          "IdValue": "d924019f-a1ef-43e6-a256-2ab657e93554"
-                        },
-                        "ContainerProperty": "Components",
-                        "IsContainerArray": true,
-                        "Data": {
-                          "__type": "Sinvest.PumperSeat",
-                          "__guid": "302bdf9f-3fea-43ba-b790-1305d87925a0",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "SeatPoint": {
-                            "_type": "gameobject",
-                            "go": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
-                          }
-                        }
-                      }
-                    ],
-                    "RemovedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "c1e8f360-317c-4f4f-bd3e-61ea5488c3a8"
-                        }
-                      }
-                    ],
-                    "PropertyOverrides": [
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
-                        },
-                        "Property": "Position",
-                        "Value": "-123.155609,0,-11.6962967"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f"
-                        },
-                        "Property": "IsTrigger",
-                        "Value": true
-                      }
-                    ],
-                    "MovedObjects": []
-                  },
-                  "__PrefabIdToInstanceId": {
-                    "2293fecf-6bc5-4656-9c8e-1893c39c6b1a": "37aedecd-45dd-491c-a7cf-a9c6fc9646db",
-                    "976de82d-645a-4f98-8d3d-b524e274533d": "ec833153-db37-44a5-bd94-c3a1b849c0a8",
-                    "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f": "b29a8cae-b8f2-404c-8048-803998d3f448",
-                    "d924019f-a1ef-43e6-a256-2ab657e93554": "20251ae7-897f-479d-8102-3fc571205711",
-                    "69beda16-d978-4af5-8025-c1c92bab0c0f": "34458e8c-93bb-497d-8f80-fa7efebdb42f",
-                    "21d974a4-451a-47cd-bf59-0060f259b86a": "750c99f8-1055-4ad6-b62e-9446b675439f"
+                ],
+                "RemovedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "c1e8f360-317c-4f4f-bd3e-61ea5488c3a8"
+                    }
                   }
-                },
-                {
-                  "__guid": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e",
-                  "__version": 2,
-                  "__Prefab": "prefabs/work_oil_pumper/oilpumper_chair.prefab",
-                  "__PrefabInstancePatch": {
-                    "AddedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "a83ff57b-0ee1-496f-abe1-a5afea9e1ae1"
-                        },
-                        "Parent": {
-                          "Type": "GameObject",
-                          "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
-                        },
-                        "PreviousElement": {
-                          "Type": "Component",
-                          "IdValue": "d924019f-a1ef-43e6-a256-2ab657e93554"
-                        },
-                        "ContainerProperty": "Components",
-                        "IsContainerArray": true,
-                        "Data": {
-                          "__type": "Sinvest.PumperSeat",
-                          "__guid": "a83ff57b-0ee1-496f-abe1-a5afea9e1ae1",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "SeatPoint": {
-                            "_type": "gameobject",
-                            "go": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
-                          }
-                        }
-                      }
-                    ],
-                    "RemovedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "c1e8f360-317c-4f4f-bd3e-61ea5488c3a8"
-                        }
-                      }
-                    ],
-                    "PropertyOverrides": [
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
-                        },
-                        "Property": "Position",
-                        "Value": "121.764938,0,-11.6962967"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
-                        },
-                        "Property": "Rotation",
-                        "Value": "0,0,1,1.94707184E-07"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f"
-                        },
-                        "Property": "IsTrigger",
-                        "Value": true
-                      }
-                    ],
-                    "MovedObjects": []
+                ],
+                "PropertyOverrides": [
+                  {
+                    "Target": {
+                      "Type": "GameObject",
+                      "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
+                    },
+                    "Property": "Position",
+                    "Value": "121.764938,0,-11.6962967"
                   },
-                  "__PrefabIdToInstanceId": {
-                    "2293fecf-6bc5-4656-9c8e-1893c39c6b1a": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e",
-                    "976de82d-645a-4f98-8d3d-b524e274533d": "425b42c9-6c83-4acb-b5ee-c47a3e4d41f6",
-                    "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f": "c17951c1-98d0-47ee-b032-5a3d263962a1",
-                    "d924019f-a1ef-43e6-a256-2ab657e93554": "77d3de98-f5c2-4d7c-972c-a1255a63aff3",
-                    "69beda16-d978-4af5-8025-c1c92bab0c0f": "b084392a-9c3e-4d90-915d-465a7e545a15",
-                    "21d974a4-451a-47cd-bf59-0060f259b86a": "212d0196-c649-4af9-aba9-8da699b9cb04"
-                  }
-                },
-                {
-                  "__guid": "d705e237-cd71-4b97-88a2-175744d1442a",
-                  "__version": 2,
-                  "__Prefab": "prefabs/work_oil_pumper/oilpumper_computer.prefab",
-                  "__PrefabInstancePatch": {
-                    "AddedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "d0e5913b-4acd-4d1a-be15-1ee6bdaccb7b"
-                        },
-                        "Parent": {
-                          "Type": "GameObject",
-                          "IdValue": "5ac03318-655c-42f5-9dda-1c9c1c646ae9"
-                        },
-                        "PreviousElement": {
-                          "Type": "Component",
-                          "IdValue": "1aa459a2-c31b-4087-b9cd-89af36bf547f"
-                        },
-                        "ContainerProperty": "Components",
-                        "IsContainerArray": true,
-                        "Data": {
-                          "__type": "Sinvest.OilPumperScreenpanel",
-                          "__guid": "d0e5913b-4acd-4d1a-be15-1ee6bdaccb7b",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "Matchmaker": {
-                            "_type": "component",
-                            "component_id": "7bcdcffa-f97d-46b6-99f7-dc2d6f9cf21a",
-                            "go": "45d1c326-d2bf-41aa-ac28-d13915cbfe63",
-                            "component_type": "OilPumperMatchmaker"
-                          },
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null
-                        }
-                      }
-                    ],
-                    "RemovedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "71109928-c386-495a-ab56-3a0dbe042e55"
-                        }
-                      },
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "57a32b26-c2d9-4157-b96c-7af7f48b9544"
-                        }
-                      }
-                    ],
-                    "PropertyOverrides": [
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "ceeff0b0-c1b9-4b36-b686-f612c5073e10"
-                        },
-                        "Property": "Position",
-                        "Value": "98.2060394,0,1.44410706"
-                      }
-                    ],
-                    "MovedObjects": []
+                  {
+                    "Target": {
+                      "Type": "GameObject",
+                      "IdValue": "2293fecf-6bc5-4656-9c8e-1893c39c6b1a"
+                    },
+                    "Property": "Rotation",
+                    "Value": "0,0,1,1.94707184E-07"
                   },
-                  "__PrefabIdToInstanceId": {
-                    "ceeff0b0-c1b9-4b36-b686-f612c5073e10": "d705e237-cd71-4b97-88a2-175744d1442a",
-                    "7a6b6bd9-5b2e-4d60-a1e1-905110d8ce39": "4853d997-70c1-43b5-b57d-da3d95e06273",
-                    "48436164-af7b-422d-9f5f-1bac01e5951e": "aa46a6ef-8c38-4125-9380-8fdff18aeb1b",
-                    "5ac03318-655c-42f5-9dda-1c9c1c646ae9": "dc49d3ef-b38b-43cc-81ae-1774847f9240",
-                    "1aa459a2-c31b-4087-b9cd-89af36bf547f": "70999efa-6105-42b5-a57d-9dd6882f9681",
-                    "b1b3f473-1902-4589-a69b-7ad30e3d3f0a": "ccce558d-217f-4bc6-a191-466e6ea7bf91"
+                  {
+                    "Target": {
+                      "Type": "Component",
+                      "IdValue": "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f"
+                    },
+                    "Property": "IsTrigger",
+                    "Value": true
                   }
-                },
-                {
-                  "__guid": "e3225652-0333-4806-b979-6b4c24abf518",
-                  "__version": 2,
-                  "__Prefab": "prefabs/work_oil_pumper/oilpumper_computer.prefab",
-                  "__PrefabInstancePatch": {
-                    "AddedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "0afd868b-71dd-453e-96db-bffe216432c6"
-                        },
-                        "Parent": {
-                          "Type": "GameObject",
-                          "IdValue": "5ac03318-655c-42f5-9dda-1c9c1c646ae9"
-                        },
-                        "PreviousElement": {
-                          "Type": "Component",
-                          "IdValue": "1aa459a2-c31b-4087-b9cd-89af36bf547f"
-                        },
-                        "ContainerProperty": "Components",
-                        "IsContainerArray": true,
-                        "Data": {
-                          "__type": "Sinvest.OilPumperScreenpanel",
-                          "__guid": "0afd868b-71dd-453e-96db-bffe216432c6",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "Matchmaker": {
-                            "_type": "component",
-                            "component_id": "7bcdcffa-f97d-46b6-99f7-dc2d6f9cf21a",
-                            "go": "45d1c326-d2bf-41aa-ac28-d13915cbfe63",
-                            "component_type": "OilPumperMatchmaker"
-                          },
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null
-                        }
-                      }
-                    ],
-                    "RemovedObjects": [
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "71109928-c386-495a-ab56-3a0dbe042e55"
-                        }
-                      },
-                      {
-                        "Id": {
-                          "Type": "Component",
-                          "IdValue": "57a32b26-c2d9-4157-b96c-7af7f48b9544"
-                        }
-                      }
-                    ],
-                    "PropertyOverrides": [
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "ceeff0b0-c1b9-4b36-b686-f612c5073e10"
-                        },
-                        "Property": "Position",
-                        "Value": "-97.4949036,0,1.44410706"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "ceeff0b0-c1b9-4b36-b686-f612c5073e10"
-                        },
-                        "Property": "Rotation",
-                        "Value": "0,0,-1,1.94707184E-07"
-                      }
-                    ],
-                    "MovedObjects": []
-                  },
-                  "__PrefabIdToInstanceId": {
-                    "ceeff0b0-c1b9-4b36-b686-f612c5073e10": "e3225652-0333-4806-b979-6b4c24abf518",
-                    "7a6b6bd9-5b2e-4d60-a1e1-905110d8ce39": "ef69df96-8efb-4e89-9456-e1b064fc6f63",
-                    "48436164-af7b-422d-9f5f-1bac01e5951e": "1722224f-ed27-43e5-8052-c1caf26d5793",
-                    "5ac03318-655c-42f5-9dda-1c9c1c646ae9": "ee6f1e15-f717-4821-bde8-f1a2f47d1664",
-                    "1aa459a2-c31b-4087-b9cd-89af36bf547f": "b705ef57-5775-4a71-9ec8-bff389ee4d6a",
-                    "b1b3f473-1902-4589-a69b-7ad30e3d3f0a": "aa58d8c1-1e5b-4409-937a-6b5046f723c0"
-                  }
-                }
-              ]
+                ],
+                "MovedObjects": []
+              },
+              "__PrefabIdToInstanceId": {
+                "2293fecf-6bc5-4656-9c8e-1893c39c6b1a": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e",
+                "976de82d-645a-4f98-8d3d-b524e274533d": "425b42c9-6c83-4acb-b5ee-c47a3e4d41f6",
+                "ce07e5b2-cda3-4d83-bd6e-2d9b0c1b4d5f": "c17951c1-98d0-47ee-b032-5a3d263962a1",
+                "d924019f-a1ef-43e6-a256-2ab657e93554": "77d3de98-f5c2-4d7c-972c-a1255a63aff3",
+                "69beda16-d978-4af5-8025-c1c92bab0c0f": "b084392a-9c3e-4d90-915d-465a7e545a15",
+                "21d974a4-451a-47cd-bf59-0060f259b86a": "212d0196-c649-4af9-aba9-8da699b9cb04"
+              }
             }
-          ]
-        }
-      ]
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "d705e237-cd71-4b97-88a2-175744d1442a"
+            },
+            "Parent": {
+              "Type": "GameObject",
+              "IdValue": "5cc18273-bb9b-4605-884c-b9b538c6cee9"
+            },
+            "PreviousElement": {
+              "Type": "GameObject",
+              "IdValue": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e"
+            },
+            "ContainerProperty": "Children",
+            "IsContainerArray": true,
+            "Data": {
+              "__guid": "d705e237-cd71-4b97-88a2-175744d1442a",
+              "__version": 2,
+              "__Prefab": "prefabs/work_oil_pumper/oilpumper_computer.prefab",
+              "__PrefabInstancePatch": {
+                "AddedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "d0e5913b-4acd-4d1a-be15-1ee6bdaccb7b"
+                    },
+                    "Parent": {
+                      "Type": "GameObject",
+                      "IdValue": "5ac03318-655c-42f5-9dda-1c9c1c646ae9"
+                    },
+                    "PreviousElement": {
+                      "Type": "Component",
+                      "IdValue": "1aa459a2-c31b-4087-b9cd-89af36bf547f"
+                    },
+                    "ContainerProperty": "Components",
+                    "IsContainerArray": true,
+                    "Data": {
+                      "__type": "Sinvest.OilPumperScreenpanel",
+                      "__guid": "d0e5913b-4acd-4d1a-be15-1ee6bdaccb7b",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "Matchmaker": {
+                        "_type": "component",
+                        "component_id": "7bcdcffa-f97d-46b6-99f7-dc2d6f9cf21a",
+                        "go": "45d1c326-d2bf-41aa-ac28-d13915cbfe63",
+                        "component_type": "OilPumperMatchmaker"
+                      },
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null
+                    }
+                  }
+                ],
+                "RemovedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "71109928-c386-495a-ab56-3a0dbe042e55"
+                    }
+                  },
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "57a32b26-c2d9-4157-b96c-7af7f48b9544"
+                    }
+                  }
+                ],
+                "PropertyOverrides": [
+                  {
+                    "Target": {
+                      "Type": "GameObject",
+                      "IdValue": "ceeff0b0-c1b9-4b36-b686-f612c5073e10"
+                    },
+                    "Property": "Position",
+                    "Value": "98.2060394,0,1.44410706"
+                  }
+                ],
+                "MovedObjects": []
+              },
+              "__PrefabIdToInstanceId": {
+                "ceeff0b0-c1b9-4b36-b686-f612c5073e10": "d705e237-cd71-4b97-88a2-175744d1442a",
+                "7a6b6bd9-5b2e-4d60-a1e1-905110d8ce39": "4853d997-70c1-43b5-b57d-da3d95e06273",
+                "48436164-af7b-422d-9f5f-1bac01e5951e": "aa46a6ef-8c38-4125-9380-8fdff18aeb1b",
+                "5ac03318-655c-42f5-9dda-1c9c1c646ae9": "dc49d3ef-b38b-43cc-81ae-1774847f9240",
+                "1aa459a2-c31b-4087-b9cd-89af36bf547f": "70999efa-6105-42b5-a57d-9dd6882f9681",
+                "b1b3f473-1902-4589-a69b-7ad30e3d3f0a": "ccce558d-217f-4bc6-a191-466e6ea7bf91"
+              }
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "e3225652-0333-4806-b979-6b4c24abf518"
+            },
+            "Parent": {
+              "Type": "GameObject",
+              "IdValue": "5cc18273-bb9b-4605-884c-b9b538c6cee9"
+            },
+            "PreviousElement": {
+              "Type": "GameObject",
+              "IdValue": "d705e237-cd71-4b97-88a2-175744d1442a"
+            },
+            "ContainerProperty": "Children",
+            "IsContainerArray": true,
+            "Data": {
+              "__guid": "e3225652-0333-4806-b979-6b4c24abf518",
+              "__version": 2,
+              "__Prefab": "prefabs/work_oil_pumper/oilpumper_computer.prefab",
+              "__PrefabInstancePatch": {
+                "AddedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "0afd868b-71dd-453e-96db-bffe216432c6"
+                    },
+                    "Parent": {
+                      "Type": "GameObject",
+                      "IdValue": "5ac03318-655c-42f5-9dda-1c9c1c646ae9"
+                    },
+                    "PreviousElement": {
+                      "Type": "Component",
+                      "IdValue": "1aa459a2-c31b-4087-b9cd-89af36bf547f"
+                    },
+                    "ContainerProperty": "Components",
+                    "IsContainerArray": true,
+                    "Data": {
+                      "__type": "Sinvest.OilPumperScreenpanel",
+                      "__guid": "0afd868b-71dd-453e-96db-bffe216432c6",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "Matchmaker": {
+                        "_type": "component",
+                        "component_id": "7bcdcffa-f97d-46b6-99f7-dc2d6f9cf21a",
+                        "go": "45d1c326-d2bf-41aa-ac28-d13915cbfe63",
+                        "component_type": "OilPumperMatchmaker"
+                      },
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null
+                    }
+                  }
+                ],
+                "RemovedObjects": [
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "71109928-c386-495a-ab56-3a0dbe042e55"
+                    }
+                  },
+                  {
+                    "Id": {
+                      "Type": "Component",
+                      "IdValue": "57a32b26-c2d9-4157-b96c-7af7f48b9544"
+                    }
+                  }
+                ],
+                "PropertyOverrides": [
+                  {
+                    "Target": {
+                      "Type": "GameObject",
+                      "IdValue": "ceeff0b0-c1b9-4b36-b686-f612c5073e10"
+                    },
+                    "Property": "Position",
+                    "Value": "-97.4949036,0,1.44410706"
+                  },
+                  {
+                    "Target": {
+                      "Type": "GameObject",
+                      "IdValue": "ceeff0b0-c1b9-4b36-b686-f612c5073e10"
+                    },
+                    "Property": "Rotation",
+                    "Value": "0,0,-1,1.94707184E-07"
+                  }
+                ],
+                "MovedObjects": []
+              },
+              "__PrefabIdToInstanceId": {
+                "ceeff0b0-c1b9-4b36-b686-f612c5073e10": "e3225652-0333-4806-b979-6b4c24abf518",
+                "7a6b6bd9-5b2e-4d60-a1e1-905110d8ce39": "ef69df96-8efb-4e89-9456-e1b064fc6f63",
+                "48436164-af7b-422d-9f5f-1bac01e5951e": "1722224f-ed27-43e5-8052-c1caf26d5793",
+                "5ac03318-655c-42f5-9dda-1c9c1c646ae9": "ee6f1e15-f717-4821-bde8-f1a2f47d1664",
+                "1aa459a2-c31b-4087-b9cd-89af36bf547f": "b705ef57-5775-4a71-9ec8-bff389ee4d6a",
+                "b1b3f473-1902-4589-a69b-7ad30e3d3f0a": "aa58d8c1-1e5b-4409-937a-6b5046f723c0"
+              }
+            }
+          }
+        ],
+        "RemovedObjects": [
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "d1f8b4da-73c2-41d1-851d-91fac010a976"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "98dd1e95-d1e4-463d-95aa-1c3226283b88"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "0114ac65-91a4-450b-b978-094e414215e7"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "f2a4d2ef-1865-4586-b9b2-d8f40263508d"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "ca93858e-029e-41fc-906b-1aa8535eeee7"
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "03b67590-e688-4c2b-aeee-a508c789efe9"
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "36ab2af9-b741-4532-903f-9a9a4319a3ae"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "5f7e17df-0630-4a51-be55-f68d1fbcda97"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "6bd85831-5ad5-41bf-b58c-dab310771b12"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "70580348-12e9-4611-b87d-af4444cae4b5"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "4a2cd124-1f61-4901-a988-2a9b8d8e46d0"
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "82632fab-40c8-4185-9904-3381059d7304"
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "68e2c520-86ea-4188-b0a5-f65e4ce0c1c1"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "da284395-5b1a-43cb-9652-e25818473e12"
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "5356c5c1-5d94-41db-89fd-632b2fc04f89"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "870456ae-951d-4e9c-8d42-31dde096085d"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "9a78cd37-9378-436e-80d2-0de685f4b70f"
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "b194820e-b295-4174-8598-79249b0ca10d"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "5596cbd1-83cd-4e8e-9b38-1f0a1c1394c3"
+            }
+          },
+          {
+            "Id": {
+              "Type": "GameObject",
+              "IdValue": "5ea84dc8-7783-4ad6-9a0e-e50d301c8d0f"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "235a87d8-e5f3-47d8-9854-7f1a30c87576"
+            }
+          },
+          {
+            "Id": {
+              "Type": "Component",
+              "IdValue": "0873098d-8506-459a-802d-111173f32e93"
+            }
+          }
+        ],
+        "PropertyOverrides": [
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "a421d1dd-c3cc-4322-8520-b4047a25d706"
+            },
+            "Property": "Name",
+            "Value": "Oil Pumper"
+          },
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "a421d1dd-c3cc-4322-8520-b4047a25d706"
+            },
+            "Property": "Position",
+            "Value": "159.771988,17.1153793,32"
+          }
+        ],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "a421d1dd-c3cc-4322-8520-b4047a25d706": "5b757a10-c6b2-410a-89db-bc43c20a516e",
+        "8cb76e38-1da4-47c9-8429-5d219763a8a3": "0073b963-d2c8-471e-8435-582213c305cc",
+        "c16c7564-fa08-4b6b-ad8e-1824d5456732": "2f4f2450-abb4-480e-9bda-30596b0b1ec4",
+        "3292090e-7172-441c-9ec4-7b817d45b14a": "0caff7bb-cf5c-43f8-ab8a-352323fc3e07",
+        "4a8f811a-4af7-4625-9a1c-beee140d1d46": "ed43d856-8e9f-4775-a9b8-0cebc9c019fa",
+        "cbbe4051-b6d6-4b81-8ad0-6ce03404b600": "155af18a-0e45-4047-bcbf-044f5f6ee2e9",
+        "f39a3b9f-126e-4b0f-8b0e-9a74092c9295": "8ddb2283-c61e-4f09-816e-0ffab35b8113",
+        "7112fbcd-092b-4d11-b301-e7148cc2aded": "e33858e3-10fb-4044-b68a-30ef8ee1ae45",
+        "5cc18273-bb9b-4605-884c-b9b538c6cee9": "45d1c326-d2bf-41aa-ac28-d13915cbfe63",
+        "5b339530-c90c-475f-831a-b6556507fdce": "12047456-589e-4898-9c90-3b52ea8bea1f",
+        "d5d22ada-9664-4088-a32a-af06dd9eb720": "bd6e2608-dad6-4def-9898-5e5a1c038a8a",
+        "d29c02d0-9e4a-4e08-8778-7628ac23d9b7": "c9f34572-e6c9-49bd-848e-0c8a657e2805",
+        "3f12bc86-c101-444c-ab36-04c0f7d202a5": "7bcdcffa-f97d-46b6-99f7-dc2d6f9cf21a",
+        "d1f8b4da-73c2-41d1-851d-91fac010a976": "37aedecd-45dd-491c-a7cf-a9c6fc9646db",
+        "ca93858e-029e-41fc-906b-1aa8535eeee7": "302bdf9f-3fea-43ba-b790-1305d87925a0",
+        "98dd1e95-d1e4-463d-95aa-1c3226283b88": "ec833153-db37-44a5-bd94-c3a1b849c0a8",
+        "0114ac65-91a4-450b-b978-094e414215e7": "b29a8cae-b8f2-404c-8048-803998d3f448",
+        "f2a4d2ef-1865-4586-b9b2-d8f40263508d": "20251ae7-897f-479d-8102-3fc571205711",
+        "03b67590-e688-4c2b-aeee-a508c789efe9": "34458e8c-93bb-497d-8f80-fa7efebdb42f",
+        "36ab2af9-b741-4532-903f-9a9a4319a3ae": "1ccaa4aa-da7b-41d5-abff-01d4c37a8b2e",
+        "4a2cd124-1f61-4901-a988-2a9b8d8e46d0": "a83ff57b-0ee1-496f-abe1-a5afea9e1ae1",
+        "5f7e17df-0630-4a51-be55-f68d1fbcda97": "425b42c9-6c83-4acb-b5ee-c47a3e4d41f6",
+        "6bd85831-5ad5-41bf-b58c-dab310771b12": "c17951c1-98d0-47ee-b032-5a3d263962a1",
+        "70580348-12e9-4611-b87d-af4444cae4b5": "77d3de98-f5c2-4d7c-972c-a1255a63aff3",
+        "82632fab-40c8-4185-9904-3381059d7304": "b084392a-9c3e-4d90-915d-465a7e545a15",
+        "68e2c520-86ea-4188-b0a5-f65e4ce0c1c1": "d705e237-cd71-4b97-88a2-175744d1442a",
+        "9a78cd37-9378-436e-80d2-0de685f4b70f": "d0e5913b-4acd-4d1a-be15-1ee6bdaccb7b",
+        "da284395-5b1a-43cb-9652-e25818473e12": "4853d997-70c1-43b5-b57d-da3d95e06273",
+        "5356c5c1-5d94-41db-89fd-632b2fc04f89": "dc49d3ef-b38b-43cc-81ae-1774847f9240",
+        "870456ae-951d-4e9c-8d42-31dde096085d": "70999efa-6105-42b5-a57d-9dd6882f9681",
+        "b194820e-b295-4174-8598-79249b0ca10d": "e3225652-0333-4806-b979-6b4c24abf518",
+        "0873098d-8506-459a-802d-111173f32e93": "0afd868b-71dd-453e-96db-bffe216432c6",
+        "5596cbd1-83cd-4e8e-9b38-1f0a1c1394c3": "ef69df96-8efb-4e89-9456-e1b064fc6f63",
+        "5ea84dc8-7783-4ad6-9a0e-e50d301c8d0f": "ee6f1e15-f717-4821-bde8-f1a2f47d1664",
+        "235a87d8-e5f3-47d8-9854-7f1a30c87576": "b705ef57-5775-4a71-9ec8-bff389ee4d6a"
+      }
     },
     {
       "__guid": "e40f2532-2de5-4b9e-9180-2d728daa7c11",
@@ -1077,8 +1033,6 @@
   "ResourceVersion": 3,
   "Title": null,
   "Description": null,
-  "__references": [
-    "brax.plank#92373"
-  ],
+  "__references": [],
   "__version": 3
 }

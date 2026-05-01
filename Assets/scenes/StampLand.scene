@@ -1,0 +1,1139 @@
+{
+  "__guid": "7434c2d9-0ff0-4d3f-b44e-29bccc6d801a",
+  "GameObjects": [
+    {
+      "__guid": "c0645b65-8ffa-42ec-acfb-5640c875715b",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Camera",
+      "Position": "-43.5478363,112.751717,27.9517517",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "maincamera",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.CameraComponent",
+          "__guid": "72695638-1a36-41fc-bed8-bc7959e7efff",
+          "__enabled": true,
+          "Flags": 0,
+          "BackgroundColor": "0.33333,0.46275,0.52157,1",
+          "ClearFlags": "All",
+          "EnablePostProcessing": true,
+          "FieldOfView": 60,
+          "FovAxis": "Horizontal",
+          "IsMainCamera": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Orthographic": false,
+          "OrthographicHeight": 1204,
+          "PostProcessAnchor": null,
+          "Priority": 1,
+          "RenderExcludeTags": "",
+          "RenderTags": "",
+          "RenderTexture": null,
+          "TargetEye": "None",
+          "Viewport": "0,0,1,1",
+          "ZFar": 10000,
+          "ZNear": 10
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "085d16f4-40e7-4671-a989-4fca6a709d07",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Sun",
+      "Position": "-43.5478363,112.751717,27.9517517",
+      "Rotation": "0.0652633309,0.495722443,-0.113039412,0.858616531",
+      "Scale": "1,1,1",
+      "Tags": "light_directional,light",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "78211413-f3ad-4f9e-8d33-2f5daec9bf30",
+          "__enabled": true,
+          "Flags": 0,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "0.91373,0.98039,1,1",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0,0,0,0",
+          "Visualizer": {}
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "02c6f8c8-ad69-418a-b0ea-f9954c827f96",
+      "__version": 2,
+      "__Prefab": "prefabs/gamesavesystem.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "df2b829f-cfb7-4e38-85c7-5676c84e706c": "02c6f8c8-ad69-418a-b0ea-f9954c827f96",
+        "cb82f584-af11-4f68-8566-81a60545b986": "83b89977-32b8-4361-8406-70dc9c48cb79",
+        "8611e950-dee8-401f-950f-459361d63675": "be2d0a46-8577-4b5b-9823-833e2d9e2d8f"
+      }
+    },
+    {
+      "__guid": "135e7b08-5c9b-4e2b-b21a-0a9506506669",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "StampLandLogic",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "StampLandManager",
+          "__guid": "0dcea945-4376-46e0-8cde-f330250f5349",
+          "__enabled": true,
+          "Flags": 0,
+          "CubePrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/stampland/cube.prefab"
+          },
+          "GridSize": "100,100",
+          "GridSpacing": 64,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
+          "__type": "StampLandDebugManager",
+          "__guid": "985c1b0c-83c7-4e54-90f9-ce4128de10b0",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RunIdentityDiagnostics": false
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "2bcbbe33-1855-4fa6-aafb-cfcf278cb41f",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Spawn Points",
+      "Position": "0,0,161.806915",
+      "Rotation": "0,0,-1,1.94707184E-07",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sinvest.NetworkHelper",
+          "__guid": "a391010f-98b6-46d5-8280-d9a19082d289",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "PlayerPrefab": {
+            "_type": "gameobject",
+            "prefab": "templates/gameobject/player controller.prefab"
+          },
+          "SpawnPoints": [
+            {
+              "_type": "gameobject",
+              "go": "2bcbbe33-1855-4fa6-aafb-cfcf278cb41f"
+            }
+          ],
+          "StartServer": true
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "a29d9906-e342-4647-9086-7bb5685e2375",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "72.8226395,166.751953,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "6ec44160-8b7f-4aea-ab03-c377dc1451f2",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "32221199-b7a1-495e-b656-730dbe4a2c5b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "95.8289337,166.751953,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "8cd43423-d352-40c1-b556-8a8ab7c83a6e",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "76a95531-3c81-4c55-838b-971f7e489858",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "26.0599556,166.751984,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "e67061be-6df2-4e4a-922f-2b82291b9fab",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1c46a707-2ec7-4af2-a6c1-71269f544620",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "49.0662613,166.751953,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "0e183088-1c7b-410a-a4e1-dc9ed5cf00c8",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "4ac8cdcf-81ed-4e2c-a74b-8d5c5e562edc",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "72.8226166,115.819168,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "d00df04c-fd76-474c-bcda-a7b86335a21e",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "736e14e6-93c3-4643-8cc3-606f94b53a18",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "95.8289185,115.819168,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "d4fbc8f0-6610-4994-9533-18029000a1f5",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "956300c7-1152-4d4d-8b58-819f76b8a56c",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "26.0599365,115.819183,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "3d6aa2fa-f19a-4252-b403-3f153130a941",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f1daa529-ce2e-4b9f-9c11-45373ffb70f1",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "49.0662384,115.819183,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "18f13d73-a749-46c6-a3bd-7e964b6718b5",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "761f62b3-e013-4ca9-b648-c4b81581fe39",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "72.8226013,67.6829376,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "23971a50-dfb4-4dd3-9b93-c0e59f18d478",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "18a1b0ba-f8c6-431c-80f5-6bf13e577173",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "95.8289032,67.6829376,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "339f6510-b000-49fe-9cfb-d8b966344846",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "eb81db48-0d4f-42c3-a1e7-f568b16082f7",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "26.0599174,67.6829529,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "900ac3cd-a2ef-4ecb-aef4-3772f2615098",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "362ff38a-7c09-4bef-a3f5-19f015dfff9a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "49.0662155,67.6829529,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "e2b4b5ec-8a24-47b8-a7fe-e7d7c7a9d331",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "78dbea5d-2859-4a60-ba40-de7733f543af",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "72.8225861,26.9264793,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "814daf64-94e4-4368-a40c-efa05e30d702",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "8dac5b6a-aded-4f07-a2ee-a080c3cfda80",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "95.8288879,26.9264679,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "bc6de593-6508-4bd9-a3fd-73f33cf0f2b7",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "137b3c44-2428-45bb-9c23-ddf490c9d073",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "26.0599022,26.9264946,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "0769b5e5-680f-40eb-aa42-9c8bada53d72",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "490aab41-edda-4cfc-9c5e-96a769fa5a80",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "49.0662003,26.926487,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "10342b78-ba84-416c-834d-60265b516484",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "34c60003-f30f-4bf1-a3e8-47de220eaa36",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "72.8225555,-20.8795891,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "5c0dd2bc-de20-48fb-8166-41c87a58d8db",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "0bd072bf-e9c9-420b-b498-e2cb07ec6ef8",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "95.8288574,-20.8796005,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "4463bb85-1787-44fc-8557-f12eb27e55de",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e4e42703-2402-4e43-9b9e-142d364cacd0",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "26.0598831,-20.8795738,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "00a644c4-d913-4aa3-9eae-07f4afacf04e",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "655a7f3a-807c-43ef-819f-87c7eec6d59e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "49.066185,-20.8795815,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "b07decc6-a2ea-4638-8c8b-2bab08990176",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "af362574-732a-429a-9544-be8a56958ae6",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "72.8225555,-54.3121185,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "7111b132-eb78-493d-b3a3-8131bc5b9ca5",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "bd91c702-c941-4b44-a7aa-0373e9013601",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "95.8288574,-54.3121262,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "5c7830c2-68ed-403b-9919-b9d350c5dcab",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "146faf8a-2197-4e4b-8137-b6bc916839b4",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "26.0598679,-54.3120956,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "a9ad3a07-a7be-4b28-b1b3-c5e4c71b684a",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "020a5a4d-dcd6-4797-8e68-f1a780b30173",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "49.0661697,-54.3121109,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "b57db8fd-71c6-4b5c-adc4-67a0a59831de",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b94f52b2-a8f0-4c07-b082-71f915d2ea0f",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "72.8225403,-85.781189,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "990fea21-cefc-4c77-86dd-01088ef5a280",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "8ee5ae85-1259-4809-9379-c34b303685ce",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "95.8288422,-85.781189,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "f04108e0-b9bd-4e72-b094-0d7d97484449",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "190cf35a-88a0-48ca-aa82-7ee54e31ac8d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "26.0598564,-85.7811737,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "ea01bf6a-4db6-4b53-b29e-d670d8c483c7",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1054489b-5c6c-4fb3-89d5-808ce155453f",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "spawnpoint",
+          "Position": "49.0661621,-85.7811737,-146.289307",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpawnPoint",
+              "__guid": "9b1d3252-5f9f-4cbf-a19c-f1779e4c538c",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.8902,0.31765,0.05098,1",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        }
+      ]
+    }
+  ],
+  "SceneProperties": {
+    "NetworkInterpolation": true,
+    "TimeScale": 1,
+    "WantsSystemScene": true,
+    "Metadata": {},
+    "NavMesh": {
+      "Enabled": false,
+      "IncludeStaticBodies": true,
+      "IncludeKeyframedBodies": true,
+      "EditorAutoUpdate": false,
+      "AgentHeight": 64,
+      "AgentRadius": 16,
+      "AgentStepSize": 18,
+      "AgentMaxSlope": 40,
+      "ExcludedBodies": "",
+      "IncludedBodies": "",
+      "DeferGeneration": false,
+      "CustomBounds": false
+    },
+    "GameObjectSystems": {
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "0bf001c0-2b33-4c2d-a809-5326862a6898"
+        }
+      },
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      }
+    }
+  },
+  "ResourceVersion": 3,
+  "Title": null,
+  "Description": null,
+  "__references": [],
+  "__version": 3
+}

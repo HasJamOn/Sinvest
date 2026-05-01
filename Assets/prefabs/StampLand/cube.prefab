@@ -1,0 +1,225 @@
+{
+  "RootObject": {
+    "__guid": "f81bc5b9-3638-4032-aab9-686999f24ef3",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "cube",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "land",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "a190612f-3d0c-4673-9085-618a002fc2db",
+        "__enabled": true,
+        "Flags": 0,
+        "BodyGroups": 18446744073709551615,
+        "CreateAttachments": false,
+        "LodOverride": null,
+        "MaterialGroup": null,
+        "MaterialOverride": null,
+        "Materials": null,
+        "Model": "models/dev/box.vmdl",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "On",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "e4b1c7f7-4dcc-442c-8a43-e7573d58cd5c",
+        "__enabled": true,
+        "Flags": 0,
+        "Center": "0,0,0",
+        "ColliderFlags": 0,
+        "Elasticity": null,
+        "Friction": null,
+        "IsTrigger": false,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "OnObjectTriggerEnter": null,
+        "OnObjectTriggerExit": null,
+        "OnTriggerEnter": null,
+        "OnTriggerExit": null,
+        "RollingResistance": null,
+        "Scale": "64,64,64",
+        "Static": false,
+        "Surface": null,
+        "SurfaceVelocity": "0,0,0"
+      },
+      {
+        "__type": "StampLandCube",
+        "__guid": "6fae71ff-5c8e-433b-bd3c-cddfb56b4d6b",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Renderer": {
+          "_type": "component",
+          "component_id": "a190612f-3d0c-4673-9085-618a002fc2db",
+          "go": "f81bc5b9-3638-4032-aab9-686999f24ef3",
+          "component_type": "ModelRenderer"
+        },
+        "TextComponent": {
+          "_type": "component",
+          "component_id": "c127f1e2-dad2-43d4-a6a1-528e78cf84a5",
+          "go": "87866f65-a473-46ec-b4fd-fa6caebb318f",
+          "component_type": "TextRenderer"
+        }
+      },
+      {
+        "__type": "Sinvest.ModelScaler",
+        "__guid": "f52d085b-e6bc-4bd5-abc6-812f292a755a",
+        "__enabled": true,
+        "Flags": 0,
+        "ModelScale": "1.27999973,1.27999997,1.27999997",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "TargetRenderer": {
+          "_type": "component",
+          "component_id": "a190612f-3d0c-4673-9085-618a002fc2db",
+          "go": "f81bc5b9-3638-4032-aab9-686999f24ef3",
+          "component_type": "ModelRenderer"
+        }
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "87866f65-a473-46ec-b4fd-fa6caebb318f",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "Text",
+        "Position": "0,0,33.1544266",
+        "Rotation": "0,0.707106709,0,0.707106829",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.TextRenderer",
+            "__guid": "c127f1e2-dad2-43d4-a6a1-528e78cf84a5",
+            "__enabled": true,
+            "Flags": 0,
+            "__version": 2,
+            "BlendMode": "Normal",
+            "FogStrength": 1,
+            "HorizontalAlignment": "Center",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "Scale": 0.3,
+            "TextScope": {
+              "Text": "1",
+              "TextColor": "0.45103,0.47149,0.5297,1",
+              "FontName": "Poppins",
+              "FontSize": 64,
+              "FontWeight": 800,
+              "FontItalic": false,
+              "FontVariantNumeric": "Normal",
+              "LineHeight": 1,
+              "LetterSpacing": 0,
+              "WordSpacing": 0,
+              "FilterMode": "Bilinear",
+              "FontSmooth": "Auto",
+              "Outline": {
+                "Enabled": false,
+                "Size": 4,
+                "Color": "0,0,1,1"
+              },
+              "Shadow": {
+                "Enabled": false,
+                "Size": 4,
+                "Color": "0,0,0,1",
+                "Offset": "4,4"
+              },
+              "OutlineUnder": {
+                "Enabled": false,
+                "Size": 4,
+                "Color": "0,1,0,1"
+              },
+              "ShadowUnder": {
+                "Enabled": false,
+                "Size": 4,
+                "Color": "0,0,0,1",
+                "Offset": "4,4"
+              }
+            },
+            "VerticalAlignment": "Center"
+          }
+        ],
+        "Children": []
+      }
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": false,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}
