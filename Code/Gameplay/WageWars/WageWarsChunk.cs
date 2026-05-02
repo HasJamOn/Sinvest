@@ -1,15 +1,15 @@
 ﻿using Sandbox;
 using System.Collections.Generic;
 
-public sealed class StampLandChunk : Component
+public sealed class WageWarsChunk : Component
 {
 	[Property] public Vector2Int ChunkCoords { get; set; }
-	private List<StampLandCube> _cubes = new();
+	private List<WageWarsCube> _cubes = new();
 	private bool _isVisible = true;
 
 	protected override void OnStart()
 	{
-		_cubes.AddRange( Components.GetAll<StampLandCube>( FindMode.EverythingInSelfAndChildren ) );
+		_cubes.AddRange( Components.GetAll<WageWarsCube>( FindMode.EverythingInSelfAndChildren ) );
 	}
 
 	protected override void OnUpdate()

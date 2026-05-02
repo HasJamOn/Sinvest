@@ -2,7 +2,7 @@ using Sandbox;
 using System;
 using System.Threading.Tasks;
 
-public sealed class StampLandPlayer : Component
+public sealed class WageWarsPlayer : Component
 {
     [Property, Group( "Stuck Recovery" )] public float StuckCheckInterval { get; set; } = 0.5f;
     [Property, Group( "Stuck Recovery" )] public float StuckCheckRadius { get; set; } = 4f;
@@ -34,7 +34,7 @@ public sealed class StampLandPlayer : Component
 
 	    if ( tr.Hit && tr.GameObject.IsValid() )
 	    {
-		    var cube = tr.GameObject.Components.GetInAncestorsOrSelf<StampLandCube>();
+		    var cube = tr.GameObject.Components.GetInAncestorsOrSelf<WageWarsCube>();
 		    if ( cube.IsValid() )
 		    {
 			    // Send this character's unique GameObject.Id to the host
@@ -49,7 +49,7 @@ public sealed class StampLandPlayer : Component
         if ( !Networking.IsHost ) return;
         if ( !cubeObj.IsValid() ) return;
 
-        var cube = cubeObj.Components.Get<StampLandCube>();
+        var cube = cubeObj.Components.Get<WageWarsCube>();
         if ( cube.IsValid() )
         {
             cube.ProcessTouch( playerId );

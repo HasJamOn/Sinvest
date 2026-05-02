@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-public sealed class StampLandCube : Component
+public sealed class WageWarsCube : Component
 {
     [Sync] public Guid OwnerId { get; set; }
     [Sync] public int Value { get; set; } = 0;
@@ -76,7 +76,7 @@ public sealed class StampLandCube : Component
 	    Renderer.MaterialOverride = ActiveMaterial; 
 
 	    // 2. IDENTITY RESOLUTION
-	    var myCharacter = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+	    var myCharacter = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
     
 	    // If player isn't found, default to a neutral gray so it doesn't stay "stuck" red
 	    Color territoryColor = new Color( 0.5f, 0.5f, 0.5f, 1.0f );
@@ -169,7 +169,7 @@ public sealed class StampLandCube : Component
     // queue a second bounce for a player whose first bounce hasn't resolved yet.
     private void ApplyPhysicalPop( float force, bool isLabor )
     {
-	    var players = Scene.GetAllComponents<StampLandPlayer>();
+	    var players = Scene.GetAllComponents<WageWarsPlayer>();
 
 	    foreach ( var player in players )
 	    {
@@ -282,7 +282,7 @@ public sealed class StampLandCube : Component
         layer.Parent = GameObject;
         foreach ( var child in layer.Children.ToList() ) child.Destroy();
         layer.LocalPosition = Vector3.Up * ( Value * CubeHeight );
-        var script = layer.Components.Get<StampLandCube>();
+        var script = layer.Components.Get<WageWarsCube>();
         if ( script.IsValid() ) script.Destroy();
         var text = layer.Components.Get<TextRenderer>();
         if ( text.IsValid() ) text.Destroy();
@@ -309,7 +309,7 @@ public sealed class StampLandCube : Component
 		    {
 			    if ( x == 0 && y == 0 ) continue;
             
-			    var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+			    var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
             
 			    // Check if any neighbor is owned by the attacker and is strictly taller
 			    if ( neighbor != null && neighbor.OwnerId == attackerId && neighbor.Value >= requiredHeight )
@@ -327,7 +327,7 @@ public sealed class StampLandCube : Component
             for ( int y = -1; y <= 1; y++ )
             {
                 if ( x == 0 && y == 0 ) continue;
-                var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+                var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
                 if ( neighbor == null || neighbor.Value < requiredNeighborValue )
                     return false;
             }
@@ -343,7 +343,7 @@ public sealed class StampLandCube : Component
 		    for ( int y = -1; y <= 1; y++ )
 		    {
 			    if ( x == 0 && y == 0 ) continue;
-			    var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+			    var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
             
 			    if ( neighbor == null || neighbor.Value < requiredNeighborValue )
 			    {
@@ -360,7 +360,7 @@ public sealed class StampLandCube : Component
 	    if ( Value <= 1 ) return null;
 
 	    // Find the local player's ID instead of Connection.Local.Id
-	    var localPlayer = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+	    var localPlayer = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
 	    if ( localPlayer == null ) return null;
 	    var localId = localPlayer.GameObject.Id;
 
@@ -373,7 +373,7 @@ public sealed class StampLandCube : Component
 		    {
 			    if ( x == 0 && y == 0 ) continue;
             
-			    var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+			    var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
 			    if ( neighbor != null && neighbor.OwnerId == localId && neighbor.Value >= requiredHeight )
 			    {
 				    hasHighGround = true;

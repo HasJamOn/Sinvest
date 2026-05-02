@@ -1,9 +1,9 @@
 using Sandbox;
 using System.Collections.Generic;
 
-public sealed class StampLandManager : Component
+public sealed class WageWarsManager : Component
 {
-    public static StampLandManager Instance { get; private set; }
+    public static WageWarsManager Instance { get; private set; }
 
     [Property, Group("Prefabs")] public GameObject ChunkPrefab { get; set; }
     [Property, Group("Prefabs")] public GameObject CubePrefab { get; set; }
@@ -12,7 +12,7 @@ public sealed class StampLandManager : Component
     [Property, Group("Settings")] public Vector2Int ChunkSizeInCubes { get; set; } = new( 16, 16 );
     
     private const float CubeSize = 50f;
-    private Dictionary<Vector2Int, StampLandCube> _cubeMap = new();
+    private Dictionary<Vector2Int, WageWarsCube> _cubeMap = new();
 
     protected override void OnAwake()
     {
@@ -43,7 +43,7 @@ public sealed class StampLandManager : Component
               chunkObj.Parent = GameObject;
               chunkObj.LocalRotation = Rotation.Identity;
 
-              var chunkScript = chunkObj.Components.GetOrCreate<StampLandChunk>();
+              var chunkScript = chunkObj.Components.GetOrCreate<WageWarsChunk>();
               chunkScript.ChunkCoords = new Vector2Int( 
                  cx - (WorldSizeInChunks.x / 2), 
                  cy - (WorldSizeInChunks.y / 2) 
@@ -68,7 +68,7 @@ public sealed class StampLandManager : Component
                 cubeObj.LocalPosition = localPos;
                 cubeObj.LocalRotation = Rotation.Identity;
 
-                var cubeScript = cubeObj.Components.Get<StampLandCube>();
+                var cubeScript = cubeObj.Components.Get<WageWarsCube>();
                 if ( cubeScript.IsValid() )
                 {
                     // Calculate and store global grid coordinates
@@ -83,5 +83,5 @@ public sealed class StampLandManager : Component
         }
     }
 
-    public StampLandCube GetCubeAt( Vector2Int pos ) => _cubeMap.GetValueOrDefault( pos );
+    public WageWarsCube GetCubeAt( Vector2Int pos ) => _cubeMap.GetValueOrDefault( pos );
 }

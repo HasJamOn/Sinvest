@@ -40,7 +40,7 @@
 
 @code
 {
-    private StampLandCube _hoveredCube;
+    private WageWarsCube _hoveredCube;
     private TimeSince _timeSinceLastHit;
 
     bool IsVisible => _hoveredCube.IsValid() 
@@ -54,7 +54,7 @@
 		    if ( !_hoveredCube.IsValid() ) return false;
             
 		    // Look for our local character pawn[cite: 2]
-		    var myCharacter = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+		    var myCharacter = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
 		    return myCharacter != null && _hoveredCube.OwnerId == myCharacter.GameObject.Id;
 	    }
     }
@@ -92,7 +92,7 @@
 
         if ( tr.Hit && tr.GameObject.IsValid() )
         {
-            var cube = tr.GameObject.Components.GetInAncestorsOrSelf<StampLandCube>();
+            var cube = tr.GameObject.Components.GetInAncestorsOrSelf<WageWarsCube>();
             if ( cube.IsValid() )
             {
                 _hoveredCube = cube;

@@ -5,7 +5,7 @@ using Sandbox.Network;
 
 namespace Sinvest;
 
-public sealed class StampLandNetworkHelper : Component, Component.INetworkListener
+public sealed class WageWarsNetworkHelper : Component, Component.INetworkListener
 {
 	[Property] public bool StartServer { get; set; } = true;
 	[Property] public GameObject PlayerPrefab { get; set; }
@@ -22,7 +22,7 @@ public sealed class StampLandNetworkHelper : Component, Component.INetworkListen
 
 	public async void OnActive( Connection channel )
 	{
-		// Safety delay to ensure StampLandManager has finished generating the grid
+		// Safety delay to ensure WageWarsManager has finished generating the grid
 		await Task.DelayRealtimeSeconds( 0.5f );
 
 		if ( !PlayerPrefab.IsValid() ) return;

@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 
 [Group( "Sinvest" )]
-public sealed class StampLandDebugManager : Component
+public sealed class WageWarsDebugManager : Component
 {
     [Property] public bool ShowWorldLabels { get; set; } = true;
     [Property] public bool TraceInteractionRay { get; set; } = true;
@@ -14,7 +14,7 @@ public sealed class StampLandDebugManager : Component
 	    if ( !ShowWorldLabels ) return;
 
 	    // Visualizing Identity for all players in world-space
-	    foreach ( var player in Scene.GetAllComponents<StampLandPlayer>() )
+	    foreach ( var player in Scene.GetAllComponents<WageWarsPlayer>() )
 	    {
 		    var labelColor = player.IsProxy ? new Color( 1f, 0.4f, 0f, 1f ) : new Color( 0f, 1f, 0f, 1f );
 		    var labelText = player.IsProxy ? $"ENEMY: {player.GameObject.Name}" : "LOCAL PLAYER (YOU)";
@@ -31,7 +31,7 @@ public sealed class StampLandDebugManager : Component
 
 	    if ( tr.Hit && tr.GameObject.IsValid() )
 	    {
-		    var cube = tr.GameObject.Components.GetInAncestorsOrSelf<StampLandCube>();
+		    var cube = tr.GameObject.Components.GetInAncestorsOrSelf<WageWarsCube>();
 		    if ( cube.IsValid() )
 		    {
 			    if ( TraceInteractionRay )
@@ -53,7 +53,7 @@ public sealed class StampLandDebugManager : Component
     [Button( "Force Re-sync Local Character" )]
     public void ForceSync()
     {
-        var local = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+        var local = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
         if ( local != null )
         {
             Log.Info( $"[DEBUG] Local Character Confirmed: {local.GameObject.Name} ({local.GameObject.Id})" );
@@ -73,7 +73,7 @@ public sealed class StampLandDebugManager : Component
             return;
         }
 
-        foreach ( var cube in Scene.GetAllComponents<StampLandCube>() )
+        foreach ( var cube in Scene.GetAllComponents<WageWarsCube>() )
         {
             cube.Value = 0;
             cube.OwnerId = Guid.Empty;
