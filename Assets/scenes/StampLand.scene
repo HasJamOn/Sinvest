@@ -123,7 +123,7 @@
       },
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "02c6f8c8-ad69-418a-b0ea-f9954c827f96",
-        "aa15c81d-c854-4a65-bf3f-0f1a02f5b61c": "b6803f1f-35d9-4e3d-8cf1-5e7ddb33bf4b",
+        "6751785f-9019-491f-945e-c085e4b31105": "c16dd7cd-2f8f-476f-863f-d24a3b9356fb",
         "8611e950-dee8-401f-950f-459361d63675": "be2d0a46-8577-4b5b-9823-833e2d9e2d8f"
       }
     },
@@ -163,13 +163,14 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "WorldSizeInChunks": "2,2"
+          "WorldSizeInChunks": "8,8"
         },
         {
-          "__type": "StampLandDebugManager",
-          "__guid": "985c1b0c-83c7-4e54-90f9-ce4128de10b0",
+          "__type": "StampLandDebugger",
+          "__guid": "cf0057e8-9d7a-4326-aea0-d858e995e1f4",
           "__enabled": true,
           "Flags": 0,
+          "DiagnosticTraceRadius": 20,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -1136,6 +1137,11 @@
     "GameObjectSystems": {
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
+      },
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "3e9529c9-f621-401c-b5d4-6e575f4a2020"
+        }
       },
       "Sandbox.SelectionSetsSystem": {
         "Data": {

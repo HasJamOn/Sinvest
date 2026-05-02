@@ -74,9 +74,11 @@
         "__enabled": true,
         "Flags": 0,
         "AttackBounceScale": 0.3,
-        "BounceForce": 600,
+        "BounceDelay": 0.05,
+        "BounceForce": 450,
         "DetectionHeight": 40,
-        "NudgeAmount": 55,
+        "MaxRecoveryAttempts": 4,
+        "NudgeHeight": 70,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -89,6 +91,7 @@
           "go": "f81bc5b9-3638-4032-aab9-686999f24ef3",
           "component_type": "ModelRenderer"
         },
+        "StuckCheckRadius": 20,
         "TextComponent": {
           "_type": "component",
           "component_id": "c127f1e2-dad2-43d4-a6a1-528e78cf84a5",

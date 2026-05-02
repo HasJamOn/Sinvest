@@ -24,6 +24,12 @@ public sealed class StampLandCube : Component
     [Property, Group( "Physics Pop" )] public float BounceDelay { get; set; } = 0.05f;
     [Property, Group( "Physics Pop" )] public float DetectionHeight { get; set; } = 40f;
     [Property, Group( "Physics Pop" )] public float AttackBounceScale { get; set; } = 0.3f;
+    // How many extra nudges to attempt if the player is still inside geometry after
+    // the initial nudge. Each attempt waits another BounceDelay before re-checking.
+    [Property, Group( "Physics Pop" )] public int MaxRecoveryAttempts { get; set; } = 4;
+    // Sphere radius used to probe whether the player is clipped into solid geometry.
+    // Keep below 25 (half a cube side) so adjacent column walls don't cause false positives.
+    [Property, Group( "Physics Pop" )] public float StuckCheckRadius { get; set; } = 20f;
 
     private const float CubeHeight = 50f;
 
@@ -141,7 +147,9 @@ public sealed class StampLandCube : Component
 
     private async void ReleaseBounceGuardAsync( Guid playerId )
     {
-        await Task.DelayRealtimeSeconds( BounceDelay * 3f );
+        // Wait long enough for the full recovery sequence to complete:
+        // initial delay + up to MaxRecoveryAttempts re-nudge delays + one frame of margin.
+        await Task.DelayRealtimeSeconds( BounceDelay * (MaxRecoveryAttempts + 3) );
         _bouncingPlayers.Remove( playerId );
     }
 
@@ -181,13 +189,55 @@ public sealed class StampLandCube : Component
     private async void ApplyImpulseAfterDelay( Rigidbody rb, float force )
     {
         await Task.DelayRealtimeSeconds( BounceDelay );
-
-        // Guard: object may have been destroyed during the delay (e.g. player left).
         if ( !rb.IsValid() ) return;
 
-        rb.ApplyImpulse( Vector3.Up * force * rb.Mass );
+        // ── Stuck recovery ────────────────────────────────────────────────────────
+        // After the initial nudge the player should be floating above the new layer.
+        // On high-latency clients or during a rapid spawn, they can end up clipped
+        // into the geometry anyway. We probe their position each iteration and keep
+        // nudging upward until they're clear, or until we hit MaxRecoveryAttempts.
+        // This runs entirely on the owning client — no RPC needed, no host involvement.
+        for ( int attempt = 0; attempt < MaxRecoveryAttempts; attempt++ )
+        {
+            if ( !IsInsideGeometry( rb.GameObject ) ) break;
 
-        Log.Info( $"[POP] Deferred impulse applied ({force * rb.Mass} N)." );
+            Log.Info( $"[POP] Stuck detected (attempt {attempt + 1}/{MaxRecoveryAttempts}) — re-nudging." );
+
+            rb.GameObject.WorldPosition += Vector3.Up * NudgeHeight;
+            rb.Velocity = rb.Velocity.WithZ( 0f );
+
+            await Task.DelayRealtimeSeconds( BounceDelay );
+            if ( !rb.IsValid() ) return;
+        }
+
+        // Apply the final upward impulse. By this point the player is guaranteed to
+        // be (or have been nudged to be) outside solid geometry, so the full force
+        // translates into actual vertical velocity rather than being absorbed by a
+        // ground-contact constraint.
+        rb.ApplyImpulse( Vector3.Up * force * rb.Mass );
+        Log.Info( $"[POP] Bounce applied ({force * rb.Mass:F0} N)." );
+    }
+
+    // Runs on the owning client only (called from within the !IsProxy branch of BroadcastBounce).
+    // Uses a zero-length sphere trace: StartedSolid == true means the origin point
+    // is overlapping solid geometry — the exact definition of "stuck inside a block".
+    // StuckCheckRadius (default 20f) is kept well below 25 (half a cube side) so the
+    // probe doesn't accidentally reach into the walls of neighbouring columns.
+    private bool IsInsideGeometry( GameObject go )
+    {
+	    if ( !go.IsValid() ) return false;
+
+	    // Use a small radius and a vertical offset here as well.
+	    // This ensures the "post-bounce" check doesn't fail just because
+	    // the player is standing near a wall.
+	    var checkPos = go.WorldPosition + Vector3.Up * 35f;
+
+	    var tr = Scene.Trace
+		    .Sphere( 4f, checkPos, checkPos )
+		    .WithTag( "land" )
+		    .Run();
+
+	    return tr.StartedSolid;
     }
 
     private void SpawnVisualLayer()
