@@ -254,19 +254,26 @@ public sealed class StampLandCube : Component
 
     private bool CanAttack( Guid attackerId )
     {
-        if ( Value <= 1 ) return true;
-        int requiredSupportValue = Value - 1;
-        for ( int x = -1; x <= 1; x++ )
-        {
-            for ( int y = -1; y <= 1; y++ )
-            {
-                if ( x == 0 && y == 0 ) continue;
-                var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
-                if ( neighbor != null && neighbor.OwnerId == attackerId && neighbor.Value >= requiredSupportValue )
-                    return true;
-            }
-        }
-        return false;
+	    // Rule: Level 1 cubes can be claimed/attacked by anyone to ensure map flow
+	    if ( Value <= 1 ) return true;
+
+	    // Rule: To attack a Level N cube, you must have an adjacent cube that is at least Level N + 1
+	    int requiredHeight = Value + 1;
+
+	    for ( int x = -1; x <= 1; x++ )
+	    {
+		    for ( int y = -1; y <= 1; y++ )
+		    {
+			    if ( x == 0 && y == 0 ) continue;
+            
+			    var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+            
+			    // Check if any neighbor is owned by the attacker and is strictly taller
+			    if ( neighbor != null && neighbor.OwnerId == attackerId && neighbor.Value >= requiredHeight )
+				    return true;
+		    }
+	    }
+	    return false;
     }
 
     private bool CanUpgrade()
@@ -283,5 +290,58 @@ public sealed class StampLandCube : Component
             }
         }
         return true;
+    }
+    
+    public string GetUpgradeRequirement()
+    {
+	    int requiredNeighborValue = Value;
+	    for ( int x = -1; x <= 1; x++ )
+	    {
+		    for ( int y = -1; y <= 1; y++ )
+		    {
+			    if ( x == 0 && y == 0 ) continue;
+			    var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+            
+			    if ( neighbor == null || neighbor.Value < requiredNeighborValue )
+			    {
+				    return $"Surrounding tiles must be Level {requiredNeighborValue}";
+			    }
+		    }
+	    }
+	    return null; // All conditions met
+    }
+    
+    public string GetAttackRequirement()
+    {
+	    var localId = Connection.Local.Id;
+
+	    // Entry level cubes are always vulnerable
+	    if ( Value <= 1 ) return null;
+
+	    int requiredHeight = Value + 1;
+	    bool hasHighGround = false;
+
+	    for ( int x = -1; x <= 1; x++ )
+	    {
+		    for ( int y = -1; y <= 1; y++ )
+		    {
+			    if ( x == 0 && y == 0 ) continue;
+            
+			    var neighbor = StampLandManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+			    if ( neighbor != null && neighbor.OwnerId == localId && neighbor.Value >= requiredHeight )
+			    {
+				    hasHighGround = true;
+				    break;
+			    }
+		    }
+		    if ( hasHighGround ) break;
+	    }
+
+	    if ( !hasHighGround )
+	    {
+		    return $"Requires adjacent Level {requiredHeight} tower to siege";
+	    }
+
+	    return null;
     }
 }
