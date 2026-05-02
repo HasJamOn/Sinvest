@@ -1,0 +1,74 @@
+﻿@using Sandbox; 
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root class="@(IsVisible ? "visible" : "")">
+    @if ( _hoveredCube.IsValid() )
+    {
+       <div class="panel">
+          <div class="header">
+             <i class="icon">layers</i>
+             <div class="name">Cube [@_hoveredCube.GridPosition.x, @_hoveredCube.GridPosition.y]</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="actions">
+             <div class="action">
+                <label class="key">@Input.GetButtonOrigin( "use" ).ToUpper()</label>
+                <span class="text">@GetActionText()</span>
+             </div>
+          </div>
+       </div>
+    }
+</root>
+
+@code
+{
+    private StampLandCube _hoveredCube;
+    private TimeSince _timeSinceLastHit;
+
+    bool IsVisible => _hoveredCube.IsValid() 
+                      && _timeSinceLastHit < 0.1f 
+                      && !(SinvestOS.Instance?.IsOpen ?? false);
+
+    private string GetActionText()
+    {
+        if ( !_hoveredCube.IsValid() ) return "";
+        if ( _hoveredCube.Value == 0 ) return "Claim Territory";
+        
+        var localId = Connection.Local.Id;
+        return _hoveredCube.OwnerId == localId ? "Upgrade Layer" : "Attack Structure";
+    }
+
+    protected override void OnUpdate()
+    {
+        if ( IsProxy ) return;
+
+        // Trace from camera to find cubes
+        var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
+        var tr = Scene.Trace.Ray( ray, 150f )
+                    .WithTag( "land" )
+                    .Run();
+
+        if ( tr.Hit && tr.GameObject.IsValid() )
+        {
+            var cube = tr.GameObject.Components.GetInAncestorsOrSelf<StampLandCube>();
+            if ( cube.IsValid() )
+            {
+                _hoveredCube = cube;
+                _timeSinceLastHit = 0;
+            }
+        }
+
+        if ( _timeSinceLastHit > 0.15f )
+        {
+            _hoveredCube = null;
+        }
+
+        SetClass( "visible", IsVisible );
+    }
+
+    protected override int BuildHash() => System.HashCode.Combine( _hoveredCube?.Id, IsVisible );
+}

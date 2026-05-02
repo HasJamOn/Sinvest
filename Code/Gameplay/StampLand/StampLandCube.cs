@@ -124,23 +124,24 @@ public sealed class StampLandCube : Component
     // Called only on the host. Finds players standing on this cube and fires one
     // BroadcastBounce per player. The _bouncingPlayers guard ensures we never
     // queue a second bounce for a player whose first bounce hasn't resolved yet.
-    private void ApplyPhysicalPop( float force, bool shouldNudge )
+    private void ApplyPhysicalPop( float force, bool isLabor )
     {
-	    var bbox = GetDetectionBox();
-	    var players = Scene.GetAllComponents<PlayerController>();
+	    var players = Scene.GetAllComponents<StampLandPlayer>();
 
-	    foreach ( var controller in players )
+	    foreach ( var player in players )
 	    {
-		    if ( !bbox.Contains( controller.WorldPosition ) ) continue;
+		    // Is the player actually inside the block's future/current volume?
+		    // We use the player's own detection logic here.
+		    if ( !player.IsInsideGeometry() ) continue;
 
-		    Guid playerId = controller.GameObject.Id;
-
+		    Guid playerId = player.GameObject.Id;
 		    if ( _bouncingPlayers.Contains( playerId ) ) continue;
 
 		    _bouncingPlayers.Add( playerId );
         
-		    // Pass the shouldNudge flag to the Broadcast
-		    BroadcastBounce( playerId, shouldNudge ? NudgeHeight : 0f, force );
+		    // For Labor (Green), we nudge then bounce. 
+		    // For Attack (Red), we just bounce to keep them from falling through.
+		    BroadcastBounce( playerId, isLabor ? NudgeHeight : 0f, force );
 
 		    ReleaseBounceGuardAsync( playerId );
 	    }

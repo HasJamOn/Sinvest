@@ -163,7 +163,7 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "WorldSizeInChunks": "8,8"
+          "WorldSizeInChunks": "5,5"
         },
         {
           "__type": "StampLandDebugger",
@@ -1113,6 +1113,55 @@
           "Children": []
         }
       ]
+    },
+    {
+      "__guid": "765a5441-529e-484b-83a0-6a206b0408d0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "HUD",
+      "Position": "-47.3488007,38.0943909,18.4085846",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "3c3e52c0-c3c3-40e7-8ad4-f020b59175da",
+          "__enabled": true,
+          "Flags": 0,
+          "AutoScreenScale": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Opacity": 1,
+          "Scale": 1,
+          "ScaleStrategy": "ConsistentHeight",
+          "TargetCamera": null,
+          "ZIndex": 100
+        },
+        {
+          "__type": "Sandbox.StampLandTooltip",
+          "__guid": "861fdf86-82dc-4abd-8c30-31a2df2f6654",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
