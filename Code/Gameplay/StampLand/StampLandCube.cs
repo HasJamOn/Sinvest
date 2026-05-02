@@ -81,68 +81,69 @@ public sealed class StampLandCube : Component
 
     public void ProcessTouch( Guid playerId )
     {
-        if ( !Networking.IsHost ) return;
+	    if ( !Networking.IsHost ) return;
 
-        if ( Value == 0 )
-        {
-            OwnerId = playerId;
-            Value = 1;
-            ApplyPhysicalPop( BounceForce );
-            SpawnVisualLayer();
-        }
-        else if ( OwnerId == playerId )
-        {
-            if ( CanUpgrade() )
-            {
-                Value++;
-                ApplyPhysicalPop( BounceForce );
-                SpawnVisualLayer();
-            }
-        }
-        else
-        {
-            if ( CanAttack( playerId ) )
-            {
-                DespawnTopLayer();
-                Value--;
-                ApplyPhysicalPop( BounceForce * AttackBounceScale );
+	    if ( Value == 0 )
+	    {
+		    OwnerId = playerId;
+		    Value = 1;
+		    // New cube: Nudge + Bounce
+		    ApplyPhysicalPop( BounceForce, true ); 
+		    SpawnVisualLayer();
+	    }
+	    else if ( OwnerId == playerId )
+	    {
+		    if ( CanUpgrade() )
+		    {
+			    Value++;
+			    // Own cube upgrade: Nudge + Bounce
+			    ApplyPhysicalPop( BounceForce, true );
+			    SpawnVisualLayer();
+		    }
+	    }
+	    else
+	    {
+		    if ( CanAttack( playerId ) )
+		    {
+			    DespawnTopLayer();
+			    Value--;
+            
+			    // Red cube attack: Bounce ONLY (nudge = false)
+			    // This allows the player to stay at their current Z-level while the block drops.
+			    ApplyPhysicalPop( BounceForce * AttackBounceScale, false );
 
-                if ( Value <= 0 )
-                {
-                    Value = 0;
-                    OwnerId = Guid.Empty;
-                }
-            }
-        }
+			    if ( Value <= 0 )
+			    {
+				    Value = 0;
+				    OwnerId = Guid.Empty;
+			    }
+		    }
+	    }
     }
 
     // Called only on the host. Finds players standing on this cube and fires one
     // BroadcastBounce per player. The _bouncingPlayers guard ensures we never
     // queue a second bounce for a player whose first bounce hasn't resolved yet.
-    private void ApplyPhysicalPop( float force )
+    private void ApplyPhysicalPop( float force, bool shouldNudge )
     {
-        var bbox = GetDetectionBox();
-        var players = Scene.GetAllComponents<PlayerController>();
+	    var bbox = GetDetectionBox();
+	    var players = Scene.GetAllComponents<PlayerController>();
 
-        foreach ( var controller in players )
-        {
-            if ( !bbox.Contains( controller.WorldPosition ) ) continue;
+	    foreach ( var controller in players )
+	    {
+		    if ( !bbox.Contains( controller.WorldPosition ) ) continue;
 
-            Guid playerId = controller.GameObject.Id;
+		    Guid playerId = controller.GameObject.Id;
 
-            if ( _bouncingPlayers.Contains( playerId ) )
-            {
-                Log.Info( $"[POP] Bounce already in flight for {controller.GameObject.Name}, skipping." );
-                continue;
-            }
+		    if ( _bouncingPlayers.Contains( playerId ) ) continue;
 
-            _bouncingPlayers.Add( playerId );
-            BroadcastBounce( playerId, NudgeHeight, force );
+		    _bouncingPlayers.Add( playerId );
+        
+		    // Pass the shouldNudge flag to the Broadcast
+		    BroadcastBounce( playerId, shouldNudge ? NudgeHeight : 0f, force );
 
-            // Release the guard after the bounce has fully resolved.
-            // BounceDelay * 3 gives the deferred impulse time to fire plus a frame of margin.
-            ReleaseBounceGuardAsync( playerId );
-        }
+		    ReleaseBounceGuardAsync( playerId );
+	    }
     }
 
     private async void ReleaseBounceGuardAsync( Guid playerId )
@@ -157,33 +158,24 @@ public sealed class StampLandCube : Component
     // player-owning client actually modifies physics. The host and all other clients
     // skip out immediately, so there is no risk of double-application.
     [Rpc.Broadcast]
-    private void BroadcastBounce( Guid targetId, float nudgeHeight, float force )
+    private void BroadcastBounce( Guid targetId, float nudgeAmount, float force )
     {
-        var target = Scene.Directory.FindByGuid( targetId );
+	    var target = Scene.Directory.FindByGuid( targetId );
+	    if ( !target.IsValid() || target.IsProxy ) return;
 
-        // IsProxy == true on every peer except the one that owns this player object.
-        // This guarantees physics changes happen exactly once, on the right machine.
-        if ( !target.IsValid() || target.IsProxy ) return;
+	    var rb = target.Components.Get<Rigidbody>();
+	    if ( !rb.IsValid() ) return;
 
-        var rb = target.Components.Get<Rigidbody>();
-        if ( !rb.IsValid() ) return;
+	    // Apply the nudge only if nudgeAmount > 0
+	    if ( nudgeAmount > 0 )
+	    {
+		    target.WorldPosition += Vector3.Up * nudgeAmount;
+	    }
+    
+	    rb.Velocity = rb.Velocity.WithZ( 0f );
 
-        // ── Frame N ──────────────────────────────────────────────────────────────
-        // Move the player above the new surface. This is a direct position write,
-        // not a physics impulse, so it takes effect immediately regardless of
-        // ground-contact state. Zeroing Z velocity prevents downward momentum from
-        // fighting the upcoming impulse.
-        target.WorldPosition += Vector3.Up * nudgeHeight;
-        rb.Velocity = rb.Velocity.WithZ( 0f );
-
-        // ── Frame N+1 ─────────────────────────────────────────────────────────────
-        // Defer the impulse so the physics engine has one full tick to register the
-        // new position (no ground contact). Applying force in the same frame as the
-        // nudge risks the engine still considering the player grounded, which would
-        // absorb part of the upward impulse.
-        ApplyImpulseAfterDelay( rb, force );
-
-        Log.Info( $"[POP] Nudge applied to {target.Name}. Impulse pending in {BounceDelay}s." );
+	    // Apply impulse after the same delay to ensure physics sync
+	    ApplyImpulseAfterDelay( rb, force );
     }
 
     private async void ApplyImpulseAfterDelay( Rigidbody rb, float force )
