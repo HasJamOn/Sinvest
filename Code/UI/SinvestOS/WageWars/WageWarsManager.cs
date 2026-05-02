@@ -6,10 +6,10 @@ public sealed class WageWarsManager : Component
     public static WageWarsManager Instance { get; private set; }
 
     [Property, Group("Prefabs")] public GameObject ChunkPrefab { get; set; }
-    [Property, Group("Prefabs")] public GameObject CubePrefab { get; set; }
+    [Property, Group("Prefabs")] public GameObject CubePrefab  { get; set; }
 
     [Property, Group("Settings")] public Vector2Int WorldSizeInChunks { get; set; } = new( 5, 5 );
-    [Property, Group("Settings")] public Vector2Int ChunkSizeInCubes { get; set; } = new( 16, 16 );
+    [Property, Group("Settings")] public Vector2Int ChunkSizeInCubes  { get; set; } = new( 16, 16 );
     
     private const float CubeSize = 50f;
     private Dictionary<Vector2Int, WageWarsCube> _cubeMap = new();
@@ -22,13 +22,18 @@ public sealed class WageWarsManager : Component
     protected override void OnStart()
     {
         if ( !Networking.IsHost ) return;
+
         GenerateWorld();
+
+        // Restore cube ownership from the previous session (if a save exists).
+        // LoadWorld() is a no-op when no save file is present, so this is always safe.
+        WageWarsWorldSave.Instance?.LoadWorld();
     }
 
     public void GenerateWorld()
     {
-        float stride = ChunkSizeInCubes.x * CubeSize;
-        float totalWidth = WorldSizeInChunks.x * stride;
+        float stride      = ChunkSizeInCubes.x * CubeSize;
+        float totalWidth  = WorldSizeInChunks.x * stride;
         float totalHeight = WorldSizeInChunks.y * stride;
         Vector3 centerOffset = new Vector3( totalWidth / 2f, totalHeight / 2f, 0 );
 
@@ -39,7 +44,7 @@ public sealed class WageWarsManager : Component
               Vector3 chunkPos = WorldPosition + new Vector3( cx * stride, cy * stride, 0 ) - centerOffset;
             
               var chunkObj = ChunkPrefab.Clone( chunkPos );
-              chunkObj.Name = $"Chunk_{cx}_{cy}";
+              chunkObj.Name   = $"Chunk_{cx}_{cy}";
               chunkObj.Parent = GameObject;
               chunkObj.LocalRotation = Rotation.Identity;
 
@@ -49,7 +54,6 @@ public sealed class WageWarsManager : Component
                  cy - (WorldSizeInChunks.y / 2) 
               );
 
-              // Pass the loop indices to calculate global grid positions
               FillChunk( chunkObj, cx, cy );
               chunkObj.NetworkSpawn();
            }
@@ -64,20 +68,19 @@ public sealed class WageWarsManager : Component
             {
                 Vector3 localPos = new Vector3( x * CubeSize, y * CubeSize, 0 );
                 var cubeObj = CubePrefab.Clone();
-                cubeObj.Parent = parent;
+                cubeObj.Parent        = parent;
                 cubeObj.LocalPosition = localPos;
                 cubeObj.LocalRotation = Rotation.Identity;
 
                 var cubeScript = cubeObj.Components.Get<WageWarsCube>();
                 if ( cubeScript.IsValid() )
                 {
-                    // Calculate and store global grid coordinates
                     Vector2Int gridPos = new Vector2Int( 
                         (cx * ChunkSizeInCubes.x) + x, 
                         (cy * ChunkSizeInCubes.y) + y 
                     );
                     cubeScript.GridPosition = gridPos;
-                    _cubeMap[gridPos] = cubeScript;
+                    _cubeMap[gridPos]       = cubeScript;
                 }
             }
         }

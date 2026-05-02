@@ -5,7 +5,7 @@
   "Decibels": 70,
   "SelectionMode": "Random",
   "Sounds": [
-    "sounds/stampland/stampland_attack.vsnd"
+    "sounds/wagewars/wagewars_place.vsnd"
   ],
   "Occlusion": true,
   "AirAbsorption": true,

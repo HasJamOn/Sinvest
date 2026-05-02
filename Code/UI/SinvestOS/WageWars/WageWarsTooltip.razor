@@ -9,7 +9,6 @@
     @if ( _hoveredCube.IsValid() )
     {
        <div class="panel">
-          @* Added dynamic 'hostile' class to trigger SCSS red theme *@
           <div class="header @(IsOwner || _hoveredCube.OwnerId == Guid.Empty ? "" : "hostile")">
              <i class="icon">@(IsOwner ? "layers" : "swords")</i>
              <div class="name">@(_hoveredCube.OwnerId == Guid.Empty ? "Unclaimed" : IsOwner ? "Your Territory" : "Hostile Tile")</div>
@@ -29,7 +28,17 @@
           <div class="divider"></div>
 
           <div class="actions">
-             <div class="action @(CanPerformAction() ? "" : "disabled")">
+             @* Share Cost Indicator *@
+             <div class="cost-info @(CanAfford ? "can-afford" : "too-expensive")">
+                <i class="icon">rebase_edit</i>
+                <span class="cost-text">Cost: 1 Share</span>
+                @if (!CanAfford)
+                {
+                   <span class="balance-warning">(Need more shares)</span>
+                }
+             </div>
+
+             <div class="action @(CanPerformAction() && CanAfford ? "" : "disabled")">
                 <label class="key">@Input.GetButtonOrigin( "use" ).ToUpper()</label>
                 <span class="text">@GetActionText()</span>
              </div>
@@ -42,6 +51,7 @@
 {
     private WageWarsCube _hoveredCube;
     private TimeSince _timeSinceLastHit;
+    private const int LaborCost = 1;
 
     bool IsVisible => _hoveredCube.IsValid() 
                       && _timeSinceLastHit < 0.1f 
@@ -49,35 +59,38 @@
 
     bool IsOwner 
     {
-	    get 
-	    {
-		    if ( !_hoveredCube.IsValid() ) return false;
-            
-		    // Look for our local character pawn[cite: 2]
-		    var myCharacter = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
-		    return myCharacter != null && _hoveredCube.OwnerId == myCharacter.GameObject.Id;
-	    }
+        get 
+        {
+           if ( !_hoveredCube.IsValid() ) return false;
+           var myCharacter = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
+           return myCharacter != null && _hoveredCube.OwnerId == myCharacter.GameObject.Id;
+        }
+    }
+
+    /// <summary>
+    /// Pulls live share data from the EconomyManager to check affordability.
+    /// </summary>
+    bool CanAfford
+    {
+        get
+        {
+            if (EconomyManager.Instance == null) return false;
+            return EconomyManager.Instance.CurrentShares >= LaborCost;
+        }
     }
     
     private string GetWarningText()
     {
         if ( !_hoveredCube.IsValid() ) return null;
-        
-        // This will now correctly return "Requires adjacent Level X tower to siege"
-        // based on our new C# logic in the Cube script.
         return IsOwner ? _hoveredCube.GetUpgradeRequirement() : _hoveredCube.GetAttackRequirement();
     }
 
-    private bool CanPerformAction()
-    {
-        return string.IsNullOrEmpty(GetWarningText());
-    }
+    private bool CanPerformAction() => string.IsNullOrEmpty(GetWarningText());
 
     private string GetActionText()
     {
         if ( !_hoveredCube.IsValid() ) return "";
         if ( _hoveredCube.Value == 0 ) return "Claim Territory";
-        
         return IsOwner ? "Upgrade Layer" : "Attack Structure";
     }
 
@@ -86,9 +99,7 @@
         if ( IsProxy ) return;
 
         var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
-        var tr = Scene.Trace.Ray( ray, 150f )
-                    .WithTag( "land" )
-                    .Run();
+        var tr = Scene.Trace.Ray( ray, 150f ).WithTag( "land" ).Run();
 
         if ( tr.Hit && tr.GameObject.IsValid() )
         {
@@ -100,14 +111,11 @@
             }
         }
 
-        if ( _timeSinceLastHit > 0.15f )
-        {
-            _hoveredCube = null;
-        }
+        if ( _timeSinceLastHit > 0.15f ) _hoveredCube = null;
 
-        // BuildHash will handle the UI re-render when GetWarningText changes
         SetClass( "visible", IsVisible );
     }
 
-    protected override int BuildHash() => System.HashCode.Combine( _hoveredCube?.Id, _hoveredCube?.Value, IsVisible, GetWarningText() );
+    // Hash includes CanAfford so the UI refreshes if the player gains/loses shares
+    protected override int BuildHash() => System.HashCode.Combine( _hoveredCube?.Id, _hoveredCube?.Value, IsVisible, GetWarningText(), CanAfford );
 }

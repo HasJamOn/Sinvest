@@ -1,0 +1,12 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "shaders/wagewars/wagewarscube.shader"
+
+	side "shaders/wagewars/moneypalletside.png"
+	top "shaders/wagewars/moneypallettop.png"
+
+	//---- Fog ----
+	g_bFogEnabled "1"
+}

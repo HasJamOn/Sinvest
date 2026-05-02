@@ -1,4 +1,4 @@
-﻿StampLandTooltip {
+﻿WageWarsTooltip {
   position: absolute;
   top: 0;
   left: 0;
@@ -10,11 +10,8 @@
   pointer-events: none;
 
   .panel {
-    // Offset from center crosshair using margin per constraints
     margin-top: 120px;
-
     background-color: rgba(255, 255, 255, 0.98);
-    // Border: width style color shorthand only
     border: 1.5px solid rgba(0, 0, 0, 1);
     border-radius: 2px;
     padding: 8px 12px;
@@ -22,10 +19,7 @@
     max-width: 260px;
     display: flex;
     flex-direction: column;
-    // Single box-shadow only
     box-shadow: 0 4px 0px rgba(0, 0, 0, 1);
-
-    // Initial Hidden State
     opacity: 0;
     transition: opacity 0.15s ease-out;
 
@@ -36,7 +30,7 @@
       .icon {
         color: rgba(0, 0, 0, 1);
         font-size: 18px;
-        margin-right: 6px; // Replaces gap
+        margin-right: 6px;
       }
 
       .name {
@@ -47,7 +41,6 @@
         text-transform: uppercase;
       }
 
-      // Visual feedback for hostile targets
       &.hostile {
         .icon, .name {
           color: rgba(220, 40, 40, 1);
@@ -60,7 +53,6 @@
       color: rgba(0, 0, 0, 0.6);
       margin-top: 2px;
 
-      // Requirement/Warning feedback
       &.warning {
         color: rgba(220, 40, 40, 1);
         font-weight: 700;
@@ -77,20 +69,63 @@
     }
 
     .actions {
+      display: flex;
+      flex-direction: column;
+
+      // New: Share Cost Display
+      .cost-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 6px;
+
+        .icon {
+          font-size: 14px;
+          margin-right: 4px;
+          color: rgba(0, 0, 0, 0.7);
+        }
+
+        .cost-text {
+          font-size: 10px;
+          font-weight: 600;
+          color: rgba(0, 0, 0, 0.7);
+          text-transform: uppercase;
+        }
+
+        .balance-warning {
+          font-size: 9px;
+          margin-left: 6px;
+          font-weight: 800;
+          color: rgba(220, 40, 40, 1);
+        }
+
+        // Affordable state
+        &.can-afford {
+          .icon, .cost-text {
+            color: rgba(40, 160, 40, 1);
+          }
+        }
+
+        // Insufficient funds state
+        &.too-expensive {
+          .icon, .cost-text {
+            color: rgba(220, 40, 40, 1);
+          }
+        }
+      }
+
       .action {
         display: flex;
         align-items: center;
 
-        // Feedback when conditions aren't met
         &.disabled {
-          opacity: 0.4;
+          opacity: 0.3; // Deeper fade for missing requirements/funds
 
           .key {
-            background-color: rgba(120, 120, 120, 1);
+            background-color: rgba(180, 180, 180, 1);
           }
 
           .text {
-            color: rgba(0, 0, 0, 0.5);
+            color: rgba(0, 0, 0, 0.4);
           }
         }
 
@@ -101,7 +136,7 @@
           padding: 1px 5px;
           font-weight: 800;
           font-size: 10px;
-          margin-right: 8px; // Replaces gap
+          margin-right: 8px;
         }
 
         .text {
@@ -114,7 +149,6 @@
     }
   }
 
-  // Set via SetClass("visible", bool) in C#
   &.visible .panel {
     opacity: 1;
   }

@@ -123,7 +123,7 @@
       },
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "02c6f8c8-ad69-418a-b0ea-f9954c827f96",
-        "a1e59aec-9fcd-4495-894b-8d2dd3963f10": "b2145be0-04ff-428c-b77b-c7e94f6d3e57",
+        "8a6bce3b-6539-40ff-9733-bc17486a79f4": "863afd25-4113-4dcf-8d2c-7e42c269fedc",
         "8611e950-dee8-401f-950f-459361d63675": "be2d0a46-8577-4b5b-9823-833e2d9e2d8f"
       }
     },
@@ -144,18 +144,18 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "StampLandManager",
-          "__guid": "0dcea945-4376-46e0-8cde-f330250f5349",
+          "__type": "WageWarsManager",
+          "__guid": "525fa793-e472-4b69-989e-53c8ab2fa9fb",
           "__enabled": true,
           "Flags": 0,
           "ChunkPrefab": {
             "_type": "gameobject",
-            "prefab": "prefabs/stampland/stamplandchunk.prefab"
+            "prefab": "prefabs/wagewars/wagewarschunk.prefab"
           },
-          "ChunkSizeInCubes": "8,8",
+          "ChunkSizeInCubes": "16,16",
           "CubePrefab": {
             "_type": "gameobject",
-            "prefab": "prefabs/stampland/cube.prefab"
+            "prefab": "prefabs/wagewars/wagewarscube.prefab"
           },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -185,8 +185,8 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Sinvest.StampLandNetworkHelper",
-          "__guid": "a391010f-98b6-46d5-8280-d9a19082d289",
+          "__type": "Sinvest.WageWarsNetworkHelper",
+          "__guid": "84c47c80-0804-4c4e-941b-64b15cc46f3f",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
@@ -1136,8 +1136,8 @@
           "ZIndex": 100
         },
         {
-          "__type": "Sandbox.StampLandTooltip",
-          "__guid": "861fdf86-82dc-4abd-8c30-31a2df2f6654",
+          "__type": "Sandbox.WageWarsTooltip",
+          "__guid": "5bed9171-a6c6-4dde-9af5-406d7db45917",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
@@ -1171,6 +1171,9 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
@@ -1180,9 +1183,6 @@
         "Storage": {
           "$blob": "3e9529c9-f621-401c-b5d4-6e575f4a2020"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },

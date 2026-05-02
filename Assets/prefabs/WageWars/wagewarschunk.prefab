@@ -3,7 +3,7 @@
     "__guid": "a50ea8a1-3ba8-49c4-88c5-533d35db1a4b",
     "__version": 2,
     "Flags": 0,
-    "Name": "StampLandChunk",
+    "Name": "stamplandchunk",
     "Position": "0,0,0",
     "Rotation": "0,0,0,1",
     "Scale": "1,1,1",
@@ -16,8 +16,8 @@
     "OwnerTransfer": 1,
     "Components": [
       {
-        "__type": "StampLandChunk",
-        "__guid": "35798942-3e20-49ea-811f-e6395098dd85",
+        "__type": "WageWarsChunk",
+        "__guid": "381998e6-c517-44d4-861d-de3b0c71ecb3",
         "__enabled": true,
         "Flags": 0,
         "ChunkCoords": "0,0",
@@ -29,7 +29,28 @@
         "OnComponentUpdate": null
       }
     ],
-    "Children": []
+    "Children": [],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": false,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
+      }
+    },
+    "__variables": []
   },
   "ResourceVersion": 2,
   "ShowInMenu": false,
