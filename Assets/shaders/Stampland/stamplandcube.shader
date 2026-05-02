@@ -82,6 +82,7 @@ PS
 	Texture2D g_ttop < Channel( RGBA, Box( top ), Srgb ); OutputFormat( DXT5 ); SrgbRead( True ); >;
 	TextureAttribute( LightSim_DiffuseAlbedoTexture, g_ttop )
 	TextureAttribute( RepresentativeTexture, g_ttop )
+	float4 g_vOwnerColor < Attribute( "OwnerColor" ); Default4( 1.00, 1.00, 1.00, 1.00 ); >;
 	
 	float4 MainPs( PixelInput i ) : SV_Target0
 	{
@@ -106,8 +107,10 @@ PS
 		float l_6 = i.vNormalWs.z;
 		float l_7 = step( 0.9, l_6 );
 		float4 l_8 = lerp( l_0, l_5, l_7 );
+		float4 l_9 = g_vOwnerColor;
+		float4 l_10 = lerp( l_8, l_9, 0.11099918 );
 		
-		m.Albedo = l_8.xyz;
+		m.Albedo = l_10.xyz;
 		m.Opacity = 1;
 		m.Roughness = 1;
 		m.Metalness = 0;

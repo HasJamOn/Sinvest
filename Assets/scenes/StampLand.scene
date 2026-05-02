@@ -55,7 +55,7 @@
       "Flags": 0,
       "Name": "Sun",
       "Position": "-43.5478363,112.751717,27.9517517",
-      "Rotation": "0.0652633309,0.495722443,-0.113039412,0.858616531",
+      "Rotation": "-0.469846547,0.171010137,0.813797534,0.2961981",
       "Scale": "1,1,1",
       "Tags": "light_directional,light",
       "Enabled": true,
@@ -81,8 +81,8 @@
           "OnComponentUpdate": null,
           "ShadowBias": 0.0005,
           "ShadowCascadeCount": 4,
-          "ShadowCascadeSplitRatio": 0.91,
-          "ShadowHardness": 0,
+          "ShadowCascadeSplitRatio": 0.77120316,
+          "ShadowHardness": 0.83234715,
           "Shadows": true,
           "SkyColor": "0,0,0,0",
           "Visualizer": {}
@@ -123,7 +123,7 @@
       },
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "02c6f8c8-ad69-418a-b0ea-f9954c827f96",
-        "6751785f-9019-491f-945e-c085e4b31105": "c16dd7cd-2f8f-476f-863f-d24a3b9356fb",
+        "a1e59aec-9fcd-4495-894b-8d2dd3963f10": "b2145be0-04ff-428c-b77b-c7e94f6d3e57",
         "8611e950-dee8-401f-950f-459361d63675": "be2d0a46-8577-4b5b-9823-833e2d9e2d8f"
       }
     },
@@ -152,7 +152,7 @@
             "_type": "gameobject",
             "prefab": "prefabs/stampland/stamplandchunk.prefab"
           },
-          "ChunkSizeInCubes": "16,16",
+          "ChunkSizeInCubes": "8,8",
           "CubePrefab": {
             "_type": "gameobject",
             "prefab": "prefabs/stampland/cube.prefab"
@@ -164,19 +164,6 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "WorldSizeInChunks": "5,5"
-        },
-        {
-          "__type": "StampLandDebugger",
-          "__guid": "cf0057e8-9d7a-4326-aea0-d858e995e1f4",
-          "__enabled": true,
-          "Flags": 0,
-          "DiagnosticTraceRadius": 20,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null
         }
       ],
       "Children": []
@@ -1184,18 +1171,18 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
       },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "3e9529c9-f621-401c-b5d4-6e575f4a2020"
         }
       },
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
-        }
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

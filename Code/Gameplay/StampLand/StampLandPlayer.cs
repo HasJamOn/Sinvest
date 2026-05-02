@@ -29,18 +29,18 @@ public sealed class StampLandPlayer : Component
 
     private void TryPerformLabor()
     {
-        var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
-        var tr = Scene.Trace.Ray( ray, 150f ).WithTag( "land" ).Run();
+	    var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
+	    var tr = Scene.Trace.Ray( ray, 150f ).WithTag( "land" ).Run();
 
-        if ( tr.Hit && tr.GameObject.IsValid() )
-        {
-            var cube = tr.GameObject.Components.GetInAncestorsOrSelf<StampLandCube>();
-            if ( cube.IsValid() )
-            {
-                // Send the command to the host
-                NotifyHostOfLabor( cube.GameObject, Connection.Local.Id );
-            }
-        }
+	    if ( tr.Hit && tr.GameObject.IsValid() )
+	    {
+		    var cube = tr.GameObject.Components.GetInAncestorsOrSelf<StampLandCube>();
+		    if ( cube.IsValid() )
+		    {
+			    // Send this character's unique GameObject.Id to the host
+			    NotifyHostOfLabor( cube.GameObject, GameObject.Id ); 
+		    }
+	    }
     }
 
     [Rpc.Broadcast]

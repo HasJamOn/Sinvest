@@ -1,103 +1,83 @@
 using Sandbox;
 using System;
 using System.Linq;
-using System.Collections.Generic;
 
 [Group( "Sinvest" )]
-public sealed class StampLandDebugger : Component
+public sealed class StampLandDebugManager : Component
 {
-    [Property, Group("Settings")] public float DiagnosticTraceRadius { get; set; } = 22f;
+    [Property] public bool ShowWorldLabels { get; set; } = true;
+    [Property] public bool TraceInteractionRay { get; set; } = true;
+    [Property] public bool LogOwnershipChanges { get; set; } = true;
 
-    [Button( "Generate Comprehensive Global Report" )]
-    public void RunGlobalStuckDiagnostic()
+    protected override void OnUpdate()
     {
-        // 1. GATHER ALL POTENTIAL PLAYER OBJECTS
-        // We look for your logic script, the engine script, and the 'player' tag.
-        var playerComponents = Scene.GetAllComponents<StampLandPlayer>().Select( x => x.GameObject );
-        var engineControllers = Scene.GetAllComponents<PlayerController>().Select( x => x.GameObject );
-        var taggedPlayers = Scene.GetAllObjects( true ).Where( x => x.Tags.Has( "player" ) );
+	    if ( !ShowWorldLabels ) return;
 
-        // Combine, unique-ify, and filter out nulls
-        var allPlayerObjects = playerComponents
-            .Concat( engineControllers )
-            .Concat( taggedPlayers )
-            .Where( x => x.IsValid() )
-            .Distinct()
-            .ToList();
+	    // Visualizing Identity for all players in world-space
+	    foreach ( var player in Scene.GetAllComponents<StampLandPlayer>() )
+	    {
+		    var labelColor = player.IsProxy ? new Color( 1f, 0.4f, 0f, 1f ) : new Color( 0f, 1f, 0f, 1f );
+		    var labelText = player.IsProxy ? $"ENEMY: {player.GameObject.Name}" : "LOCAL PLAYER (YOU)";
+        
+		    // FIX: Wrap Vector3 in a Transform
+		    Gizmo.Draw.Color = labelColor;
+		    var textPos = player.WorldPosition + Vector3.Up * 80f;
+		    Gizmo.Draw.Text( $"{labelText}\nID: {player.GameObject.Id}", new Transform( textPos ) );
+	    }
 
-        if ( !allPlayerObjects.Any() )
+	    // Draw Cube Ownership stats on hover
+	    var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
+	    var tr = Scene.Trace.Ray( ray, 500f ).WithTag( "land" ).Run();
+
+	    if ( tr.Hit && tr.GameObject.IsValid() )
+	    {
+		    var cube = tr.GameObject.Components.GetInAncestorsOrSelf<StampLandCube>();
+		    if ( cube.IsValid() )
+		    {
+			    if ( TraceInteractionRay )
+			    {
+				    Gizmo.Draw.Color = new Color( 1f, 1f, 1f, 0.5f );
+				    Gizmo.Draw.Line( ray.Position, tr.HitPosition );
+			    }
+
+			    string ownerDisplay = cube.OwnerId == Guid.Empty ? "NEUTRAL" : $"OWNER: {cube.OwnerId}";
+			    Gizmo.Draw.Color = Color.White;
+            
+			    // FIX: Wrap Vector3 in a Transform
+			    var cubeTextPos = tr.HitPosition + Vector3.Up * 20f;
+			    Gizmo.Draw.Text( $"CUBE DATA:\n{ownerDisplay}\nLevel: {cube.Value}", new Transform( cubeTextPos ) );
+		    }
+	    }
+    }
+
+    [Button( "Force Re-sync Local Character" )]
+    public void ForceSync()
+    {
+        var local = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+        if ( local != null )
         {
-            Log.Error( "--- [ DIAGNOSTIC FAILED ] ---" );
-            Log.Warning( "CRITICAL: No players detected in the scene hierarchy." );
-            Log.Info( "REASON: Your prefab might not have the 'player' tag or the scripts are missing." );
+            Log.Info( $"[DEBUG] Local Character Confirmed: {local.GameObject.Name} ({local.GameObject.Id})" );
+        }
+        else
+        {
+            Log.Warning( "[DEBUG] No local character found! Check NetworkHelper spawning." );
+        }
+    }
+
+    [Button( "Clear All Ownership (HOST ONLY)" )]
+    public void ResetMap()
+    {
+        if ( !Networking.IsHost )
+        {
+            Log.Error( "[DEBUG] Only the Host can reset map state." );
             return;
         }
 
-        Log.Info( $"=== [ GLOBAL STUCK REPORT - {allPlayerObjects.Count} PLAYERS ] ===" );
-
-        foreach ( var playerObj in allPlayerObjects )
+        foreach ( var cube in Scene.GetAllComponents<StampLandCube>() )
         {
-            AnalyzePlayer( playerObj );
+            cube.Value = 0;
+            cube.OwnerId = Guid.Empty;
         }
-
-        Log.Info( "=== [ END OF REPORT ] ===" );
-    }
-
-    private void AnalyzePlayer( GameObject go )
-    {
-        var rb = go.Components.Get<Rigidbody>( FindMode.EverythingInSelfAndChildren );
-        var pos = go.WorldPosition;
-        string netStatus = go.IsProxy ? "PROXY (Remote)" : "LOCAL (Owner)";
-
-        Log.Info( $"--- Target: {go.Name} [{netStatus}] ---" );
-        Log.Info( $"ID: {go.Id} | Pos: {pos} | Vel: {rb?.Velocity ?? Vector3.Zero}" );
-
-        // COMPONENT AUDIT: This tells us why detection might be failing
-        var comps = go.Components.GetAll<Component>( FindMode.EverythingInSelfAndChildren )
-                        .Select( c => c.GetType().Name );
-        Log.Info( $"Components on Object: {string.Join( ", ", comps )}" );
-
-        // GRID ANALYSIS
-        var nearestCube = Scene.GetAllComponents<StampLandCube>()
-            .OrderBy( c => Vector3.DistanceBetween( pos.WithZ( 0 ), c.WorldPosition.WithZ( 0 ) ) )
-            .FirstOrDefault();
-
-        if ( nearestCube.IsValid() )
-        {
-            float cubeTopZ = nearestCube.WorldPosition.z + (nearestCube.Value * 50f);
-            float deltaZ = pos.z - cubeTopZ;
-
-            Log.Info( $"Nearest Cube: {nearestCube.GridPosition} (Value: {nearestCube.Value}) | Top Z: {cubeTopZ}" );
-            
-            if ( deltaZ < -2f ) 
-                Log.Error( $"[STUCK] Player is {Math.Abs(deltaZ):F2} units DEEP in the cube!" );
-            else 
-                Log.Info( $"[PHYSICS] Clearance: {deltaZ:F2} units." );
-        }
-
-        RunSpatialAudit( go );
-    }
-
-    private void RunSpatialAudit( GameObject go )
-    {
-        // Overlap Check
-        var overlaps = Scene.Trace.Sphere( DiagnosticTraceRadius, go.WorldPosition, go.WorldPosition )
-            .WithoutTags( "player" ).RunAll();
-
-        if ( overlaps != null && overlaps.Any() )
-        {
-            Log.Warning( $"[OVERLAP] Inside {overlaps.Count()} objects:" );
-            foreach ( var hit in overlaps ) 
-                Log.Warning( $"  > {hit.GameObject.Name} (Tags: {string.Join( ',', hit.GameObject.Tags )})" );
-        }
-
-        // Downward Floor Check
-        var floor = Scene.Trace.Ray( go.WorldPosition + Vector3.Up * 5, go.WorldPosition + Vector3.Down * 100 )
-            .WithoutTags( "player" ).Run();
-
-        if ( !floor.Hit ) 
-            Log.Error( "[FLOOR] NO COLLISION BELOW PLAYER! Are they falling through the world?" );
-        else 
-            Log.Info( $"[FLOOR] Standing on: {floor.GameObject.Name}" );
+        Log.Info( "[DEBUG] Map ownership has been wiped." );
     }
 }

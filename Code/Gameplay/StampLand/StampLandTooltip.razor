@@ -47,8 +47,18 @@
                       && _timeSinceLastHit < 0.1f 
                       && !(SinvestOS.Instance?.IsOpen ?? false);
 
-    bool IsOwner => _hoveredCube.IsValid() && _hoveredCube.OwnerId == Connection.Local.Id;
-
+    bool IsOwner 
+    {
+	    get 
+	    {
+		    if ( !_hoveredCube.IsValid() ) return false;
+            
+		    // Look for our local character pawn[cite: 2]
+		    var myCharacter = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+		    return myCharacter != null && _hoveredCube.OwnerId == myCharacter.GameObject.Id;
+	    }
+    }
+    
     private string GetWarningText()
     {
         if ( !_hoveredCube.IsValid() ) return null;

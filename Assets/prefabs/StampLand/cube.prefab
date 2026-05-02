@@ -73,11 +73,14 @@
         "__guid": "6fae71ff-5c8e-433b-bd3c-cddfb56b4d6b",
         "__enabled": true,
         "Flags": 0,
+        "ActiveMaterial": "shaders/stampland/stamplandcube.vmat",
         "AttackBounceScale": 0.3,
+        "AttackSound": "sounds/stampland/stampland_attack.sound",
         "BounceDelay": 0.05,
         "BounceForce": 450,
         "DetectionHeight": 40,
         "MaxRecoveryAttempts": 4,
+        "NeutralMaterial": "shaders/stampland/floortile.vmat",
         "NudgeHeight": 70,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -85,6 +88,7 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null,
+        "PlaceSound": "sounds/stampland/stampland_place.sound",
         "Renderer": {
           "_type": "component",
           "component_id": "a190612f-3d0c-4673-9085-618a002fc2db",
@@ -97,7 +101,8 @@
           "component_id": "c127f1e2-dad2-43d4-a6a1-528e78cf84a5",
           "go": "87866f65-a473-46ec-b4fd-fa6caebb318f",
           "component_type": "TextRenderer"
-        }
+        },
+        "UpgradeSound": "sounds/stampland/stampland_upgrade.sound"
       }
     ],
     "Children": [

@@ -30,6 +30,13 @@ public sealed class StampLandCube : Component
     // Sphere radius used to probe whether the player is clipped into solid geometry.
     // Keep below 25 (half a cube side) so adjacent column walls don't cause false positives.
     [Property, Group( "Physics Pop" )] public float StuckCheckRadius { get; set; } = 20f;
+    
+    [Property, Group( "References" )] public Material NeutralMaterial { get; set; } 
+    [Property, Group( "References" )] public Material ActiveMaterial { get; set; }
+    
+    [Property, Group( "Audio" )] public SoundEvent PlaceSound { get; set; }
+    [Property, Group( "Audio" )] public SoundEvent UpgradeSound { get; set; }
+    [Property, Group( "Audio" )] public SoundEvent AttackSound { get; set; }
 
     private const float CubeHeight = 50f;
 
@@ -41,11 +48,6 @@ public sealed class StampLandCube : Component
     {
         if ( !Renderer.Enabled ) return;
         UpdateVisuals();
-
-        // DEBUG: Draw the detection box so you can see it in the Scene view
-        var bbox = GetDetectionBox();
-        Gizmo.Draw.Color = Color.Yellow.WithAlpha( 0.2f );
-        Gizmo.Draw.LineBBox( bbox );
     }
 
     private BBox GetDetectionBox()
@@ -58,25 +60,51 @@ public sealed class StampLandCube : Component
 
     private void UpdateVisuals()
     {
-        if ( !Renderer.IsValid() ) return;
-        Renderer.Tint = new Color( 0.5f, 0.5f, 0.5f, 1.0f );
+	    if ( !Renderer.IsValid() ) return;
 
-        Color towerColor = (OwnerId == Connection.Local.Id)
-           ? new Color( 0.0f, 1.0f, 0.0f, 1.0f )
-           : new Color( 1.0f, 0.0f, 0.0f, 1.0f );
+	    // 1. MATERIAL SWITCHING
+	    if ( Value <= 0 || OwnerId == Guid.Empty )
+	    {
+		    Renderer.MaterialOverride = NeutralMaterial; // floortile.vmat[cite: 1]
+		    // Neutral tiles should stay white/original
+		    Renderer.Attributes.Set( "OwnerColor", Color.White );
+		    Renderer.Tint = Color.White;
+		    return; 
+	    }
 
-        foreach ( var child in GameObject.Children )
-        {
-            var childRenderer = child.Components.Get<ModelRenderer>();
-            if ( childRenderer.IsValid() ) childRenderer.Tint = towerColor;
-        }
+	    // Use the money stack
+	    Renderer.MaterialOverride = ActiveMaterial; 
 
-        if ( TextComponent.IsValid() )
-        {
-            TextComponent.Enabled = true;
-            TextComponent.Text = Value.ToString();
-            TextComponent.LocalPosition = Vector3.Up * ( (Value * CubeHeight) + 26f );
-        }
+	    // 2. IDENTITY RESOLUTION
+	    var myCharacter = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+    
+	    // If player isn't found, default to a neutral gray so it doesn't stay "stuck" red
+	    Color territoryColor = new Color( 0.5f, 0.5f, 0.5f, 1.0f );
+
+	    if ( myCharacter != null )
+	    {
+		    bool isMine = OwnerId == myCharacter.GameObject.Id;
+		    territoryColor = isMine 
+			    ? new Color( 0.0f, 1.0f, 0.0f, 1.0f ) // Green
+			    : new Color( 1.0f, 0.0f, 0.0f, 1.0f ); // Red
+	    }
+
+	    // 3. APPLY TO RENDERER
+	    // We set BOTH because the shader likely ignores Tint in favor of OwnerColor
+	    Renderer.Attributes.Set( "OwnerColor", territoryColor );
+	    Renderer.Tint = territoryColor;
+
+	    // 4. APPLY TO CLONED LAYERS (Children)
+	    foreach ( var child in GameObject.Children )
+	    {
+		    var childRenderer = child.Components.Get<ModelRenderer>();
+		    if ( childRenderer.IsValid() )
+		    {
+			    childRenderer.MaterialOverride = ActiveMaterial;
+			    childRenderer.Attributes.Set( "OwnerColor", territoryColor );
+			    childRenderer.Tint = territoryColor;
+		    }
+	    }
     }
 
     public void ProcessTouch( Guid playerId )
@@ -87,37 +115,52 @@ public sealed class StampLandCube : Component
 	    {
 		    OwnerId = playerId;
 		    Value = 1;
-		    // New cube: Nudge + Bounce
 		    ApplyPhysicalPop( BounceForce, true ); 
 		    SpawnVisualLayer();
+		    BroadcastPlaySound( "place" ); // Trigger Sound
 	    }
 	    else if ( OwnerId == playerId )
 	    {
 		    if ( CanUpgrade() )
 		    {
 			    Value++;
-			    // Own cube upgrade: Nudge + Bounce
 			    ApplyPhysicalPop( BounceForce, true );
 			    SpawnVisualLayer();
+			    BroadcastPlaySound( "upgrade" ); // Trigger Sound
 		    }
 	    }
-	    else
+	    else if ( CanAttack( playerId ) )
 	    {
-		    if ( CanAttack( playerId ) )
-		    {
-			    DespawnTopLayer();
-			    Value--;
+		    DespawnTopLayer();
+		    Value--;
+		    ApplyPhysicalPop( BounceForce * AttackBounceScale, false );
             
-			    // Red cube attack: Bounce ONLY (nudge = false)
-			    // This allows the player to stay at their current Z-level while the block drops.
-			    ApplyPhysicalPop( BounceForce * AttackBounceScale, false );
-
-			    if ( Value <= 0 )
-			    {
-				    Value = 0;
-				    OwnerId = Guid.Empty;
-			    }
+		    if ( Value <= 0 )
+		    {
+			    Value = 0;
+			    OwnerId = Guid.Empty;
 		    }
+		    BroadcastPlaySound( "attack" ); // Trigger Sound
+	    }
+    }
+    
+    [Rpc.Broadcast]
+    private void BroadcastPlaySound( string type )
+    {
+	    // Use the SoundEvent properties assigned in the editor
+	    var soundToPlay = type switch
+	    {
+		    "place" => PlaceSound,
+		    "upgrade" => UpgradeSound,
+		    "attack" => AttackSound,
+		    _ => null
+	    };
+
+	    if ( soundToPlay != null )
+	    {
+		    // Plays at the cube's position. 
+		    // Setting distance to 0f uses the SoundEvent's default attenuation.
+		    Sound.Play( soundToPlay, WorldPosition );
 	    }
     }
 
@@ -313,10 +356,13 @@ public sealed class StampLandCube : Component
     
     public string GetAttackRequirement()
     {
-	    var localId = Connection.Local.Id;
-
 	    // Entry level cubes are always vulnerable
 	    if ( Value <= 1 ) return null;
+
+	    // Find the local player's ID instead of Connection.Local.Id
+	    var localPlayer = Scene.GetAllComponents<StampLandPlayer>().FirstOrDefault( p => !p.IsProxy );
+	    if ( localPlayer == null ) return null;
+	    var localId = localPlayer.GameObject.Id;
 
 	    int requiredHeight = Value + 1;
 	    bool hasHighGround = false;

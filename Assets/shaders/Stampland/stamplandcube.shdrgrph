@@ -27,10 +27,10 @@
       "DefaultMetalness": 0,
       "DefaultAmbientOcclusion": 1,
       "Identifier": "0",
-      "Position": "636,-300",
+      "Position": "744,-228",
       "HandleOffsets": {},
       "Albedo": {
-        "Identifier": "4",
+        "Identifier": "12",
         "Output": "Result"
       }
     },
@@ -97,7 +97,7 @@
         }
       },
       "Identifier": "2",
-      "Position": "-72,36",
+      "Position": "-180,72",
       "HandleOffsets": {},
       "Coords": {
         "Identifier": "8",
@@ -107,7 +107,7 @@
     {
       "_class": "WorldNormal",
       "Identifier": "3",
-      "Position": "-336,-324",
+      "Position": "-540,-336",
       "HandleOffsets": {}
     },
     {
@@ -116,7 +116,7 @@
       "DefaultB": 1,
       "Fraction": 0.5,
       "Identifier": "4",
-      "Position": "384,-192",
+      "Position": "156,-132",
       "HandleOffsets": {},
       "A": {
         "Identifier": "1",
@@ -134,7 +134,7 @@
     {
       "_class": "SplitVector",
       "Identifier": "5",
-      "Position": "-132,-336",
+      "Position": "-336,-348",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "3",
@@ -146,7 +146,7 @@
       "DefaultInput": 0,
       "DefaultEdge": 0.9,
       "Identifier": "6",
-      "Position": "144,-312",
+      "Position": "-60,-324",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "5",
@@ -214,6 +214,45 @@
       "Identifier": "10",
       "Position": "-660,-12",
       "HandleOffsets": {}
+    },
+    {
+      "_class": "Float4",
+      "Value": "1,1,1,1",
+      "Name": "OwnerColor",
+      "IsAttribute": true,
+      "UI": {
+        "Type": "Color",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
+      "Identifier": "11",
+      "Position": "204,132",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Lerp",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Fraction": 0.11099918,
+      "Identifier": "12",
+      "Position": "408,-96",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "4",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "11",
+        "Output": "Result"
+      }
     }
   ]
 }
