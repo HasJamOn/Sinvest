@@ -24,7 +24,7 @@
         "CreateAttachments": false,
         "LodOverride": null,
         "MaterialGroup": null,
-        "MaterialOverride": null,
+        "MaterialOverride": "shaders/stampland/stamplandcube.vmat",
         "Materials": null,
         "Model": "models/dev/box.vmdl",
         "OnComponentDestroy": null,

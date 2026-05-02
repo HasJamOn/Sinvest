@@ -1,0 +1,6 @@
+
+Layer0
+{
+	shader "shaders/stampland/stamplandcube.shader_c"
+
+}
