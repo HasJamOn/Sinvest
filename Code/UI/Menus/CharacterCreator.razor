@@ -85,34 +85,35 @@
 
     async void OnConfirm() 
     {
-        if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
+	    if ( IsProcessing || string.IsNullOrWhiteSpace( CharName ) ) return;
 
-        IsProcessing = true;
-        StateHasChanged();
+	    IsProcessing = true;
+	    StateHasChanged();
 
-        try 
-        {
-           if ( OnCreate != null )
-           {
-              await OnCreate.Invoke( CharName, ActiveMods );
-           }
-        }
-        catch ( TaskCanceledException )
-        {
-           Log.Info( "[UI] Creation task finalized via scene transition." );
-           return; 
-        }
-        catch ( Exception e )
-        {
-           Log.Error( $"[UI] Character Creation Error: {e.Message}" );
-        }
-        finally
-        {
-           if ( this.IsValid() )
-           {
-              IsProcessing = false; 
-              StateHasChanged();
-           }
-        }
+	    try 
+	    {
+		    if ( OnCreate != null )
+		    {
+			    // We await the parent's Task. 
+			    // If the parent calls StartGame(), this will be cancelled.
+			    await OnCreate.Invoke( CharName, ActiveMods );
+		    }
+	    }
+	    catch ( Exception e ) when ( e is TaskCanceledException || e is OperationCanceledException )
+	    {
+		    // Scene changed, we don't need to reset IsProcessing because 
+		    // this component is being deleted anyway.
+		    Log.Info( "[UI] Character Creation cleaned up." );
+	    }
+	    catch ( Exception e )
+	    {
+		    Log.Error( $"[UI] Error: {e.Message}" );
+		    // Only reset if we are still valid and didn't switch scenes
+		    if ( this.IsValid() )
+		    {
+			    IsProcessing = false;
+			    StateHasChanged();
+		    }
+	    }
     }
 }

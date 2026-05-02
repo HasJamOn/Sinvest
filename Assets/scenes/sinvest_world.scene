@@ -4965,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "2ada08e6-b015-4a40-a892-76b2369e967b",
+                  "__guid": "3a3d77c6-95d5-4bd9-a373-d1a56a43e55b",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4982,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "45634ec4-e67a-4992-9cb1-2ea4830368d4",
+                      "__guid": "a6c1ba67-2408-47ba-ac80-1f6d950b1444",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5034,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "e92df9cc-dc82-4117-a86d-cd8f70a1d033",
+                  "__guid": "a640e1bf-f6e9-4dfa-8870-42301f46907f",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5051,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "09b4a639-f156-4fc9-ae0b-999cac2c52fd",
+                      "__guid": "f95c640d-4926-43ae-af84-c0f6685155a4",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5103,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "b9806361-b2b8-4b36-b4bb-39985603f069",
+                  "__guid": "9d5fd611-2e78-4476-98e1-edd2adeddcce",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5120,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "9ca5c512-c0bb-4d51-b57d-4179784455e6",
+                      "__guid": "8885bbce-af1d-4c41-bdfc-3b4c1a10c704",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5172,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "8e0de733-af58-4ea8-8739-2ea258502b46",
+                  "__guid": "35a3c085-ea7f-4689-8a5e-4dd2da285487",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5189,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "1c94d3c3-2b5c-488b-a5b0-2a411d0d451e",
+                      "__guid": "855eb6e3-bb09-4129-95f9-44f99c7f25d9",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -11744,6 +11744,47 @@
         "235a87d8-e5f3-47d8-9854-7f1a30c87576": "d4fa9d35-b2d4-45d7-a80b-a2039b1388f6",
         "0873098d-8506-459a-802d-111173f32e93": "d4010f0b-3813-4378-96a4-de61ee6dece8"
       }
+    },
+    {
+      "__guid": "fcc92129-430d-4b02-b25e-e784762f17c8",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "WageWarsGameArea",
+      "Position": "-1520.79272,1142.07324,582.524841",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "WageWarsManager",
+          "__guid": "53ac5a45-ae89-4214-afbe-21c0a031c17a",
+          "__enabled": true,
+          "Flags": 0,
+          "ChunkPrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/wagewars/wagewarschunk.prefab"
+          },
+          "ChunkSize": 16,
+          "CubePrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/wagewars/wagewarscube.prefab"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "WorldSize": 1
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -11766,11 +11807,6 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
-        }
-      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1ff7db61-0293-4529-be2b-9f606b7c33ea"
@@ -11778,6 +11814,11 @@
       },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
+      },
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
       }
     }
   },

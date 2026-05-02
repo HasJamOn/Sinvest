@@ -30,7 +30,7 @@ public sealed class WageWarsWorldSave : Component
 {
 	public static WageWarsWorldSave Instance { get; private set; }
 
-	private const string SavePath = "wagewars_world.json";
+	private const string SavePath = "wagewars_global_world.json";
 
 	// ── Data contract ─────────────────────────────────────────────────────────
 

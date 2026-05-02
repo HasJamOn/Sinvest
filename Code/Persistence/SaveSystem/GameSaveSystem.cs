@@ -27,26 +27,19 @@ public sealed partial class GameSaveSystem : Component
 
 	protected override void OnAwake()
 	{
-		// 1. Singleton Check
 		if ( Instance.IsValid() && Instance != this )
 		{
-			Log.Info( $"[SAVE] Persistent instance found. Destroying duplicate on {GameObject.Name}" );
 			GameObject.Destroy(); 
 			return;
 		}
 
 		Instance = this;
-
-		// 2. Persistence
 		GameObject.Flags |= GameObjectFlags.DontDestroyOnLoad;
 
-		// 3. Initialization
-		// We ONLY load. If the file doesn't exist, LoadActiveSlot should just 
-		// result in a default/empty CharacterSession in RAM.
+		// Only load if we are the "Master" instance
 		if ( ActiveSlot > 0 )
 		{
 			LoadActiveSlot();
-			Log.Info( $"[SAVE] Initialized Session for Slot {ActiveSlot}" );
 		}
 	}
 
@@ -83,7 +76,13 @@ public sealed partial class GameSaveSystem : Component
 			Log.Error( "WorldScene is not assigned in the GameSaveSystem Inspector!" );
 			return;
 		}
-		
-		Game.ActiveScene.Load( WorldScene );
+   
+		Log.Info( $"[SAVE] Transitioning to {WorldScene.ResourceName}..." );
+   
+		// Force the UI to update one last time before the scene nukes
+		NotifyDataChanged();
+
+		// Switch Scene
+		Scene.Load( WorldScene );
 	}
 }

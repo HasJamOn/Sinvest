@@ -2,120 +2,209 @@
 @using Sinvest;
 @using Sandbox.UI;
 @using Sandbox.Movement;
+@using System;
 @using System.Linq;
 @inherits PanelComponent
 @namespace Sandbox
 
 <root class="@(IsVisible ? "visible" : "")">
-    @if ( ActiveObject.IsValid() && !string.IsNullOrEmpty(CurrentTitle) )
+
+    @* ── WageWars cube panel ─────────────────────────────────────────── *@
+    @if ( _hoveredCube.IsValid() )
     {
-       <div class="panel">
-          <div class="header">
-             @if ( !string.IsNullOrEmpty(CurrentIcon) )
-             {
-                <i class="icon">@CurrentIcon</i>
-             }
-             <div class="name">@CurrentTitle</div>
-          </div>
+        <div class="panel">
+            <div class="header @(IsCubeOwner || _hoveredCube.OwnerId == Guid.Empty ? "" : "hostile")">
+                <i class="icon">@(IsCubeOwner ? "layers" : "swords")</i>
+                <div class="name">@CubeTitle</div>
+            </div>
 
-          <div class="divider"></div>
+            @if ( CubeWarning is string warning )
+            {
+                <div class="description warning">@warning</div>
+            }
+            else
+            {
+                <div class="description">
+                    @(IsCubeOwner ? $"Level {_hoveredCube.Value} Structure" : $"Grid [{_hoveredCube.GridPosition.x}, {_hoveredCube.GridPosition.y}]")
+                </div>
+            }
 
-          <div class="actions">
-             <div class="action">
-                <label class="key">@CurrentKey</label>
-                <span class="text">@CurrentAction</span>
-             </div>
-          </div>
-       </div>
+            <div class="divider"></div>
+
+            <div class="actions">
+                <div class="action @(CanActOnCube ? "" : "disabled")">
+                    <label class="key">@Input.GetButtonOrigin( "use" ).ToUpper()</label>
+                    <span class="text">@CubeActionText</span>
+                </div>
+            </div>
+        </div>
     }
+
+    @* ── World-object panel (chair / trigger / case) ─────────────────── *@
+    @if ( !_hoveredCube.IsValid() && WorldObject.IsValid() && !string.IsNullOrEmpty( WorldTitle ) )
+    {
+        <div class="panel">
+            <div class="header">
+                @if ( !string.IsNullOrEmpty( WorldIcon ) )
+                {
+                    <i class="icon">@WorldIcon</i>
+                }
+                <div class="name">@WorldTitle</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="actions">
+                <div class="action">
+                    <label class="key">@WorldKey</label>
+                    <span class="text">@WorldAction</span>
+                </div>
+            </div>
+        </div>
+    }
+
 </root>
 
 @code
 {
-    private BaseChair _foundChair;
-    private UIPopupTrigger _foundTrigger;
-    private SteamGameCase _foundCase;
+    // ── Shared state ──────────────────────────────────────────────────────
+
     private TimeSince _timeSinceLastHit;
 
-    GameObject ActiveObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject ?? _foundCase?.GameObject;
-    
-    // UPDATED: Added check for SinvestOS.Instance to hide tooltips when OS is up (Phone or PC)
-    bool IsVisible => ActiveObject.IsValid() 
-                      && _timeSinceLastHit < 0.1f 
+    bool IsVisible => _timeSinceLastHit < 0.1f
                       && !(Player?.WantsHideHud ?? false)
                       && !UIPopupTrigger.ActiveInstance.IsValid()
                       && !(SinvestOS.Instance?.IsOpen ?? false);
 
-    string CurrentTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? _foundCase?.TooltipTitle ?? string.Empty;
-    string CurrentIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? _foundCase?.TooltipIcon ?? string.Empty;
-    string CurrentAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? _foundCase?.TooltipDescription ?? string.Empty;
-    
-    string CurrentKey => (_foundChair != null || _foundCase != null) 
-                         ? Input.GetButtonOrigin( "use" ).ToUpper() 
-                         : _foundTrigger?.ToolTipKey?.ToUpper();
+    // ── WageWars cube ─────────────────────────────────────────────────────
+
+    private WageWarsCube _hoveredCube;
+
+    bool IsCubeOwner
+    {
+        get
+        {
+            if ( !_hoveredCube.IsValid() ) return false;
+            var me = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
+            return me != null && _hoveredCube.OwnerId == me.GameObject.Id;
+        }
+    }
+
+    string CubeTitle   => _hoveredCube.OwnerId == Guid.Empty ? "Unclaimed"
+                        : IsCubeOwner                        ? "Your Territory"
+                                                             : "Hostile Tile";
+
+    string CubeWarning => _hoveredCube.IsValid()
+                        ? (IsCubeOwner ? _hoveredCube.GetUpgradeRequirement() : _hoveredCube.GetAttackRequirement())
+                        : null;
+
+    bool   CanActOnCube    => string.IsNullOrEmpty( CubeWarning );
+
+    string CubeActionText
+    {
+        get
+        {
+            if ( !_hoveredCube.IsValid() ) return "";
+            if ( _hoveredCube.Value == 0 ) return "Claim Territory";
+            return IsCubeOwner ? "Upgrade Layer" : "Attack Structure";
+        }
+    }
+
+    // ── World objects (chair / trigger / case) ────────────────────────────
+
+    private BaseChair        _foundChair;
+    private UIPopupTrigger   _foundTrigger;
+    private SteamGameCase    _foundCase;
+
+    GameObject WorldObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject ?? _foundCase?.GameObject;
+    string WorldTitle      => _foundChair?.TooltipTitle       ?? _foundTrigger?.TooltipTitle       ?? _foundCase?.TooltipTitle       ?? string.Empty;
+    string WorldIcon       => _foundChair?.TooltipIcon        ?? _foundTrigger?.TooltipIcon        ?? _foundCase?.TooltipIcon        ?? string.Empty;
+    string WorldAction     => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? _foundCase?.TooltipDescription ?? string.Empty;
+    string WorldKey        => (_foundChair != null || _foundCase != null)
+                            ? Input.GetButtonOrigin( "use" ).ToUpper()
+                            : _foundTrigger?.ToolTipKey?.ToUpper();
+
+    // ── Per-frame ─────────────────────────────────────────────────────────
 
     protected override void OnUpdate()
     {
-        // Optimization: Early exit if SinvestOS is active to stop tracing entirely
+        // Early-out when the SinvestOS computer UI is open — no tracing needed.
         if ( SinvestOS.Instance.IsValid() && SinvestOS.Instance.IsOpen )
         {
-	        _foundChair = null;
-	        _foundTrigger = null;
-	        _foundCase = null;
-	        return;
+            ClearAll();
+            return;
         }
 
         var controller = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
         if ( controller == null ) return;
 
+        // Single shared trace for both tooltip types.
         var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
-        var tr = Scene.Trace.Ray( ray, 150f )
-                    .WithoutTags( "player" ) 
-                    .Run();
+        var tr  = Scene.Trace.Ray( ray, 150f )
+                      .WithoutTags( "player" )
+                      .Run();
 
         if ( tr.Hit && tr.GameObject.IsValid() )
         {
-            bool isSitting = controller.Mode is SitMoveMode;
-    
-            var chair = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>() : null;
-            var trigger = isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
-            var sCase = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<SteamGameCase>() : null;
-
-            if ( chair.IsValid() || trigger.IsValid() || sCase.IsValid() )
+            // Priority 1: WageWars cube.
+            var cube = tr.GameObject.Components.GetInAncestorsOrSelf<WageWarsCube>();
+            if ( cube.IsValid() )
             {
-               _foundChair = chair;
-               _foundTrigger = trigger;
-               _foundCase = sCase; 
-               _timeSinceLastHit = 0;
+                _hoveredCube    = cube;
+                _foundChair     = null;
+                _foundTrigger   = null;
+                _foundCase      = null;
+                _timeSinceLastHit = 0;
+            }
+            else
+            {
+                // Priority 2: World interaction objects.
+                bool isSitting = controller.Mode is SitMoveMode;
+
+                var chair   = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>()      : null;
+                var trigger =  isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
+                var sCase   = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<SteamGameCase>()  : null;
+
+                if ( chair.IsValid() || trigger.IsValid() || sCase.IsValid() )
+                {
+                    _hoveredCube    = null;
+                    _foundChair     = chair;
+                    _foundTrigger   = trigger;
+                    _foundCase      = sCase;
+                    _timeSinceLastHit = 0;
+                }
             }
         }
-        
+
+        // SteamGameCase interaction lives here since this is the only update loop.
         if ( _foundCase.IsValid() && IsVisible && Input.Pressed( "use" ) )
         {
             _foundCase.Shuffle();
         }
 
         if ( _timeSinceLastHit > 0.15f )
-        {
-            _foundChair = null;
-            _foundTrigger = null;
-            _foundCase = null; 
-        }
+            ClearAll();
 
         SetClass( "visible", IsVisible );
     }
 
+    private void ClearAll()
+    {
+        _hoveredCube  = null;
+        _foundChair   = null;
+        _foundTrigger = null;
+        _foundCase    = null;
+    }
+
     Player Player => Player.FindLocalPlayer();
 
-    protected override int BuildHash() 
-    {
-        return System.HashCode.Combine( 
-           ActiveObject?.Id, 
-           IsVisible,
-           _foundCase?.TooltipTitle,
-           _foundCase?.TooltipDescription,
-           UIPopupTrigger.ActiveInstance.IsValid(),
-           SinvestOS.Instance != null // Added to BuildHash to ensure UI refreshes when OS opens/closes
-        );
-    }
+    protected override int BuildHash() => System.HashCode.Combine(
+        _hoveredCube?.Id,
+        _hoveredCube?.Value,
+        WorldObject?.Id,
+        IsVisible,
+        CubeWarning,
+        UIPopupTrigger.ActiveInstance.IsValid(),
+        SinvestOS.Instance != null
+    );
 }

@@ -29,14 +29,13 @@ public sealed class WageWarsPlayer : Component
 
     protected override void OnStart()
     {
-        if ( IsProxy ) return;
+	    if ( IsProxy ) return;
 
-        // Stamp our stable Steam ID so all peers (and WageWarsWorldSave) can read it.
-        SteamId = Connection.Local.SteamId;
+	    // Cast the SteamId to ulong to match your property type
+	    uint slotSuffix = (uint)(GameSaveSystem.Instance?.ActiveSlot ?? 1);
+	    SteamId = (ulong)Connection.Local.SteamId + slotSuffix; 
 
-        // Tell the host to remap any cubes saved under this Steam ID to our fresh
-        // GameObject Guid. Safe to call even when no save exists — it's a no-op then.
-        WageWarsWorldSave.Instance?.ClaimRestoredCubes( SteamId, GameObject.Id );
+	    WageWarsWorldSave.Instance?.ClaimRestoredCubes( SteamId, GameObject.Id );
     }
 
     // ── Per-frame ─────────────────────────────────────────────────────────────
@@ -90,12 +89,20 @@ public sealed class WageWarsPlayer : Component
     [Rpc.Broadcast]
     public void NotifyHostOfLabor( GameObject cubeObj, Guid playerId )
     {
-        if ( !Networking.IsHost ) return;
-        if ( !cubeObj.IsValid() ) return;
+	    // Only the Host handles the authoritative world state and file IO
+	    if ( !Networking.IsHost ) return;
+	    if ( !cubeObj.IsValid() ) return;
 
-        var cube = cubeObj.Components.Get<WageWarsCube>();
-        if ( cube.IsValid() )
-            cube.ProcessTouch( playerId );
+	    var cube = cubeObj.Components.Get<WageWarsCube>();
+	    if ( cube.IsValid() )
+	    {
+		    // 1. Apply the labor (Increase Value / Change Owner)
+		    cube.ProcessTouch( playerId );
+
+		    // 2. Persist the change to wagewars_world.json immediately
+		    // This satisfies your requirement: Success -> Save
+		    WageWarsWorldSave.Instance?.SaveWorld();
+	    }
     }
 
     // ── Stuck recovery ────────────────────────────────────────────────────────

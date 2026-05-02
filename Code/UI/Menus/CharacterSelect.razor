@@ -98,21 +98,25 @@
 
     async Task CreateAndStart( string name, StartingModifiers mods )
     {
-        if ( SaveManager == null ) return;
+	    if ( SaveManager == null ) return;
 
-        var charData = SaveManager.CurrentCharacter;
-        charData.Name = name;
-        charData.Modifiers = mods;
-        charData.Money = 0; 
-        charData.Shares = 0;
+	    var charData = SaveManager.CurrentCharacter;
+	    charData.Name = name;
+	    charData.Modifiers = mods;
 
-        await SaveManager.SaveActiveSlotAsync();
+	    // 1. Write the file
+	    await SaveManager.SaveActiveSlotAsync();
+	    Log.Info( $"[UI] Save Complete for {name}. Transitioning..." );
 
-        IsCreating = false;
-        StateHasChanged();
+	    // 2. Clear the UI so the user doesn't see "Syncing" while the engine loads
+	    IsCreating = false;
+	    StateHasChanged();
 
-        await Task.Delay( 100 );
-        StartGame();
+	    // 3. Brief delay to allow the UI to finish its FrameStats/Batch
+	    await Task.Delay( 100 );
+
+	    // 4. Force Start
+	    StartGame();
     }
     
     protected override void OnStart()

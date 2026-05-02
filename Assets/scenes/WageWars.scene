@@ -123,7 +123,7 @@
       },
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "02c6f8c8-ad69-418a-b0ea-f9954c827f96",
-        "8a6bce3b-6539-40ff-9733-bc17486a79f4": "863afd25-4113-4dcf-8d2c-7e42c269fedc",
+        "fbf2acec-66de-430c-96c1-55618c282dc7": "d17afd07-0f54-4735-a9ae-1a99a038f3b2",
         "8611e950-dee8-401f-950f-459361d63675": "be2d0a46-8577-4b5b-9823-833e2d9e2d8f"
       }
     },
@@ -152,7 +152,7 @@
             "_type": "gameobject",
             "prefab": "prefabs/wagewars/wagewarschunk.prefab"
           },
-          "ChunkSizeInCubes": "16,16",
+          "ChunkSize": 16,
           "CubePrefab": {
             "_type": "gameobject",
             "prefab": "prefabs/wagewars/wagewarscube.prefab"
@@ -163,7 +163,7 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "WorldSizeInChunks": "5,5"
+          "WorldSize": 5
         }
       ],
       "Children": []
@@ -1177,11 +1177,6 @@
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
-        }
-      },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "3e9529c9-f621-401c-b5d4-6e575f4a2020"
         }
       }
     }
