@@ -2,10 +2,10 @@
   "publish": {
     "Enabled": false,
     "ProjectConfig": {
-      "Title": "Sinvest World",
+      "Title": "Sinvest World 2",
       "Type": "map",
       "Org": "local",
-      "Ident": "sinvestworld",
+      "Ident": "sinvestworld2",
       "Schema": 0,
       "IncludeSourceFiles": false,
       "Resources": null,
@@ -14,8 +14,8 @@
       "Mounts": null,
       "IsStandaloneOnly": false,
       "Metadata": {
-        "ParentPackage": "hasjamon.sinvest",
-        "SingleAssetSource": "maps/sinvest_world.vmap"
+        "SingleAssetSource": "maps/sinvest_world2.vmap",
+        "ParentPackage": "hasjamon.sinvest"
       }
     }
   }

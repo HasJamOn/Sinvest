@@ -26,7 +26,7 @@
         "MaterialGroup": null,
         "MaterialOverride": "shaders/idlemon_master_graph.vmat",
         "Materials": null,
-        "Model": "models/dev/box.vmdl",
+        "Model": "models/signmon/sign_dollar_basic.vmdl",
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -47,6 +47,8 @@
         "__guid": "bbecd031-85d2-4f2d-9bcb-d15939b0dc08",
         "__enabled": true,
         "Flags": 0,
+        "ModelFolder": "models/signmon",
+        "ModelPool": [],
         "ModelVisual": {
           "_type": "component",
           "component_id": "e2ef2242-1abc-462e-ad4f-0cd8ffb10ef8",

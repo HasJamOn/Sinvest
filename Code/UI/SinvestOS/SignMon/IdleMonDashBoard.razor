@@ -17,7 +17,7 @@
     {
         <div class="header">
             <div class="app-identity">
-                <label class="label">IDLEMON.ino</label>
+                <label class="label">SIGNMON.ino</label>
                 <div class="sync-status @(Roster.IsDirty ? "pending" : "synced")">
                     <div class="indicator"></div>
                     <label>@(Roster.IsDirty ? "SYNC PENDING" : "DATA SECURED")</label>
@@ -322,20 +322,20 @@
           var mon = Roster.ActiveNodes[i];
           if ( mon.ID != Guid.Empty )
           {
-             display.SetModel( mon.ModelPath );
-             display.UpdateStats( mon, mon.SteamId ); 
+	          display.SetModel( null );
+	          display.UpdateStats( mon, mon.SteamId ); 
           }
        }
 
        // 2. REFRESH THE INSPECTOR PORTRAIT
        if (SelectedSlotIndex.HasValue && InspectorDisplay != null)
        {
-          var mon = Roster.ActiveNodes[SelectedSlotIndex.Value];
-          if (mon.ID != Guid.Empty)
-          {
-             InspectorDisplay.SetModel(mon.ModelPath);
-             InspectorDisplay.UpdateStats(mon, mon.SteamId);
-          }
+	       var mon = Roster.ActiveNodes[SelectedSlotIndex.Value];
+	       if (mon.ID != Guid.Empty)
+	       {
+		       InspectorDisplay.SetModel( null );
+		       InspectorDisplay.UpdateStats(mon, mon.SteamId);
+	       }
        }
 
        // 3. REFRESH THE COMPARISON PORTRAITS
