@@ -65,28 +65,39 @@
 {
     public enum Side { Heads, Tails }
 
+    /* --- Game State --- */
     private Side SelectedSide = Side.Heads;
     private string BetAmount = "10";
     private string LastFlip = "Heads";
     private string ResultMessage = "";
     private bool IsWin = false;
     private bool IsFlipping = false;
-    
     private bool IsError = false;
     
+    /* --- Animation State --- */
     private string FlipAnimClass = "";
     private bool IsSquished = false;
+    /// <summary> Returns the CSS class for the "squash" effect during the spin cycle </summary>
     private string SquishClass => IsSquished ? "squished" : "";
     private float SpinSpeed = 0.05f; 
     
+    /* --- Asset Management --- */
     private Side DisplaySide = Side.Heads; 
+    /// <summary> Dynamically resolves the coin image path based on the current display side </summary>
     private string CoinImageSrc => $"/ui/casino/coinflip/coin_{DisplaySide.ToString().ToLower()}.png";
-
-    // New Helper for the UI
+    
+    /* --- Financial Validation --- */
+    /// <summary>
+    /// Validates if the player has enough funds in the authoritative ledger to place the bet.
+    /// This pulls from the SinvestOS instance which mirrors the GameSaveSystem character data.
+    /// </summary>
     private bool CanAfford => float.TryParse(BetAmount, out float amount) && 
                               SinvestOS.Instance != null && 
                               SinvestOS.Instance.CurrentMoney >= amount;
 
+    /// <summary>
+    /// Updates the player's chosen side. Ignored if the coin is currently mid-air.
+    /// </summary>
     private void SetSide(Side side)
     {
        if (IsFlipping) return;
@@ -94,25 +105,30 @@
        StateHasChanged();
     }
 
+    /// <summary>
+    /// The primary game loop. Handles transaction commitment, animation timing, and payout resolution.
+    /// </summary>
     private async void PlayGame()
     {
-	    if (IsFlipping) return;
-	    IsError = false; // Reset error state
+        if (IsFlipping) return;
+        IsError = false;
 
-	    if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
+        // Ensure valid input before proceeding
+        if (!float.TryParse(BetAmount, out float amount) || amount <= 0) return;
     
-	    if (SinvestOS.Instance == null || SinvestOS.Instance.CurrentMoney < amount)
-	    {
-		    IsError = true;
-		    ResultMessage = "INSUFFICIENT FUNDS!";
-		    StateHasChanged();
-		    return;
-	    }
+        // Final sanity check for funds
+        if (SinvestOS.Instance == null || SinvestOS.Instance.CurrentMoney < amount)
+        {
+           IsError = true;
+           ResultMessage = "INSUFFICIENT FUNDS!";
+           StateHasChanged();
+           return;
+        }
 
-        // 2. Immediate Deduction
+        // Commit the initial bet to the authoritative ledger as an "OUT" transaction
         SinvestOS.Instance.Transaction(-amount);
 
-        // Pre-calculate result
+        // Pre-calculate the result immediately to prevent client-side manipulation mid-animation
         var result = Game.Random.Int(0, 1) == 0 ? Side.Heads : Side.Tails;
         
         IsFlipping = true;
@@ -120,33 +136,36 @@
         FlipAnimClass = "";
         StateHasChanged();
 
-        // 3. Animation Loop
+        /* --- Animation Sequence --- */
+        // We cycle through sides with a decaying speed (easing out) to simulate physics
         int totalFlips = 12; 
         float currentSpeed = 0.05f;
 
         for (int i = 0; i < totalFlips; i++)
         {
-	        // Play the spin sound from the OS settings
-	        if ( !string.IsNullOrEmpty( SinvestOS.Instance?.CoinSpinSound ) )
-	        {
-		        Sound.Play( SinvestOS.Instance.CoinSpinSound );
-	        }
+            if ( !string.IsNullOrEmpty( SinvestOS.Instance?.CoinSpinSound ) )
+            {
+               Sound.Play( SinvestOS.Instance.CoinSpinSound );
+            }
 
-	        SpinSpeed = currentSpeed;
-	        IsSquished = true;
+            SpinSpeed = currentSpeed;
+            IsSquished = true; // Trigger CSS transform scale
             StateHasChanged();
             await GameTask.DelaySeconds(currentSpeed);
 
+            // Toggle visual side
             DisplaySide = (DisplaySide == Side.Heads) ? Side.Tails : Side.Heads;
 
             IsSquished = false;
             StateHasChanged();
             await GameTask.DelaySeconds(currentSpeed);
 
+            // Gradually slow down the spin as it reaches the end
             if (i > 4) currentSpeed += 0.02f; 
         }
 
-        // 4. Settle
+        /* --- Settle Sequence --- */
+        // Final "bounce" before revealing the pre-calculated result
         SpinSpeed = currentSpeed + 0.05f;
         IsSquished = true;
         StateHasChanged();
@@ -159,31 +178,36 @@
 
         await GameTask.DelaySeconds(0.6f);
 
-        // 5. Resolution
+        /* --- Resolution & Ledger Update --- */
         LastFlip = result.ToString();
         IsWin = (SelectedSide == result);
         IsFlipping = false;
 
         if (IsWin)
         {
-	        // Refund initial bet + pay out winnings (2x total)
-	        SinvestOS.Instance.Transaction(amount * 2);
-	        ResultMessage = $"YOU WON ${amount}!";
+            // Refund the initial bet and pay out 1x winnings (Total 2x)
+            // This is committed as an "IN" transaction to the ledger
+            SinvestOS.Instance.Transaction(amount * 2);
+            ResultMessage = $"YOU WON ${amount}!";
             
-	        if ( !string.IsNullOrEmpty( SinvestOS.Instance?.WinSound ) )
-		        Sound.Play( SinvestOS.Instance.WinSound );
+            if ( !string.IsNullOrEmpty( SinvestOS.Instance?.WinSound ) )
+               Sound.Play( SinvestOS.Instance.WinSound );
         }
         else
         {
-	        ResultMessage = $"YOU LOST ${amount}!";
+            ResultMessage = $"YOU LOST ${amount}!";
             
-	        if ( !string.IsNullOrEmpty( SinvestOS.Instance?.LoseSound ) )
-		        Sound.Play( SinvestOS.Instance.LoseSound );
+            if ( !string.IsNullOrEmpty( SinvestOS.Instance?.LoseSound ) )
+               Sound.Play( SinvestOS.Instance.LoseSound );
         }
 
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Determines when the UI should re-render. 
+    /// Includes the money balance to ensure the 'CanAfford' state and play button update if external transactions occur.
+    /// </summary>
     protected override int BuildHash()
     {
         return HashCode.Combine(
