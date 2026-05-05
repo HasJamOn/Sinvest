@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Sinvest;
 
+/// <summary>
+/// Responsible for the procedural generation of IdleMon assets.
+/// Combines file parsing, Steam API metadata fetching, and randomized stat rolling.
+/// </summary>
 public sealed class AssetGenerator : Component
 {
     [Property] public float BasePotential { get; set; } = 10.0f;
@@ -17,6 +21,10 @@ public sealed class AssetGenerator : Component
        LoadBootstrapIds();
     }
 
+    /// <summary>
+    /// Parses a flat text file from the shaders directory to populate the valid Steam ID pool.
+    /// Supports multiple delimiters for flexibility in data entry.
+    /// </summary>
     private void LoadBootstrapIds()
     {
        string path = "shaders/data/bootstrap_ids.txt";
@@ -36,10 +44,14 @@ public sealed class AssetGenerator : Component
        else
        {
           Log.Error( $"[AssetGenerator] Could not find bootstrap_ids.txt at {path}" );
-          _cachedSteamIds = new List<int> { 4000 }; 
+          _cachedSteamIds = new List<int> { 4000 }; // Fallback to Garry's Mod AppID
        }
     }
 
+    /// <summary>
+    /// Fetches live application metadata from the Steam Store API.
+    /// Uses regex to extract the Name and Price without requiring heavy JSON libraries.
+    /// </summary>
     private async Task<(string Title, string Price)> GetSteamMetadata( int steamId )
     {
        try
@@ -47,6 +59,7 @@ public sealed class AssetGenerator : Component
           var response = await Http.RequestStringAsync( $"https://store.steampowered.com/api/appdetails?appids={steamId}" );
           if ( string.IsNullOrEmpty( response ) ) return (null, null);
 
+          // Lightweight extraction for performance within the s&box runtime
           var nameMatch = System.Text.RegularExpressions.Regex.Match( response, @"""name"":\s*""([^""]+)""" );
           var priceMatch = System.Text.RegularExpressions.Regex.Match( response, @"""final_formatted"":\s*""([^""]+)""" );
 
@@ -62,6 +75,10 @@ public sealed class AssetGenerator : Component
        }
     }
 
+    /// <summary>
+    /// Generates a unique IdleMonData instance.
+    /// Stat weightings are influenced by the current MarketScale (S).
+    /// </summary>
     public async Task<IdleMonData> RollNewAsset()
     {
         if ( _cachedSteamIds == null || _cachedSteamIds.Count == 0 )
@@ -75,6 +92,7 @@ public sealed class AssetGenerator : Component
             ? _cachedSteamIds[random.Next(_cachedSteamIds.Count)] 
             : 4000;
 
+        // Fetch current economy scale for stat weighting
         float S = MarketServiceSystem.GetCurrentScale();
 
         var metadata = await GetSteamMetadata( rolledSteamId );
@@ -90,22 +108,31 @@ public sealed class AssetGenerator : Component
             finalName = $"{prefixes[random.Next( prefixes.Length )]}-{random.Next( 100, 999 )} Node";
         }
         
-        // Stat Generation Logic
+        // --- STAT GENERATION LOGIC ---
+        // Addition: Pure PPS increase scaled by Market Potential
         double addition = Math.Round(random.NextDouble() * (BasePotential * S), 2);
+        
+        // Multiplier: Percentage boost (1.0 to 1.5 base)
         double multiplier = 1.0 + Math.Round(random.NextDouble() * (0.5 * S), 2);
+        
+        // Subtraction: 40% chance of a "Cursed" flat penalty
         double subtraction = (random.NextDouble() < 0.4) 
             ? Math.Round(random.NextDouble() * (BasePotential * 0.5 * S), 2) 
             : 0;
+            
+        // Division: 20% chance of an efficiency penalty (Higher is worse)
         double division = (random.NextDouble() < 0.2) 
             ? 1.0 + Math.Round(random.NextDouble() * 0.5, 2) 
             : 1.0;
+            
+        // TeamBonus: Rare (10%) synergy multiplier
         double teamBonus = (random.NextDouble() < 0.1) 
             ? 1.0 + Math.Round(random.NextDouble() * 0.1, 2) 
             : 1.0;
 
         return new IdleMonData
         {
-            ID = Guid.NewGuid(), // CRITICAL: This seeds the deterministic model selection
+            ID = Guid.NewGuid(), // Primary key for roster identity
             Name = finalName,
             SteamId = rolledSteamId,
             

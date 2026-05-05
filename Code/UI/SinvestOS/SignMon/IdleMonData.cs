@@ -3,47 +3,50 @@ using System;
 
 namespace Sinvest;
 
+/// <summary>
+/// The core data structure representing an "IdleMon" asset.
+/// Follows a strict Addition/Subtraction/Multiplier/Division (ASMD) math model.
+/// </summary>
 [System.Serializable]
 public struct IdleMonData
 {
-	/// <summary>
-	/// Unique identifier used to seed deterministic model selection.
-	/// Same ID = Same Model from the pool.
-	/// </summary>
-	public Guid ID;
-	public string Name;
-
-	/// <summary>
-	/// If set, this specific model is used. 
-	/// If null or empty, the system picks deterministically from the folder pool using ID.
-	/// </summary>
-	public string ModelPath;
-
-	/// <summary>
-	/// Optional: Can be used to point to specific sub-folders in the ModelPool 
-	/// (e.g., "models/idlemon/rare")
-	/// </summary>
-	public string PoolCategory;
-
-	public int SteamId;
+	// --- IDENTIFICATION ---
+	public Guid ID;             // Unique instance identifier for roster persistence
+	public string Name;         // Human-readable title (typically injected via Steam API)
+	public string ModelPath;    // Specific model override (null if using Pooled Visuals)
+	public string PoolCategory; // Tags for visual variance (e.g., "standard", "gold", "void")
+	public int SteamId;         // The AppID used for shader parameters and icon fetching
     
-	// --- Primary Stats ---
-	[Title( "Addition (A)" )] public double Addition;      
-	[Title( "Multiplier (M)" )] public double Multiplier;    
-	[Title( "Subtraction (S)" )] public double Subtraction;   
-	[Title( "Division (D)" )] public double Division;      
-	[Title( "Team Bonus (T)" )] public double TeamBonus;
-	[Title( "Luck (L)" )] public double Luck;
-	[Title( "Efficiency (E)" )] public double CostEfficiency;
-    
-	// --- Metadata & Lifecycle ---
-	public DateTime RolledAt;
-	public float MarketScaleAtBirth { get; set; } 
-	public int Generation { get; set; }           
+	// --- ECONOMIC ATTRIBUTES (The ASMD Engine) ---
+	// Logic Order: ((Base + Sum(A)) - Sum(S)) / Prod(D) * Prod(M) * Prod(T)
 
-	/// <summary>
-	/// Default empty state for vacant roster slots.
-	/// </summary>
+	[Title( "Addition (A)" )] 
+	public double Addition;      // Flat increase to base generation (PPS)
+
+	[Title( "Multiplier (M)" )] 
+	public double Multiplier;    // Percentage-based boost applied after base calculations
+
+	[Title( "Subtraction (S)" )] 
+	public double Subtraction;   // Flat penalty (Negative traits or "Rusty" assets)
+
+	[Title( "Division (D)" )] 
+	public double Division;      // Efficiency tax (divisor); must be >= 1.0 to avoid bugs
+
+	[Title( "Team Bonus (T)" )] 
+	public double TeamBonus;    // Contextual multiplier applied if requirements are met
+
+	[Title( "Luck (L)" )] 
+	public double Luck;          // Influences roll quality in the AssetGenerator
+
+	[Title( "Efficiency (E)" )] 
+	public double CostEfficiency; // Reduction in upgrade or maintenance costs
+    
+	// --- LIFECYCLE METADATA ---
+	public DateTime RolledAt;         // Birth timestamp for age-based rewards
+	public float MarketScaleAtBirth { get; set; } // Global multiplier (S) at time of creation
+	public int Generation { get; set; }           // Determines stat caps and rarity tier
+
+	// --- FALLBACKS ---
 	public static IdleMonData Empty => new IdleMonData 
 	{ 
 		ID = Guid.Empty, 

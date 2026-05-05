@@ -9,7 +9,7 @@
 // ROOT
 // ==============================
 IdleMonDashBoard {
-  pointer-events: all;
+  pointer-events: all; // Required for Panorama OS-style focus capture
   width: 100%;
   height: 100%;
   display: flex;
@@ -20,12 +20,13 @@ IdleMonDashBoard {
 
   // ============================
   // SHARED STAT SYSTEM
-  // Defined at root so RenderStats works everywhere
+  // Logic: Defined at root so RenderStats fragments can inherit 
+  // styling across different UI depth levels (Cards vs Inspector).
   // ============================
   .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 12px; // Note: Ensure gap polyfill is active or replace with margin if engine version is < 2024.
 
     .stats-section {
       display: flex;
@@ -58,7 +59,7 @@ IdleMonDashBoard {
     background: rgba(0, 0, 0, 0.15);
     padding: 4px 8px;
     border-radius: 2px;
-    border-left: 2px solid $gtk-shadow;
+    border-left: 2px solid $gtk-shadow; // Mechanical hint: Visualizes the stat 'weight'
     transition: all 0.1s ease;
 
     .icon {
@@ -85,6 +86,7 @@ IdleMonDashBoard {
       }
     }
 
+    // Color Logic: Maps directly to the Ledger's Inflow/Outflow impact
     &.positive { border-left-color: $accent-money; }
     &.negative { border-left-color: $danger-red; }
 
@@ -139,7 +141,7 @@ IdleMonDashBoard {
     width: 100%;
     min-height: 0;
 
-    // LEFT COLUMN
+    // LEFT COLUMN: Scrollable node list
     .node-matrix {
       flex: 1;
       display: flex;
@@ -156,6 +158,7 @@ IdleMonDashBoard {
     }
 
     // RIGHT COLUMN - The Diagnostic Inspector
+    // High-density data for analyzing specific ledger contributions
     .inspector-panel {
       width: 820px;
       min-width: 420px;
@@ -197,7 +200,7 @@ IdleMonDashBoard {
           height: 340px;
           flex-shrink: 0;
           @include bevel-in;
-          overflow: hidden;
+          overflow: hidden; // Clips the 3D ScenePanel to the bevel container
         }
 
         .performance-data {
@@ -217,7 +220,6 @@ IdleMonDashBoard {
               color: $gtk-shadow;
             }
           }
-          // Stats layout inherited from root — no overrides needed here
         }
       }
 
@@ -278,7 +280,7 @@ IdleMonDashBoard {
         min-height: 0;
         overflow: hidden;
 
-        // Compact overrides
+        // Compact overrides: Optimizes space for the grid view
         .stats-container { gap: 4px; }
         .stats-section   { gap: 3px; }
         .stats-grid      { gap: 3px; }
@@ -289,7 +291,7 @@ IdleMonDashBoard {
           gap: 3px;
 
           .icon          { font-size: 10px; }
-          .stat-info label { display: none; } 
+          .stat-info label { display: none; }
           .value         { font-size: 9px; }
         }
       }
@@ -297,7 +299,7 @@ IdleMonDashBoard {
   }
 
   // ============================
-  // FOOTER
+  // FOOTER (Drafting / Comparison Stage)
   // ============================
   .footer {
     display: flex;
@@ -317,6 +319,7 @@ IdleMonDashBoard {
       width: 1500px;
       gap: 20px;
 
+      // Yield labels: Colors represent the projected delta of a swap
       .yield-contribution {
         font-size: 11px;
         font-weight: 800;
@@ -334,7 +337,6 @@ IdleMonDashBoard {
         &.negative {
           color: $danger-red;
           background-color: rgba($danger-red, 0.05);
-          // Optional: Add a slight pulse or bold to warn the player
           font-weight: 900;
         }
       }
@@ -368,7 +370,7 @@ IdleMonDashBoard {
         .card-header {
           display: flex;
           flex-direction: row;
-          justify-content: space-between; // This pushes Name to left and Gen to right
+          justify-content: space-between;
           align-items: center;
           padding: 8px 12px;
           height: 45px;
@@ -379,7 +381,6 @@ IdleMonDashBoard {
             font-weight: 800;
             color: $gtk-text;
             text-transform: uppercase;
-            // Prevent long names from squishing the gen-tag
             flex: 1;
             margin-right: 8px;
           }
@@ -392,7 +393,7 @@ IdleMonDashBoard {
             background: rgba(0, 0, 0, 0.2);
             padding: 2px 6px;
             border-radius: 2px;
-            flex-shrink: 0; // Ensures the G# tag never shrinks
+            flex-shrink: 0;
           }
         }
 
@@ -420,7 +421,6 @@ IdleMonDashBoard {
           flex-direction: column;
           min-height: 0;
 
-          // Compact overrides
           .stats-container { gap: 8px; }
           .stats-section   { gap: 4px; }
           .stats-grid      { gap: 4px; }
@@ -434,7 +434,7 @@ IdleMonDashBoard {
             gap: 4px;
 
             .icon            { font-size: 11px; }
-            .stat-info label { display: none; } 
+            .stat-info label { display: none; }
             .value           { font-size: 9px; }
           }
         }

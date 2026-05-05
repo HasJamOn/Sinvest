@@ -6,6 +6,10 @@ using System.Text.Json;
 
 namespace Sinvest;
 
+/// <summary>
+/// Manages the active team of IdleMons, handles economic yield calculations, 
+/// and orchestrates persistence via the GameSaveSystem.
+/// </summary>
 public sealed class RosterManager : Component
 {
     public static RosterManager Instance { get; private set; }
@@ -13,7 +17,7 @@ public sealed class RosterManager : Component
     private static readonly JsonSerializerOptions _jsonOptions = new() { IncludeFields = true };
     
     [Property] public bool ShowDebugHUD { get; set; } = true;
-    [Property] public double BaseGeneration { get; set; } = 0.0; // Variable 'B' from GDD
+    [Property] public double BaseGeneration { get; set; } = 0.0; // Starting PPS before modifiers
     
     protected override void OnAwake()
     {
@@ -29,61 +33,72 @@ public sealed class RosterManager : Component
 
     private RealTimeSince _timeSinceLastChange;
     private bool _isDirty = false;
-    private const float SYNC_DELAY = 10.0f; 
+    private const float SYNC_DELAY = 10.0f; // Seconds to wait before auto-syncing changes
 
     public bool IsDirty => _isDirty;
     private bool _hasInitialized = false;
 
     /// <summary>
-    /// GDD Section 3: The Core Math Engine.
+    /// THE CORE MATH ENGINE (GDD Section 3)
+    /// Calculates current Profit Per Second (PPS) across the roster.
+    /// Order: (Additive Phase) -> (Divisive Phase) -> (Multiplicative Phase)
     /// Formula: G = [ max(0, ((B + sumA) - sumS) / prodD) ] * prodM * prodT
     /// </summary>
     public double CalculateTotalYield()
     {
-	    if ( ActiveNodes == null || ActiveNodes.Count == 0 ) return 0;
+        if ( ActiveNodes == null || ActiveNodes.Count == 0 ) return 0;
 
-	    // 1. Accumulation Phase
-	    double sumA = 0;
-	    double sumS = 0;
-	    double prodD = 1.0;
-	    double prodM = 1.0;
-	    double prodT = 1.0;
+        // 1. ACCUMULATION PHASE
+        // We aggregate traits across all 6 slots simultaneously.
+        double sumA = 0;    // Sum of all Addition stats
+        double sumS = 0;    // Sum of all Subtraction stats
+        double prodD = 1.0; // Product of all Division stats
+        double prodM = 1.0; // Product of all Multipliers
+        double prodT = 1.0; // Product of Team Bonuses
 
-	    foreach ( var node in ActiveNodes )
-	    {
-		    if ( node.ID == Guid.Empty ) continue;
+        foreach ( var node in ActiveNodes )
+        {
+           if ( node.ID == Guid.Empty ) continue;
 
-		    sumA += node.Addition;
-		    sumS += node.Subtraction;
+           sumA += node.Addition;
+           sumS += node.Subtraction;
             
-		    // Apply products using 1.0 as identity (empty/default slots do nothing)
-		    prodD *= Math.Max( 1.0, node.Division );
-		    prodM *= Math.Max( 0, node.Multiplier ); 
-		    prodT *= Math.Max( 0, node.TeamBonus );
-	    }
+           // Using 1.0 as identity (Empty slots have no impact on products)
+           prodD *= Math.Max( 1.0, node.Division );
+           prodM *= Math.Max( 0, node.Multiplier ); 
+           prodT *= Math.Max( 0, node.TeamBonus );
+        }
 
-	    // 2. The Formula Assembly
-	    // Additive base: (Base + Addition - Subtraction)
-	    double additiveBase = (BaseGeneration + sumA) - sumS;
+        // 2. THE FORMULA ASSEMBLY
+        // Base Income calculation
+        double additiveBase = (BaseGeneration + sumA) - sumS;
 
-	    // Divide: Reduces the base before multipliers are applied
-	    double quotient = additiveBase / prodD;
+        // Efficiency reduction applied BEFORE multipliers to dampen growth curves
+        double quotient = additiveBase / prodD;
 
-	    // Clamp: Prevents "Cursed" nodes from generating negative money
-	    double clampedBase = Math.Max( 0, quotient );
+        // Economic Floor: Prevents "Negative Yield" from depleting funds
+        double clampedBase = Math.Max( 0, quotient );
 
-	    // Final Global Multipliers (Synergy)
-	    return clampedBase * prodM * prodT;
+        // 3. GLOBAL SYNERGY
+        // Final scaling applied at the end of the chain
+        return clampedBase * prodM * prodT;
     }
 
+    /// <summary>
+    /// Deducts funds and marks the ledger as "Dirty" to trigger an eventual sync.
+    /// </summary>
     public void ConsumeIdleBucks( double amount )
     {
         IdleBucks -= amount;
         SaveRoster();
-        _isDirty = true; // Mark dirty so we sync the new balance
+        _isDirty = true; 
         _timeSinceLastChange = 0;
     }
 
+    /// <summary>
+    /// Utility for UI feedback. Simulates replacing each slot with a candidate 
+    /// to determine which swap yields the highest PPS increase/decrease.
+    /// </summary>
     public double[] GetSwapDeltas( IdleMonData candidate )
     {
         double[] deltas = new double[6];
@@ -98,7 +113,7 @@ public sealed class RosterManager : Component
             
             deltas[i] = CalculateTotalYield() - currentYield;
             
-            ActiveNodes[i] = originalMon; // Restore
+            ActiveNodes[i] = originalMon; // Restore state
         }
         return deltas;
     }
@@ -107,27 +122,26 @@ public sealed class RosterManager : Component
     {
         if ( ShowDebugHUD ) DrawDebugHUD();
 
+        // Lazy-loading sequence once GameSaveSystem is ready
         if ( !_hasInitialized && GameSaveSystem.Instance.IsValid() )
         {
-	        var save = GameSaveSystem.Instance;
+            var save = GameSaveSystem.Instance;
     
-	        // Ensure the save system actually has a session ready
-	        if ( save.CurrentCharacter == null )
-	        {
-		        save.LoadActiveSlot(); 
-	        }
+            if ( save.CurrentCharacter == null )
+            {
+               save.LoadActiveSlot(); 
+            }
 
-	        // REMOVE the check for "New Character". 
-	        // We want to load data even if the player hasn't renamed themselves yet.
-	        LoadRoster();
-	        CalculateOfflineGains();
-	        _hasInitialized = true;
+            LoadRoster();
+            CalculateOfflineGains();
+            _hasInitialized = true;
         }
 
         if ( !_hasInitialized ) return;
 
         ProcessEconomy();
 
+        // Auto-save logic: Commits changes if no new changes occurred during SYNC_DELAY
         if ( _isDirty && _timeSinceLastChange > SYNC_DELAY )
         {
             _isDirty = false;
@@ -135,6 +149,10 @@ public sealed class RosterManager : Component
         }
     }
 
+    /// <summary>
+    /// Integrates yield over time. Bucks are stored in a pending buffer and 
+    /// "flushed" to the main balance at set intervals to reduce save frequency.
+    /// </summary>
     private void ProcessEconomy()
     {
         double yield = CalculateTotalYield();
@@ -146,7 +164,7 @@ public sealed class RosterManager : Component
             {
                 IdleBucks += _pendingBucks;
                 _pendingBucks = 0;
-                // We save stats to the local buffer immediately
+                // Immediate update to local save buffer for data safety
                 GameSaveSystem.Instance?.SetStoredStat( "idlemon_bucks", IdleBucks );
             }
             _timeSinceLastFlush = 0;
@@ -166,72 +184,76 @@ public sealed class RosterManager : Component
         );
     }
 
+    /// <summary>
+    /// Primary entry point for roster modification. Triggers an immediate disk commit.
+    /// </summary>
     public void SwapNode( int index, IdleMonData candidate )
     {
-	    if ( index < 0 || index >= ActiveNodes.Count ) return;
+        if ( index < 0 || index >= ActiveNodes.Count ) return;
     
-	    ActiveNodes[index] = candidate;
-
-	    // Trigger an immediate commit to disk
-	    SaveRoster();
+        ActiveNodes[index] = candidate;
+        SaveRoster();
     
-	    // Reset the dirty flag since we just saved
-	    _isDirty = false;
-	    _timeSinceLastChange = 0;
+        _isDirty = false;
+        _timeSinceLastChange = 0;
     
-	    Log.Info( $"[ROSTER] Slot {index} updated. Transaction committed to FileSystem." );
+        Log.Info( $"[ROSTER] Slot {index} updated. Transaction committed." );
     }
 
+    /// <summary>
+    /// Serializes current state to the persistent storage.
+    /// Handles both detailed JSON (roster) and flat stats (leaderboards).
+    /// </summary>
     public void SaveRoster()
     {
-	    var save = GameSaveSystem.Instance;
-	    if ( !save.IsValid() ) return;
+        var save = GameSaveSystem.Instance;
+        if ( !save.IsValid() ) return;
 
-	    // 1. COMPLEX DATA (Cookies)
-	    string json = JsonSerializer.Serialize( ActiveNodes, _jsonOptions );
-	    save.SetStoredString( "idlemon_roster", json );
+        // 1. FULL DATA (The "Source of Truth" for the roster)
+        string json = JsonSerializer.Serialize( ActiveNodes, _jsonOptions );
+        save.SetStoredString( "idlemon_roster", json );
 
-	    // 2. COMPETITIVE STATS (Numeric Stats for Leaderboards)
-	    double yield = CalculateTotalYield();
-	    save.SetStoredStat( "idlemon_bucks", IdleBucks );
-	    save.SetStoredStat( "current_yield_pps", yield ); // Global Yield Ranking
+        // 2. COMPETITIVE STATS (Standardized keys for Global Stats API)
+        double yield = CalculateTotalYield();
+        save.SetStoredStat( "idlemon_bucks", IdleBucks );
+        save.SetStoredStat( "current_yield_pps", yield ); 
     
-	    // Track the highest Luck in the roster for a "Luckiest Player" board
-	    double maxLuck = ActiveNodes.Max( x => x.Luck );
-	    save.SetStoredStat( "roster_max_luck", maxLuck );
+        double maxLuck = ActiveNodes.Count > 0 ? ActiveNodes.Max( x => x.Luck ) : 0;
+        save.SetStoredStat( "roster_max_luck", maxLuck );
 
-	    save.SetStoredString( "idlemon_last_timestamp", DateTime.UtcNow.ToString("O") );
-	    
-	    _ = save.SaveActiveSlotAsync();
+        // Timestamp for calculating offline gains upon next load
+        save.SetStoredString( "idlemon_last_timestamp", DateTime.UtcNow.ToString("O") );
+        
+        _ = save.SaveActiveSlotAsync();
     }
 
     public void LoadRoster()
     {
-	    var save = GameSaveSystem.Instance;
-	    if ( !save.IsValid() ) return;
+        var save = GameSaveSystem.Instance;
+        if ( !save.IsValid() ) return;
 
-	    IdleBucks = save.GetStoredStat( "idlemon_bucks" );
-	    string json = save.GetStoredString( "idlemon_roster" );
+        IdleBucks = save.GetStoredStat( "idlemon_bucks" );
+        string json = save.GetStoredString( "idlemon_roster" );
     
-	    if ( !string.IsNullOrEmpty( json ) && json != "[]" )
-	    {
-		    try
-		    {
-			    // Use _jsonOptions here as well
-			    var loaded = JsonSerializer.Deserialize<List<IdleMonData>>( json, _jsonOptions );
-			    if ( loaded != null )
-			    {
-				    ActiveNodes = loaded;
-				    while (ActiveNodes.Count < 6) ActiveNodes.Add(IdleMonData.Empty);
-				    return;
-			    }
-		    }
-		    catch ( Exception e ) 
-		    { 
-			    Log.Error( $"[ROSTER] Load failed - schema mismatch: {e.Message}" ); 
-		    }
-	    }
-	    ResetToGenesis();
+        if ( !string.IsNullOrEmpty( json ) && json != "[]" )
+        {
+           try
+           {
+              var loaded = JsonSerializer.Deserialize<List<IdleMonData>>( json, _jsonOptions );
+              if ( loaded != null )
+              {
+                 ActiveNodes = loaded;
+                 // Ensure we always have exactly 6 slots
+                 while (ActiveNodes.Count < 6) ActiveNodes.Add(IdleMonData.Empty);
+                 return;
+              }
+           }
+           catch ( Exception e ) 
+           { 
+              Log.Error( $"[ROSTER] Load failed - schema mismatch: {e.Message}" ); 
+           }
+        }
+        ResetToGenesis();
     }
 
     private void ResetToGenesis()
@@ -240,6 +262,9 @@ public sealed class RosterManager : Component
         for ( int i = 0; i < 6; i++ ) ActiveNodes.Add( IdleMonData.Empty );
     }
 
+    /// <summary>
+    /// Calculates catch-up income based on the last recorded session timestamp.
+    /// </summary>
     private void CalculateOfflineGains()
     {
         var save = GameSaveSystem.Instance;
@@ -248,7 +273,6 @@ public sealed class RosterManager : Component
         string lastTimestampStr = save.GetStoredString( "idlemon_last_timestamp" );
         if ( DateTime.TryParse( lastTimestampStr, out DateTime lastSeen ) )
         {
-            // GDD Section 5: Offline Gains = G * (Current - Last)
             TimeSpan gap = DateTime.UtcNow - lastSeen;
             if ( gap.TotalSeconds > 1 ) 
             {
@@ -262,13 +286,11 @@ public sealed class RosterManager : Component
     
     protected override void OnDisabled()
     {
-	    // If the component is turned off or the game stops, try to save if dirty
-	    if ( _isDirty )
-	    {
-		    SaveRoster();
-		    Log.Info( "[ROSTER] Emergency Save triggered on Component Disable." );
-	    }
+        // Safety flush on shutdown
+        if ( _isDirty )
+        {
+           SaveRoster();
+           Log.Info( "[ROSTER] Emergency Save triggered on Component Disable." );
+        }
     }
-    
-    
 }
