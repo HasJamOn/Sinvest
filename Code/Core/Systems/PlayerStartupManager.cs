@@ -5,9 +5,12 @@ using System.Threading.Tasks;
 
 namespace Sinvest;
 
+/// <summary>
+/// Orchestrates the initial synchronization between the scene, the GameSaveSystem, 
+/// and the EconomyManager. It ensures the "Starter Kit" is only injected once per save.
+/// </summary>
 public sealed class PlayerStartupManager : Component
 {
-    // Changed to property with fallback to ensure we find it across the scene if needed
     private EconomyManager _economy => Components.Get<EconomyManager>( FindMode.EverythingInSelfAndAncestors ) 
                                     ?? Scene.GetAllComponents<EconomyManager>().FirstOrDefault();
 
@@ -15,7 +18,7 @@ public sealed class PlayerStartupManager : Component
     {
        if ( IsProxy ) return;
 
-       // Kick off the initialization
+       // Initialization is asynchronous to account for frame-delays during scene loading.
        _ = InitializeCharacterAsync();
     }
 
@@ -24,7 +27,7 @@ public sealed class PlayerStartupManager : Component
        Log.Info( "[STARTUP] Beginning character sync sequence..." );
 
        int attempts = 0;
-       // Polling loop for GameSaveSystem and CurrentCharacter
+       // Polling loop: Wait for the singleton Instance and the Replay Engine to finish loading data.
        while ( (GameSaveSystem.Instance == null || GameSaveSystem.Instance.CurrentCharacter == null) && attempts < 50 )
        {
           await Task.Delay( 100 );
@@ -36,12 +39,10 @@ public sealed class PlayerStartupManager : Component
        if ( !saveSystem.IsValid() || saveSystem.CurrentCharacter == null )
        {
           Log.Error( "[STARTUP] Timed out waiting for SaveSystem. UI may stay stuck." );
-          // Force a notification to at least let the UI try to resolve the "Syncing" state
           saveSystem?.NotifyDataChanged();
           return;
        }
 
-       // Ensure the EconomyManager is ready. Scene transitions can be frame-delayed.
        attempts = 0;
        while ( _economy == null && attempts < 10 )
        {
@@ -52,21 +53,24 @@ public sealed class PlayerStartupManager : Component
        RunStartupLogic( saveSystem );
     }
 
+    /// <summary>
+    /// Checks if the ledger requires the initial injection of cash/items.
+    /// Uses the "Starter Kit" string as a sentinel value in the plaintext file.
+    /// </summary>
     private void RunStartupLogic( GameSaveSystem saveSystem )
     {
         var path = $"slot_{saveSystem.ActiveSlot}.txt";
         bool fileExists = FileSystem.Data.FileExists( path );
         string content = fileExists ? FileSystem.Data.ReadAllText( path ) : "";
 
-        // If file is missing OR brand-new (only has META tag, no kit transactions)
+        // Only apply modifiers if the file is brand new or lacks the starter kit entry.
         if ( !fileExists || !content.Contains( "Starter Kit" ) )
         {
            Log.Info( "[STARTUP] Ledger needs initialization. Applying modifiers..." );
         
-           // If the file didn't exist, SaveActiveSlotAsync creates the META header
            if ( !fileExists )
            {
-              // We don't await this as it's a simple write, but we want it done before transactions
+              // Create the initial META header before appending transactions.
               _ = saveSystem.SaveActiveSlotAsync();
            }
 
@@ -75,11 +79,14 @@ public sealed class PlayerStartupManager : Component
         else
         {
            Log.Info( $"[STARTUP] Ledger for {saveSystem.CurrentCharacter.Name} verified. Skipping kit injection." );
-           // Even if we skip injection, we notify data changed to clear any UI loading states
            saveSystem.NotifyDataChanged();
         }
     }
 
+    /// <summary>
+    /// Logic for processing StartingModifiers. 
+    /// Handles the "Nepokid" share injection and the "Destitute" zero-balance restriction.
+    /// </summary>
     private void ApplyModifiers( StartingModifiers mods )
     {
         var save = GameSaveSystem.Instance;
@@ -87,30 +94,28 @@ public sealed class PlayerStartupManager : Component
         if ( !_economy.IsValid() )
         {
            Log.Error( "[STARTUP] EconomyManager MISSING. Cannot apply starting funds!" );
-           // Critical failure - notify UI anyway so it doesn't hang
            save.NotifyDataChanged();
            return;
         }
 
         Log.Info( $"[STARTUP] Injecting funds for Slot {save.ActiveSlot}..." );
 
-        // Standard Issue: Applied unless Destitute
+        // Standard Issue: Given to all players unless the 'Destitute' flag is set.
         if ( !mods.HasFlag( StartingModifiers.Destitute ) )
         {
            save.CommitMoneyTransaction( "IN", 1000, "Starter Kit: Cash" );
            save.CommitShareTransaction( 1, "Starter Kit: Share" ); 
         }
 
-        // Conditional Modifier: Nepokid
+        // Modifier: Nepokid. Injects high-value shares into the S&P 500 equivalent.
         if ( mods.HasFlag( StartingModifiers.Nepokid ) )
         {
            save.CommitShareTransaction( 500000, "Modifier: Nepokid" );
         }
 
-        // Handle other items...
+        // Modifier: Phoney. Immediately unlocks the mobile interface.
         if ( mods.HasFlag( StartingModifiers.Phoney ) ) GrantItem( "item_phone" );
 
-        // Finalize and broadcast
         save.NotifyDataChanged();
         Log.Info( "[STARTUP] Sync sequence complete." );
     }

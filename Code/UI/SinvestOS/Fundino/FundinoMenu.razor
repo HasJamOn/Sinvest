@@ -203,15 +203,15 @@
 
     private void PreFillHistory()
     {
-        var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
+        var system = Scene.GetAllComponents<MarketServiceSystem>().FirstOrDefault();
         if (system == null) return;
 
         var now = DateTime.UtcNow;
         for (int i = 59; i >= 0; i--)
         {
             var time  = now.AddMinutes(-i);
-            int seed  = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
-            double px = MarketServerSystem.CalculatePrice(time, seed, false);
+            int seed  = MarketServiceSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+            double px = MarketServiceSystem.CalculatePrice(time, seed, false);
             FundinoMarketService.UpdatePrice(px);
         }
     }
@@ -223,20 +223,24 @@
         RefreshGraph();
     }
 
-    private void RefreshGraph()
+private void RefreshGraph()
     {
+        // Safety: Prevent execution if the GraphCanvas reference or MarketService isn't established.
         if (GraphCanvas == null) return;
 
-        var system = Scene.GetAllComponents<MarketServerSystem>().FirstOrDefault();
+        var system = Scene.GetAllComponents<MarketServiceSystem>().FirstOrDefault();
         if (system == null) return;
 
-        // --- 1. Build price data ---
+        // --- 1. Historical Data Reconstruction ---
+        // We reconstruct the price history based on the selected time range.
+        // The loop moves backward in time to fetch seeds; Reverse() ensures 
+        // the list follows chronological order for left-to-right drawing.
         var data = new List<double>();
         XAxisLabels.Clear();
 
         var now        = DateTime.UtcNow;
-        int resolution = 60;
-        int labelCount = 6;
+        int resolution = 60; // Total points to render on the graph
+        int labelCount = 6;  // Total timestamps on the X-Axis
 
         int totalMinutes = TimeRanges.ContainsKey(CurrentRange) ? TimeRanges[CurrentRange] : 1440;
 
@@ -251,12 +255,13 @@
         for (int i = 0; i < resolution; i++)
         {
             var time = now.AddMinutes(-(i * step));
-            int seed = MarketServerSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
-            data.Add(MarketServerSystem.CalculatePrice(time, seed, false));
+            int seed = MarketServiceSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+            data.Add(MarketServiceSystem.CalculatePrice(time, seed, false));
         }
         data.Reverse();
 
-        // --- 2. X-Axis labels ---
+        // --- 2. X-Axis Label Generation ---
+        // Generates human-readable timestamps distributed evenly across the horizontal axis.
         for (int i = 0; i < labelCount; i++)
         {
             float   pct       = (float)i / (labelCount - 1);
@@ -264,39 +269,39 @@
             XAxisLabels.Add(GetLabelForRange(labelTime, CurrentRange));
         }
 
-        // --- 3. Determine view window (price bounds + buffer) ---
         if (data.Count == 0) { StateHasChanged(); return; }
 
+        // --- 3. View Window Calculation (The 'Camera' Logic) ---
+        // We find the min/max of the dataset to define the graph's Y-scale.
         double dataMin  = data.Min();
         double dataMax  = data.Max();
         double dataRange = dataMax - dataMin;
 
+        // Edge Case: If price is flat, create a artificial 10% range to avoid division by zero.
         if (dataRange <= 0)
         {
             dataRange = FundinoMarketService.CurrentPrice * 0.1;
             if (dataRange <= 0) dataRange = 1.0;
         }
 
-        // 40% buffer on each side — this keeps the line visually centred and
-        // provides headroom so the line never touches the panel edge.
+        // Apply a 40% vertical buffer. This centers the line and prevents the 
+        // graph from clipping into the top header or bottom X-labels.
         double buffer  = dataRange * 0.4;
         double viewMin = dataMin - buffer;
         double viewMax = dataMax + buffer;
 
-        // --- 4. Push data & bounds to the graph panel ---
+        // --- 4. Synchronization with Painter ---
+        // Push the bounds and data to the custom FundinoMarketGraph panel.
         GraphCanvas.MinVal  = (float)viewMin;
         GraphCanvas.MaxVal  = (float)viewMax;
         GraphCanvas.History = data;
-        // RequestUpdate uses the stored rect if available, or defers to OnLayout.
+        
+        // Triggers the procedural drawing of 'graph-line' segments.
         GraphCanvas.RequestUpdate();
 
-        // --- 5. Y-Axis labels ---
-        //
-        // We generate them across viewMin..viewMax in the same order the
-        // y-axis renders them: top label = viewMax, bottom label = viewMin.
-        // The y-axis uses justify-content: space-between + padding: 10px 0,
-        // so label[0] sits at VerticalPadding px from the top.
-        // MapPriceToY(viewMax) also returns VerticalPadding → aligned ✓
+        // --- 5. Y-Axis Price Labeling ---
+        // Generates price labels for the sidebar. The logic descends from 
+        // viewMax (top) to viewMin (bottom) to match the UI layout.
         YAxisLabels.Clear();
         int priceSteps = 5;
         double viewRange = viewMax - viewMin;
@@ -305,22 +310,12 @@
             YAxisLabels.Add(viewMax - viewRange * (i / (float)(priceSteps - 1)));
         }
 
-        // --- 6. Current-price-tag pixel position ---
-        //
-        // We ask the graph for the Y pixel that corresponds to the live price.
-        // This uses the exact same MapPriceToY() math as the drawn line, so
-        // the tag and the line tip are always on the same horizontal scanline.
-        float rawY = GraphCanvas.GetCurrentPriceY((float)FundinoMarketService.CurrentPrice);
-
-        // Clamp so the tag label never overflows the top or bottom of the panel.
-        float maxY = GraphCanvas.LastKnownRect.Height > 0
-            ? GraphCanvas.LastKnownRect.Height - TagHalfHeight
-            : 220f - TagHalfHeight;
-        CurrentPricePixelY = Math.Clamp(rawY, TagHalfHeight, maxY);
+        // --- 6. Tag Positioning ---
+        // Maps the current live price to a pixel coordinate within the new view window.
+        UpdatePriceTagPosition();
 
         StateHasChanged();
-    }
-    
+    }    
     private string GetLabelForRange(DateTime dt, string range)
     {
         return range switch
@@ -378,6 +373,24 @@
         
 	    IsProcessing = false;
 	    StateHasChanged();
+    }
+    
+    private void UpdatePriceTagPosition()
+    {
+	    if ( GraphCanvas == null ) return;
+
+	    // Fetch the Y pixel that corresponds to the live price.
+	    float rawY = GraphCanvas.GetCurrentPriceY((float)FundinoMarketService.CurrentPrice);
+
+	    // Access the container height to safely clamp the tag.
+	    float containerHeight = GraphCanvas.LastKnownRect.Height > 0 
+		    ? GraphCanvas.LastKnownRect.Height 
+		    : 220f; // Matches SCSS .chart-container height
+
+	    float maxY = containerHeight - TagHalfHeight;
+        
+	    // Clamp ensures the tag doesn't render behind the header or under the footer
+	    CurrentPricePixelY = Math.Clamp(rawY, TagHalfHeight, maxY);
     }
 
     protected override int BuildHash()

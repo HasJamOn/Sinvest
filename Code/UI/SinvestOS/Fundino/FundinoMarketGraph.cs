@@ -7,62 +7,72 @@ using System.Linq;
 
 namespace Sinvest;
 
+/// <summary>
+/// A custom Panorama panel that renders a line-graph representing market history.
+/// It uses a segment-based drawing approach, creating individual panels for line
+/// segments to bypass the lack of a traditional 2D Canvas API in Panorama.
+/// </summary>
 public class FundinoMarketGraph : Panel
 {
     public List<double> History { get; set; } = new();
     public float MinVal { get; set; }
     public float MaxVal { get; set; }
 
-    // -------------------------------------------------------------------------
-    // PADDING CONSTANTS — must be kept in sync with SCSS manually.
-    //
-    // HorizontalPadding: pixels inset from left/right edge of the painter rect.
-    //   • Matches padding-left/padding-right on .graph-labels in SCSS.
-    //   • Set to 0 if you want the line to touch the edges (simplest alignment).
-    //
-    // VerticalPadding: pixels inset from top/bottom edge of the painter rect.
-    //   • Matches padding-top/padding-bottom on .y-axis in SCSS.
-    //   • Ensures the top and bottom y-labels are pixel-aligned with the graph.
-    // -------------------------------------------------------------------------
+    /* --- Padding Configuration --- */
+    // These must align with the SCSS to ensure the graph line doesn't 
+    // clip into the axis labels or borders.
     public float HorizontalPadding { get; set; } = 0f;
-    public float VerticalPadding   { get; set; } = 10f; // matches .y-axis padding: 10px 0
+    public float VerticalPadding   { get; set; } = 10f; 
 
-    // The last rect that was actually used to draw — published so the parent
-    // can call MapPriceToY() to position the current-price-tag correctly.
+    /// <summary> The most recent Rect provided by the layout engine. </summary>
     public Rect LastKnownRect { get; private set; }
 
     private bool _queuedUpdate = false;
 
-    // -------------------------------------------------------------------------
-    // LIFECYCLE — OnLayout receives the *freshly computed* rect from the
-    // layout engine, which is always correct even on the very first frame.
-    // We use the size-change check as a lightweight guard so we don't rebuild
-    // the whole child list every frame when nothing has changed.
-    // -------------------------------------------------------------------------
+    /// <summary>
+    /// Triggered by the UI engine whenever the panel's geometry is recalculated.
+    /// This is the most reliable place to draw, as it guarantees we have a 
+    /// non-zero width and height.
+    /// </summary>
     public override void OnLayout( ref Rect rect )
     {
-        if ( _queuedUpdate
-             || MathF.Abs( rect.Width  - LastKnownRect.Width  ) > 0.5f
-             || MathF.Abs( rect.Height - LastKnownRect.Height ) > 0.5f )
-        {
-            // Store now, before we enter UpdateGraph, so _queuedUpdate = false
-            // and any re-entrant call sees the correct rect.
-            LastKnownRect  = rect;
-            _queuedUpdate = false;
-            DrawSegments( rect );
-        }
+	    // 1. DYNAMIC SYNC: Fetch padding/margin from the SCSS computed values
+	    // This allows you to change the SCSS and have the graph "just work."
+	    UpdateDynamicPadding();
+
+	    if ( _queuedUpdate
+	         || MathF.Abs( rect.Width  - LastKnownRect.Width  ) > 0.5f
+	         || MathF.Abs( rect.Height - LastKnownRect.Height ) > 0.5f )
+	    {
+		    LastKnownRect  = rect;
+		    _queuedUpdate = false;
+		    DrawSegments( rect );
+	    }
+    }
+    
+    private void UpdateDynamicPadding()
+    {
+	    // Traverses up to .chart-container to find the .y-axis sibling
+	    var yAxis = Parent?.Parent?.Children.FirstOrDefault( x => x.HasClass( "y-axis" ) ); 
+
+	    if ( yAxis != null )
+	    {
+		    // Use .Value (pixels) and fallback to 10f if SCSS isn't loaded yet
+		    float top = yAxis.ComputedStyle.PaddingTop?.Value ?? 10f;
+		    float bottom = yAxis.ComputedStyle.PaddingBottom?.Value ?? 10f;
+        
+		    // We take the top padding to ensure the Y=0 point aligns with the first Y-label
+		    VerticalPadding = top;
+	    }
+
+	    // HorizontalPadding maps to the .graph-window margin
+	    HorizontalPadding = ComputedStyle.MarginLeft?.Value ?? 0f;
     }
 
-    // -------------------------------------------------------------------------
-    // PUBLIC API — called by the parent (InvestMenu) whenever data changes.
-    //
-    // Strategy:
-    //   • If we already have a valid rect (normal steady-state), redraw
-    //     immediately with the stored rect — no layout ping needed.
-    //   • If we don't yet have a rect (first frame, or after a DOM rebuild),
-    //     set the flag so the *next* OnLayout call triggers the draw with the
-    //     fresh rect the engine provides. This eliminates the Task.Delay hack.
-    // -------------------------------------------------------------------------
+    /// <summary>
+    /// Forces the graph to refresh its visual segments. 
+    /// If the panel hasn't been laid out yet, it queues the update for the next frame.
+    /// </summary>
     public void RequestUpdate()
     {
         if ( LastKnownRect.Width > 0 && LastKnownRect.Height > 0 )
@@ -71,19 +81,15 @@ public class FundinoMarketGraph : Panel
         }
         else
         {
-            // Panel has no size yet — defer until OnLayout fires.
             _queuedUpdate = true;
         }
     }
 
-    // -------------------------------------------------------------------------
-    // COORDINATE HELPERS — exposed as public so InvestMenu can use the exact
-    // same math when positioning the current-price-tag and y-axis labels.
-    // -------------------------------------------------------------------------
+    /* --- Coordinate Mapping Logic --- */
 
     /// <summary>
-    /// Maps a price value to a Y pixel coordinate (top = 0).
-    /// Respects VerticalPadding so the result aligns with y-axis labels.
+    /// Converts a price value into a vertical pixel offset.
+    /// Inverts the scale so higher prices move toward the top (Y=0).
     /// </summary>
     public float MapPriceToY( float price, Rect rect )
     {
@@ -91,14 +97,13 @@ public class FundinoMarketGraph : Panel
         if ( range <= 0f ) range = 1f;
 
         float drawHeight = rect.Height - VerticalPadding * 2f;
-        float normalized = ( price - MinVal ) / range; // 0 = Min, 1 = Max
-        // In UI space Y=0 is the top, so invert: high price → low Y.
+        float normalized = ( price - MinVal ) / range; 
+        
         return VerticalPadding + ( 1f - normalized ) * drawHeight;
     }
 
     /// <summary>
-    /// Maps a data-series index to an X pixel coordinate.
-    /// Respects HorizontalPadding so the result aligns with x-axis labels.
+    /// Maps a history index into a horizontal pixel offset.
     /// </summary>
     public float MapIndexToX( int index, int totalCount, Rect rect )
     {
@@ -107,21 +112,19 @@ public class FundinoMarketGraph : Panel
         return HorizontalPadding + ( index / (float)( totalCount - 1 ) ) * drawWidth;
     }
 
-    /// <summary>
-    /// Convenience wrapper: maps the current price using the last known rect.
-    /// Returns the midpoint of the rect if no valid rect exists yet.
-    /// </summary>
     public float GetCurrentPriceY( float price )
     {
         if ( LastKnownRect.Height <= 0 ) return 0f;
         return MapPriceToY( price, LastKnownRect );
     }
 
-    // -------------------------------------------------------------------------
-    // DRAW IMPLEMENTATION — private; always called with a validated rect.
-    // -------------------------------------------------------------------------
+    /// <summary>
+    /// The Core Painter: Instantiates 'graph-line' panels and calculates their 
+    /// transforms (rotation and length) to connect history points.
+    /// </summary>
     private void DrawSegments( Rect rect )
     {
+        // Clear previous segments to prevent visual stacking.
         DeleteChildren( true );
 
         if ( History == null || History.Count < 2 ) return;
@@ -137,6 +140,7 @@ public class FundinoMarketGraph : Panel
 
             if ( !float.IsFinite( y1 ) || !float.IsFinite( y2 ) ) continue;
 
+            // Geometry Math: Calculate distance (width) and angle (rotation).
             float dx       = x2 - x1;
             float dy       = y2 - y1;
             float distance = MathF.Sqrt( dx * dx + dy * dy );
@@ -144,12 +148,13 @@ public class FundinoMarketGraph : Panel
 
             var line = AddChild<Panel>( "graph-line" );
 
-            line.Style.Position        = PositionMode.Absolute;
-            line.Style.Left            = x1;
-            line.Style.Top             = y1;
-            // +0.5px overlap prevents sub-pixel gaps between adjacent segments.
-            line.Style.Width           = distance + 0.5f;
-            line.Style.Height          = 2;
+            // Applying inline styles for the "Procedural Line"
+            line.Style.Position         = PositionMode.Absolute;
+            line.Style.Left             = x1;
+            line.Style.Top              = y1;
+            // 0.5px overlap to combat anti-aliasing seams between segments.
+            line.Style.Width            = distance + 0.5f; 
+            line.Style.Height           = 2;
             line.Style.TransformOriginX = 0f;
             line.Style.TransformOriginY = 0.5f;
 

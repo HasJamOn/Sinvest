@@ -124,7 +124,7 @@ FundinoMenu {
       .graph-painter {
         position: absolute;
         top: 0; left: 0;
-        width: 83%;
+        width: 83%; //hack to ensure the whole graph shows and thereby the current price aligns correctly.
         height: 100%;
         pointer-events: none;
         z-index: 5;

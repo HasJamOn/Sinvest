@@ -75,7 +75,7 @@ public sealed class AssetGenerator : Component
             ? _cachedSteamIds[random.Next(_cachedSteamIds.Count)] 
             : 4000;
 
-        float S = MarketServerSystem.GetCurrentScale();
+        float S = MarketServiceSystem.GetCurrentScale();
 
         var metadata = await GetSteamMetadata( rolledSteamId );
         string finalName;

@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace Sinvest;
 
+/// <summary>
+/// Monitors the active session for achievement triggers and manages the local unlock flow.
+/// </summary>
 public sealed class PlayerAchievementManager : Component
 {
 	[Property] public bool DebugLogUnlocks { get; set; } = true;
@@ -13,7 +16,7 @@ public sealed class PlayerAchievementManager : Component
 	{
 		if ( IsProxy ) return;
 
-		// Hook into the Save System's data event
+		// Subscribe to the global data event to check conditions whenever the ledger changes.
 		GameSaveSystem.OnDataChanged += OnStatsUpdated;
         
 		Log.Info( "[ACHIEVEMENTS] Manager initialized locally." );
@@ -21,28 +24,35 @@ public sealed class PlayerAchievementManager : Component
 
 	protected override void OnDestroy()
 	{
+		// Cleanup subscription to prevent memory leaks or calling on destroyed objects.
 		GameSaveSystem.OnDataChanged -= OnStatsUpdated;
 	}
 
+	/// <summary>
+	/// Event handler called whenever Money, Shares, or Stats are updated.
+	/// </summary>
 	private void OnStatsUpdated()
 	{
 		var save = GameSaveSystem.Instance;
 		if ( save?.CurrentCharacter == null ) return;
 
-		// --- ROCK BOTTOM CHECK ---
-		// Condition: Exactly 0 money and 0 shares
+		// Achievement: "Rock Bottom"
+		// Condition: Player has effectively zero liquid and equity assets.
 		if ( save.CurrentCharacter.Money <= 0.01 && save.CurrentCharacter.Shares <= 0 )
 		{
 			TryUnlock( "rock_bottom" );
 		}
 	}
 
+	/// <summary>
+	/// Validates the unlock against the current session cache before committing to the ledger.
+	/// </summary>
 	public void TryUnlock( string achievementId )
 	{
 		var save = GameSaveSystem.Instance;
 		if ( save == null ) return;
 
-		// Check if already unlocked this session to prevent spamming the ledger
+		// Prevent duplicate "ACH" entries in the plaintext ledger.
 		if ( !save.UnlockedAchievements.Contains( achievementId ) )
 		{
 			save.LocalUnlockAchievement( achievementId );
