@@ -1,17 +1,15 @@
 @import "../../Shared/_base.scss";
 
 // ============================================================================
-// LAYOUT CONSTANTS — mirror these in MarketGraph.cs as properties.
+// COORDINATE SYNCHRONIZATION CONSTANTS
 //
-//   $graph-h-padding  ↔  GraphCanvas.HorizontalPadding = 0f
-//   $graph-v-padding  ↔  GraphCanvas.VerticalPadding   = 10f
-//   $y-axis-width     ↔  used in .graph-labels margin-right
-//
-// If you change any of these values you MUST update the matching C# constant.
+// These variables act as the "Source of Truth" for the graph's internal math.
+// The FundinoMarketGraph.cs component reads these values via ComputedStyle 
+// to ensure the procedural line-drawing matches the visual container bounds.
 // ============================================================================
-$graph-h-padding : 0px;    // horizontal inset for graph line start/end
-$graph-v-padding : 10px;   // vertical inset — matches y-axis padding-top/bottom
-$y-axis-width    : 65px;
+$graph-h-padding : 0px;    // Horizontal inset for line start/end (mirrored in C#)
+$graph-v-padding : 10px;   // Vertical inset — matches y-axis label alignment
+$y-axis-width    : 65px;   // Fixed width to prevent graph-line horizontal jitter
 
 FundinoMenu {
   display: flex;
@@ -87,15 +85,15 @@ FundinoMenu {
       width: 100%;
       @include bevel-in;
       background-color: #000d00;
-      overflow: hidden;
+      overflow: hidden; // Prevents procedural line segments from leaking
     }
 
     // -------------------------------------------------------------------------
     // .graph-window
-    // The flex-grow: 1 child that holds the absolute-positioned painter.
-    // Left/right margins create breathing room between the panel border and the
-    // drawn line.  C# $graph-h-padding is 0 here because the padding is
-    // structural (provided by this margin), not drawn-coordinate padding.
+    // Context: This is the 'Viewport' for the line graph. 
+    // The margin-left/right here define the "Visual Safe Zone." 
+    // C# retrieves these margins to ensure the first and last data points
+    // don't touch the container borders.
     // -------------------------------------------------------------------------
     .graph-window {
       flex-grow: 1;
@@ -103,19 +101,19 @@ FundinoMenu {
       overflow: hidden;
       display: flex;
 
-      // Visual breathing room.  Increase to push the line away from the edges.
-      // If you increase this, add the same value to GraphCanvas.HorizontalPadding.
+      // Visual breathing room. If changed, update C# GraphCanvas.HorizontalPadding.
       margin-left: 15px;
       margin-right: 15px;
 
+      // Retro-styled CRT Grid Overlay
       &::before {
         content: "";
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
         opacity: 0.1;
         background-image:
-          linear-gradient(#00ff00 10%, transparent 50%),
-          linear-gradient(90deg, #00ff00 10%, transparent 50%);
+                linear-gradient(#00ff00 10%, transparent 50%),
+                linear-gradient(90deg, #00ff00 10%, transparent 50%);
         background-size: 25px 25px;
         pointer-events: none;
         z-index: 2;
@@ -139,13 +137,9 @@ FundinoMenu {
 
     // -------------------------------------------------------------------------
     // .y-axis
-    //
-    // padding-top / padding-bottom MUST equal $graph-v-padding (10px).
-    // This ensures label[0] (viewMax) sits at the same pixel row as the
-    // graph line at viewMax, and label[last] (viewMin) aligns with the bottom.
-    //
-    // The .current-price-tag uses `top` (set inline by C#) + translateY(-50%)
-    // so its centre line always matches the corresponding graph scanline.
+    // Vertical Math: padding-top/bottom MUST match $graph-v-padding.
+    // This aligns the 'Max Price' label exactly with the Y=0 coordinate
+    // used by the C# MapPriceToY function.
     // -------------------------------------------------------------------------
     .y-axis {
       width: $y-axis-width;
@@ -156,7 +150,7 @@ FundinoMenu {
       flex-direction: column;
       justify-content: space-between;
 
-      // Keep these equal to $graph-v-padding or y-labels will drift.
+      // Keep these equal to $graph-v-padding or y-labels will drift from graph points.
       padding-top:    $graph-v-padding;
       padding-bottom: $graph-v-padding;
 
@@ -170,6 +164,11 @@ FundinoMenu {
         padding-right: 6px;
       }
 
+      // -----------------------------------------------------------------------
+      // .current-price-tag
+      // Transform Logic: 'top' is updated via C# (pixel offset from top).
+      // translateY(-50%) centers the tag on that pixel row.
+      // -----------------------------------------------------------------------
       .current-price-tag {
         position: absolute;
         right: 0;
@@ -180,9 +179,6 @@ FundinoMenu {
         font-weight: bold;
         padding: 2px 4px;
         z-index: 20;
-
-        // `top` is set dynamically in pixels by C# (CurrentPricePixelY).
-        // translateY(-50%) centres the tag on that pixel row.
         transform: translateY(-50%);
         transition: top 0.2s ease-out;
 
@@ -201,15 +197,8 @@ FundinoMenu {
 
     // -------------------------------------------------------------------------
     // .graph-labels  (X-axis time labels)
-    //
-    // margin-left aligns the labels container with the left edge of .graph-window
-    // (accounting for .graph-window's own margin-left: 15px).
-    //
-    // margin-right accounts for .y-axis width so labels don't extend under it.
-    //
-    // padding-left/right match $graph-h-padding so the first and last labels
-    // sit directly above the first and last graph data points.
-    // With $graph-h-padding = 0 the labels span the full container width.
+    // Horizontal Math: margin-left/right must mirror the .graph-window 
+    // margins to ensure X-axis timestamps sit directly beneath data points.
     // -------------------------------------------------------------------------
     .graph-labels {
       display: flex;
@@ -219,11 +208,9 @@ FundinoMenu {
       background-color: #000;
       border-top: 1px solid $gtk-shadow;
 
-      // Horizontal alignment — mirrors .graph-window margins + $graph-h-padding
-      margin-left:  15px;              // same as .graph-window margin-left
-      margin-right: $y-axis-width;    // exclude the y-axis column (single declaration)
+      margin-left:  15px;              // Matches .graph-window margin-left
+      margin-right: $y-axis-width;    // Offsets for the Y-axis column
 
-      // Mirror C# HorizontalPadding so first/last labels sit above line endpoints
       padding-left:  $graph-h-padding;
       padding-right: $graph-h-padding;
 
@@ -232,7 +219,6 @@ FundinoMenu {
         font-size: 9px;
         color: #008800;
         text-transform: uppercase;
-        // Zero width + flex-centering lets intermediate labels float freely
         width: 0;
         display: flex;
         justify-content: center;
