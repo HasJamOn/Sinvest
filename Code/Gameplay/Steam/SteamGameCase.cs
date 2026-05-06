@@ -6,156 +6,172 @@ using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Linq;
 
+/// <summary>
+/// Data structure representing a fully resolved Steam game with pre-loaded textures.
+/// </summary>
 public class LoadedGame
 {
     public string Title;
     public Texture Cover;
     public Texture Hero;
-    public long AppId; // Added to track uniqueness in history
+    public long AppId;
 }
 
+/// <summary>
+/// Manages a physical game case that dynamically displays Steam library assets.
+/// Utilizes a background buffering system to ensure zero-latency texture swapping.
+/// </summary>
 public sealed class SteamGameCase : Component
 {
-	public enum StartBehavior { ClassicRandom, InstantShuffle }
+    public enum StartBehavior { ClassicRandom, InstantShuffle }
 
-	[Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
-	
-	private string _swapSound = "sounds/ui/shuffle.sound";
-	
-	[Property, Group( "Audio" ), ResourceType( "sound" )] 
-	public string SwapSound { get; set; } = "sounds/ui/shuffle.sound";
+    [Property, Group( "References" )] public ModelRenderer TargetRenderer { get; set; }
+    
+    private string _swapSound = "sounds/ui/shuffle.sound";
+    
+    [Property, Group( "Audio" ), ResourceType( "sound" )] 
+    public string SwapSound { get; set; } = "sounds/ui/shuffle.sound";
 
-	[Property, Group( "Settings" )] public StartBehavior OnStartMode { get; set; } = StartBehavior.ClassicRandom;
-	[Property, Group( "Settings" )] public int MaxHistory { get; set; } = 30;
+    [Property, Group( "Settings" )] public StartBehavior OnStartMode { get; set; } = StartBehavior.ClassicRandom;
+    [Property, Group( "Settings" )] public int MaxHistory { get; set; } = 30;
 
     [Property, Group( "Tooltip" )] public string TooltipTitle { get; set; } = "Steam Game Case";
     [Property, Group( "Tooltip" )] public string TooltipIcon { get; set; } = "videogame_asset";
     [Property, Group( "Tooltip" )] public string TooltipDescription { get; set; } = "Press E to Shuffle";
            
+    // Stores discovered AppIDs and their associated names
     private Dictionary<long, string> _appIdPool = new();
+    // Queue for IDs currently being processed for asset downloads
     private LinkedList<(long Id, string Name)> _processingQueue = new();
+    // High-priority IDs loaded from local bootstrap file
     private List<int> _bootstrapIds = new();
 
     // --- BUFFER SYSTEM ---
+    // Stores fully loaded games ready for immediate display
     private Queue<LoadedGame> _readyBuffer = new();
     private int _bufferTargetSize = 20;
     private bool _isRefilling = false;
 
     // --- HISTORY SYSTEM (Fallback) ---
+    // Cache of previously displayed games to use if the buffer is empty
     private List<LoadedGame> _historyPool = new();
     private int _historyIndex = 0;
+    private bool _isInitialized = false;
 
     protected override void OnStart()
     {
-	    string internalPath = "shaders/data/bootstrap_ids.txt";
+        string internalPath = "shaders/data/bootstrap_ids.txt";
     
-	    LoadBootstrapFromFile( internalPath );
-	    
-	    _bootstrapIds = _bootstrapIds.OrderBy( x => Guid.NewGuid() ).ToList();
+        LoadBootstrapFromFile( internalPath );
+        
+        // Randomize seeds to prevent repetitive start-up sequences
+        _bootstrapIds = _bootstrapIds.OrderBy( x => Guid.NewGuid() ).ToList();
 
-	    _ = InitializeSystem();
+        _ = InitializeSystem();
     }
 
-    private bool _isInitialized = false;
-
+    /// <summary>
+    /// Prepares the initial pool and fills the buffer before marking the system as live.
+    /// </summary>
     private async Task InitializeSystem()
     {
-	    // s&box AppID: 590830
-	    if ( OnStartMode == StartBehavior.ClassicRandom )
-	    {
-		    var gmod = await LoadGameData( 4000, "Garry's Mod" );
-		    if ( gmod != null ) 
-		    {
-			    ApplyToRenderer( gmod );
-			    AddToHistory( gmod );
-		    }
+        if ( OnStartMode == StartBehavior.ClassicRandom )
+        {
+           // Explicitly load staple games for the classic experience
+           var gmod = await LoadGameData( 4000, "Garry's Mod" );
+           if ( gmod != null ) 
+           {
+              ApplyToRenderer( gmod );
+              AddToHistory( gmod );
+           }
 
-		    var sbox = await LoadGameData( 590830, "sbox" );
-		    if ( sbox != null ) AddToHistory( sbox );
+           var sbox = await LoadGameData( 590830, "sbox" );
+           if ( sbox != null ) AddToHistory( sbox );
     
-		    await RefreshAppPool();
-		    _ = FillBuffer();
-	    }
-	    else
-	    {
-		    var sbox = await LoadGameData( 590830, "sbox" );
-		    if ( sbox != null ) 
-		    {
-			    _readyBuffer.Enqueue( sbox );
-			    AddToHistory( sbox );
-		    }
+           await RefreshAppPool();
+           _ = FillBuffer();
+        }
+        else
+        {
+           // Load sbox immediately then trigger a shuffle once the buffer is ready
+           var sbox = await LoadGameData( 590830, "sbox" );
+           if ( sbox != null ) 
+           {
+              _readyBuffer.Enqueue( sbox );
+              AddToHistory( sbox );
+           }
 
-		    await RefreshAppPool();
-		    await FillBuffer();
-		    Shuffle(); 
-	    }
+           await RefreshAppPool();
+           await FillBuffer();
+           Shuffle(); 
+        }
 
-	    // --- SYSTEM IS NOW LIVE ---
-	    _isInitialized = true;
+        _isInitialized = true;
     }
 
+    /// <summary>
+    /// Primary interaction point. Pulls from the buffer or cycles history if the buffer is dry.
+    /// </summary>
     public void Shuffle()
     {
-	    // 1. Try the fresh buffer first
-	    if ( _readyBuffer.Count > 0 )
-	    {
-		    var game = _readyBuffer.Dequeue();
-		    ApplyToRenderer( game );
-		    _ = FillBuffer(); // Keep the factory moving
-		    return;
-	    }
+        // Priority 1: Use fresh, pre-loaded data
+        if ( _readyBuffer.Count > 0 )
+        {
+           var game = _readyBuffer.Dequeue();
+           ApplyToRenderer( game );
+           _ = FillBuffer(); // Async refill trigger
+           return;
+        }
 
-	    // 2. Fallback to cycling through the last 30 games
-	    if ( _historyPool.Count > 0 )
-	    {
-		    // Cycle through history (Oldest -> Newest)
-		    var cachedGame = _historyPool[_historyIndex];
-		    ApplyToRenderer( cachedGame );
+        // Priority 2: Cycle through local cache
+        if ( _historyPool.Count > 0 )
+        {
+           var cachedGame = _historyPool[_historyIndex];
+           ApplyToRenderer( cachedGame );
 
-		    _historyIndex = ( _historyIndex + 1 ) % _historyPool.Count;
-        
-		    Log.Info( $"[SteamGameCase] Buffer empty. Cycling history ({_historyIndex}/{_historyPool.Count})" );
-		    return;
-	    }
+           _historyIndex = ( _historyIndex + 1 ) % _historyPool.Count;
+           return;
+        }
 
-	    Log.Warning( "Shuffle pressed: No games loaded yet!" );
+        Log.Warning( "Shuffle pressed: No games loaded yet!" );
     }
 
     private void AddToHistory( LoadedGame game )
     {
-	    // Don't add the same game twice
-	    if ( _historyPool.Any( x => x.AppId == game.AppId ) ) return;
+        if ( _historyPool.Any( x => x.AppId == game.AppId ) ) return;
 
-	    _historyPool.Add( game );
+        _historyPool.Add( game );
 
-	    // Trim pool if it exceeds your defined MaxHistory
-	    if ( _historyPool.Count > MaxHistory )
-	    {
-		    _historyPool.RemoveAt( 0 ); // Remove the oldest item
-	    }
+        // Maintain fixed memory footprint by trimming old history
+        if ( _historyPool.Count > MaxHistory )
+        {
+           _historyPool.RemoveAt( 0 );
+        }
 
-	    // Reset cycle index whenever we get fresh data
-	    _historyIndex = 0;
+        _historyIndex = 0;
     }
 
     /// <summary>
-    /// Updates the Material Attributes on the TargetRenderer and triggers audio feedback.
+    /// Updates Material Attributes on the SceneObject. 
+    /// This avoids creating unique material instances and improves performance.
     /// </summary>
     private void ApplyToRenderer( LoadedGame game )
     {
-	    if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
+        if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
 
-	    TargetRenderer.SceneObject.Attributes.Set( "CoverArt", game.Cover );
-	    TargetRenderer.SceneObject.Attributes.Set( "BackArt", game.Hero );
-	    TooltipTitle = game.Title;
+        TargetRenderer.SceneObject.Attributes.Set( "CoverArt", game.Cover );
+        TargetRenderer.SceneObject.Attributes.Set( "BackArt", game.Hero );
+        TooltipTitle = game.Title;
 
-	    // Only play sound if the system has finished its initial load
-	    if ( _isInitialized )
-	    {
-		    Sound.Play( SwapSound, WorldPosition );
-	    }
+        if ( _isInitialized )
+        {
+           Sound.Play( SwapSound, WorldPosition );
+        }
     }
 
+    /// <summary>
+    /// Continuous background task that populates the buffer until the target size is met.
+    /// </summary>
     private async Task FillBuffer()
     {
         if ( _isRefilling || _readyBuffer.Count >= _bufferTargetSize ) return;
@@ -177,16 +193,20 @@ public sealed class SteamGameCase : Component
             if ( loaded != null )
             {
                 _readyBuffer.Enqueue( loaded );
-                AddToHistory( loaded ); // Save to history as they become ready
+                AddToHistory( loaded ); 
             }
         }
 
         _isRefilling = false;
     }
 
-    // [Rest of your candidate and loading logic remains the same...]
+    /// <summary>
+    /// Logic for selecting the next ID to load. 
+    /// Prioritizes bootstrap IDs before falling back to the random web-scraped pool.
+    /// </summary>
     private (long Id, string Name) GetNextCandidate()
     {
+        // 50% chance to pull from bootstrap first to ensure "quality" results appear often
         if ( _bootstrapIds.Count > 0 && Game.Random.Int( 0, 1 ) == 0 )
         {
             var id = _bootstrapIds[0];
@@ -220,6 +240,9 @@ public sealed class SteamGameCase : Component
         return (0, "");
     }
 
+    /// <summary>
+    /// Asynchronously fetches textures and metadata from Steam's CDN and API.
+    /// </summary>
     private async Task<LoadedGame> LoadGameData( long appId, string title )
     {
         string cdn = "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps";
@@ -228,13 +251,18 @@ public sealed class SteamGameCase : Component
         var coverTex = await Texture.LoadAsync( $"{cdn}/{appId}/library_600x900.jpg" );
         var heroTex = await Texture.LoadAsync( $"{cdn}/{appId}/library_hero.jpg" );
 
+        // Validation: Some apps (DLC/Tools) lack these specific library assets
         if ( coverTex == null || heroTex == null || coverTex.Width < 100 ) return null;
 
+        // Artificial delay to prevent aggressive burst requests
         await Task.Delay( 200 );
 
         return new LoadedGame { AppId = appId, Title = finalTitle, Cover = coverTex, Hero = heroTex };
     }
 
+    /// <summary>
+    /// Scrapes SteamSpy for a random genre to refresh the local discovery pool.
+    /// </summary>
     private async Task RefreshAppPool()
     {
         string[] genres = { "Action", "Strategy", "RPG", "Indie", "Adventure", "Simulation" };
@@ -256,6 +284,9 @@ public sealed class SteamGameCase : Component
         }
     }
 
+    /// <summary>
+    /// Resolves a human-readable name from Steam's Store API for anonymous IDs.
+    /// </summary>
     private async Task<string> FetchGameNameFromSteam( long appId )
     {
         try
