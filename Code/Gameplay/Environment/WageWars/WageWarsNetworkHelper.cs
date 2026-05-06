@@ -5,46 +5,62 @@ using Sandbox.Network;
 
 namespace Sinvest;
 
+/// <summary>
+/// Handles lobby creation and player instantiation for the Wage Wars multiplayer mode.
+/// Implements INetworkListener to react to player connections.
+/// </summary>
 public sealed class WageWarsNetworkHelper : Component, Component.INetworkListener
 {
-	[Property] public bool StartServer { get; set; } = true;
-	[Property] public GameObject PlayerPrefab { get; set; }
+    [Property] public bool StartServer { get; set; } = true;
+    [Property] public GameObject PlayerPrefab { get; set; }
 
-	protected override async Task OnLoad()
-	{
-		if ( Scene.IsEditor ) return;
+    protected override async Task OnLoad()
+    {
+       // Prevents the editor from automatically creating lobbies during scene editing.
+       if ( Scene.IsEditor ) return;
 
-		if ( StartServer && !Networking.IsActive )
-		{
-			Networking.CreateLobby( new LobbyConfig() );
-		}
-	}
+       // Automatically initializes a networking session if configured as a server/host.
+       if ( StartServer && !Networking.IsActive )
+       {
+          Networking.CreateLobby( new LobbyConfig() );
+       }
+    }
 
-	public async void OnActive( Connection channel )
-	{
-		// Safety delay to ensure WageWarsManager has finished generating the grid
-		await Task.DelayRealtimeSeconds( 0.5f );
+    /// <summary>
+    /// Called when a client has successfully joined and is ready to inhabit the scene.
+    /// </summary>
+    public async void OnActive( Connection channel )
+    {
+       // Safety delay to ensure WageWarsManager has finished generating the cube grid.
+       // Mechanical Necessity: Prevents players from falling through the world before cubes exist.
+       await Task.DelayRealtimeSeconds( 0.5f );
 
-		if ( !PlayerPrefab.IsValid() ) return;
+       if ( !PlayerPrefab.IsValid() ) return;
 
-		var spawnTransform = FindSpawnLocation();
-		var player = PlayerPrefab.Clone( spawnTransform );
+       var spawnTransform = FindSpawnLocation();
        
-		// Ensure the player starts with zero velocity so they don't "fast pass" the floor
-		var body = player.Components.Get<Rigidbody>( FindMode.EverythingInSelfAndChildren );
-		if ( body.IsValid() ) body.Velocity = Vector3.Zero;
+       // Creates a local instance of the player at the designated spawn point.
+       var player = PlayerPrefab.Clone( spawnTransform );
+       
+       // Physics Reset: Prevents inherited velocity from causing "tunnelling" through thin cube colliders.
+       var body = player.Components.Get<Rigidbody>( FindMode.EverythingInSelfAndChildren );
+       if ( body.IsValid() ) body.Velocity = Vector3.Zero;
 
-		player.NetworkSpawn( channel );
-	}
+       // Assigns ownership of the GameObject to the connecting channel and synchronizes it.
+       player.NetworkSpawn( channel );
+    }
 
-	private Transform FindSpawnLocation()
-	{
-		// Prioritize designated SpawnPoints in the scene
-		var spawnPoint = Scene.GetAllComponents<SpawnPoint>().FirstOrDefault();
-		if ( spawnPoint.IsValid() ) return spawnPoint.WorldTransform;
+    /// <summary>
+    /// Determines the optimal starting position for a new player.
+    /// </summary>
+    private Transform FindSpawnLocation()
+    {
+       // Prioritize designated SpawnPoints placed manually in the Hammer editor or Scene.
+       var spawnPoint = Scene.GetAllComponents<SpawnPoint>().FirstOrDefault();
+       if ( spawnPoint.IsValid() ) return spawnPoint.WorldTransform;
 
-		// Fallback: Spawn 150 units above the NetworkHelper's position 
-		// to give the player a safe landing on the generated cubes.
-		return WorldTransform.WithPosition( WorldPosition + Vector3.Up * 150 );
-	}
+       // Fallback: Spawns the player 150 units above this component's position.
+       // Logic: Provides enough height to clear the initial "Level 1" cube layer.
+       return WorldTransform.WithPosition( WorldPosition + Vector3.Up * 150 );
+    }
 }

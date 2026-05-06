@@ -4,21 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Represents an individual interactable tile in the Wage Wars world.
+/// Handles territory ownership, visual stacking (Value), and physics-based player bouncing.
+/// </summary>
 public sealed class WageWarsCube : Component
 {
+    // --- Networking & Persistence Data ---
     [Sync] public Guid OwnerId { get; set; }
-    /// <summary>
-    /// Stable cross-session owner identity (Steam ID). Populated whenever OwnerId is
-    /// set so WageWarsWorldSave can persist ownership without relying on the ephemeral
-    /// GameObject Guid.
-    /// </summary>
-    [Sync] public ulong OwnerSteamId { get; set; }
-    [Sync] public int Value { get; set; } = 0;
+    [Sync] public ulong OwnerSteamId { get; set; } // Persistent identifier for Save/Load
+    [Sync] public int Value { get; set; } = 0; // Represents the height/level of the cube stack
     [Sync] public Vector2Int GridPosition { get; set; }
 
+    // --- Scene References ---
     [Property, Group( "References" )] public TextRenderer TextComponent { get; set; }
     [Property, Group( "References" )] public ModelRenderer Renderer { get; set; }
 
+    // --- Physics & Interaction Settings ---
     [Property, Group( "Physics Pop" )] public float BounceForce { get; set; } = 600f;
     [Property, Group( "Physics Pop" )] public float NudgeHeight { get; set; } = 70f;
     [Property, Group( "Physics Pop" )] public float BounceDelay { get; set; } = 0.05f;
@@ -27,23 +29,30 @@ public sealed class WageWarsCube : Component
     [Property, Group( "Physics Pop" )] public int MaxRecoveryAttempts { get; set; } = 4;
     [Property, Group( "Physics Pop" )] public float StuckCheckRadius { get; set; } = 20f;
     
+    // --- Visual Materials ---
     [Property, Group( "References" )] public Material NeutralMaterial { get; set; } 
     [Property, Group( "References" )] public Material ActiveMaterial { get; set; }
     
+    // --- Sound Assets ---
     [Property, Group( "Audio" )] public SoundEvent PlaceSound { get; set; }
     [Property, Group( "Audio" )] public SoundEvent UpgradeSound { get; set; }
     [Property, Group( "Audio" )] public SoundEvent AttackSound { get; set; }
 
     private const float CubeHeight = 50f;
 
+    // Prevents a single interaction from triggering multiple physics impulses on the same player
     private readonly HashSet<Guid> _bouncingPlayers = new();
 
     protected override void OnUpdate()
     {
+        // Optimization: Do not process visual updates if the Chunk has disabled this renderer
         if ( !Renderer.Enabled ) return;
         UpdateVisuals();
     }
 
+    /// <summary>
+    /// Defines the 3D volume where players are detected for "labor" (bouncing).
+    /// </summary>
     private BBox GetDetectionBox()
     {
         Vector3 mins = WorldPosition + Vector3.Up * ( (Value - 1) * CubeHeight ) - new Vector3( 25, 25, 0 );
@@ -51,139 +60,134 @@ public sealed class WageWarsCube : Component
         return new BBox( mins, maxs );
     }
 
+    /// <summary>
+    /// Updates materials and Tint colors based on ownership. 
+    /// Uses Red for enemies and Green for the local player.
+    /// </summary>
     private void UpdateVisuals()
     {
-	    if ( !Renderer.IsValid() ) return;
+        if ( !Renderer.IsValid() ) return;
 
-	    if ( Value <= 0 || OwnerId == Guid.Empty )
-	    {
-		    Renderer.MaterialOverride = NeutralMaterial;
-		    Renderer.Attributes.Set( "OwnerColor", Color.White );
-		    Renderer.Tint = Color.White;
-		    return; 
-	    }
+        if ( Value <= 0 || OwnerId == Guid.Empty )
+        {
+           Renderer.MaterialOverride = NeutralMaterial;
+           Renderer.Attributes.Set( "OwnerColor", Color.White );
+           Renderer.Tint = Color.White;
+           return; 
+        }
 
-	    Renderer.MaterialOverride = ActiveMaterial; 
+        Renderer.MaterialOverride = ActiveMaterial; 
 
-	    var myCharacter = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
-    
-	    Color territoryColor = new Color( 0.5f, 0.5f, 0.5f, 1.0f );
+        var myCharacter = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
+        Color territoryColor = new Color( 0.5f, 0.5f, 0.5f, 1.0f );
 
-	    if ( myCharacter != null )
-	    {
-		    bool isMine = OwnerId == myCharacter.GameObject.Id;
-		    territoryColor = isMine 
-			    ? new Color( 0.0f, 1.0f, 0.0f, 1.0f )
-			    : new Color( 1.0f, 0.0f, 0.0f, 1.0f );
-	    }
+        if ( myCharacter != null )
+        {
+           bool isMine = OwnerId == myCharacter.GameObject.Id;
+           territoryColor = isMine 
+              ? new Color( 0.0f, 1.0f, 0.0f, 1.0f )
+              : new Color( 1.0f, 0.0f, 0.0f, 1.0f );
+        }
 
-	    Renderer.Attributes.Set( "OwnerColor", territoryColor );
-	    Renderer.Tint = territoryColor;
+        Renderer.Attributes.Set( "OwnerColor", territoryColor );
+        Renderer.Tint = territoryColor;
 
-	    foreach ( var child in GameObject.Children )
-	    {
-		    var childRenderer = child.Components.Get<ModelRenderer>();
-		    if ( childRenderer.IsValid() )
-		    {
-			    childRenderer.MaterialOverride = ActiveMaterial;
-			    childRenderer.Attributes.Set( "OwnerColor", territoryColor );
-			    childRenderer.Tint = territoryColor;
-		    }
-	    }
+        // Apply owner color to all visual "Value" layers attached to this cube
+        foreach ( var child in GameObject.Children )
+        {
+           var childRenderer = child.Components.Get<ModelRenderer>();
+           if ( childRenderer.IsValid() )
+           {
+              childRenderer.MaterialOverride = ActiveMaterial;
+              childRenderer.Attributes.Set( "OwnerColor", territoryColor );
+              childRenderer.Tint = territoryColor;
+           }
+        }
     }
 
+    /// <summary>
+    /// Primary logic for claiming, upgrading, or attacking a cube. Host-authoritative.
+    /// </summary>
     public void ProcessTouch( Guid playerId )
     {
-	    if ( !Networking.IsHost ) return;
+        if ( !Networking.IsHost ) return;
 
-	    // Resolve the stable Steam ID from the active player list so it can be
-	    // persisted in the world save file.
-	    ulong steamId = ResolveOwnerSteamId( playerId );
+        ulong steamId = ResolveOwnerSteamId( playerId );
 
-	    if ( Value == 0 )
-	    {
-		    OwnerId      = playerId;
-		    OwnerSteamId = steamId;
-		    Value        = 1;
-		    ApplyPhysicalPop( BounceForce, true ); 
-		    SpawnVisualLayer();
-		    BroadcastPlaySound( "place" );
-	    }
-	    else if ( OwnerId == playerId )
-	    {
-		    if ( CanUpgrade() )
-		    {
-			    Value++;
-			    ApplyPhysicalPop( BounceForce, true );
-			    SpawnVisualLayer();
-			    BroadcastPlaySound( "upgrade" );
-		    }
-	    }
-	    else if ( CanAttack( playerId ) )
-	    {
-		    DespawnTopLayer();
-		    Value--;
-		    ApplyPhysicalPop( BounceForce * AttackBounceScale, false );
+        if ( Value == 0 ) // Unclaimed
+        {
+           OwnerId      = playerId;
+           OwnerSteamId = steamId;
+           Value        = 1;
+           ApplyPhysicalPop( BounceForce, true ); 
+           SpawnVisualLayer();
+           BroadcastPlaySound( "place" );
+        }
+        else if ( OwnerId == playerId ) // Upgrade existing
+        {
+           if ( CanUpgrade() )
+           {
+              Value++;
+              ApplyPhysicalPop( BounceForce, true );
+              SpawnVisualLayer();
+              BroadcastPlaySound( "upgrade" );
+           }
+        }
+        else if ( CanAttack( playerId ) ) // Enemy Siege
+        {
+           DespawnTopLayer();
+           Value--;
+           ApplyPhysicalPop( BounceForce * AttackBounceScale, false );
             
-		    if ( Value <= 0 )
-		    {
-			    Value        = 0;
-			    OwnerId      = Guid.Empty;
-			    OwnerSteamId = 0;
-		    }
-		    BroadcastPlaySound( "attack" );
-	    }
-	    else
-	    {
-		    // No state change — nothing to persist.
-		    return;
-	    }
+           if ( Value <= 0 )
+           {
+              Value        = 0;
+              OwnerId      = Guid.Empty;
+              OwnerSteamId = 0;
+           }
+           BroadcastPlaySound( "attack" );
+        }
+        else
+        {
+           return;
+        }
 
-	    // Persist the world after every successful state change (host-only write).
-	    WageWarsWorldSave.Instance?.SaveWorld();
+        // Trigger persistence via the Authoritative Ledger model
+        WageWarsWorldSave.Instance?.SaveWorld();
     }
 
-    /// <summary>
-    /// Looks up the WageWarsPlayer whose GameObject.Id matches <paramref name="playerId"/>
-    /// and returns their stable SteamId for persistence.
-    /// </summary>
     private ulong ResolveOwnerSteamId( Guid playerId )
     {
-	    var player = Scene.GetAllComponents<WageWarsPlayer>()
-	                      .FirstOrDefault( p => p.GameObject.Id == playerId );
-	    return player?.SteamId ?? 0;
+        var player = Scene.GetAllComponents<WageWarsPlayer>()
+                          .FirstOrDefault( p => p.GameObject.Id == playerId );
+        return player?.SteamId ?? 0;
     }
 
-    // ── Visual layer helpers ───────────────────────────────────────────────────
+    // --- Visual Layer Management ---
 
-    /// <summary>
-    /// Spawns a single visual layer at the current Value height (used during live play).
-    /// </summary>
     private void SpawnVisualLayer() => SpawnVisualLayerAt( Value );
 
     /// <summary>
-    /// Spawns a visual layer at an explicit stack index. Used both during live play
-    /// and during save restoration so the stack can be rebuilt without temporarily
-    /// mutating Value.
+    /// Creates a visual-only clone of the cube to represent height. 
+    /// Removes functional components from the clone to prevent logic recursion.
     /// </summary>
     private void SpawnVisualLayerAt( int layerIndex )
     {
         var layer = GameObject.Clone();
         layer.Parent = GameObject;
         foreach ( var child in layer.Children.ToList() ) child.Destroy();
+        
         layer.LocalPosition = Vector3.Up * ( layerIndex * CubeHeight );
+        
+        // Strip logic components from the visual clone
         var script = layer.Components.Get<WageWarsCube>();
         if ( script.IsValid() ) script.Destroy();
         var text = layer.Components.Get<TextRenderer>();
         if ( text.IsValid() ) text.Destroy();
+        
         layer.NetworkSpawn();
     }
 
-    /// <summary>
-    /// Rebuilds the entire visual stack from scratch for a cube whose Value and
-    /// OwnerSteamId have already been set by WageWarsWorldSave.LoadWorld().
-    /// Called only on the host during scene restore.
-    /// </summary>
     public void RestoreVisualLayers()
     {
         for ( int i = 1; i <= Value; i++ )
@@ -196,38 +200,41 @@ public sealed class WageWarsCube : Component
         topLayer?.Destroy();
     }
 
-    // ── Physics bounce ─────────────────────────────────────────────────────────
+    // --- Physics Interaction (The "Pop") ---
 
     [Rpc.Broadcast]
     private void BroadcastPlaySound( string type )
     {
-	    var soundToPlay = type switch
-	    {
-		    "place"   => PlaceSound,
-		    "upgrade" => UpgradeSound,
-		    "attack"  => AttackSound,
-		    _         => null
-	    };
+        var soundToPlay = type switch
+        {
+           "place"   => PlaceSound,
+           "upgrade" => UpgradeSound,
+           "attack"  => AttackSound,
+           _         => null
+        };
 
-	    if ( soundToPlay != null )
-		    Sound.Play( soundToPlay, WorldPosition );
+        if ( soundToPlay != null )
+           Sound.Play( soundToPlay, WorldPosition );
     }
 
+    /// <summary>
+    /// Detects players inside the cube's collision and triggers a broadcasted physics impulse.
+    /// </summary>
     private void ApplyPhysicalPop( float force, bool isLabor )
     {
-	    var players = Scene.GetAllComponents<WageWarsPlayer>();
+        var players = Scene.GetAllComponents<WageWarsPlayer>();
 
-	    foreach ( var player in players )
-	    {
-		    if ( !player.IsInsideGeometry() ) continue;
+        foreach ( var player in players )
+        {
+           if ( !player.IsInsideGeometry() ) continue;
 
-		    Guid playerId = player.GameObject.Id;
-		    if ( _bouncingPlayers.Contains( playerId ) ) continue;
+           Guid playerId = player.GameObject.Id;
+           if ( _bouncingPlayers.Contains( playerId ) ) continue;
 
-		    _bouncingPlayers.Add( playerId );
-		    BroadcastBounce( playerId, isLabor ? NudgeHeight : 0f, force );
-		    ReleaseBounceGuardAsync( playerId );
-	    }
+           _bouncingPlayers.Add( playerId );
+           BroadcastBounce( playerId, isLabor ? NudgeHeight : 0f, force );
+           ReleaseBounceGuardAsync( playerId );
+        }
     }
 
     private async void ReleaseBounceGuardAsync( Guid playerId )
@@ -239,19 +246,23 @@ public sealed class WageWarsCube : Component
     [Rpc.Broadcast]
     private void BroadcastBounce( Guid targetId, float nudgeAmount, float force )
     {
-	    var target = Scene.Directory.FindByGuid( targetId );
-	    if ( !target.IsValid() || target.IsProxy ) return;
+        var target = Scene.Directory.FindByGuid( targetId );
+        if ( !target.IsValid() || target.IsProxy ) return;
 
-	    var rb = target.Components.Get<Rigidbody>();
-	    if ( !rb.IsValid() ) return;
+        var rb = target.Components.Get<Rigidbody>();
+        if ( !rb.IsValid() ) return;
 
-	    if ( nudgeAmount > 0 )
-		    target.WorldPosition += Vector3.Up * nudgeAmount;
+        // Teleport slightly upward to prevent getting stuck in the floor before applying force
+        if ( nudgeAmount > 0 )
+           target.WorldPosition += Vector3.Up * nudgeAmount;
     
-	    rb.Velocity = rb.Velocity.WithZ( 0f );
-	    ApplyImpulseAfterDelay( rb, force );
+        rb.Velocity = rb.Velocity.WithZ( 0f );
+        ApplyImpulseAfterDelay( rb, force );
     }
 
+    /// <summary>
+    /// Applies upward force. Includes a recovery loop to re-nudge players if they remain stuck in geometry.
+    /// </summary>
     private async void ApplyImpulseAfterDelay( Rigidbody rb, float force )
     {
         await Task.DelayRealtimeSeconds( BounceDelay );
@@ -261,7 +272,6 @@ public sealed class WageWarsCube : Component
         {
             if ( !IsInsideGeometry( rb.GameObject ) ) break;
 
-            Log.Info( $"[POP] Stuck detected (attempt {attempt + 1}/{MaxRecoveryAttempts}) — re-nudging." );
             rb.GameObject.WorldPosition += Vector3.Up * NudgeHeight;
             rb.Velocity = rb.Velocity.WithZ( 0f );
 
@@ -270,35 +280,40 @@ public sealed class WageWarsCube : Component
         }
 
         rb.ApplyImpulse( Vector3.Up * force * rb.Mass );
-        Log.Info( $"[POP] Bounce applied ({force * rb.Mass:F0} N)." );
     }
 
     private bool IsInsideGeometry( GameObject go )
     {
-	    if ( !go.IsValid() ) return false;
-	    var checkPos = go.WorldPosition + Vector3.Up * 35f;
-	    var tr = Scene.Trace.Sphere( 4f, checkPos, checkPos ).WithTag( "land" ).Run();
-	    return tr.StartedSolid;
+        if ( !go.IsValid() ) return false;
+        var checkPos = go.WorldPosition + Vector3.Up * 35f;
+        var tr = Scene.Trace.Sphere( 4f, checkPos, checkPos ).WithTag( "land" ).Run();
+        return tr.StartedSolid;
     }
 
-    // ── Upgrade / attack rules ─────────────────────────────────────────────────
+    // --- Progression Rules (Labor -> Capital) ---
 
+    /// <summary>
+    /// Attack Rule: To siege a tower > Level 1, you must have an adjacent tower of higher level (Value + 1).
+    /// </summary>
     private bool CanAttack( Guid attackerId )
     {
-	    if ( Value <= 1 ) return true;
+        if ( Value <= 1 ) return true;
 
-	    int requiredHeight = Value + 1;
-	    for ( int x = -1; x <= 1; x++ )
-	    for ( int y = -1; y <= 1; y++ )
-	    {
-		    if ( x == 0 && y == 0 ) continue;
-		    var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
-		    if ( neighbor != null && neighbor.OwnerId == attackerId && neighbor.Value >= requiredHeight )
-			    return true;
-	    }
-	    return false;
+        int requiredHeight = Value + 1;
+        for ( int x = -1; x <= 1; x++ )
+        for ( int y = -1; y <= 1; y++ )
+        {
+           if ( x == 0 && y == 0 ) continue;
+           var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+           if ( neighbor != null && neighbor.OwnerId == attackerId && neighbor.Value >= requiredHeight )
+              return true;
+        }
+        return false;
     }
 
+    /// <summary>
+    /// Upgrade Rule: A cube can only level up if all 8 neighbors are at least the same level.
+    /// </summary>
     private bool CanUpgrade()
     {
         int requiredNeighborValue = Value;
@@ -313,44 +328,41 @@ public sealed class WageWarsCube : Component
         return true;
     }
     
+    // --- UI Feedback Strings ---
+    
     public string GetUpgradeRequirement()
     {
-	    int requiredNeighborValue = Value;
-	    for ( int x = -1; x <= 1; x++ )
-	    for ( int y = -1; y <= 1; y++ )
-	    {
-		    if ( x == 0 && y == 0 ) continue;
-		    var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
-		    if ( neighbor == null || neighbor.Value < requiredNeighborValue )
-			    return $"Surrounding tiles must be Level {requiredNeighborValue}";
-	    }
-	    return null;
+        int requiredNeighborValue = Value;
+        for ( int x = -1; x <= 1; x++ )
+        for ( int y = -1; y <= 1; y++ )
+        {
+           if ( x == 0 && y == 0 ) continue;
+           var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+           if ( neighbor == null || neighbor.Value < requiredNeighborValue )
+              return $"Surrounding tiles must be Level {requiredNeighborValue}";
+        }
+        return null;
     }
     
     public string GetAttackRequirement()
     {
-	    if ( Value <= 1 ) return null;
+        if ( Value <= 1 ) return null;
 
-	    var localPlayer = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
-	    if ( localPlayer == null ) return null;
-	    var localId = localPlayer.GameObject.Id;
+        var localPlayer = Scene.GetAllComponents<WageWarsPlayer>().FirstOrDefault( p => !p.IsProxy );
+        if ( localPlayer == null ) return null;
+        var localId = localPlayer.GameObject.Id;
 
-	    int  requiredHeight = Value + 1;
-	    bool hasHighGround  = false;
+        int  requiredHeight = Value + 1;
 
-	    for ( int x = -1; x <= 1; x++ )
-	    for ( int y = -1; y <= 1; y++ )
-	    {
-		    if ( x == 0 && y == 0 ) continue;
-		    var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
-		    if ( neighbor != null && neighbor.OwnerId == localId && neighbor.Value >= requiredHeight )
-		    {
-			    hasHighGround = true;
-			    break;
-		    }
-		    if ( hasHighGround ) break;
-	    }
+        for ( int x = -1; x <= 1; x++ )
+        for ( int y = -1; y <= 1; y++ )
+        {
+           if ( x == 0 && y == 0 ) continue;
+           var neighbor = WageWarsManager.Instance.GetCubeAt( GridPosition + new Vector2Int( x, y ) );
+           if ( neighbor != null && neighbor.OwnerId == localId && neighbor.Value >= requiredHeight )
+              return null;
+        }
 
-	    return hasHighGround ? null : $"Requires adjacent Level {requiredHeight} tower to siege";
+        return $"Requires adjacent Level {requiredHeight} tower to siege";
     }
 }

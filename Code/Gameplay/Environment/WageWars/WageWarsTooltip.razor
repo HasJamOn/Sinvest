@@ -9,11 +9,13 @@
     @if ( _hoveredCube.IsValid() )
     {
        <div class="panel">
+          @* Dynamic header styling: changes to 'hostile' (Red) if the tile belongs to an opponent *@
           <div class="header @(IsOwner || _hoveredCube.OwnerId == Guid.Empty ? "" : "hostile")">
              <i class="icon">@(IsOwner ? "layers" : "swords")</i>
              <div class="name">@(_hoveredCube.OwnerId == Guid.Empty ? "Unclaimed" : IsOwner ? "Your Territory" : "Hostile Tile")</div>
           </div>
 
+          @* Displays logic-driven warnings (e.g., "Requires adjacent Level X tower") *@
           @if ( GetWarningText() is string warning )
           {
              <div class="description warning">@warning</div>
@@ -28,7 +30,10 @@
           <div class="divider"></div>
 
           <div class="actions">
-             @* Share Cost Indicator *@
+             @* 
+                Economy Integration: Uses the 'Authoritative Ledger' logic.
+                Displays share cost and visual feedback if the player is under-capitalized. 
+             *@
              <div class="cost-info @(CanAfford ? "can-afford" : "too-expensive")">
                 <i class="icon">rebase_edit</i>
                 <span class="cost-text">Cost: 1 Share</span>
@@ -38,6 +43,7 @@
                 }
              </div>
 
+             @* Interaction prompt: Disabled if requirements aren't met or balance is insufficient *@
              <div class="action @(CanPerformAction() && CanAfford ? "" : "disabled")">
                 <label class="key">@Input.GetButtonOrigin( "use" ).ToUpper()</label>
                 <span class="text">@GetActionText()</span>
@@ -53,6 +59,7 @@
     private TimeSince _timeSinceLastHit;
     private const int LaborCost = 1;
 
+    // Visibility state: HUD hides if SinvestOS (Menu) is open or raycast misses
     bool IsVisible => _hoveredCube.IsValid() 
                       && _timeSinceLastHit < 0.1f 
                       && !(SinvestOS.Instance?.IsOpen ?? false);
@@ -68,7 +75,8 @@
     }
 
     /// <summary>
-    /// Pulls live share data from the EconomyManager to check affordability.
+    /// Validates transaction capability against the global EconomyManager.
+    /// Follows the Sinvest protocol: Balance = Inflow - Outflow.
     /// </summary>
     bool CanAfford
     {
@@ -82,6 +90,7 @@
     private string GetWarningText()
     {
         if ( !_hoveredCube.IsValid() ) return null;
+        // Logic pulled from WageWarsCube neighbor checks
         return IsOwner ? _hoveredCube.GetUpgradeRequirement() : _hoveredCube.GetAttackRequirement();
     }
 
@@ -98,11 +107,13 @@
     {
         if ( IsProxy ) return;
 
+        // Performs a central screen raycast to detect cubes in the "land" layer
         var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
         var tr = Scene.Trace.Ray( ray, 150f ).WithTag( "land" ).Run();
 
         if ( tr.Hit && tr.GameObject.IsValid() )
         {
+            // Traverse hierarchy to find the root cube logic component
             var cube = tr.GameObject.Components.GetInAncestorsOrSelf<WageWarsCube>();
             if ( cube.IsValid() )
             {
@@ -111,11 +122,15 @@
             }
         }
 
+        // Auto-clear reference if the crosshair moves away
         if ( _timeSinceLastHit > 0.15f ) _hoveredCube = null;
 
+        // Panorama CSS constraint: uses classes for visibility transitions
         SetClass( "visible", IsVisible );
     }
 
-    // Hash includes CanAfford so the UI refreshes if the player gains/loses shares
+    /// <summary>
+    /// Re-renders the UI only when critical state changes occur.
+    /// </summary>
     protected override int BuildHash() => System.HashCode.Combine( _hoveredCube?.Id, _hoveredCube?.Value, IsVisible, GetWarningText(), CanAfford );
 }
