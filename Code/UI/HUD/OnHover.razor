@@ -13,38 +13,64 @@
 
 @code
 {
+    /**
+     * The text content displayed in the world-space popup.
+     */
     [Property, TextArea] public string MyStringValue { get; set; } = "";
 
+    /**
+     * Internal state tracking if the player's crosshair is currently over the parent object.
+     */
     private bool IsLookedAt { get; set; } = false;
 
     protected override void OnUpdate()
     {
-	    // 1. If SinvestOS exists in the scene, force the popup to hide and exit early.
-	    if ( SinvestOS.Instance != null )
-	    {
-		    IsLookedAt = false;
-		    return;
-	    }
+        /**
+         * Priority Check: Global UI Override
+         * If the SinvestOS interface is active, all world-space tooltips are suppressed.
+         * This prevents visual clutter and input conflicts during OS interaction.
+         */
+        if ( SinvestOS.Instance != null )
+        {
+           IsLookedAt = false;
+           return;
+        }
 
-	    // 2. Otherwise, proceed with your normal trace logic...
-	    var camera = Scene.GetAllComponents<CameraComponent>()
-		    .FirstOrDefault( x => x.IsMainCamera );
+        /**
+         * Camera Acquisition
+         * Locates the primary viewport to define the start point of the interaction ray.
+         */
+        var camera = Scene.GetAllComponents<CameraComponent>()
+           .FirstOrDefault( x => x.IsMainCamera );
 
-	    if ( camera is null )
-	    {
-		    IsLookedAt = false;
-		    return;
-	    }
+        if ( camera is null )
+        {
+           IsLookedAt = false;
+           return;
+        }
 
-	    var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault();
+        /**
+         * Interaction Raycast
+         * Casts a ray 150 units forward from the camera.
+         * IgnoreGameObjectHierarchy ensures the player does not block their own line of sight.
+         */
+        var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault();
 
-	    var tr = Scene.Trace
-		    .Ray( camera.WorldPosition, camera.WorldPosition + camera.WorldRotation.Forward * 150f )
-		    .IgnoreGameObjectHierarchy( player?.GameObject )
-		    .Run();
+        var tr = Scene.Trace
+           .Ray( camera.WorldPosition, camera.WorldPosition + camera.WorldRotation.Forward * 150f )
+           .IgnoreGameObjectHierarchy( player?.GameObject )
+           .Run();
 
-	    IsLookedAt = tr.Hit && tr.GameObject == GameObject.Parent;
+        /**
+         * State Update
+         * IsLookedAt is true only if the ray hits the GameObject hosting this UI component.
+         */
+        IsLookedAt = tr.Hit && tr.GameObject == GameObject.Parent;
     }
 
+    /**
+     * Hash reconciliation for the Panorama UI engine.
+     * Ensures the UI re-renders only when the visibility state changes.
+     */
     protected override int BuildHash() => System.HashCode.Combine( IsLookedAt );
 }
