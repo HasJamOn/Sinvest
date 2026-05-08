@@ -1048,7 +1048,7 @@
         {
           "__type": "Sandbox.MapInstance",
           "__guid": "f2863e59-f16e-4473-94aa-28fa4c3350dd",
-          "__enabled": true,
+          "__enabled": false,
           "Flags": 0,
           "__version": 1,
           "EnableCollision": true,
@@ -4965,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "319901c4-8aaa-45a6-ab2e-68ce2b10a4b1",
+                  "__guid": "b1563509-1fda-470b-98ba-5b447763f139",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4982,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "3820c35f-ff25-4186-8923-88d115d62edf",
+                      "__guid": "3edfc8f4-4fdb-4d67-a2ab-c9926aa195dc",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5034,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "5132b42a-efd9-4ca8-8a66-91ae148f05ca",
+                  "__guid": "a64e6ace-42b1-4301-8b30-858f25ae61eb",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5051,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "d4b18647-8d4e-4280-b479-3526e737043a",
+                      "__guid": "50bd8ee4-12fc-475c-92b7-4f6af38b6234",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5103,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "8ac07541-a2cf-4aca-bef3-c3f78ffbcd39",
+                  "__guid": "788b55f2-fb03-42b2-bc8d-bff1064e1349",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5120,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "663e4bee-53a7-4476-8601-0eee2f659edc",
+                      "__guid": "ee5d8641-7470-4043-8ecb-de99670ca524",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5172,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "7aad2d4d-2789-4112-b685-5624c19c97a0",
+                  "__guid": "05d0b8eb-086b-48eb-9ef2-6d6cdc253084",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5189,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "488dc6fb-bf6d-4e95-828a-a4ad39e90d7c",
+                      "__guid": "58355227-0a35-4fc8-81b1-f15b77d8e178",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5569,7 +5569,7 @@
               "Name": "wooden_door_01d",
               "Position": "66.6381378,101.530304,-33.5243568",
               "Rotation": "0,0,0,1",
-              "Scale": "1,1.12999988,1.00999999",
+              "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
               "NetworkMode": 2,
@@ -11506,7 +11506,7 @@
               "OnTriggerEnter": null,
               "OnTriggerExit": null,
               "RollingResistance": null,
-              "Scale": "47.6001167,50,196.379929",
+              "Scale": "47.6001167,50,200.049728",
               "Static": false,
               "Surface": null,
               "SurfaceVelocity": "0,0,0"
@@ -11834,6 +11834,39 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "7d2123fc-8e1f-4994-aea6-6dc2c137b016",
+      "__version": 2,
+      "__Prefab": "prefabs/map_noham.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "8d81920d-d7cb-49fd-8505-ef25c3a3b8c3"
+            },
+            "Property": "Name",
+            "Value": "Map_noham"
+          },
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "8d81920d-d7cb-49fd-8505-ef25c3a3b8c3"
+            },
+            "Property": "Position",
+            "Value": "3.51330566,-152.440918,79.3594284"
+          }
+        ],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "8d81920d-d7cb-49fd-8505-ef25c3a3b8c3": "7d2123fc-8e1f-4994-aea6-6dc2c137b016",
+        "d1ac5178-72c4-4fb6-a402-24077bd5f756": "a37efc40-997b-4c08-9280-228a4d409555",
+        "0907017c-57be-42d5-8ef3-028ab4784d8a": "f95fc198-f651-4b8c-9e8a-9a65b9cb78eb"
+      }
     }
   ],
   "SceneProperties": {
