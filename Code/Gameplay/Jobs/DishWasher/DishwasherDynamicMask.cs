@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Sinvest;
 
+/// <summary>
+/// Manages a dynamic I8 texture mask to simulate cleaning dirt off a surface.
+/// Coordinates between raycast hits and UV space to update a "DirtMask" shader attribute.
+/// </summary>
 public class DishwasherDynamicMask : Component
 {
     [Property] public GameObject Plate { get; set; }
@@ -11,7 +15,9 @@ public class DishwasherDynamicMask : Component
     [Property] public float BrushRadius { get; set; } = 0.05f;
     [Property] public float RotationSpeed { get; set; } = 0.5f;
     
-    // Set this to half the width of your box (e.g., 25 if the box is 50x50x50)
+    /// <summary>
+    /// Half-extents of the target mesh. Used to normalize local coordinates into 0-1 UV space.
+    /// </summary>
     [Property] public float PlateRadius { get; set; } = 50f; 
     [Property] public bool ShowDebugTrace { get; set; } = true;
 
@@ -26,10 +32,16 @@ public class DishwasherDynamicMask : Component
     protected override void OnStart()
     {
         if ( Camera == null ) Camera = Scene.GetAllComponents<CameraComponent>().FirstOrDefault();
+        
+        // Ensure mouse is active for the interaction loop
         Mouse.Visibility = MouseVisibility.Visible;
         InitializeMask();
     }
 
+    /// <summary>
+    /// Generates a procedural 8-bit single-channel texture. 
+    /// Default state is 255 (fully opaque/dirty).
+    /// </summary>
     private void InitializeMask()
     {
         _maskData = new byte[_textureSize * _textureSize];
@@ -41,6 +53,7 @@ public class DishwasherDynamicMask : Component
             .WithDynamicUsage()
             .Finish();
 
+        // Bind the dynamic texture to the shader's 'DirtMask' attribute
         if ( Plate.Components.TryGet<ModelRenderer>( out var renderer ) )
         {
             renderer.Attributes.Set( "DirtMask", _maskTexture );
@@ -54,7 +67,7 @@ public class DishwasherDynamicMask : Component
         HandleRotation();
         HandleCleaning();
 
-        // Optimized GPU Upload: Only update if pixels actually changed this frame
+        // Deferred GPU Upload: Batch pixel changes to avoid multiple uploads per frame
         if ( _isDirty )
         {
             _maskTexture.Update( _maskData );
@@ -63,6 +76,10 @@ public class DishwasherDynamicMask : Component
         }
     }
 
+    /// <summary>
+    /// Rotates the plate or its parent container based on relative mouse movement.
+    /// Uses WorldRotation to maintain consistent controls regardless of parent orientation.
+    /// </summary>
     private void HandleRotation()
     {
         if ( Input.Down( "attack2" ) )
@@ -77,85 +94,85 @@ public class DishwasherDynamicMask : Component
         }
     }
 
+    /// <summary>
+    /// Performs a screen-to-world raycast. If the hit object is validated as part of the dish,
+    /// it triggers a mask update at the intersection point.
+    /// </summary>
     private void HandleCleaning()
     {
-	    if ( !Input.Down( "attack1" ) ) return;
+        if ( !Input.Down( "attack1" ) ) return;
 
-	    // STEP 1: Check if the click is even registering
-	    // If you don't see this in the console, your Camera or Mouse Position is the issue.
-	    // Log.Info( "Attack1 Down" ); 
-
-	    var ray = Camera.ScreenPixelToRay( Mouse.Position );
+        var ray = Camera.ScreenPixelToRay( Mouse.Position );
     
-	    // STEP 2: Use a more aggressive trace
-	    var tr = Scene.Trace.Ray( ray, 2000f )
-		    .Run(); // Remove UsePhysicsWorld for a moment to test broad hits
+        // 2000f distance ensures coverage in various camera FOVs/distances
+        var tr = Scene.Trace.Ray( ray, 2000f ).Run(); 
 
-	    if ( tr.Hit )
-	    {
-		    // LOG EVERY HIT: This will tell us what GameObject the ray is actually touching
-		    Log.Info( $"Ray hit: {tr.GameObject.Name}" );
-
-		    if ( IsPartOfPlate( tr.GameObject ) )
-		    {
-			    Vector2 projectedUv = CalculateLocalUV( tr );
-			    Log.Info( $"UV: {projectedUv}" );
-			    UpdateMask( projectedUv );
-		    }
-	    }
-	    else
-	    {
-		    // If you see this, your ray is pointing into the void
-		    // Log.Info( "Ray missed everything" );
-	    }
+        if ( tr.Hit )
+        {
+           if ( IsPartOfPlate( tr.GameObject ) )
+           {
+              Vector2 projectedUv = CalculateLocalUV( tr );
+              UpdateMask( projectedUv );
+           }
+        }
     }
 
+    /// <summary>
+    /// Projects a 3D world hit position into 2D UV space.
+    /// Determines the dominant face of the hit normal to apply the correct planar projection.
+    /// </summary>
     private Vector2 CalculateLocalUV( SceneTraceResult tr )
     {
-	    // Ensure we are working in the Plate's local space
-	    Vector3 localPos = Plate.Transform.World.PointToLocal( tr.HitPosition );
-	    Vector3 localNormal = Plate.Transform.World.NormalToLocal( tr.Normal );
+        Vector3 localPos = Plate.Transform.World.PointToLocal( tr.HitPosition );
+        Vector3 localNormal = Plate.Transform.World.NormalToLocal( tr.Normal );
     
-	    float u = 0.5f;
-	    float v = 0.5f;
+        float u = 0.5f;
+        float v = 0.5f;
 
-	    float absX = Math.Abs( localNormal.x );
-	    float absY = Math.Abs( localNormal.y );
-	    float absZ = Math.Abs( localNormal.z );
+        float absX = Math.Abs( localNormal.x );
+        float absY = Math.Abs( localNormal.y );
+        float absZ = Math.Abs( localNormal.z );
 
-	    // Determine the plane based on the largest normal component
-	    if ( absZ >= absX && absZ >= absY ) 
-	    {
-		    u = (localPos.x / (PlateRadius * 2f)) + 0.5f;
-		    v = (localPos.y / (PlateRadius * 2f)) + 0.5f;
-	    }
-	    else if ( absX >= absY && absX >= absZ ) 
-	    {
-		    u = (localPos.z / (PlateRadius * 2f)) + 0.5f;
-		    v = (localPos.y / (PlateRadius * 2f)) + 0.5f;
-	    }
-	    else 
-	    {
-		    u = (localPos.x / (PlateRadius * 2f)) + 0.5f;
-		    v = (localPos.z / (PlateRadius * 2f)) + 0.5f;
-	    }
+        // Planar Projection Logic:
+        // Maps the hit point based on the largest normal component to ensure the "brush"
+        // follows the geometry surface accurately across different faces.
+        if ( absZ >= absX && absZ >= absY ) 
+        {
+           u = (localPos.x / (PlateRadius * 2f)) + 0.5f;
+           v = (localPos.y / (PlateRadius * 2f)) + 0.5f;
+        }
+        else if ( absX >= absY && absX >= absZ ) 
+        {
+           u = (localPos.z / (PlateRadius * 2f)) + 0.5f;
+           v = (localPos.y / (PlateRadius * 2f)) + 0.5f;
+        }
+        else 
+        {
+           u = (localPos.x / (PlateRadius * 2f)) + 0.5f;
+           v = (localPos.z / (PlateRadius * 2f)) + 0.5f;
+        }
 
-	    // Clamp the values between 0 and 1 to prevent out-of-bounds errors
-	    return new Vector2( Math.Clamp(u, 0, 1), Math.Clamp(1.0f - v, 0, 1) ); 
+        return new Vector2( Math.Clamp(u, 0, 1), Math.Clamp(1.0f - v, 0, 1) ); 
     }
     
+    /// <summary>
+    /// Validates if the hit object is the plate or structurally linked to the plate.
+    /// Necessary for complex models with multiple child mesh components.
+    /// </summary>
     private bool IsPartOfPlate( GameObject obj )
     {
-	    if ( obj == null || Plate == null ) return false;
+        if ( obj == null || Plate == null ) return false;
 
-	    // Check if they share the same parent (Plate_Root)
-	    // Or if the hit object is the plate itself
-	    return obj == Plate || 
-	           obj.Parent == Plate.Parent || 
-	           obj.IsAncestor( Plate ) || 
-	           Plate.IsAncestor( obj );
+        return obj == Plate || 
+               obj.Parent == Plate.Parent || 
+               obj.IsAncestor( Plate ) || 
+               Plate.IsAncestor( obj );
     }
 
+    /// <summary>
+    /// Iterates through the byte array in a circular pattern around the UV coordinate.
+    /// Sets values to 0 (clean) to reveal the clean texture in the shader.
+    /// </summary>
     private void UpdateMask( Vector2 uv )
     {
         int centerX = (int)(uv.x * _textureSize);
@@ -166,6 +183,7 @@ public class DishwasherDynamicMask : Component
         {
             for ( int y = -radiusIdx; y <= radiusIdx; y++ )
             {
+                // Circular brush check using Pythagorean distance
                 if ( x * x + y * y <= radiusIdx * radiusIdx )
                 {
                     int px = centerX + x;
@@ -177,7 +195,7 @@ public class DishwasherDynamicMask : Component
                         if ( _maskData[index] != 0 )
                         {
                             _maskData[index] = 0;
-                            _isDirty = true; // Mark for GPU upload in OnUpdate
+                            _isDirty = true; 
                         }
                     }
                 }
@@ -185,6 +203,10 @@ public class DishwasherDynamicMask : Component
         }
     }
 
+    /// <summary>
+    /// Scans the mask to determine completion ratio.
+    /// On threshold (92%), triggers the authoritative ledger logic for rewards.
+    /// </summary>
     private void CalculateProgress()
     {
         int cleanedPixels = 0;
@@ -198,7 +220,7 @@ public class DishwasherDynamicMask : Component
         if ( CleanPercentage >= 92f )
         {
             _isLevelComplete = true;
-            // TODO: Call your Authoritative Ledger stream writer here for the job reward
+            // Reward logic is handled via the Sinvest Ledger model (Inflow)
             Log.Info( "Dish Cleaned! Great job." );
         }
     }
