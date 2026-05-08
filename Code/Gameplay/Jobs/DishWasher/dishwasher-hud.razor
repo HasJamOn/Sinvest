@@ -1,0 +1,91 @@
+﻿@using Sandbox;
+@using Sinvest;
+@using Sandbox.UI;
+@using System;
+@namespace Sinvest
+@inherits PanelComponent
+
+<root class="dishwasher-hud">
+    <div class="progress-container">
+       <div class="label">CLEANLINESS</div>
+       <div class="bar-background">
+          <div class="bar-fill" style="width: @(CleanPercentage)%"></div>
+       </div>
+       <div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
+    </div>
+</root>
+
+@code {
+    [Property] public DishwasherDynamicMask Target { get; set; }
+
+    /// <summary>
+    /// Property to pull the progress value from our logic component.
+    /// </summary>
+    private float CleanPercentage => Target?.CleanPercentage ?? 0f;
+
+    protected override void OnStart()
+    {
+        // Tells the UI system this panel is interactive and should request the cursor.
+        Panel.AcceptsFocus = true;
+        Panel.Focus();
+    }
+
+    /// <summary>
+    /// Standard s&box UI hash check to determine if the panel needs to re-render.
+    /// </summary>
+    protected override int BuildHash() => System.HashCode.Combine( CleanPercentage );
+}
+
+<style>
+    .dishwasher-hud {
+       position: absolute;
+       bottom: 50px;
+       left: 0;
+       right: 0;
+       display: flex;
+       justify-content: center;
+       
+       /* CRITICAL: pointer-events: all; allows the panel to intercept the mouse.
+          Without this, the mouse will pass through to the game world and remain hidden.
+       */
+       pointer-events: all; 
+    }
+
+    .progress-container {
+       width: 400px;
+       flex-direction: column;
+       align-items: center;
+       pointer-events: none; /* Let clicks pass through the HUD elements to the plate below */
+    }
+
+    .label {
+       color: rgba(255, 255, 255, 0.8);
+       font-size: 14px;
+       font-weight: bold;
+       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .bar-background {
+       width: 100%;
+       height: 24px;
+       background-color: rgba(0, 0, 0, 0.6);
+       border: 2px solid rgba(255, 255, 255, 0.1);
+       margin-top: 10px;
+       margin-bottom: 5px;
+       border-radius: 4px;
+    }
+
+    .bar-fill {
+       height: 100%;
+       background-color: rgba(0, 200, 255, 0.9);
+       /* Smooth the bar movement */
+       transition: width 0.1s ease-out; 
+    }
+
+    .percentage-text {
+       color: rgba(255, 255, 255, 0.9);
+       font-family: monospace;
+       font-size: 18px;
+       font-weight: bold;
+    }
+</style>
