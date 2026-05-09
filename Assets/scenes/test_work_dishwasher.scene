@@ -120,8 +120,8 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Main Camera",
-      "Position": "10.4623413,122.657196,123.101212",
-      "Rotation": "0.0105508976,0.100383654,-0.103996128,0.989442825",
+      "Position": "26.4152641,136.870041,104.65435",
+      "Rotation": "0,0.707106769,0,0.707106769",
       "Scale": "1,1,1",
       "Tags": "",
       "Enabled": true,
@@ -159,6 +159,25 @@
           "Viewport": "0,0,1,1",
           "ZFar": 10000,
           "ZNear": 10
+        },
+        {
+          "__type": "Sinvest.DishwasherRaycast",
+          "__guid": "27e18c96-0522-4f58-b6de-70cd58cdba10",
+          "__enabled": true,
+          "Flags": 0,
+          "ComponentCamera": {
+            "_type": "component",
+            "component_id": "fc7c70b1-8498-4782-b78d-c9dfe84ff371",
+            "go": "af41cd4d-346d-488d-be9d-8cd6651b8269",
+            "component_type": "CameraComponent"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ReachDistance": 500
         }
       ],
       "Children": []
@@ -263,7 +282,7 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "935a21d0-5fad-4b0c-a6e3-587b28d81104": "09a5611b-728c-40d9-956d-89574cd93c29"
+        "05cf1868-89b3-4b53-8f30-e4ed3b95458f": "8a4a8b66-b76d-49e2-b244-618f53c80b85"
       }
     },
     {
@@ -271,8 +290,8 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Plate_Root",
-      "Position": "131.343307,123.447662,87.5089111",
-      "Rotation": "0,0,0,1",
+      "Position": "28.1952667,138.567215,39.9154434",
+      "Rotation": "0.49999994,0.5,0.49999997,0.50000006",
       "Scale": "1,1,1",
       "Tags": "",
       "Enabled": true,
@@ -310,7 +329,7 @@
               "MaterialGroup": null,
               "MaterialOverride": null,
               "Materials": null,
-              "Model": "models/dev/box.vmdl",
+              "Model": "models/signmon/sign_dollar_basic.vmdl",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -337,7 +356,7 @@
           "Position": "0,0,0",
           "Rotation": "0,0,0,1",
           "Scale": "1.00100005,1.00100005,1.00100005",
-          "Tags": "",
+          "Tags": "dirtydish",
           "Enabled": true,
           "NetworkMode": 2,
           "NetworkFlags": 0,
@@ -356,7 +375,7 @@
               "MaterialGroup": null,
               "MaterialOverride": "materials/job_dishwasher/dishwasher_dirt.vmat",
               "Materials": null,
-              "Model": "models/dev/box.vmdl",
+              "Model": "models/signmon/sign_dollar_basic.vmdl",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -378,12 +397,6 @@
               "__enabled": true,
               "Flags": 0,
               "BrushRadius": 0.2,
-              "Camera": {
-                "_type": "component",
-                "component_id": "fc7c70b1-8498-4782-b78d-c9dfe84ff371",
-                "go": "af41cd4d-346d-488d-be9d-8cd6651b8269",
-                "component_type": "CameraComponent"
-              },
               "CleanPercentage": 0,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
@@ -391,24 +404,18 @@
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "Plate": {
-                "_type": "gameobject",
-                "go": "d574d770-ffb1-478e-abae-c43e182ba615"
-              },
-              "PlateRadius": 50,
-              "RotationSpeed": 0.5,
-              "ShowDebugTrace": true
+              "PlateRadius": 50
             },
             {
-              "__type": "Sandbox.BoxCollider",
+              "__type": "Sandbox.ModelCollider",
               "__guid": "95bf7dc7-1ec9-486e-ae02-00f314b45222",
               "__enabled": true,
               "Flags": 0,
-              "Center": "0,0,0",
               "ColliderFlags": 0,
               "Elasticity": null,
               "Friction": null,
               "IsTrigger": false,
+              "Model": "models/signmon/sign_dollar_basic.vmdl",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -420,8 +427,7 @@
               "OnTriggerEnter": null,
               "OnTriggerExit": null,
               "RollingResistance": null,
-              "Scale": "50,50,50",
-              "Static": false,
+              "Static": true,
               "Surface": null,
               "SurfaceVelocity": "0,0,0"
             }
@@ -448,7 +454,7 @@
       "Components": [
         {
           "__type": "Sinvest.dishwasher_hud",
-          "__guid": "e259b08b-a08f-4aac-bc79-414c7cb64bbe",
+          "__guid": "e777a5d1-0396-44c7-8dd4-56b73782ff79",
           "__enabled": true,
           "Flags": 0,
           "OnComponentDestroy": null,
@@ -463,6 +469,29 @@
             "go": "d574d770-ffb1-478e-abae-c43e182ba615",
             "component_type": "DishwasherDynamicMask"
           }
+        },
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "6fd6e067-158c-438f-a1cd-493146929a28",
+          "__enabled": true,
+          "Flags": 0,
+          "AutoScreenScale": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Opacity": 1,
+          "Scale": 1,
+          "ScaleStrategy": "ConsistentHeight",
+          "TargetCamera": {
+            "_type": "component",
+            "component_id": "fc7c70b1-8498-4782-b78d-c9dfe84ff371",
+            "go": "af41cd4d-346d-488d-be9d-8cd6651b8269",
+            "component_type": "CameraComponent"
+          },
+          "ZIndex": 100
         }
       ],
       "Children": []
@@ -488,18 +517,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
         }
       },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "5c20f6ac-a058-485f-9b79-e74851ebad5e"
-        }
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

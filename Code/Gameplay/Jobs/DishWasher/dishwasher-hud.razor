@@ -16,24 +16,24 @@
 </root>
 
 @code {
-    [Property] public DishwasherDynamicMask Target { get; set; }
+	[Property] public DishwasherDynamicMask Target { get; set; }
 
-    /// <summary>
-    /// Property to pull the progress value from our logic component.
-    /// </summary>
-    private float CleanPercentage => Target?.CleanPercentage ?? 0f;
+	private float CleanPercentage => Target?.CleanPercentage ?? 0f;
 
-    protected override void OnStart()
-    {
-        // Tells the UI system this panel is interactive and should request the cursor.
-        Panel.AcceptsFocus = true;
-        Panel.Focus();
-    }
+	protected override void OnStart()
+	{
+		Mouse.Visibility = MouseVisibility.Visible;
+        
+		Panel.AcceptsFocus = true;
+		Panel.Focus();
+	}
 
-    /// <summary>
-    /// Standard s&box UI hash check to determine if the panel needs to re-render.
-    /// </summary>
-    protected override int BuildHash() => System.HashCode.Combine( CleanPercentage );
+	protected override void OnDestroy()
+	{
+		Mouse.Visibility = MouseVisibility.Auto;
+	}
+
+	protected override int BuildHash() => System.HashCode.Combine( CleanPercentage );
 }
 
 <style>
