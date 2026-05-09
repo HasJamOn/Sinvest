@@ -178,55 +178,23 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "ReachDistance": 500
-        }
-      ],
-      "Children": []
-    },
-    {
-      "__guid": "e7591b03-87ce-40a0-a2e6-85f20edb7b1a",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "HUD",
-      "Position": "-47.3488007,38.0943909,18.4085846",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
+        },
         {
-          "__type": "Sandbox.ScreenPanel",
-          "__guid": "f4bc9cbd-e89b-49c0-af1c-8d3d4edc2177",
+          "__type": "Sinvest.PlateRotator",
+          "__guid": "f9001e7e-f5e9-4616-b254-76defe35aa81",
           "__enabled": true,
           "Flags": 0,
-          "AutoScreenScale": true,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "Opacity": 1,
-          "Scale": 1,
-          "ScaleStrategy": "ConsistentHeight",
-          "TargetCamera": null,
-          "ZIndex": 100
-        },
-        {
-          "__type": "Sandbox.WorldHUD",
-          "__guid": "142137da-e20a-4986-85aa-24993fc0d66c",
-          "__enabled": true,
-          "Flags": 0,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null
+          "PlateRoot": {
+            "_type": "gameobject",
+            "go": "8e734b84-e9c2-4330-a467-e134219e93ce"
+          },
+          "RotationSpeed": 5
         }
       ],
       "Children": []
@@ -404,7 +372,8 @@
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "PlateRadius": 50
+              "PlateRadius": 50,
+              "RotationSpeed": 0.5
             },
             {
               "__type": "Sandbox.ModelCollider",
@@ -427,7 +396,7 @@
               "OnTriggerEnter": null,
               "OnTriggerExit": null,
               "RollingResistance": null,
-              "Static": true,
+              "Static": false,
               "Surface": null,
               "SurfaceVelocity": "0,0,0"
             }
