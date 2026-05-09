@@ -1,58 +1,58 @@
 using Sandbox;
 using System;
-using System.Linq;
 
 namespace Sinvest;
 
 public sealed class DishwasherRaycast : Component
 {
-	// In s&box, the component class is CameraComponent
-	[Property] public CameraComponent ComponentCamera { get; set; } 
 	[Property] public float ReachDistance { get; set; } = 500f;
+	[Property] public bool ShowDebug { get; set; } = true;
+
+	private SceneTraceResult _lastTrace;
+	private Ray _lastRay;
 
 	protected override void OnUpdate()
 	{
-		if ( Input.Down( "attack1" ) )
+		// Safety check for Scene Camera
+		if ( Scene.Camera is null ) return;
+
+		// Construct the ray from the center of your screen
+		_lastRay = new Ray( Scene.Camera.WorldPosition, Scene.Camera.WorldRotation.Forward );
+
+		// Execute the trace
+		_lastTrace = Scene.Trace.Ray( _lastRay, ReachDistance )
+			.UsePhysicsWorld()
+			// .WithTag( "dirtydish" ) // Uncomment this later when your dishes have tags!
+			.Run();
+
+		// Immediate feedback in the Scene View
+		if ( ShowDebug )
 		{
-			ExecuteTrace();
+			DrawDebugLine();
 		}
 	}
 
-	private void ExecuteTrace()
+	private void DrawDebugLine()
 	{
-		var activeCam = ComponentCamera.IsValid() ? ComponentCamera : Scene.Camera;
-
-		if ( !activeCam.IsValid() )
+		using ( Gizmo.Scope() )
 		{
-			Log.Warning( "No valid CameraComponent found for raycasting!" );
-			return;
-		}
+			// PRO TIP: Offset the visual line slightly down/right so it's not 
+			// perfectly hidden behind the camera's center point.
+			Vector3 visualStart = _lastRay.Position + (Scene.Camera.WorldRotation.Down * 5f) + (Scene.Camera.WorldRotation.Right * 5f);
+			Vector3 endPos = _lastTrace.Hit ? _lastTrace.HitPosition : _lastRay.Position + (_lastRay.Forward * ReachDistance);
 
-		// 1. Generate ray from the current mouse position
-		// activeCam.ScreenNormalToRay converts 0.0-1.0 screen coordinates to a Ray
-		var mousePos = Mouse.Position / Screen.Size;
-		var ray = activeCam.ScreenNormalToRay( mousePos );
-    
-		// 2. Perform the Trace
-		var tr = Scene.Trace.Ray( ray, ReachDistance )
-			.WithTag( "dirtydish" )
-			.Run();
+			Gizmo.Draw.Color = _lastTrace.Hit ? Color.Green : Color.Red;
+			Gizmo.Draw.LineThickness = 3f;
+            
+			// Draw the line
+			Gizmo.Draw.Line( visualStart, endPos );
 
-		// --- VISUAL FEEDBACK ---
-
-		// Draw the "Aim" line in Cyan
-		DebugOverlay.Line( ray.Position, ray.Project( ReachDistance ), Color.Cyan, 2.0f );
-
-		if ( tr.Hit )
-		{
-			// Draw Green line to the hit point
-			DebugOverlay.Line( ray.Position, tr.HitPosition, Color.Green, 2.0f );
-			DebugOverlay.Sphere( new Sphere( tr.HitPosition, 2f ), Color.Green, 2.0f );
-        
-			Log.Info( $"HIT! -> {tr.GameObject.Name}" );
-        
-			var mask = tr.GameObject.Components.Get<DishwasherDynamicMask>();
-			mask?.CleanAtWorldLocation( tr );
+			if ( _lastTrace.Hit )
+			{
+				// Draw a small box where it hits
+				Gizmo.Draw.SolidBox( new BBox( endPos - 2f, endPos + 2f ) );
+				Gizmo.Draw.Text( $"Hit: {_lastTrace.GameObject.Name}", new Transform( endPos + Vector3.Up * 10f ) );
+			}
 		}
 	}
 }

@@ -9,23 +9,29 @@ public sealed class PlateRotator : Component
 
 	protected override void OnUpdate()
 	{
-		if ( PlateRoot == null ) return;
+		if ( !PlateRoot.IsValid() ) return;
 
-		// Only rotate while Attack2 (Right Click) is held
+		// INDUSTRY STANDARD: Toggle between "Pointer Mode" and "Capture Mode"
 		if ( Input.Down( "attack2" ) )
 		{
-			// Fetch mouse input deltas
+			// 1. Hide and lock the cursor. 
+			// In s&box, MouseVisibility.Hidden enables raw delta input 
+			// so the cursor doesn't hit the edge of your screen.
+			Mouse.Visibility = MouseVisibility.Hidden;
+
 			float mouseX = Input.MouseDelta.x;
 			float mouseY = Input.MouseDelta.y;
 
-			// Convert mouse movement into rotation increments
-			// We use the Camera's Up and Right vectors to ensure rotation 
-			// feels intuitive relative to what the player sees.
 			var rotationX = Rotation.FromAxis( Scene.Camera.WorldRotation.Up, -mouseX * RotationSpeed * Time.Delta );
 			var rotationY = Rotation.FromAxis( Scene.Camera.WorldRotation.Right, mouseY * RotationSpeed * Time.Delta );
 
-			// Apply the rotation to the PlateRoot
 			PlateRoot.WorldRotation = rotationX * rotationY * PlateRoot.WorldRotation;
+		}
+		else
+		{
+			// 2. Restore the cursor to 'Visible' mode.
+			// This allows the user to use the cursor to aim the 'DishwasherRaycast'.
+			Mouse.Visibility = MouseVisibility.Visible;
 		}
 	}
 }

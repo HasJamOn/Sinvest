@@ -165,19 +165,14 @@
           "__guid": "27e18c96-0522-4f58-b6de-70cd58cdba10",
           "__enabled": true,
           "Flags": 0,
-          "ComponentCamera": {
-            "_type": "component",
-            "component_id": "fc7c70b1-8498-4782-b78d-c9dfe84ff371",
-            "go": "af41cd4d-346d-488d-be9d-8cd6651b8269",
-            "component_type": "CameraComponent"
-          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "ReachDistance": 500
+          "ReachDistance": 500,
+          "ShowDebug": true
         },
         {
           "__type": "Sinvest.PlateRotator",
@@ -250,7 +245,7 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "05cf1868-89b3-4b53-8f30-e4ed3b95458f": "8a4a8b66-b76d-49e2-b244-618f53c80b85"
+        "ee2be860-e954-4367-9034-2d45b2068eb4": "ddb02887-96cb-4035-8684-8c7459832075"
       }
     },
     {
@@ -259,7 +254,7 @@
       "Flags": 0,
       "Name": "Plate_Root",
       "Position": "28.1952667,138.567215,39.9154434",
-      "Rotation": "0.49999994,0.5,0.49999997,0.50000006",
+      "Rotation": "0,7.4505806E-08,0,1",
       "Scale": "1,1,1",
       "Tags": "",
       "Enabled": true,
@@ -297,7 +292,7 @@
               "MaterialGroup": null,
               "MaterialOverride": null,
               "Materials": null,
-              "Model": "models/signmon/sign_dollar_basic.vmdl",
+              "Model": "models/dishwasher/plate.vmdl",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -321,9 +316,9 @@
           "__version": 2,
           "Flags": 0,
           "Name": "DirtOverlay",
-          "Position": "0,0,0",
+          "Position": "-1.00323518E-07,0,0.673259735",
           "Rotation": "0,0,0,1",
-          "Scale": "1.00100005,1.00100005,1.00100005",
+          "Scale": "1.10000002,1.10000002,1.10000002",
           "Tags": "dirtydish",
           "Enabled": true,
           "NetworkMode": 2,
@@ -343,7 +338,7 @@
               "MaterialGroup": null,
               "MaterialOverride": "materials/job_dishwasher/dishwasher_dirt.vmat",
               "Materials": null,
-              "Model": "models/signmon/sign_dollar_basic.vmdl",
+              "Model": "models/dishwasher/plate.vmdl",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -365,6 +360,7 @@
               "__enabled": true,
               "Flags": 0,
               "BrushRadius": 0.2,
+              "CalculatedPlateRadius": 50,
               "CleanPercentage": 0,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
@@ -372,7 +368,6 @@
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "PlateRadius": 50,
               "RotationSpeed": 0.5
             },
             {
@@ -384,7 +379,7 @@
               "Elasticity": null,
               "Friction": null,
               "IsTrigger": false,
-              "Model": "models/signmon/sign_dollar_basic.vmdl",
+              "Model": "models/dishwasher/plate.vmdl",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -486,13 +481,18 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
         }
       },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "5bd0305c-7e46-433d-94e2-a1f0dcab994c"
+        }
       }
     }
   },
