@@ -40,7 +40,7 @@
         </div>
     }
 
-    @* ── World-object panel (chair / trigger / case) ─────────────────── *@
+    @* ── World-object panel (chair / trigger / case / dishwasher) ────── *@
     @if ( !_hoveredCube.IsValid() && WorldObject.IsValid() && !string.IsNullOrEmpty( WorldTitle ) )
     {
         <div class="panel">
@@ -110,25 +110,41 @@
         }
     }
 
-    // ── World objects (chair / trigger / case) ────────────────────────────
+    // ── World objects (chair / trigger / case / dishwasher) ───────────────
 
-    private BaseChair        _foundChair;
-    private UIPopupTrigger   _foundTrigger;
-    private SteamGameCase    _foundCase;
+    private BaseChair              _foundChair;
+    private UIPopupTrigger         _foundTrigger;
+    private SteamGameCase          _foundCase;
+    private DishwasherWorkTrigger  _foundDishwasher;
 
-    GameObject WorldObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject ?? _foundCase?.GameObject;
-    string WorldTitle      => _foundChair?.TooltipTitle       ?? _foundTrigger?.TooltipTitle       ?? _foundCase?.TooltipTitle       ?? string.Empty;
-    string WorldIcon       => _foundChair?.TooltipIcon        ?? _foundTrigger?.TooltipIcon        ?? _foundCase?.TooltipIcon        ?? string.Empty;
-    string WorldAction     => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? _foundCase?.TooltipDescription ?? string.Empty;
-    string WorldKey        => (_foundChair != null || _foundCase != null)
-                            ? Input.GetButtonOrigin( "use" ).ToUpper()
-                            : _foundTrigger?.ToolTipKey?.ToUpper();
+    GameObject WorldObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject ?? _foundCase?.GameObject ?? _foundDishwasher?.GameObject;
+    
+    string WorldTitle => _foundChair?.TooltipTitle 
+                      ?? _foundTrigger?.TooltipTitle 
+                      ?? _foundCase?.TooltipTitle 
+                      ?? _foundDishwasher?.TooltipTitle 
+                      ?? string.Empty;
+
+    string WorldIcon => _foundChair?.TooltipIcon 
+                     ?? _foundTrigger?.TooltipIcon 
+                     ?? _foundCase?.TooltipIcon 
+                     ?? _foundDishwasher?.TooltipIcon 
+                     ?? string.Empty;
+
+    string WorldAction => _foundChair?.TooltipDescription 
+                       ?? _foundTrigger?.TooltipDescription 
+                       ?? _foundCase?.TooltipDescription 
+                       ?? _foundDishwasher?.TooltipDescription 
+                       ?? string.Empty;
+
+    string WorldKey => (_foundChair != null || _foundCase != null || _foundDishwasher != null)
+                    ? Input.GetButtonOrigin( "use" ).ToUpper()
+                    : _foundTrigger?.ToolTipKey?.ToUpper();
 
     // ── Per-frame ─────────────────────────────────────────────────────────
 
     protected override void OnUpdate()
     {
-        // Early-out when the SinvestOS computer UI is open — no tracing needed.
         if ( SinvestOS.Instance.IsValid() && SinvestOS.Instance.IsOpen )
         {
             ClearAll();
@@ -138,7 +154,6 @@
         var controller = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
         if ( controller == null ) return;
 
-        // Single shared trace for both tooltip types.
         var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
         var tr  = Scene.Trace.Ray( ray, 150f )
                       .WithoutTags( "player" )
@@ -146,37 +161,34 @@
 
         if ( tr.Hit && tr.GameObject.IsValid() )
         {
-            // Priority 1: WageWars cube.
             var cube = tr.GameObject.Components.GetInAncestorsOrSelf<WageWarsCube>();
             if ( cube.IsValid() )
             {
-                _hoveredCube    = cube;
-                _foundChair     = null;
-                _foundTrigger   = null;
-                _foundCase      = null;
+                ClearWorldObjects();
+                _hoveredCube = cube;
                 _timeSinceLastHit = 0;
             }
             else
             {
-                // Priority 2: World interaction objects.
                 bool isSitting = controller.Mode is SitMoveMode;
 
                 var chair   = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>()      : null;
                 var trigger =  isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
                 var sCase   = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<SteamGameCase>()  : null;
+                var dWasher = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<DishwasherWorkTrigger>() : null;
 
-                if ( chair.IsValid() || trigger.IsValid() || sCase.IsValid() )
+                if ( chair.IsValid() || trigger.IsValid() || sCase.IsValid() || dWasher.IsValid() )
                 {
-                    _hoveredCube    = null;
-                    _foundChair     = chair;
-                    _foundTrigger   = trigger;
-                    _foundCase      = sCase;
+                    _hoveredCube      = null;
+                    _foundChair       = chair;
+                    _foundTrigger     = trigger;
+                    _foundCase        = sCase;
+                    _foundDishwasher  = dWasher;
                     _timeSinceLastHit = 0;
                 }
             }
         }
 
-        // SteamGameCase interaction lives here since this is the only update loop.
         if ( _foundCase.IsValid() && IsVisible && Input.Pressed( "use" ) )
         {
             _foundCase.Shuffle();
@@ -188,12 +200,18 @@
         SetClass( "visible", IsVisible );
     }
 
+    private void ClearWorldObjects()
+    {
+        _foundChair      = null;
+        _foundTrigger    = null;
+        _foundCase       = null;
+        _foundDishwasher = null;
+    }
+
     private void ClearAll()
     {
-        _hoveredCube  = null;
-        _foundChair   = null;
-        _foundTrigger = null;
-        _foundCase    = null;
+        _hoveredCube = null;
+        ClearWorldObjects();
     }
 
     Player Player => Player.FindLocalPlayer();
@@ -205,6 +223,6 @@
         IsVisible,
         CubeWarning,
         UIPopupTrigger.ActiveInstance.IsValid(),
-        SinvestOS.Instance != null
+        SinvestOS.Instance?.IsOpen ?? false
     );
 }

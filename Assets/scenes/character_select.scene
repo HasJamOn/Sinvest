@@ -136,7 +136,7 @@
       },
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "0dc3de13-61df-432f-9a4d-0174925c3d38",
-        "190e4119-beeb-4a8c-a9ca-3a3663202db2": "eb8c6de2-f1c8-45a5-93b9-cbf62266f639",
+        "702bc60c-40d4-4bbf-b7ca-3f49802fb91c": "de30c39a-3c0a-4f19-a259-fb216655604c",
         "8611e950-dee8-401f-950f-459361d63675": "ba39a522-a8aa-4b3e-be35-a8c10979f8d0"
       }
     },
@@ -265,17 +265,17 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
+      },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "10451406-e6c8-4ffa-aadb-5296f2df955e"
-        }
-      },
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
         }
       }
     }

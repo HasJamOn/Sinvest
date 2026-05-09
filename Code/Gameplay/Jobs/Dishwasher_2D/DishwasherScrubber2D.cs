@@ -20,22 +20,24 @@ public sealed class DishwasherScrubber2D : Component
     private GameObject _activeDraggingObject;
     private SoundHandle _scrubSoundHandle;
 
+    private CameraComponent _camera;
+
     protected override void OnStart()
     {
-        // Force the mouse to be visible
-        Mouse.Visibility = MouseVisibility.Visible;
+	    // Grab the camera this component lives on — never use Scene.Camera,
+	    // which may resolve to the player's disabled camera mid-transition.
+	    _camera = Components.Get<CameraComponent>( FindMode.InSelf );
+	    Mouse.Visibility = MouseVisibility.Visible;
     }
 
     protected override void OnUpdate()
     {
-        // 1. Maintain mouse visibility (safety check for UI interaction)
-        if ( Mouse.Visibility != MouseVisibility.Visible )
-        {
-            Mouse.Visibility = MouseVisibility.Visible;
-        }
+	    if ( Mouse.Visibility != MouseVisibility.Visible )
+		    Mouse.Visibility = MouseVisibility.Visible;
 
-        // 2. Raycast from the Camera to find plates under the mouse
-        var mouseRay = Scene.Camera.ScreenPixelToRay( Mouse.Position );
+	    if ( _camera is null ) return;
+
+	    var mouseRay = _camera.ScreenPixelToRay( Mouse.Position );
         var tr = Scene.Trace.Ray( mouseRay, 1500f )
             .UsePhysicsWorld()
             .WithTag( "plate" ) // Make sure your prefab root has the "plate" tag
@@ -67,7 +69,7 @@ public sealed class DishwasherScrubber2D : Component
             if ( _activeDraggingObject.IsValid() )
             {
                 // Match world units to screen pixels using Camera Ortho height
-                float unitsPerPixel = Scene.Camera.OrthographicHeight / Screen.Height;
+                float unitsPerPixel = _camera.OrthographicHeight / Screen.Height;
 
                 // Apply your verified axis-swap and inversion logic
                 float moveX = -Mouse.Delta.y * unitsPerPixel;

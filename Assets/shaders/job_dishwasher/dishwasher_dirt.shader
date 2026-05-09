@@ -92,12 +92,17 @@ PS
 		m.Emission = float3( 0, 0, 0 );
 		m.Transmission = 0;
 		
-		float4 l_0 = float4( 0.35349, 0.21957, 0.0559, 1 );
-		float4 l_1 = Tex2DS( g_tDirtMask, g_sSampler0, i.vTextureCoords.xy );
-		float l_2 = step( 0.5, l_1.r );
+		float4 l_0 = float4( 0.06512, 0.04283, 0.00939, 1 );
+		float4 l_1 = float4( 0.35349, 0.21957, 0.0559, 1 );
+		float l_2 = ValueNoise( i.vTextureCoords.xy );
+		float l_3 = VoronoiNoise( i.vTextureCoords.xy, l_2, 8.126001 );
+		float l_4 = ValueNoise( float2( l_3, l_3 ) );
+		float4 l_5 = lerp( l_0, l_1, l_4 );
+		float4 l_6 = Tex2DS( g_tDirtMask, g_sSampler0, i.vTextureCoords.xy );
+		float l_7 = smoothstep( 0.4, 0.6, l_6.r );
 		
-		m.Albedo = l_0.xyz;
-		m.Opacity = l_2;
+		m.Albedo = l_5.xyz;
+		m.Opacity = l_7;
 		m.Roughness = 0;
 		m.Metalness = 0;
 		m.AmbientOcclusion = 0;

@@ -51,7 +51,7 @@
         "DistortionAmplitude": 0.8,
         "DistortionFrequency": 0.15,
         "FinishSound": "sounds/ui/win.sound",
-        "MaxSplats": 8,
+        "MaxSplats": 20,
         "MaxSplatSize": 60,
         "MinSplats": 3,
         "MinSplatSize": 15,

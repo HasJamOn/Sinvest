@@ -28,23 +28,20 @@ public sealed class PlateSpawner : Component
 	{
 		if ( !PlatePrefab.IsValid() ) return;
 
-		// 1. Increment our depth counter
 		_spawnIteration++;
 
 		float randomX = Game.Random.Float( -SpawnArea.x / 2, SpawnArea.x / 2 );
 		float randomY = Game.Random.Float( -SpawnArea.y / 2, SpawnArea.y / 2 );
 
-		Vector3 spawnPos = WorldPosition + new Vector3( randomX, randomY, _spawnIteration * 1.0f );
-		
-		var plate = PlatePrefab.Clone( spawnPos, WorldRotation, Vector3.One );
-		
-		// Use the iteration count in the name for easier debugging in the Hierarchy
+		// Clone parented to this spawner, then set LOCAL position.
+		// Local offsets survive any future repositioning of the minigame root.
+		var plate = PlatePrefab.Clone( new Transform( WorldPosition ), GameObject );
+		plate.LocalPosition = new Vector3( randomX, randomY, _spawnIteration * 1.0f );
+		plate.LocalRotation = Rotation.Identity;
 		plate.Name = $"Plate_{_spawnIteration}";
 
 		if ( plate.Components.TryGet<Dishwasher2DDynamicMask>( out var mask ) )
-		{
 			mask.Spawner = this;
-		}
 	}
 
 	public void OnPlateCleaned( GameObject plate )

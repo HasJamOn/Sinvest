@@ -4965,7 +4965,7 @@
                   ]
                 },
                 {
-                  "__guid": "42a421a9-6432-43e5-b370-763e3c7a6879",
+                  "__guid": "482a50c8-489d-436e-a9f7-1a4e9fbbbaba",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - tanktop",
@@ -4982,7 +4982,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "125a94c4-ea17-416a-b87a-89381305d1e7",
+                      "__guid": "6dea6e44-cefb-407b-9c17-a240518f0cf7",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5034,7 +5034,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "b3efe661-d212-4980-b6af-953da827b697",
+                  "__guid": "5a4cbb9f-f362-4be5-bbcc-b015f86ae0be",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - loose_jeans",
@@ -5051,7 +5051,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "d595f3ef-ddfe-434f-b217-cce94e346b18",
+                      "__guid": "eb55833d-c5d1-4d23-be20-48bdf852da69",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5103,7 +5103,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "9643ee88-c3f3-44ff-b1fc-f8281288e823",
+                  "__guid": "7eb6a1b8-ea4c-445a-b3c8-2cdd4e07df57",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - sneakers",
@@ -5120,7 +5120,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "2cff37c3-c04a-4979-9351-89b9469cdc31",
+                      "__guid": "9c9cc29f-e889-4402-896a-8fdbadfbc7eb",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -5172,7 +5172,7 @@
                   "Children": []
                 },
                 {
-                  "__guid": "6f7d1aff-636f-4e1e-b719-4f7984346b98",
+                  "__guid": "7391c4ec-c84e-49c7-990e-69ee00916d28",
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Clothing - nerdy_glasses",
@@ -5189,7 +5189,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.SkinnedModelRenderer",
-                      "__guid": "cdb1b99b-b4bb-4e8d-9709-caffa42aa260",
+                      "__guid": "3cf5d767-2ba3-4d3e-88c5-77da792c0ccc",
                       "__enabled": true,
                       "Flags": 0,
                       "AnimationGraph": null,
@@ -19588,6 +19588,99 @@
         "d1ac5178-72c4-4fb6-a402-24077bd5f756": "a37efc40-997b-4c08-9280-228a4d409555",
         "0907017c-57be-42d5-8ef3-028ab4784d8a": "f95fc198-f651-4b8c-9e8a-9a65b9cb78eb"
       }
+    },
+    {
+      "__guid": "b5218990-6184-47ad-94ae-5a1fa78044c3",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Job_Dishwasher",
+      "Position": "865.998901,-21.0803223,200.982742",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "b65f4cde-d08f-4909-8a19-2f2795cc98db",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": "models/dev/box.vmdl",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "0,0.33333,1,1"
+        },
+        {
+          "__type": "Sinvest.DishwasherWorkTrigger",
+          "__guid": "5474447b-2669-480a-8eac-c944b8a8ce44",
+          "__enabled": true,
+          "Flags": 0,
+          "GamePrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/work_dishwasher_2d/dishwasher_2d_game.prefab"
+          },
+          "GameSpawnPosition": "5000,0,0",
+          "MaxDistance": 100,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "TooltipDescription": "Start Shift",
+          "TooltipIcon": "flatware",
+          "TooltipTitle": "Dishwasher"
+        },
+        {
+          "__type": "Sandbox.BoxCollider",
+          "__guid": "bcd1ed39-6be5-4798-8d7f-f015b13c005b",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,0,0",
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Scale": "50,50,50",
+          "Static": false,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -19610,6 +19703,9 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1ff7db61-0293-4529-be2b-9f606b7c33ea"
@@ -19619,9 +19715,6 @@
         "Data": {
           "SelectionSets": []
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },

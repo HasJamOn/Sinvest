@@ -27,14 +27,14 @@
       "DefaultMetalness": 0,
       "DefaultAmbientOcclusion": 0,
       "Identifier": "0",
-      "Position": "84,-360",
+      "Position": "600,-480",
       "HandleOffsets": {},
       "Albedo": {
-        "Identifier": "1",
+        "Identifier": "6",
         "Output": "Result"
       },
       "Opacity": {
-        "Identifier": "3",
+        "Identifier": "4",
         "Output": "Result"
       }
     },
@@ -57,7 +57,7 @@
         }
       },
       "Identifier": "1",
-      "Position": "-192,-444",
+      "Position": "-396,-456",
       "HandleOffsets": {}
     },
     {
@@ -90,19 +90,92 @@
         }
       },
       "Identifier": "2",
-      "Position": "-444,-132",
+      "Position": "-456,-192",
       "HandleOffsets": {}
     },
     {
-      "_class": "Step",
-      "DefaultInput": 0,
-      "DefaultEdge": 0.5,
+      "_class": "Float4",
+      "Value": "0.06512,0.04283,0.00939,1",
+      "Name": "",
+      "IsAttribute": false,
+      "UI": {
+        "Type": "Color",
+        "Step": 0,
+        "Priority": 0,
+        "PrimaryGroup": {
+          "Name": null,
+          "Priority": 0
+        },
+        "SecondaryGroup": {
+          "Name": null,
+          "Priority": 0
+        }
+      },
       "Identifier": "3",
-      "Position": "-192,-120",
+      "Position": "-384,-636",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "SmoothStep",
+      "DefaultInput": 0,
+      "DefaultEdge1": 0.4,
+      "DefaultEdge2": 0.6,
+      "Identifier": "4",
+      "Position": "-168,-204",
       "HandleOffsets": {},
       "Input": {
         "Identifier": "2",
         "Output": "R"
+      }
+    },
+    {
+      "_class": "ValueNoise",
+      "Identifier": "5",
+      "Position": "-156,-324",
+      "HandleOffsets": {}
+    },
+    {
+      "_class": "Lerp",
+      "DefaultA": 0,
+      "DefaultB": 1,
+      "Fraction": 0.5,
+      "Identifier": "6",
+      "Position": "96,-636",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "3",
+        "Output": "Result"
+      },
+      "B": {
+        "Identifier": "1",
+        "Output": "Result"
+      },
+      "C": {
+        "Identifier": "7",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "ValueNoise",
+      "Identifier": "7",
+      "Position": "-72,-468",
+      "HandleOffsets": {},
+      "Coords": {
+        "Identifier": "8",
+        "Output": "Result"
+      }
+    },
+    {
+      "_class": "VoronoiNoise",
+      "AngleOffset": 3.1415925,
+      "CellDensity": 8.126001,
+      "Worley": false,
+      "Identifier": "8",
+      "Position": "108,-384",
+      "HandleOffsets": {},
+      "A": {
+        "Identifier": "5",
+        "Output": "Result"
       }
     }
   ]

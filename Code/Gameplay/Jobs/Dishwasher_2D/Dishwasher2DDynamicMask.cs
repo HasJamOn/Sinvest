@@ -130,32 +130,55 @@ public sealed class Dishwasher2DDynamicMask : Component
 
     private void GenerateOrganicSplats()
     {
-        int splatCount = Game.Random.Int( MinSplats, MaxSplats );
-        float plateRadius = TextureSize / 2f;
-        Vector2 center = new Vector2( plateRadius, plateRadius );
+	    float plateRadius = TextureSize / 2f;
+	    Vector2 center = new Vector2( plateRadius, plateRadius );
 
-        for ( int i = 0; i < splatCount; i++ )
-        {
-            // Distribute splats randomly within the circular bounds of the plate
-            float dist = MathF.Sqrt( Game.Random.Float( 0, 1 ) ) * (plateRadius * 0.8f);
-            float angle = Game.Random.Float( 0, MathF.PI * 2 );
-            
-            int centerX = (int)(center.x + MathF.Cos( angle ) * dist);
-            int centerY = (int)(center.y + MathF.Sin( angle ) * dist);
-            float splatSize = Game.Random.Float( MinSplatSize, MaxSplatSize );
+	    // --- NEW: Global Noise Pass ---
+	    // This adds a light coating of "grime" across the entire circular area
+	    for ( int y = 0; y < TextureSize; y++ )
+	    {
+		    for ( int x = 0; x < TextureSize; x++ )
+		    {
+			    float dx = x - center.x;
+			    float dy = y - center.y;
+			    float distSq = dx * dx + dy * dy;
 
-            DrawWarpedSplat( centerX, centerY, splatSize );
-        }
+			    // Only apply noise within the plate's circular bounds
+			    if ( distSq < (plateRadius * plateRadius) )
+			    {
+				    // Adjust frequency (0.1f) for "tightness" and threshold (0.6f) for "thickness"
+				    float globalNoise = Noise.Perlin( x * 0.1f, y * 0.1f );
+                
+				    if ( globalNoise > 0.6f ) 
+				    {
+					    _maskData[y * TextureSize + x] = 255;
+				    }
+			    }
+		    }
+	    }
 
-        // Establish the baseline for "100% dirty"
-        _initialDirtyPixels = 0;
-        foreach ( var b in _maskData ) 
-        {
-            if ( b == 255 ) _initialDirtyPixels++;
-        }
+	    // --- EXISTING: Chunky Splats ---
+	    int splatCount = Game.Random.Int( MinSplats, MaxSplats );
+	    for ( int i = 0; i < splatCount; i++ )
+	    {
+		    float dist = MathF.Sqrt( Game.Random.Float( 0, 1 ) ) * (plateRadius * 0.8f);
+		    float angle = Game.Random.Float( 0, MathF.PI * 2 );
         
-        // Prevent division by zero if plate is somehow born clean
-        if (_initialDirtyPixels == 0) _initialDirtyPixels = 1;
+		    int centerX = (int)(center.x + MathF.Cos( angle ) * dist);
+		    int centerY = (int)(center.y + MathF.Sin( angle ) * dist);
+		    float splatSize = Game.Random.Float( MinSplatSize, MaxSplatSize );
+
+		    DrawWarpedSplat( centerX, centerY, splatSize );
+	    }
+
+	    // Establish the baseline for "100% dirty"
+	    _initialDirtyPixels = 0;
+	    foreach ( var b in _maskData ) 
+	    {
+		    if ( b == 255 ) _initialDirtyPixels++;
+	    }
+    
+	    if (_initialDirtyPixels == 0) _initialDirtyPixels = 1;
     }
 
     private void DrawWarpedSplat( int cx, int cy, float radius )
