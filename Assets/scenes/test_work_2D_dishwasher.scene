@@ -52,7 +52,7 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "3dcfc161-8d4c-4665-a1c7-6adc5e478ac0": "f1b8c2ac-f216-4002-8f8b-0ac532514a75"
+        "c65f5522-897f-4a48-933b-4a79fecfd6f7": "384719f6-1f64-45b3-bf4a-e6323fb753b8"
       }
     },
     {
@@ -161,12 +161,14 @@
           "Flags": 0,
           "BrushRadius": 0.05,
           "DragSensitivity": 1,
+          "GrabSound": "sounds/ui/click.sound",
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null
+          "OnComponentUpdate": null,
+          "ScrubSound": "sounds/dialog/type.sound"
         }
       ],
       "Children": []
@@ -270,14 +272,14 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "67aaf221-5f09-466b-9cc1-120644d8cc79"
-        }
-      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
+        }
+      },
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "67aaf221-5f09-466b-9cc1-120644d8cc79"
         }
       },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
