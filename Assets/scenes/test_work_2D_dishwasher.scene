@@ -52,7 +52,7 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "ee2be860-e954-4367-9034-2d45b2068eb4": "ddb02887-96cb-4035-8684-8c7459832075"
+        "3dcfc161-8d4c-4665-a1c7-6adc5e478ac0": "f1b8c2ac-f216-4002-8f8b-0ac532514a75"
       }
     },
     {
@@ -166,16 +166,14 @@
           "__enabled": true,
           "Flags": 0,
           "BrushRadius": 0.05,
+          "DragSensitivity": 1,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "Surface": {
-            "_type": "gameobject",
-            "go": "515715f4-f295-4ca8-b95d-6a64afcca70f"
-          }
+          "TargetTags": null
         }
       ],
       "Children": []
@@ -183,62 +181,21 @@
     {
       "__guid": "515715f4-f295-4ca8-b95d-6a64afcca70f",
       "__version": 2,
-      "Flags": 0,
-      "Name": "Scrubbing_Surface",
-      "Position": "0,0,0",
-      "Rotation": "0,-2.98023224E-08,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sandbox.ModelRenderer",
-          "__guid": "e6df5446-3754-43e7-bc15-f28250f62f83",
-          "__enabled": true,
-          "Flags": 0,
-          "BodyGroups": 18446744073709551615,
-          "CreateAttachments": false,
-          "LodOverride": null,
-          "MaterialGroup": null,
-          "MaterialOverride": "materials/job_dishwasher/dishwasher_dirt.vmat",
-          "Materials": null,
-          "Model": "models/dev/plane.vmdl",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "RenderOptions": {
-            "GameLayer": true,
-            "OverlayLayer": false,
-            "BloomLayer": false,
-            "AfterUILayer": false
-          },
-          "RenderType": "On",
-          "Tint": "1,1,1,1"
-        },
-        {
-          "__type": "Sinvest.Dishwasher2DDynamicMask",
-          "__guid": "9da5fef8-5271-4659-b53c-e85b5064e489",
-          "__enabled": true,
-          "Flags": 0,
-          "CleanPercentage": 0,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "TextureSize": 512
-        }
-      ],
-      "Children": []
+      "__Prefab": "prefabs/work_dishwasher_2d/plate.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "04c5df86-3f65-45ec-975d-025cd0bb8246": "515715f4-f295-4ca8-b95d-6a64afcca70f",
+        "fbfa01d9-cacc-4c73-b535-8a2c018360d0": "e6df5446-3754-43e7-bc15-f28250f62f83",
+        "5f7d9be5-fdc4-4c77-ba71-2c636c46135f": "9da5fef8-5271-4659-b53c-e85b5064e489",
+        "0d17a224-3ea4-4dda-a57e-adff690eaa40": "c56e4556-755e-49e5-850f-bc44028986bc",
+        "b2102417-8f13-4ea8-b86b-9820df27b277": "4673a12f-9798-491d-8705-568a38d99340",
+        "706aa95d-8516-47d3-87f3-98f02f16956d": "78c73064-3e77-4664-91d6-0d9e3165daf5"
+      }
     },
     {
       "__guid": "dd7c272a-92a7-499f-b767-a41799214ef3",
@@ -280,6 +237,43 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "3abea924-3b3a-43ce-900b-de5ad2e56d6f",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Plate_spawner",
+      "Position": "49.6468048,377.030701,-97.7914581",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sinvest.PlateSpawner",
+          "__guid": "0d1fa6c5-f5c4-4f52-9f45-221fc694fac8",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "PlatePrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/work_dishwasher_2d/plate.prefab"
+          },
+          "SpawnArea": "500,500",
+          "SpawnCount": 5
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -302,17 +296,17 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "67aaf221-5f09-466b-9cc1-120644d8cc79"
-        }
-      },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
+        }
+      },
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "67aaf221-5f09-466b-9cc1-120644d8cc79"
         }
       }
     }

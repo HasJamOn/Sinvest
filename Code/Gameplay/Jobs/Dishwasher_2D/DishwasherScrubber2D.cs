@@ -1,44 +1,96 @@
 using Sandbox;
+using System.Linq;
 
 namespace Sinvest;
 
 public sealed class DishwasherScrubber2D : Component
 {
-	[Property] public float BrushRadius { get; set; } = 0.05f; 
-	[Property] public GameObject Surface { get; set; } // Assign your Scrubbing_Surface here
+	[Property] public float BrushRadius { get; set; } = 0.05f;
+	[Property] public float DragSensitivity { get; set; } = 1.0f;
+	
+	/// <summary>
+	/// The Mask component of the plate currently under the mouse.
+	/// Your UI can read this to show the specific plate's progress.
+	/// </summary>
+	public Dishwasher2DDynamicMask CurrentHoveredTarget { get; private set; }
+
+	private GameObject _activeDraggingObject;
+
+	protected override void OnStart()
+	{
+		// Force the mouse to be visible
+		Mouse.Visibility = MouseVisibility.Visible;
+	}
 
 	protected override void OnUpdate()
 	{
-		// If you want to be extra safe against other components:
+		// 1. Maintain mouse visibility (safety check for UI interaction)
 		if ( Mouse.Visibility != MouseVisibility.Visible )
 		{
 			Mouse.Visibility = MouseVisibility.Visible;
 		}
-		
-		if ( !Input.Down( "attack1" ) || !Surface.IsValid() ) return;
 
-		// 1. Get Mouse Position projected into the world
+		// 2. Raycast from the Camera to find plates under the mouse
 		var mouseRay = Scene.Camera.ScreenPixelToRay( Mouse.Position );
-        
-		// 2. Map World Position to Local UV
-		// ModelRenderer planes are centered, so localPos ranges from -50 to 50
-		var localPos = Surface.WorldTransform.PointToLocal( mouseRay.Position );
-        
-		// 3. Convert to 0-1 UV (Assuming 100x100 unit plane)
-		Vector2 uv = new Vector2( 
-			(localPos.y / 100f) + 0.5f,  // Map Screen Y to Plane X
-			(localPos.x / 100f) + 0.5f   // Map Screen X to Plane Y
-		);
-		
-		if ( Surface.Components.TryGet<Dishwasher2DDynamicMask>( out var mask ) )
+		var tr = Scene.Trace.Ray( mouseRay, 1500f )
+			.UsePhysicsWorld()
+			.WithTag( "plate" ) // Make sure your prefab root has the "plate" tag
+			.Run();
+
+		// 3. Update the Hovered Target for the UI
+		if ( tr.Hit && tr.GameObject.Components.TryGet<Dishwasher2DDynamicMask>( out var mask ) )
 		{
-			mask.CleanAtUV( uv, BrushRadius );
+			CurrentHoveredTarget = mask;
 		}
-	}
-	
-	protected override void OnStart()
-	{
-		// Force the mouse to be visible even if we aren't hovering over UI
-		Mouse.Visibility = MouseVisibility.Visible;
+		else if ( !Input.Down( "attack2" ) ) // Keep the target locked if we are still dragging it
+		{
+			CurrentHoveredTarget = null;
+		}
+
+		// --- Handle Dragging (Right Click / Attack2) ---
+		if ( Input.Down( "attack2" ) )
+		{
+			// Grab the object on the first frame of the click
+			if ( Input.Pressed( "attack2" ) && tr.Hit )
+			{
+				_activeDraggingObject = tr.GameObject;
+			}
+
+			if ( _activeDraggingObject.IsValid() )
+			{
+				// Match world units to screen pixels using Camera Ortho height
+				float unitsPerPixel = Scene.Camera.OrthographicHeight / Screen.Height;
+				
+				// Apply your verified axis-swap and inversion logic
+				float moveX = -Mouse.Delta.y * unitsPerPixel; 
+				float moveY = -Mouse.Delta.x * unitsPerPixel; 
+
+				Vector3 moveDir = new Vector3( moveX, moveY, 0 ) * DragSensitivity;
+				_activeDraggingObject.WorldPosition += moveDir;
+			}
+		}
+		else
+		{
+			_activeDraggingObject = null;
+		}
+
+		// --- Handle Scrubbing (Left Click / Attack1) ---
+		if ( Input.Down( "attack1" ) && tr.Hit )
+		{
+			// Transform hit position to the local space of the specific plate
+			var localPos = tr.GameObject.WorldTransform.PointToLocal( tr.HitPosition );
+
+			// Convert local units (-50 to 50) to UV (0 to 1) 
+			// Assuming plane.vmdl (100x100) and your established axis rotation
+			Vector2 uv = new Vector2(
+				(localPos.y / 100f) + 0.5f,
+				(localPos.x / 100f) + 0.5f
+			);
+
+			if ( tr.GameObject.Components.TryGet<Dishwasher2DDynamicMask>( out var plateMask ) )
+			{
+				plateMask.CleanAtUV( uv, BrushRadius );
+			}
+		}
 	}
 }

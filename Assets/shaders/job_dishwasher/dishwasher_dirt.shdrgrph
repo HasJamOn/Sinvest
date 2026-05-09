@@ -76,9 +76,9 @@
         "CustomExtension": null,
         "ShowExtension": true,
         "Processor": "None",
-        "ColorSpace": "Srgb",
+        "ColorSpace": "Linear",
         "ImageFormat": "DXT5",
-        "SrgbRead": true,
+        "SrgbRead": false,
         "Priority": 0,
         "PrimaryGroup": {
           "Name": null,

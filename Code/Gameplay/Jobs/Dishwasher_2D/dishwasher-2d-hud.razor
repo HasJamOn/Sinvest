@@ -5,23 +5,36 @@
 @namespace Sinvest
 @inherits PanelComponent
 
-@* Changed class to match the style block below *@
 <root class="dishwasher-hud">
-    <div class="progress-container">
-       <div class="label">PLATE CLEANED</div>
-       <div class="bar-background">
-          <div class="bar-fill" style="width: @(CleanPercentage)%"></div>
-       </div>
-       <div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
-    </div>
+	@* Only show the bar if we are actually scrubbing/hovering a plate *@
+	@if ( ActiveTarget.IsValid() )
+	{
+		<div class="progress-container">
+			<div class="label">CLEANING: @ActiveTarget.GameObject.Name</div>
+			<div class="bar-background">
+				<div class="bar-fill" style="width: @(CleanPercentage)%"></div>
+			</div>
+			<div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
+		</div>
+	}
 </root>
 
 @code {
-    [Property] public Dishwasher2DDynamicMask Target { get; set; }
+	// We find the Scrubber on the camera to see what it's touching
+	private DishwasherScrubber2D Scrubber => Scene.GetAllComponents<DishwasherScrubber2D>().FirstOrDefault();
+    
+	// Get the mask from whatever the scrubber is currently interacting with
+	private Dishwasher2DDynamicMask ActiveTarget => Scrubber?.CurrentHoveredTarget;
 
-    private float CleanPercentage => Target?.CleanPercentage ?? 0f;
+	private float CleanPercentage => ActiveTarget?.CleanPercentage ?? 0f;
 
-    protected override int BuildHash() => System.HashCode.Combine( CleanPercentage );
+	protected override void OnEnabled()
+	{
+		Mouse.Visibility = MouseVisibility.Visible;
+	}
+
+	// Hash by the percentage AND the target itself so the UI swaps immediately
+	protected override int BuildHash() => System.HashCode.Combine( CleanPercentage, ActiveTarget );
 }
 
 <style>
