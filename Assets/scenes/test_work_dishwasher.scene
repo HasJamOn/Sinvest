@@ -280,7 +280,6 @@
               "__guid": "402cd7f8-7516-4279-86ab-fc8fdbc6696c",
               "__enabled": true,
               "Flags": 0,
-              "BrushRadius": 0.02,
               "CalculatedPlateRadius": 50,
               "CleanPercentage": 0,
               "OnComponentDestroy": null,
@@ -427,26 +426,6 @@
           "ZNear": 10
         },
         {
-          "__type": "Sinvest.DishwasherRaycast",
-          "__guid": "472d0981-99b3-461b-b731-e2f465910277",
-          "__enabled": true,
-          "Flags": 0,
-          "EyeLocalOffset": "0,-300,150",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "PlateRoot": {
-            "_type": "gameobject",
-            "go": "8e734b84-e9c2-4330-a467-e134219e93ce"
-          },
-          "ReachDistance": 500,
-          "ScrubPlaneSize": 120,
-          "ShowDebug": true
-        },
-        {
           "__type": "Sinvest.PlateRotator",
           "__guid": "b30a367b-584c-414b-98d8-503510bcb783",
           "__enabled": true,
@@ -462,6 +441,24 @@
             "go": "8e734b84-e9c2-4330-a467-e134219e93ce"
           },
           "RotationSpeed": 5
+        },
+        {
+          "__type": "Sinvest.DishwasherScrubber",
+          "__guid": "92dd1cd6-ec39-4baa-aca3-6f294e79f895",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ReachDistance": 500,
+          "ScrubberShape": {
+            "Center": "0,0,0",
+            "Radius": 10
+          },
+          "ShowDebug": true
         }
       ],
       "Children": []
@@ -493,11 +490,6 @@
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
-        }
-      },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "5bd0305c-7e46-433d-94e2-a1f0dcab994c"
         }
       }
     }
