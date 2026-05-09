@@ -16,7 +16,34 @@ public sealed class Dishwasher2DDynamicMask : Component
     protected override void OnStart()
     {
 	    _maskData = new byte[TextureSize * TextureSize];
-	    Array.Fill( _maskData, (byte)255 );
+    
+	    // Calculate center and radius in pixel coordinates
+	    float centerX = TextureSize / 2f;
+	    float centerY = TextureSize / 2f;
+	    float radius = TextureSize / 2f; // Full circle radius
+
+	    for ( int y = 0; y < TextureSize; y++ )
+	    {
+		    for ( int x = 0; x < TextureSize; x++ )
+		    {
+			    int idx = y * TextureSize + x;
+            
+			    // Calculate distance from center
+			    float dx = x - centerX;
+			    float dy = y - centerY;
+			    float distSq = dx * dx + dy * dy;
+
+			    // If inside the circle, it's dirty (255), otherwise clean (0)
+			    if ( distSq <= radius * radius )
+			    {
+				    _maskData[idx] = 255;
+			    }
+			    else
+			    {
+				    _maskData[idx] = 0;
+			    }
+		    }
+	    }
 
 	    _maskTexture = Texture.Create( TextureSize, TextureSize )
 		    .WithFormat( ImageFormat.I8 )
@@ -27,12 +54,8 @@ public sealed class Dishwasher2DDynamicMask : Component
 
 	    if ( Components.TryGet<ModelRenderer>( out _renderer ) )
 	    {
-		    // 1. Create a unique material clone for THIS specific plate.
-		    // This stops s&box from batching plates together and 
-		    // ensures 'DirtMask' stays private to this instance.
+		    // Break the batching so each plate is unique
 		    _renderer.MaterialOverride = _renderer.MaterialOverride.CreateCopy();
-
-		    // 2. Set the attribute on the unique material copy.
 		    _renderer.Attributes.Set( "DirtMask", _maskTexture );
 	    }
     }

@@ -104,13 +104,7 @@
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "Target": {
-            "_type": "component",
-            "component_id": "9da5fef8-5271-4659-b53c-e85b5064e489",
-            "go": "515715f4-f295-4ca8-b95d-6a64afcca70f",
-            "component_type": "Dishwasher2DDynamicMask"
-          }
+          "OnComponentUpdate": null
         }
       ],
       "Children": []
@@ -172,8 +166,7 @@
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "TargetTags": null
+          "OnComponentUpdate": null
         }
       ],
       "Children": []
