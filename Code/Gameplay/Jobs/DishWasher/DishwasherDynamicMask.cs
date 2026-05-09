@@ -129,43 +129,22 @@ public class DishwasherDynamicMask : Component
 	public void CleanAtWorldLocation( SceneTraceResult tr )
 	{
 		if ( !Components.TryGet<ModelRenderer>( out var renderer ) ) return;
-    
-		// Store for debug gizmos
-		_lastWorldHit = tr.HitPosition;
-		_hasHitThisFrame = true;
 
-		// Convert hit to local space
-		Vector3 localPos = GameObject.WorldTransform.PointToLocal( tr.HitPosition );
-		Vector3 localNormal = GameObject.WorldTransform.NormalToLocal( tr.Normal );
-    
-		// CRITICAL: Offset by the model's geometric center so the UVs align with the shape, 
-		// not the pivot (which is usually at the bottom).
-		localPos -= renderer.Model.Bounds.Center;
-
-		float u, v;
-		float absX = MathF.Abs( localNormal.x );
-		float absY = MathF.Abs( localNormal.y );
-		float absZ = MathF.Abs( localNormal.z );
+		// Project world hit into the plate's local coordinate space.
+		// TexCoord0 does not exist on SceneTraceResult — derive UVs from geometry instead.
+		var localHit = GameObject.WorldTransform.PointToLocal( tr.HitPosition );
 		float diameter = CalculatedPlateRadius * 2f;
 
-		// Tri-planar Projection Logic
-		if ( absZ >= absX && absZ >= absY ) 
-		{ 
-			u = (localPos.x / diameter) + 0.5f; 
-			v = (localPos.y / diameter) + 0.5f; 
-		}
-		else if ( absX >= absY && absX >= absZ ) 
-		{ 
-			u = (localPos.z / diameter) + 0.5f; 
-			v = (localPos.y / diameter) + 0.5f; 
-		}
-		else 
-		{ 
-			u = (localPos.x / diameter) + 0.5f; 
-			v = (localPos.z / diameter) + 0.5f; 
-		}
+		// Map local X from [-radius, +radius] → [0, 1]
+		// Negate local Y so +V points in the same direction as local -Y,
+		// which matches the debug gizmo's back-projection that uses -diameter for Y.
+		float u = (localHit.x / diameter) + 0.5f;
+		float v = (-localHit.y / diameter) + 0.5f;
 
-		_lastUV = new Vector2( Math.Clamp( u, 0, 1 ), Math.Clamp( 1.0f - v, 0, 1 ) );
+		_lastWorldHit = tr.HitPosition;
+		_hasHitThisFrame = true;
+		_lastUV = new Vector2( u, v );
+
 		UpdateMask( _lastUV );
 	}
 
