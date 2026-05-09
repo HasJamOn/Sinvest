@@ -239,6 +239,47 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "dd7c272a-92a7-499f-b767-a41799214ef3",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Directional Light",
+      "Position": "0,0,200",
+      "Rotation": "-0.245984167,0.593858242,0.293152541,0.707732737",
+      "Scale": "1,1,1",
+      "Tags": "light_directional,light",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "ce7a7774-42ac-4192-8086-c525a03226fc",
+          "__enabled": true,
+          "Flags": 0,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "0.91373,0.98039,1,1",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0,0,0,0",
+          "Visualizer": {}
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
