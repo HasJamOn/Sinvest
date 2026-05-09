@@ -1,0 +1,82 @@
+﻿@using Sandbox;
+@using Sinvest;
+@using Sandbox.UI;
+@using System;
+@namespace Sinvest
+@inherits PanelComponent
+
+@* Changed class to match the style block below *@
+<root class="dishwasher-hud">
+    <div class="progress-container">
+       <div class="label">PLATE CLEANED</div>
+       <div class="bar-background">
+          <div class="bar-fill" style="width: @(CleanPercentage)%"></div>
+       </div>
+       <div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
+    </div>
+</root>
+
+@code {
+    [Property] public Dishwasher2DDynamicMask Target { get; set; }
+
+    private float CleanPercentage => Target?.CleanPercentage ?? 0f;
+
+    protected override int BuildHash() => System.HashCode.Combine( CleanPercentage );
+}
+
+<style>
+    .dishwasher-hud {
+        position: absolute;
+        bottom: 10%;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        
+        /* Clicks pass through to the Scrubber2D component */
+        pointer-events: none; 
+    }
+
+    .progress-container {
+        width: 500px;
+        flex-direction: column;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding: 20px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+    }
+
+    .label {
+        color: white;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-shadow: 2px 2px 4px black;
+    }
+
+    .bar-background {
+        width: 100%;
+        height: 12px;
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-top: 15px;
+        margin-bottom: 10px;
+        border-radius: 100px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        background-color: #00e1ff;
+        box-shadow: 0 0 15px #00e1ff;
+        transition: width 0.2s ease-in-out; 
+    }
+
+    .percentage-text {
+        color: #00e1ff;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 24px;
+        font-weight: 900;
+        text-shadow: 0 0 10px rgba(0, 225, 255, 0.5);
+    }
+</style>

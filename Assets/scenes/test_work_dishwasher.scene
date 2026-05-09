@@ -447,6 +447,8 @@
           "__guid": "92dd1cd6-ec39-4baa-aca3-6f294e79f895",
           "__enabled": true,
           "Flags": 0,
+          "InvertU": false,
+          "InvertV": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -458,7 +460,7 @@
             "Center": "0,0,0",
             "Radius": 10
           },
-          "ShowDebug": true
+          "SwapUv": false
         }
       ],
       "Children": []
@@ -484,6 +486,11 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "69db0226-f6f9-46aa-a8b8-c5920a80ecad"
+        }
+      },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       },
