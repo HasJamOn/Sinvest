@@ -48,6 +48,8 @@
         "__enabled": true,
         "Flags": 0,
         "CleanPercentage": 0,
+        "DirtThreshold": 0.5,
+        "NoiseScale": 0.05,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
