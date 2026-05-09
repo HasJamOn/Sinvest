@@ -431,13 +431,19 @@
           "__guid": "472d0981-99b3-461b-b731-e2f465910277",
           "__enabled": true,
           "Flags": 0,
+          "EyeLocalOffset": "0,-300,150",
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
+          "PlateRoot": {
+            "_type": "gameobject",
+            "go": "8e734b84-e9c2-4330-a467-e134219e93ce"
+          },
           "ReachDistance": 500,
+          "ScrubPlaneSize": 120,
           "ShowDebug": true
         },
         {

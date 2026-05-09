@@ -5,183 +5,193 @@ namespace Sinvest;
 
 /// <summary>
 /// Handles real-time dirty-to-clean texture masking for mesh surfaces.
-/// This component projects world-space hits onto a 2D local byte array 
-/// and updates a GPU texture attribute named 'DirtMask'.
+/// Projects world-space hits into a 2D local byte array and updates
+/// a GPU texture attribute named 'DirtMask'.
 /// </summary>
 public class DishwasherDynamicMask : Component
 {
-	[Property] public float BrushRadius { get; set; } = 0.05f;
-	[Property] public float RotationSpeed { get; set; } = 0.5f;
+    [Property] public float BrushRadius    { get; set; } = 0.05f;
+    [Property] public float RotationSpeed  { get; set; } = 0.5f;
 
-	/// <summary>
-	/// The boundary used for UV projection. Calculated automatically from the model 
-	/// but can be adjusted manually in the editor via Gizmos.
-	/// </summary>
-	[Property, ReadOnly] public float CalculatedPlateRadius { get; private set; } = 50f;
+    /// <summary>
+    /// Derived from the model bounds automatically; tweak manually if needed.
+    /// </summary>
+    [Property, ReadOnly] public float CalculatedPlateRadius { get; private set; } = 50f;
 
-	private Texture _maskTexture;
-	private byte[] _maskData;
-	private int _textureSize = 256;
-	private bool _isDirty = false;
-	private int _cleanedPixelCount = 0;
+    [Property, ReadOnly] public float CleanPercentage { get; private set; } = 0f;
 
-	// Debug tracking
-	private Vector3 _lastWorldHit;
-	private Vector2 _lastUV;
-	private bool _hasHitThisFrame;
+    private Texture  _maskTexture;
+    private byte[]   _maskData;
+    private const int TextureSize = 256;
+    private bool _isDirty;
+    private int  _cleanedPixelCount;
 
-	[Property, ReadOnly] public float CleanPercentage { get; private set; } = 0f;
+    // Debug state
+    private Vector3 _lastWorldHit;
+    private Vector2 _lastUV;
+    private bool    _hasHitThisFrame;
 
-	private bool IsStatic => GameObject.Tags.Has( "static" );
+    private bool IsStatic => GameObject.Tags.Has( "static" );
 
-	protected override void OnStart()
-	{
-		InitializeRadius();
-		InitializeMask();
+    // ── lifecycle ──────────────────────────────────────────────────────────
 
-		if ( IsStatic )
-		{
-			Log.Warning( $"[Sinvest] {GameObject.Name} has the 'static' tag. It will not rotate!" );
-		}
-	}
+    protected override void OnStart()
+    {
+        InitializeRadius();
+        InitializeMask();
 
-	private void InitializeRadius()
-	{
-		if ( Components.TryGet<ModelRenderer>( out var renderer ) && renderer.Model is not null )
-		{
-			var bounds = renderer.Model.Bounds;
-			CalculatedPlateRadius = MathF.Max( bounds.Size.x, MathF.Max( bounds.Size.y, bounds.Size.z ) ) / 2f;
-		}
-	}
+        if ( IsStatic )
+            Log.Warning( $"[Sinvest] {GameObject.Name} has the 'static' tag — it will not rotate!" );
+    }
 
-	protected override void OnPreRender()
-	{
-		if ( !Components.TryGet<ModelRenderer>( out var renderer ) ) return;
-		if ( !Gizmo.IsSelected && !_hasHitThisFrame ) return;
+    /// <summary>Restores the mask to fully dirty (all white).</summary>
+    public override void Reset() // Added 'override'
+    {
+	    base.Reset(); // Optional: Calls the base Component.Reset() to reset properties
+    
+	    Array.Fill( _maskData, (byte)255 );
+	    _cleanedPixelCount = 0;
+	    CleanPercentage    = 0f;
+	    _maskTexture?.Update( _maskData );
+    }
 
-		// We use the GameObject's transform scope so everything inside follows the plate
-		using ( Gizmo.Scope( "plate_debug", GameObject.WorldTransform ) )
-		{
-			// 1. Draw the actual model geometry as a wireframe
-			Gizmo.Draw.Color = Color.Cyan.WithAlpha( 0.3f );
-			// This ensures the gizmo perfectly matches the dish shape
-			Gizmo.Draw.Model( renderer.Model );
+    // ── gizmo ──────────────────────────────────────────────────────────────
 
-			if ( _hasHitThisFrame )
-			{
-				var localHit = GameObject.WorldTransform.PointToLocal( _lastWorldHit );
+    protected override void OnPreRender()
+    {
+        if ( !Components.TryGet<ModelRenderer>( out var renderer ) ) return;
+        if ( !Gizmo.IsSelected && !_hasHitThisFrame ) return;
 
-				// 2. Draw ACTUAL World Hit (Red)
-				Gizmo.Draw.Color = Color.Red;
-				Gizmo.Draw.SolidSphere( localHit, 1f );
+        using ( Gizmo.Scope( "plate_debug", GameObject.WorldTransform ) )
+        {
+            Gizmo.Draw.Color = Color.Cyan.WithAlpha( 0.3f );
+            Gizmo.Draw.Model( renderer.Model );
 
-				// 3. Draw CALCULATED Mask Hit (Green)
-				float diameter = CalculatedPlateRadius * 2f;
-				Vector3 mathLocalPos = new Vector3( 
-					(_lastUV.x - 0.5f) * diameter, 
-					((1.0f - _lastUV.y) - 0.5f) * diameter, 
-					localHit.z // Match hit depth for visual alignment
-				);
+            if ( _hasHitThisFrame )
+            {
+                var localHit = GameObject.WorldTransform.PointToLocal( _lastWorldHit );
+                float diameter = CalculatedPlateRadius * 2f;
 
-				Gizmo.Draw.Color = Color.Green;
-				Gizmo.Draw.SolidSphere( mathLocalPos, 1f );
-				
-				// Connector line - if this is short, your math is accurate!
-				Gizmo.Draw.Color = Color.Yellow;
-				Gizmo.Draw.Line( localHit, mathLocalPos );
+                // Red = actual physics hit
+                Gizmo.Draw.Color = Color.Red;
+                Gizmo.Draw.SolidSphere( localHit, 1f );
 
-				_hasHitThisFrame = false;
-			}
-		}
-	}
+                // Green = UV back-projection (should overlap red when math is correct)
+                Vector3 mathPos = new Vector3(
+                    (_lastUV.x - 0.5f)         * diameter,
+                    ((1f - _lastUV.y) - 0.5f)  * diameter,
+                    localHit.z
+                );
+                Gizmo.Draw.Color = Color.Green;
+                Gizmo.Draw.SolidSphere( mathPos, 1f );
 
-	protected override void OnUpdate()
-	{
-		if ( !Input.Down( "attack2" ) ) return;
+                // Yellow connector — shorter = more accurate
+                Gizmo.Draw.Color = Color.Yellow;
+                Gizmo.Draw.Line( localHit, mathPos );
 
-		var plateRoot = GameObject.Parent;
-		if ( !plateRoot.IsValid() ) return;
+                _hasHitThisFrame = false;
+            }
+        }
+    }
 
-		var delta = Input.MouseDelta;
-		var camRot = Scene.Camera.WorldRotation;
-		
-		plateRoot.WorldRotation = Rotation.FromAxis( camRot.Up, -delta.x * RotationSpeed ) * plateRoot.WorldRotation;
-		plateRoot.WorldRotation = Rotation.FromAxis( camRot.Right, delta.y * RotationSpeed ) * plateRoot.WorldRotation;
-	}
+    // ── input: plate rotation (right-click drag) ───────────────────────────
 
-	private void InitializeMask()
-	{
-		_maskData = new byte[_textureSize * _textureSize];
-		for ( int i = 0; i < _maskData.Length; i++ ) _maskData[i] = 255;
-		
-		_maskTexture = Texture.Create( _textureSize, _textureSize )
-			.WithFormat( ImageFormat.I8 )
-			.WithData( _maskData )
-			.WithDynamicUsage() 
-			.Finish();
+    protected override void OnUpdate()
+    {
+        if ( !Input.Down( "attack2" ) ) return;
 
-		if ( Components.TryGet<ModelRenderer>( out var renderer ) )
-		{
-			renderer.Attributes.Set( "DirtMask", _maskTexture );
-		}
-	}
+        var plateRoot = GameObject.Parent;
+        if ( !plateRoot.IsValid() ) return;
 
-	public void CleanAtWorldLocation( SceneTraceResult tr )
-	{
-		if ( !Components.TryGet<ModelRenderer>( out var renderer ) ) return;
+        var delta  = Input.MouseDelta;
+        var camRot = Scene.Camera.WorldRotation;
 
-		// Project world hit into the plate's local coordinate space.
-		// TexCoord0 does not exist on SceneTraceResult — derive UVs from geometry instead.
-		var localHit = GameObject.WorldTransform.PointToLocal( tr.HitPosition );
-		float diameter = CalculatedPlateRadius * 2f;
+        plateRoot.WorldRotation =
+            Rotation.FromAxis( camRot.Up,    -delta.x * RotationSpeed ) *
+            Rotation.FromAxis( camRot.Right,  delta.y * RotationSpeed ) *
+            plateRoot.WorldRotation;
+    }
 
-		// Map local X from [-radius, +radius] → [0, 1]
-		// Negate local Y so +V points in the same direction as local -Y,
-		// which matches the debug gizmo's back-projection that uses -diameter for Y.
-		float u = (localHit.x / diameter) + 0.5f;
-		float v = (-localHit.y / diameter) + 0.5f;
+    // ── cleaning API (called by DishwasherRaycast) ─────────────────────────
 
-		_lastWorldHit = tr.HitPosition;
-		_hasHitThisFrame = true;
-		_lastUV = new Vector2( u, v );
+    public void CleanAtWorldLocation( SceneTraceResult tr )
+    {
+        if ( !Components.TryGet<ModelRenderer>( out _ ) ) return;
 
-		UpdateMask( _lastUV );
-	}
+        // Project hit into the plate's local coordinate space.
+        // UV is derived from geometry since TexCoord0 is unavailable on SceneTraceResult.
+        var localHit = GameObject.WorldTransform.PointToLocal( tr.HitPosition );
+        float diameter = CalculatedPlateRadius * 2f;
 
-	private void UpdateMask( Vector2 uv )
-	{
-		int centerX = (int)(uv.x * _textureSize);
-		int centerY = (int)(uv.y * _textureSize);
-		int radiusIdx = (int)(BrushRadius * _textureSize);
+        float u =  (localHit.x / diameter) + 0.5f;
+        float v = (-localHit.y / diameter) + 0.5f;
 
-		for ( int x = -radiusIdx; x <= radiusIdx; x++ )
-		{
-			for ( int y = -radiusIdx; y <= radiusIdx; y++ )
-			{
-				if ( x * x + y * y <= radiusIdx * radiusIdx )
-				{
-					int px = centerX + x;
-					int py = centerY + y;
-					
-					if ( px >= 0 && px < _textureSize && py >= 0 && py < _textureSize )
-					{
-						int index = py * _textureSize + px;
-						if ( _maskData[index] != 0 )
-						{
-							_maskData[index] = 0; 
-							_cleanedPixelCount++;
-							_isDirty = true; 
-						}
-					}
-				}
-			}
-		}
+        _lastWorldHit    = tr.HitPosition;
+        _hasHitThisFrame = true;
+        _lastUV          = new Vector2( u, v );
 
-		if ( _isDirty )
-		{
-			_maskTexture.Update( _maskData );
-			CleanPercentage = (float)_cleanedPixelCount / (_textureSize * _textureSize) * 100f;
-			_isDirty = false;
-		}
-	}
+        UpdateMask( _lastUV );
+    }
+
+    // ── internals ──────────────────────────────────────────────────────────
+
+    private void InitializeRadius()
+    {
+        if ( Components.TryGet<ModelRenderer>( out var renderer ) && renderer.Model is not null )
+        {
+            var bounds = renderer.Model.Bounds;
+            CalculatedPlateRadius =
+                MathF.Max( bounds.Size.x, MathF.Max( bounds.Size.y, bounds.Size.z ) ) / 2f;
+        }
+    }
+
+    private void InitializeMask()
+    {
+        _maskData = new byte[TextureSize * TextureSize];
+        Array.Fill( _maskData, (byte)255 );
+
+        _maskTexture = Texture.Create( TextureSize, TextureSize )
+            .WithFormat( ImageFormat.I8 )
+            .WithData( _maskData )
+            .WithDynamicUsage()
+            .Finish();
+
+        if ( Components.TryGet<ModelRenderer>( out var renderer ) )
+            renderer.Attributes.Set( "DirtMask", _maskTexture );
+    }
+
+    private void UpdateMask( Vector2 uv )
+    {
+        int cx = (int)(uv.x * TextureSize);
+        int cy = (int)(uv.y * TextureSize);
+        int r  = (int)(BrushRadius * TextureSize);
+
+        for ( int x = -r; x <= r; x++ )
+        {
+            for ( int y = -r; y <= r; y++ )
+            {
+                if ( x * x + y * y > r * r ) continue;
+
+                int px = cx + x;
+                int py = cy + y;
+
+                if ( px < 0 || px >= TextureSize || py < 0 || py >= TextureSize ) continue;
+
+                int idx = py * TextureSize + px;
+                if ( _maskData[idx] != 0 )
+                {
+                    _maskData[idx] = 0;
+                    _cleanedPixelCount++;
+                    _isDirty = true;
+                }
+            }
+        }
+
+        if ( _isDirty )
+        {
+            _maskTexture.Update( _maskData );
+            CleanPercentage = (float)_cleanedPixelCount / (TextureSize * TextureSize) * 100f;
+            _isDirty = false;
+        }
+    }
 }
