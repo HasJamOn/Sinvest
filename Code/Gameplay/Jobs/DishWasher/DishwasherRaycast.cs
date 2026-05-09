@@ -13,48 +13,55 @@ public sealed class DishwasherRaycast : Component
 
     protected override void OnUpdate()
     {
-	    if ( Scene.Camera is null ) return;
+        if ( Scene.Camera is null ) return;
 
-	    _lastRay = new Ray( Scene.Camera.WorldPosition, Scene.Camera.WorldRotation.Forward );
+        // 1. Generate a ray from the mouse cursor position
+        // This handles the conversion from 2D screen space to 3D world space
+        _lastRay = Scene.Camera.ScreenPixelToRay( Mouse.Position );
 
-	    _lastTrace = Scene.Trace.Ray( _lastRay, ReachDistance )
-		    .UsePhysicsWorld()
-		    .Run();
+        // 2. Run the trace
+        _lastTrace = Scene.Trace.Ray( _lastRay, ReachDistance )
+           .UsePhysicsWorld()
+           .Run();
 
-	    // Check for Attack1 (Left Click)
-	    if ( Input.Down( "attack1" ) && _lastTrace.Hit )
-	    {
-		    // In s&box, we check for existence by simply attempting to Get the component
-		    var mask = _lastTrace.GameObject.Components.Get<DishwasherDynamicMask>();
+        // 3. Check for Attack1 (Left Click)
+        if ( Input.Down( "attack1" ) && _lastTrace.Hit )
+        {
+            // Attempt to get the mask component using the s&box standard .Get<T>()
+            var mask = _lastTrace.GameObject.Components.Get<DishwasherDynamicMask>();
             
-		    if ( mask.IsValid() ) // Use .IsValid() for managed s&box objects
-		    {
-			    mask.CleanAtWorldLocation( _lastTrace );
-		    }
-	    }
+            if ( mask.IsValid() ) 
+            {
+                mask.CleanAtWorldLocation( _lastTrace );
+            }
+        }
 
-	    if ( ShowDebug ) DrawDebugLine();
+        if ( ShowDebug ) DrawDebugLine();
     }
 
     private void DrawDebugLine()
     {
-	    using ( Gizmo.Scope() )
-	    {
-		    Vector3 visualStart = _lastRay.Position + (Scene.Camera.WorldRotation.Down * 5f);
-		    Vector3 endPos = _lastTrace.Hit ? _lastTrace.HitPosition : _lastRay.Position + (_lastRay.Forward * ReachDistance);
+        using ( Gizmo.Scope() )
+        {
+            // We draw from the ray's origin (the camera) to the hit point
+            Vector3 endPos = _lastTrace.Hit ? _lastTrace.HitPosition : _lastRay.Project( ReachDistance );
 
-		    Gizmo.Draw.Color = _lastTrace.Hit ? Color.Green : Color.Red;
-		    Gizmo.Draw.LineThickness = 2f;
-		    Gizmo.Draw.Line( visualStart, endPos );
+            Gizmo.Draw.Color = _lastTrace.Hit ? Color.Green : Color.Red;
+            Gizmo.Draw.LineThickness = 2f;
+            Gizmo.Draw.Line( _lastRay.Position, endPos );
 
-		    // Fix: Check for the component's existence using Get() != null
-		    bool isDish = _lastTrace.Hit && _lastTrace.GameObject.Components.Get<DishwasherDynamicMask>() is not null;
-
-		    if ( Input.Down( "attack1" ) && isDish )
-		    {
-			    Gizmo.Draw.Color = Color.Yellow;
-			    Gizmo.Draw.SolidSphere( _lastTrace.HitPosition, 1f );
-		    }
-	    }
+            // Visual feedback for hitting a valid dish
+            var mask = _lastTrace.GameObject?.Components.Get<DishwasherDynamicMask>();
+            if ( mask.IsValid() )
+            {
+                Gizmo.Draw.Color = Color.Yellow;
+                Gizmo.Draw.SolidSphere( _lastTrace.HitPosition, 2f );
+                
+                if ( Input.Down( "attack1" ) )
+                {
+                    Gizmo.Draw.Text( "SCRUBBING", new Transform( _lastTrace.HitPosition + Vector3.Up * 10f ) );
+                }
+            }
+        }
     }
 }
