@@ -1,5 +1,6 @@
 using Sandbox;
 using System.Linq;
+using Sandbox.Audio;
 
 namespace Sinvest;
 
@@ -61,9 +62,19 @@ public sealed class DishwasherScrubber2D : Component
             {
                 _activeDraggingObject = tr.GameObject;
                 
-                // Play grab sound at the hit location
+                // Play 2D sound for immediate, clear feedback
                 if ( GrabSound is not null )
-                    Sound.Play( GrabSound, tr.HitPosition );
+                {
+	                // Play without a position to keep it 2D/Direct
+	                var handle = Sound.Play( GrabSound );
+	                if ( handle.IsValid() )
+	                {
+		                // Force UI/Clear settings manually in case the SoundEvent isn't marked as UI
+		                handle.ListenLocal = true;
+		                handle.DistanceAttenuation = false;
+		                handle.Occlusion = false;
+	                }
+                }
             }
 
             if ( _activeDraggingObject.IsValid() )
@@ -99,19 +110,19 @@ public sealed class DishwasherScrubber2D : Component
 
             if ( tr.GameObject.Components.TryGet<Dishwasher2DDynamicMask>( out var plateMask ) )
             {
-                plateMask.CleanAtUV( uv, BrushRadius );
+	            plateMask.CleanAtUV( uv, BrushRadius );
 
-                // Manage looping scrub sound
-                if ( ScrubSound is not null && ( _scrubSoundHandle == null || !_scrubSoundHandle.IsPlaying ) )
-                {
-                    _scrubSoundHandle = Sound.Play( ScrubSound, tr.HitPosition );
-                }
-                
-                // Update position of the sound to follow the brush
-                if ( _scrubSoundHandle != null )
-                {
-                    _scrubSoundHandle.Position = tr.HitPosition;
-                }
+	            if ( ScrubSound is not null && ( _scrubSoundHandle == null || !_scrubSoundHandle.IsPlaying ) )
+	            {
+		            // Play 2D for maximum clarity
+		            _scrubSoundHandle = Sound.Play( ScrubSound );
+		            if ( _scrubSoundHandle.IsValid() )
+		            {
+			            _scrubSoundHandle.ListenLocal = true;
+			            _scrubSoundHandle.DistanceAttenuation = false;
+			            _scrubSoundHandle.Occlusion = false;
+		            }
+	            }
             }
         }
         else

@@ -1,6 +1,7 @@
 using Sandbox;
 using Sandbox.Utility;
 using System;
+using Sandbox.Audio;
 
 namespace Sinvest;
 
@@ -74,10 +75,22 @@ public sealed class Dishwasher2DDynamicMask : Component
         // Completion threshold (e.g., 92% clean)
         if ( CleanPercentage >= 92f )
         {
-            if ( FinishSound is not null )
-            {
-                Sound.Play( FinishSound, WorldPosition );
-            }
+	        if ( FinishSound is not null )
+	        {
+		        // Play the sound - don't provide a position to keep it 2D
+		        var handle = Sound.Play( FinishSound );
+		        if ( handle.IsValid() )
+		        {
+			        // Force UI/Clear settings
+			        handle.ListenLocal = true;
+			        handle.DistanceAttenuation = false;
+			        handle.Occlusion = false;
+                
+			        // Use Mixer.Find to get the UI bus
+			        // If "UI" mixer doesn't exist, it will safely fallback to Master
+			        handle.TargetMixer = Mixer.FindMixerByName( "UI" );
+		        }
+	        }
 
             // Notify the spawner to handle destruction/scoring
             Spawner?.OnPlateCleaned( GameObject );
