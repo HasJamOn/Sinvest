@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sinvest;
 
@@ -10,13 +11,15 @@ public sealed class DishwasherDirtManager : Component
 	[Property] public int DirtCount { get; set; } = 40;
 	[Property] public float DecalSize { get; set; } = 0.5f;
 
-	// Each dirt piece takes exactly this many scrubs to fully remove
-	// (alpha starts at 1.0, each scrub removes 0.25, removed at <= 0.05)
-	public const int ScrubsPerDirt = 4;
+	/// <summary>
+	/// How much alpha to remove per scrub (e.g., 0.2 = 5 scrubs to reach 0 alpha).
+	/// </summary>
+	[Property, Range( 0.05f, 1.0f )] public float AlphaStep { get; set; } = 0.25f;
 
 	// Read by the HUD
 	public int TotalScrubsNeeded { get; private set; }
 	public int TotalScrubsApplied { get; private set; }
+	
 	public float CleanPercentage => TotalScrubsNeeded <= 0
 		? 0f
 		: ((float)TotalScrubsApplied / TotalScrubsNeeded * 100f).Clamp( 0f, 100f );
@@ -26,6 +29,7 @@ public sealed class DishwasherDirtManager : Component
 		public GameObject Projector;
 		public Vector3 LocalSurfacePoint;
 		public float CurrentAlpha;
+		public bool IsInFinalStage; // Track if we are at the < 10% threshold
 	}
 
 	private readonly List<DirtData> _activeDirt = new();
@@ -67,11 +71,12 @@ public sealed class DishwasherDirtManager : Component
 			spawned++;
 		}
 
-		// Total scrubs = actual spawned count * scrubs each needs
-		TotalScrubsNeeded = _activeDirt.Count * ScrubsPerDirt;
+		// Calculate total scrubs: (Alpha / Step) rounded up, + 1 for the final "10% to zero" scrub
+		int scrubsPerPiece = (int)MathF.Ceiling( 0.9f / AlphaStep ) + 1;
+		TotalScrubsNeeded = _activeDirt.Count * scrubsPerPiece;
 		TotalScrubsApplied = 0;
 
-		Log.Info( $"[DirtManager] Spawned {_activeDirt.Count} dirt pieces. Total scrubs needed: {TotalScrubsNeeded}" );
+		Log.Info( $"[DirtManager] Spawned {_activeDirt.Count} dirt. Step: {AlphaStep}. Needed: {TotalScrubsNeeded}" );
 	}
 
 	private void CreateDirtEntry( Vector3 position, Vector3 normal, int index )
@@ -101,7 +106,8 @@ public sealed class DishwasherDirtManager : Component
 		{
 			Projector = go,
 			LocalSurfacePoint = GameObject.WorldTransform.PointToLocal( position ),
-			CurrentAlpha = 1.0f
+			CurrentAlpha = 1.0f,
+			IsInFinalStage = false
 		} );
 	}
 
@@ -126,24 +132,32 @@ public sealed class DishwasherDirtManager : Component
 				continue;
 			}
 
-			// One scrub application per drag-enter per dirt piece
 			if ( session.Contains( dirt.Projector.Id ) ) continue;
 			session.Add( dirt.Projector.Id );
 
 			if ( !dirt.Projector.Components.TryGet<Decal>( out var decal ) ) continue;
 
-			dirt.CurrentAlpha -= 0.25f;
-			dirt.CurrentAlpha = dirt.CurrentAlpha.Clamp( 0f, 1f );
-			decal.ColorTint = Color.White.WithAlpha( dirt.CurrentAlpha );
-
-			// Count every scrub hit regardless of removal
-			TotalScrubsApplied = Math.Min( TotalScrubsApplied + 1, TotalScrubsNeeded );
-
-			if ( dirt.CurrentAlpha <= 0.05f )
+			// Logic: If already in final stage (10% alpha), destroy it
+			if ( dirt.IsInFinalStage )
 			{
+				TotalScrubsApplied = Math.Min( TotalScrubsApplied + 1, TotalScrubsNeeded );
 				dirt.Projector.Destroy();
 				_activeDirt.RemoveAt( i );
+				continue;
 			}
+
+			// Otherwise, reduce alpha
+			dirt.CurrentAlpha -= AlphaStep;
+
+			// Clamp to 10% if we go below it but aren't deleting yet
+			if ( dirt.CurrentAlpha <= 0.10f )
+			{
+				dirt.CurrentAlpha = 0.10f;
+				dirt.IsInFinalStage = true;
+			}
+
+			decal.ColorTint = Color.White.WithAlpha( dirt.CurrentAlpha );
+			TotalScrubsApplied = Math.Min( TotalScrubsApplied + 1, TotalScrubsNeeded );
 		}
 	}
 }
