@@ -166,7 +166,7 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "ee2be860-e954-4367-9034-2d45b2068eb4": "ddb02887-96cb-4035-8684-8c7459832075"
+        "77b3825e-6718-4048-a2b1-1df1e81dcf4e": "d079c60b-2e71-450d-b885-520c757e35ca"
       }
     },
     {
@@ -257,7 +257,7 @@
               "CreateAttachments": false,
               "LodOverride": null,
               "MaterialGroup": null,
-              "MaterialOverride": "materials/job_dishwasher/dishwasher_dirt.vmat",
+              "MaterialOverride": null,
               "Materials": null,
               "Model": "models/dishwasher/plate.vmdl",
               "OnComponentDestroy": null,
@@ -274,21 +274,6 @@
               },
               "RenderType": "On",
               "Tint": "1,1,1,1"
-            },
-            {
-              "__type": "Sinvest.DishwasherDynamicMask",
-              "__guid": "402cd7f8-7516-4279-86ab-fc8fdbc6696c",
-              "__enabled": true,
-              "Flags": 0,
-              "CalculatedPlateRadius": 50,
-              "CleanPercentage": 0,
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "RotationSpeed": 0.5
             },
             {
               "__type": "Sandbox.ModelCollider",
@@ -314,6 +299,45 @@
               "Static": false,
               "Surface": null,
               "SurfaceVelocity": "0,0,0"
+            },
+            {
+              "__type": "Sinvest.DishwasherDirtManager",
+              "__guid": "5aa636e8-0b90-401e-bffe-ca873e95cc90",
+              "__enabled": true,
+              "Flags": 0,
+              "CleanPercentage": 0,
+              "DecalDepth": 5,
+              "DecalSize": 0.49999863,
+              "DirtCount": 40,
+              "DirtDecal": "monitor_screen.decal",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "SpawnHeight": 0.1,
+              "SpawnRadius": 13.020005
+            },
+            {
+              "__type": "Sinvest.DishwasherDirtDebugger",
+              "__guid": "4a724a2e-17eb-41aa-85a9-975110aa82c9",
+              "__enabled": true,
+              "Flags": 0,
+              "LiveUpdate": true,
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "ShowProjectionVolumes": true,
+              "Target": {
+                "_type": "component",
+                "component_id": "5aa636e8-0b90-401e-bffe-ca873e95cc90",
+                "go": "d574d770-ffb1-478e-abae-c43e182ba615",
+                "component_type": "DishwasherDirtManager"
+              }
             }
           ],
           "Children": []
@@ -347,12 +371,7 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "Target": {
-            "_type": "component",
-            "component_id": "402cd7f8-7516-4279-86ab-fc8fdbc6696c",
-            "go": "d574d770-ffb1-478e-abae-c43e182ba615",
-            "component_type": "DishwasherDynamicMask"
-          }
+          "Target": null
         },
         {
           "__type": "Sandbox.ScreenPanel",
@@ -447,8 +466,6 @@
           "__guid": "92dd1cd6-ec39-4baa-aca3-6f294e79f895",
           "__enabled": true,
           "Flags": 0,
-          "InvertU": false,
-          "InvertV": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -456,11 +473,7 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "ReachDistance": 500,
-          "ScrubberShape": {
-            "Center": "0,0,0",
-            "Radius": 10
-          },
-          "SwapUv": false
+          "ScrubRadius": 3
         }
       ],
       "Children": []
@@ -491,13 +504,13 @@
           "$blob": "69db0226-f6f9-46aa-a8b8-c5920a80ecad"
         }
       },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
         }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       }
     }
   },

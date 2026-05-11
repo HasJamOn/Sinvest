@@ -6,17 +6,17 @@
 @inherits PanelComponent
 
 <root class="dishwasher-hud">
-    <div class="progress-container">
-       <div class="label">CLEANLINESS</div>
-       <div class="bar-background">
-          <div class="bar-fill" style="width: @(CleanPercentage)%"></div>
-       </div>
-       <div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
-    </div>
+	<div class="progress-container">
+		<div class="label">CLEANLINESS</div>
+		<div class="bar-background">
+			<div class="bar-fill" style="width: @(CleanPercentage)%"></div>
+		</div>
+		<div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
+	</div>
 </root>
 
 @code {
-	[Property] public DishwasherDynamicMask Target { get; set; }
+	[Property] public DishwasherDirtManager Target { get; set; }
 
 	private float CleanPercentage => Target?.CleanPercentage ?? 0f;
 
@@ -31,11 +31,6 @@
         right: 0;
         display: flex;
         justify-content: center;
-        
-        /* 
-           STRICT CONSTRAINT: This allows the cursor to interact with the 
-           3D plate behind the UI.
-        */
         pointer-events: none; 
     }
 
@@ -43,7 +38,6 @@
         width: 400px;
         flex-direction: column;
         align-items: center;
-        /* Inherits pointer-events: none from root */
     }
 
     .label {
@@ -57,7 +51,7 @@
         width: 100%;
         height: 24px;
         background-color: rgba(0, 0, 0, 0.6);
-        border: 2px solid rgba(255, 255, 255, 0.1); /* Shorthand per protocol */
+        border: 2px solid rgba(255, 255, 255, 0.1);
         margin-top: 10px;
         margin-bottom: 5px;
         border-radius: 4px;
