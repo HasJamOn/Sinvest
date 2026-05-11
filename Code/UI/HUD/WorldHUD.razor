@@ -4,12 +4,26 @@
 @using Sandbox.Movement;
 @using System;
 @using System.Linq;
+
+@* 
+  WorldHud: Handles the top-right persistent stats and context-sensitive 
+  tooltips appearing at the crosshair.
+*@
 @inherits PanelComponent
 @namespace Sandbox
 
 <root class="@(IsVisible ? "visible" : "")">
 
-    @* ── WageWars cube panel ─────────────────────────────────────────── *@
+    @* 
+       PERSISTENT LEDGER: Now controlled by an Inspector Toggle.
+       If OnlyShowStatsInOS is true, stats only appear when the OS is open.
+    *@
+    @if ( ShouldShowStats )
+    {
+        <SystemStats />
+    }
+
+    @* ── WAGEWARS CUBE PANEL ─────────────────────────────────────────── *@
     @if ( _hoveredCube.IsValid() )
     {
         <div class="panel">
@@ -40,8 +54,8 @@
         </div>
     }
 
-    @* ── World-object panel (chair / trigger / case / dishwasher) ────── *@
-    @if ( !_hoveredCube.IsValid() && WorldObject.IsValid() && !string.IsNullOrEmpty( WorldTitle ) )
+    @* ── WORLD-OBJECT PANEL (CHAIR / TRIGGER / CASE / DISHWASHER) ────── *@
+    else if ( WorldObject.IsValid() && !string.IsNullOrEmpty( WorldTitle ) )
     {
         <div class="panel">
             <div class="header">
@@ -67,17 +81,29 @@
 
 @code
 {
-    // ── Shared state ──────────────────────────────────────────────────────
+    [Property] public bool ShowStatConditional { get; set; } = true;
 
     private TimeSince _timeSinceLastHit;
 
+    // Determines if the SystemStats component should be rendered
+    bool ShouldShowStats
+    {
+        get
+        {
+            var osIsOpen = SinvestOS.Instance?.IsOpen ?? false;
+            // If toggled: Only show when OS is open. 
+            // If untoggled: Only show when OS is closed (Original behavior).
+            return ShowStatConditional ? osIsOpen : !osIsOpen;
+        }
+    }
+
+    // Controls visibility of the center tooltip panel
     bool IsVisible => _timeSinceLastHit < 0.1f
                       && !(Player?.WantsHideHud ?? false)
                       && !UIPopupTrigger.ActiveInstance.IsValid()
                       && !(SinvestOS.Instance?.IsOpen ?? false);
 
-    // ── WageWars cube ─────────────────────────────────────────────────────
-
+    // ── WageWars Logic ──
     private WageWarsCube _hoveredCube;
 
     bool IsCubeOwner
@@ -90,15 +116,9 @@
         }
     }
 
-    string CubeTitle   => _hoveredCube.OwnerId == Guid.Empty ? "Unclaimed"
-                        : IsCubeOwner                        ? "Your Territory"
-                                                             : "Hostile Tile";
-
-    string CubeWarning => _hoveredCube.IsValid()
-                        ? (IsCubeOwner ? _hoveredCube.GetUpgradeRequirement() : _hoveredCube.GetAttackRequirement())
-                        : null;
-
-    bool   CanActOnCube    => string.IsNullOrEmpty( CubeWarning );
+    string CubeTitle => _hoveredCube.OwnerId == Guid.Empty ? "Unclaimed" : IsCubeOwner ? "Your Territory" : "Hostile Tile";
+    string CubeWarning => _hoveredCube.IsValid() ? (IsCubeOwner ? _hoveredCube.GetUpgradeRequirement() : _hoveredCube.GetAttackRequirement()) : null;
+    bool CanActOnCube => string.IsNullOrEmpty( CubeWarning );
 
     string CubeActionText
     {
@@ -110,38 +130,17 @@
         }
     }
 
-    // ── World objects (chair / trigger / case / dishwasher) ───────────────
-
-    private BaseChair              _foundChair;
-    private UIPopupTrigger         _foundTrigger;
-    private SteamGameCase          _foundCase;
-    private DishwasherWorkTrigger  _foundDishwasher;
+    // ── World Objects Logic ──
+    private BaseChair _foundChair;
+    private UIPopupTrigger _foundTrigger;
+    private SteamGameCase _foundCase;
+    private DishwasherWorkTrigger _foundDishwasher;
 
     GameObject WorldObject => _foundChair?.GameObject ?? _foundTrigger?.GameObject ?? _foundCase?.GameObject ?? _foundDishwasher?.GameObject;
-    
-    string WorldTitle => _foundChair?.TooltipTitle 
-                      ?? _foundTrigger?.TooltipTitle 
-                      ?? _foundCase?.TooltipTitle 
-                      ?? _foundDishwasher?.TooltipTitle 
-                      ?? string.Empty;
-
-    string WorldIcon => _foundChair?.TooltipIcon 
-                     ?? _foundTrigger?.TooltipIcon 
-                     ?? _foundCase?.TooltipIcon 
-                     ?? _foundDishwasher?.TooltipIcon 
-                     ?? string.Empty;
-
-    string WorldAction => _foundChair?.TooltipDescription 
-                       ?? _foundTrigger?.TooltipDescription 
-                       ?? _foundCase?.TooltipDescription 
-                       ?? _foundDishwasher?.TooltipDescription 
-                       ?? string.Empty;
-
-    string WorldKey => (_foundChair != null || _foundCase != null || _foundDishwasher != null)
-                    ? Input.GetButtonOrigin( "use" ).ToUpper()
-                    : _foundTrigger?.ToolTipKey?.ToUpper();
-
-    // ── Per-frame ─────────────────────────────────────────────────────────
+    string WorldTitle => _foundChair?.TooltipTitle ?? _foundTrigger?.TooltipTitle ?? _foundCase?.TooltipTitle ?? _foundDishwasher?.TooltipTitle ?? string.Empty;
+    string WorldIcon => _foundChair?.TooltipIcon ?? _foundTrigger?.TooltipIcon ?? _foundCase?.TooltipIcon ?? _foundDishwasher?.TooltipIcon ?? string.Empty;
+    string WorldAction => _foundChair?.TooltipDescription ?? _foundTrigger?.TooltipDescription ?? _foundCase?.TooltipDescription ?? _foundDishwasher?.TooltipDescription ?? string.Empty;
+    string WorldKey => (_foundChair != null || _foundCase != null || _foundDishwasher != null) ? Input.GetButtonOrigin( "use" ).ToUpper() : _foundTrigger?.ToolTipKey?.ToUpper();
 
     protected override void OnUpdate()
     {
@@ -155,9 +154,7 @@
         if ( controller == null ) return;
 
         var ray = Scene.Camera.ScreenNormalToRay( 0.5f );
-        var tr  = Scene.Trace.Ray( ray, 150f )
-                      .WithoutTags( "player" )
-                      .Run();
+        var tr = Scene.Trace.Ray( ray, 150f ).WithoutTags( "player" ).Run();
 
         if ( tr.Hit && tr.GameObject.IsValid() )
         {
@@ -171,19 +168,18 @@
             else
             {
                 bool isSitting = controller.Mode is SitMoveMode;
-
-                var chair   = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>()      : null;
-                var trigger =  isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
-                var sCase   = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<SteamGameCase>()  : null;
+                var chair = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<BaseChair>() : null;
+                var trigger = isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<UIPopupTrigger>() : null;
+                var sCase = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<SteamGameCase>() : null;
                 var dWasher = !isSitting ? tr.GameObject.Components.GetInAncestorsOrSelf<DishwasherWorkTrigger>() : null;
 
                 if ( chair.IsValid() || trigger.IsValid() || sCase.IsValid() || dWasher.IsValid() )
                 {
-                    _hoveredCube      = null;
-                    _foundChair       = chair;
-                    _foundTrigger     = trigger;
-                    _foundCase        = sCase;
-                    _foundDishwasher  = dWasher;
+                    _hoveredCube = null;
+                    _foundChair = chair;
+                    _foundTrigger = trigger;
+                    _foundCase = sCase;
+                    _foundDishwasher = dWasher;
                     _timeSinceLastHit = 0;
                 }
             }
@@ -191,7 +187,8 @@
 
         if ( _foundCase.IsValid() && IsVisible && Input.Pressed( "use" ) )
         {
-            _foundCase.Shuffle();
+	        _foundCase.Shuffle();
+	        StateHasChanged();
         }
 
         if ( _timeSinceLastHit > 0.15f )
@@ -202,9 +199,9 @@
 
     private void ClearWorldObjects()
     {
-        _foundChair      = null;
-        _foundTrigger    = null;
-        _foundCase       = null;
+        _foundChair = null;
+        _foundTrigger = null;
+        _foundCase = null;
         _foundDishwasher = null;
     }
 
@@ -221,8 +218,9 @@
         _hoveredCube?.Value,
         WorldObject?.Id,
         IsVisible,
-        CubeWarning,
-        UIPopupTrigger.ActiveInstance.IsValid(),
-        SinvestOS.Instance?.IsOpen ?? false
+        ShowStatConditional,
+        _foundCase?.TooltipTitle,
+        SinvestOS.Instance?.IsOpen ?? false 
+	        
     );
 }

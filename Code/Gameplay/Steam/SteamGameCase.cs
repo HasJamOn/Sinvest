@@ -157,16 +157,19 @@ public sealed class SteamGameCase : Component
     /// </summary>
     private void ApplyToRenderer( LoadedGame game )
     {
-        if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
+	    if ( !this.IsValid || TargetRenderer?.SceneObject == null ) return;
 
-        TargetRenderer.SceneObject.Attributes.Set( "CoverArt", game.Cover );
-        TargetRenderer.SceneObject.Attributes.Set( "BackArt", game.Hero );
-        TooltipTitle = game.Title;
+	    // 1. Update the visual textures
+	    TargetRenderer.SceneObject.Attributes.Set( "CoverArt", game.Cover );
+	    TargetRenderer.SceneObject.Attributes.Set( "BackArt", game.Hero );
 
-        if ( _isInitialized )
-        {
-           Sound.Play( SwapSound, WorldPosition );
-        }
+	    // 2. Update the tooltip metadata IMMEDIATELY
+	    TooltipTitle = game.Title; 
+
+	    if ( _isInitialized )
+	    {
+		    Sound.Play( SwapSound, WorldPosition );
+	    }
     }
 
     /// <summary>

@@ -65,21 +65,24 @@
         <div class="market-data-strip">
 	        <div class="data-point">
 		        <span class="label">HOLDINGS</span>
-		        <span class="value">@FormatValue(SinvestOS.Instance?.CurrentShares ?? 0) UNITS</span>
+		        @* FIX: Pull from EconomyManager instead of SinvestOS *@
+		        <span class="value">@FormatValue(EconomyManager.Instance?.CurrentShares ?? 0) UNITS</span>
 	        </div>
 
 	        <div class="divider"></div>
 
 	        <div class="data-point">
 		        <span class="label">EQUITY</span>
-		        <span class="value">$@FormatValue((SinvestOS.Instance?.CurrentShares ?? 0) * FundinoMarketService.CurrentPrice)</span>
+		        @* FIX: Pull from EconomyManager instead of SinvestOS *@
+		        <span class="value">$@FormatValue((EconomyManager.Instance?.CurrentShares ?? 0) * FundinoMarketService.CurrentPrice)</span>
 	        </div>
 
 	        <div class="divider"></div>
 
 	        <div class="data-point">
 		        <span class="label">BUY POWER</span>
-		        <span class="value">$@FormatValue(SinvestOS.Instance?.CurrentMoney ?? 0)</span>
+		        @* FIX: Pull from EconomyManager instead of SinvestOS *@
+		        <span class="value">$@FormatValue(EconomyManager.Instance?.CurrentMoney ?? 0)</span>
 	        </div>
         </div>
 
@@ -123,15 +126,7 @@
     private string CurrentRange = "1D";
     private List<string> XAxisLabels = new();
     private List<double> YAxisLabels = new();
-
-    // Pixel distance from the top of the y-axis panel.
-    // Calculated via GraphCanvas.GetCurrentPriceY() so it uses the exact same
-    // coordinate transform as the drawn line — guaranteed pixel-perfect.
     private float CurrentPricePixelY = 0f;
-
-    // Half-height of the current-price-tag in pixels.
-    // Clamp the tag so it never clips outside the y-axis bounds.
-    // Increase if your font/padding makes the tag taller.
     private const float TagHalfHeight = 9f;
 
     private double PriceDelta => FundinoMarketService.CurrentPrice - PreviousPrice;
@@ -148,11 +143,12 @@
         { "MAX", 60 * 24 * 365 * 10  }
     };
 
-    private bool CanAfford => SinvestOS.Instance != null && 
-                              SinvestOS.Instance.CurrentMoney >= FundinoMarketService.CurrentPrice;
+    // References EconomyManager directly for balance checks
+    private bool CanAfford => EconomyManager.Instance != null && 
+                              EconomyManager.Instance.CurrentMoney >= FundinoMarketService.CurrentPrice;
 
-    private bool CanSell => SinvestOS.Instance != null && 
-                            SinvestOS.Instance.CurrentShares >= 1;
+    private bool CanSell => EconomyManager.Instance != null && 
+                            EconomyManager.Instance.CurrentShares >= 1;
     
     private string FormatValue(double value)
     {
@@ -162,44 +158,23 @@
         return value.ToString("N2");
     }
 
-    // -------------------------------------------------------------------------
-    // LIFECYCLE
-    // -------------------------------------------------------------------------
-
     protected override void OnAfterTreeRender( bool firstTime )
     {
         if ( !firstTime ) return;
-
-        LastPrice     = FundinoMarketService.CurrentPrice;
+        LastPrice = FundinoMarketService.CurrentPrice;
         PreviousPrice = FundinoMarketService.CurrentPrice;
-
-        if ( FundinoMarketService.PriceHistory.Count < 2 )
-            PreFillHistory();
-
-        // RequestUpdate() handles the zero-rect race internally:
-        //   • If the panel has a valid rect already  → draws immediately.
-        //   • If the rect is still (0,0,0,0)         → sets a flag so OnLayout
-        //     draws on the first frame the engine computes dimensions.
-        // No Task.Delay needed.
+        if ( FundinoMarketService.PriceHistory.Count < 2 ) PreFillHistory();
         RefreshGraph();
     }
 
     public override void Tick()
     {
-        // Only act when the live price changes; RefreshGraph() handles
-        // both the graph redraw and the price-tag repositioning.
         if ( FundinoMarketService.CurrentPrice == LastPrice ) return;
-
         PreviousPrice = LastPrice;
-        LastPrice     = FundinoMarketService.CurrentPrice;
-
+        LastPrice = FundinoMarketService.CurrentPrice;
         RefreshGraph();
         StateHasChanged();
     }
-
-    // -------------------------------------------------------------------------
-    // DATA & GRAPH
-    // -------------------------------------------------------------------------
 
     private void PreFillHistory()
     {
@@ -209,8 +184,8 @@
         var now = DateTime.UtcNow;
         for (int i = 59; i >= 0; i--)
         {
-            var time  = now.AddMinutes(-i);
-            int seed  = MarketServiceSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
+            var time = now.AddMinutes(-i);
+            int seed = MarketServiceSystem.GetSeedAtTime(time, system.CurrentSeed, system.CurrentEraStart);
             double px = MarketServiceSystem.CalculatePrice(time, seed, false);
             FundinoMarketService.UpdatePrice(px);
         }
@@ -223,35 +198,26 @@
         RefreshGraph();
     }
 
-private void RefreshGraph()
+    private void RefreshGraph()
     {
-        // Safety: Prevent execution if the GraphCanvas reference or MarketService isn't established.
         if (GraphCanvas == null) return;
-
         var system = Scene.GetAllComponents<MarketServiceSystem>().FirstOrDefault();
         if (system == null) return;
 
-        // --- 1. Historical Data Reconstruction ---
-        // We reconstruct the price history based on the selected time range.
-        // The loop moves backward in time to fetch seeds; Reverse() ensures 
-        // the list follows chronological order for left-to-right drawing.
         var data = new List<double>();
         XAxisLabels.Clear();
-
-        var now        = DateTime.UtcNow;
-        int resolution = 60; // Total points to render on the graph
-        int labelCount = 6;  // Total timestamps on the X-Axis
-
+        var now = DateTime.UtcNow;
+        int resolution = 60; 
+        int labelCount = 6;  
         int totalMinutes = TimeRanges.ContainsKey(CurrentRange) ? TimeRanges[CurrentRange] : 1440;
 
         if (CurrentRange == "YTD")
         {
             var yearStart = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            totalMinutes  = (int)(now - yearStart).TotalMinutes;
+            totalMinutes = (int)(now - yearStart).TotalMinutes;
         }
 
         int step = Math.Max(1, totalMinutes / resolution);
-
         for (int i = 0; i < resolution; i++)
         {
             var time = now.AddMinutes(-(i * step));
@@ -260,48 +226,29 @@ private void RefreshGraph()
         }
         data.Reverse();
 
-        // --- 2. X-Axis Label Generation ---
-        // Generates human-readable timestamps distributed evenly across the horizontal axis.
         for (int i = 0; i < labelCount; i++)
         {
-            float   pct       = (float)i / (labelCount - 1);
-            var     labelTime = now.AddMinutes(-(totalMinutes * (1 - pct)));
+            float pct = (float)i / (labelCount - 1);
+            var labelTime = now.AddMinutes(-(totalMinutes * (1 - pct)));
             XAxisLabels.Add(GetLabelForRange(labelTime, CurrentRange));
         }
 
         if (data.Count == 0) { StateHasChanged(); return; }
 
-        // --- 3. View Window Calculation (The 'Camera' Logic) ---
-        // We find the min/max of the dataset to define the graph's Y-scale.
-        double dataMin  = data.Min();
-        double dataMax  = data.Max();
+        double dataMin = data.Min();
+        double dataMax = data.Max();
         double dataRange = dataMax - dataMin;
+        if (dataRange <= 0) dataRange = FundinoMarketService.CurrentPrice * 0.1 + 1.0;
 
-        // Edge Case: If price is flat, create a artificial 10% range to avoid division by zero.
-        if (dataRange <= 0)
-        {
-            dataRange = FundinoMarketService.CurrentPrice * 0.1;
-            if (dataRange <= 0) dataRange = 1.0;
-        }
-
-        // Apply a 40% vertical buffer. This centers the line and prevents the 
-        // graph from clipping into the top header or bottom X-labels.
-        double buffer  = dataRange * 0.4;
+        double buffer = dataRange * 0.4;
         double viewMin = dataMin - buffer;
         double viewMax = dataMax + buffer;
 
-        // --- 4. Synchronization with Painter ---
-        // Push the bounds and data to the custom FundinoMarketGraph panel.
-        GraphCanvas.MinVal  = (float)viewMin;
-        GraphCanvas.MaxVal  = (float)viewMax;
+        GraphCanvas.MinVal = (float)viewMin;
+        GraphCanvas.MaxVal = (float)viewMax;
         GraphCanvas.History = data;
-        
-        // Triggers the procedural drawing of 'graph-line' segments.
         GraphCanvas.RequestUpdate();
 
-        // --- 5. Y-Axis Price Labeling ---
-        // Generates price labels for the sidebar. The logic descends from 
-        // viewMax (top) to viewMin (bottom) to match the UI layout.
         YAxisLabels.Clear();
         int priceSteps = 5;
         double viewRange = viewMax - viewMin;
@@ -310,12 +257,10 @@ private void RefreshGraph()
             YAxisLabels.Add(viewMax - viewRange * (i / (float)(priceSteps - 1)));
         }
 
-        // --- 6. Tag Positioning ---
-        // Maps the current live price to a pixel coordinate within the new view window.
         UpdatePriceTagPosition();
-
         StateHasChanged();
     }    
+
     private string GetLabelForRange(DateTime dt, string range)
     {
         return range switch
@@ -332,77 +277,56 @@ private void RefreshGraph()
         };
     }
 
-    /// <summary>
-    /// Executes a trade through the SinvestOS, which handles the Ledger write.
-    /// </summary>
     private async void DoTrade(int amount)
     {
-	    // 1. Basic Validation
-	    if (IsProcessing || !FundinoMarketService.IsReady) return;
-	    if (SinvestOS.Instance == null || EconomyManager.Instance == null) return;
+        if (IsProcessing || !FundinoMarketService.IsReady) return;
+        if (SinvestOS.Instance == null || EconomyManager.Instance == null) return;
 
-	    IsProcessing = true;
-	    StateHasChanged();
+        IsProcessing = true;
+        StateHasChanged();
     
-	    double unitPrice = FundinoMarketService.CurrentPrice;
-	    double totalMoneyDelta = -(unitPrice * amount); // Negative if buying, Positive if selling
+        double unitPrice = FundinoMarketService.CurrentPrice;
+        double totalMoneyDelta = -(unitPrice * amount);
 
-	    // 2. Pre-flight check (EconomyManager is the source of truth)
-	    if (amount > 0 && EconomyManager.Instance.CurrentMoney < (unitPrice * amount))
-	    {
-		    Log.Warning("[FUND.INO] Insufficient Cash for purchase.");
-		    IsProcessing = false;
-		    StateHasChanged();
-		    return;
-	    }
+        if (amount > 0 && EconomyManager.Instance.CurrentMoney < (unitPrice * amount))
+        {
+           IsProcessing = false;
+           StateHasChanged();
+           return;
+        }
 
-	    if (amount < 0 && EconomyManager.Instance.CurrentShares < Math.Abs(amount))
-	    {
-		    Log.Warning("[FUND.INO] Insufficient Units for sale.");
-		    IsProcessing = false;
-		    StateHasChanged();
-		    return;
-	    }
+        if (amount < 0 && EconomyManager.Instance.CurrentShares < Math.Abs(amount))
+        {
+           IsProcessing = false;
+           StateHasChanged();
+           return;
+        }
 
-	    // 3. Execute via OS
-	    // This triggers GameSaveSystem.CommitMoneyTransaction and CommitShareTransaction
-	    SinvestOS.Instance.Transaction(totalMoneyDelta, (double)amount);
+        // SinvestOS still handles the mechanical Transaction call to the Ledger
+        SinvestOS.Instance.Transaction(totalMoneyDelta, (double)amount);
 
-	    // 4. Cool-down to prevent double-click file-stream contention
-	    await GameTask.Delay(100); 
-        
-	    IsProcessing = false;
-	    StateHasChanged();
+        await GameTask.Delay(100); 
+        IsProcessing = false;
+        StateHasChanged();
     }
     
     private void UpdatePriceTagPosition()
     {
-	    if ( GraphCanvas == null ) return;
-
-	    // Fetch the Y pixel that corresponds to the live price.
-	    float rawY = GraphCanvas.GetCurrentPriceY((float)FundinoMarketService.CurrentPrice);
-
-	    // Access the container height to safely clamp the tag.
-	    float containerHeight = GraphCanvas.LastKnownRect.Height > 0 
-		    ? GraphCanvas.LastKnownRect.Height 
-		    : 220f; // Matches SCSS .chart-container height
-
-	    float maxY = containerHeight - TagHalfHeight;
-        
-	    // Clamp ensures the tag doesn't render behind the header or under the footer
-	    CurrentPricePixelY = Math.Clamp(rawY, TagHalfHeight, maxY);
+        if ( GraphCanvas == null ) return;
+        float rawY = GraphCanvas.GetCurrentPriceY((float)FundinoMarketService.CurrentPrice);
+        float containerHeight = GraphCanvas.LastKnownRect.Height > 0 ? GraphCanvas.LastKnownRect.Height : 220f;
+        float maxY = containerHeight - TagHalfHeight;
+        CurrentPricePixelY = Math.Clamp(rawY, TagHalfHeight, maxY);
     }
 
     protected override int BuildHash()
     {
-	    // Include CurrentMoney and CurrentShares from the OS so the 
-	    // UI re-renders as the values lerp/tick.
-	    return HashCode.Combine(
-		    FundinoMarketService.CurrentPrice,
-		    IsProcessing,
-		    SinvestOS.Instance?.CurrentMoney,
-		    SinvestOS.Instance?.CurrentShares,
-		    CurrentRange
-	    );
+        return HashCode.Combine(
+           FundinoMarketService.CurrentPrice,
+           IsProcessing,
+           EconomyManager.Instance?.CurrentMoney,
+           EconomyManager.Instance?.CurrentShares,
+           CurrentRange
+        );
     }
 }

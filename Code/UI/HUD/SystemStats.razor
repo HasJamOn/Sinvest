@@ -1,0 +1,118 @@
+﻿@using Sandbox;
+@using Sandbox.UI;
+@using Sinvest;
+@using System;
+@using System.Linq;
+
+@* Inherit from Panel to allow this to be used as a tag <SystemStats /> *@
+@inherits Panel
+@namespace Sandbox
+
+<root class="system-stats-tray">
+    @* CASH SEGMENT *@
+    <div class="stat-segment">
+        <img src="ui/casino/navigation/sincash.png" class="mini-icon" />
+        <div class="content">
+            <span class="label">CASH</span>
+            <span class="value">$@FormatValue(_displayMoney)</span>
+        </div>
+    </div>
+
+    <div class="stat-divider"></div>
+
+    @* SHARES SEGMENT *@
+    <div class="stat-segment">
+        <img src="ui/casino/navigation/fundino_icon.png" class="mini-icon" />
+        <div class="content">
+            <span class="label">SHARES</span>
+            <div class="value-row">
+                <span class="value">@FormatValue(_displayShares)</span>
+                <span class="valuation">[$@FormatValue(_targetShares * GetSharePrice())]</span>
+            </div>
+        </div>
+    </div>
+</root>
+
+@code {
+    private double _displayMoney = 0;
+    private double _targetMoney = 0;
+    private double _displayShares = 0;
+    private double _targetShares = 0;
+    private bool _initialized = false;
+
+    protected override void OnAfterTreeRender(bool firstTime)
+    {
+        if (firstTime)
+        {
+            // Subscribe to the ledger changes
+            GameSaveSystem.OnDataChanged += RefreshData;
+            RefreshData();
+        }
+    }
+
+    /// <summary>
+    /// Pulls current character stats from the authoritative ledger.
+    /// </summary>
+    private void RefreshData()
+    {
+        var save = GameSaveSystem.Instance;
+        if (!save.IsValid() || save.CurrentCharacter == null) return;
+
+        _targetMoney = save.CurrentCharacter.Money;
+        _targetShares = save.CurrentCharacter.Shares;
+
+        if (!_initialized)
+        {
+            _displayMoney = _targetMoney;
+            _displayShares = _targetShares;
+            _initialized = true;
+        }
+
+        StateHasChanged();
+    }
+
+    public override void Tick()
+    {
+        bool needsUpdate = false;
+
+        // Smooth Lerp for visual counters
+        if (Math.Abs(_displayMoney - _targetMoney) > 0.1)
+        {
+            _displayMoney = MathX.Lerp(_displayMoney, _targetMoney, RealTime.Delta * 8.0f);
+            needsUpdate = true;
+        }
+
+        if (Math.Abs(_displayShares - _targetShares) > 0.1)
+        {
+            _displayShares = MathX.Lerp(_displayShares, _targetShares, RealTime.Delta * 8.0f);
+            needsUpdate = true;
+        }
+
+        if (needsUpdate) StateHasChanged();
+    }
+
+    private double GetSharePrice() => FundinoMarketService.CurrentPrice;
+
+    private string FormatValue(double value)
+    {
+        double floorValue = Math.Floor(value);
+        double absValue = Math.Abs(floorValue);
+
+        if (absValue >= 1000000)
+            return (floorValue / 1000000D).ToString("0.##") + "M";
+
+        return floorValue.ToString("N0");
+    }
+
+    // Cleanup reference on deletion
+    public override void OnDeleted()
+    {
+        GameSaveSystem.OnDataChanged -= RefreshData;
+        base.OnDeleted();
+    }
+
+    /// <summary>
+    /// Ensures the UI refreshes if the share price changes externally.
+    /// </summary>
+    protected override int BuildHash() => System.HashCode.Combine(_targetMoney, _targetShares, GetSharePrice());
+}

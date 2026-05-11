@@ -12,73 +12,8 @@ SinvestOS {
 
   &.hidden { display: none; pointer-events: none;}
 
-  .system-stats-bar {
-    @include bevel-out; // One large container instead of many small ones
-    position: absolute;
-    top: 20px;
-    right: 60px;
-    display: flex;
-    align-items: center;
-    padding: 4px; // Small padding for the "tray" look
-    gap: 4px;
-
-    .stat-segment {
-      display: flex;
-      align-items: center;
-      padding: 6px 12px;
-      gap: 10px;
-
-      .mini-icon {
-        width: 24px;
-        height: 24px;
-        image-rendering: pixelated;
-      }
-
-      .content {
-        display: flex;
-        flex-direction: column;
-        width: 100px;
-
-        .label {
-          font-family: "MS Sans Serif", Arial;
-          font-size: 10px;
-          font-weight: bold;
-          color: $gtk-shadow; // Dimmer text for the label
-          margin-bottom: -2px;
-        }
-
-        .value {
-          font-family: monospace;
-          font-size: 18px;
-          font-weight: bold;
-          color: $gtk-text;
-          white-space: nowrap;
-        }
-
-        .value-row {
-          display: flex;
-          align-items: baseline;
-          gap: 6px;
-          min-width: 140px;
-
-          .valuation {
-            font-family: monospace;
-            font-size: 11px;
-            color: $accent-money; // Use the green accent for the money value
-          }
-        }
-      }
-    }
-
-    // Vertical etch line between stats
-    .divider {
-      width: 2px;
-      height: 32px;
-      border-left: 1px solid $gtk-shadow;
-      border-right: 1px solid $gtk-highlight;
-      margin: 0 4px;
-    }
-  }
+  // --- PERSISTENT STATS REMOVED ---
+  // Managed by WorldHud + SystemStats component now.
 
   .hud-content {
     display: flex;
@@ -86,6 +21,7 @@ SinvestOS {
     align-items: center;
     gap: 20px;
     pointer-events: none;
+
     .menu, .app-icon, .back-button, SinCashMenu, CoinFlip {
       pointer-events: all;
     }
@@ -105,7 +41,7 @@ SinvestOS {
     justify-content: center;
     width: 100%;
     padding-bottom: 40px;
-    pointer-events: none; 
+    pointer-events: none;
 
     .back-button {
       pointer-events: all;
@@ -119,8 +55,16 @@ SinvestOS {
     width: $icon-cell-w;
     background: none;
 
-    img { width: $icon-size; image-rendering: pixelated; }
-    label { font-size: 15px; color: $gtk-text; padding: 2px 4px; }
+    img {
+      width: $icon-size;
+      image-rendering: pixelated;
+    }
+
+    label {
+      font-size: 15px;
+      color: $gtk-text;
+      padding: 2px 4px;
+    }
 
     &:hover {
       img { filter: brightness(1.2) drop-shadow(0 0 10px $gtk-blue); }

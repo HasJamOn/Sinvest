@@ -8,29 +8,10 @@
 @namespace Sandbox
 
 <root class="@(_isOpen ? "" : "hidden")">
-    @* SYSTEM HEADER: Always visible high-level ledger stats *@
-    <div class="system-stats-bar">
-       <div class="stat-segment">
-          <img src="ui/casino/navigation/sincash.png" class="mini-icon" />
-          <div class="content">
-             <span class="label">CASH</span>
-             <span class="value">$@FormatValue(_displayMoney)</span>
-          </div>
-       </div>
-
-       <div class="divider"></div>
-
-       <div class="stat-segment">
-          <img src="ui/casino/navigation/fundino_icon.png" class="mini-icon" />
-          <div class="content">
-             <span class="label">SHARES</span>
-             <div class="value-row">
-                <span class="value">@FormatValue(_displayShares)</span>
-                <span class="valuation">[$@FormatValue(_targetShares * GetSharePrice())]</span>
-             </div>
-          </div>
-       </div>
-    </div>
+    @* 
+       NOTE: system-stats-bar removed. 
+       Rendering is now handled by WorldHud via <SystemStats /> 
+    *@
 
     @* MAIN VIEWPORT: Desktop Icons or App Injection Point *@
     <div class="hud-content">
@@ -58,7 +39,6 @@
              </button>
           </div>
        }
-       @* Note: If _mode is UI, C# AddChild populates this div dynamically *@
     </div>
 
     @* NAVIGATION LAYER: Only active when inside an application *@
@@ -78,6 +58,7 @@
        }
     </div>
 </root>
+
 @code
 {
     public static SinvestOS Instance { get; private set; }
@@ -85,29 +66,28 @@
 
     /* --- INSPECTOR SETTINGS --- */
     [Property, Group( "Audio" ), ResourceType( "sound" )] public string ClickSound { get; set; } = "sounds/ui/click.sound";
-    
-    // The 3D Scene object for the IdleMon/SignMon mini-game
     [Property] public GameObject IdleMonObject { get; set; }
     
     [Property, Group( "Audio" ), ResourceType( "sound" )] public string CoinSpinSound { get; set; } = "sounds/ui/coin_spin.sound";
     [Property, Group( "Audio" ), ResourceType( "sound" )] public string WinSound { get; set; } = "sounds/ui/win.sound";
     [Property, Group( "Audio" ), ResourceType( "sound" )] public string LoseSound { get; set; } = "sounds/ui/lose.sound";
 
-    /* --- INTERNAL STATE --- */
+    /* --- INTERNAL STATE & INTERPOLATION --- */
     private Panel _activeViewPanel;
     private Stack<Type> _history = new Stack<Type>();
     private bool _isOpen = false;
     private bool _initialized = false;
     
-    // Linear Interpolation (Lerp) targets for smooth UI counters
+    // We keep these here so <SystemStats /> can reference SinvestOS.Instance.DisplayMoney
     private double _displayMoney = 0;
     private double _targetMoney = 0;
     private double _displayShares = 0;
     private double _targetShares = 0;
 
-    // Direct accessors for sub-panels/apps to verify current balance
+    public double DisplayMoney => _displayMoney;
+    public double DisplayShares => _displayShares;
+    public double TargetShares => _targetShares;
     public double CurrentMoney => _targetMoney;
-    public double CurrentShares => _targetShares;
 
     private enum AppMode { None, UI, Scene }
     private AppMode _mode = AppMode.None;
@@ -117,24 +97,13 @@
     protected override void OnEnabled()
     {
         if ( Panel == null ) return;
-
-        // Global click listener for the OS interface
         Panel.AddEventListener( "onmousedown", () => Sound.Play( ClickSound ) );
-        
-        // Hooks into the ledger to update stats whenever transactions occur
         GameSaveSystem.OnDataChanged += RefreshData;
         RefreshData();
     }
     
-    protected override void OnDisabled()
-    {
-        // Essential cleanup to prevent ghost callbacks after UI destruction
-        GameSaveSystem.OnDataChanged -= RefreshData;
-    }
+    protected override void OnDisabled() => GameSaveSystem.OnDataChanged -= RefreshData;
     
-    /// <summary>
-    /// Pulls raw data from the Character Session/Ledger into the UI state.
-    /// </summary>
     private void RefreshData()
     {
         var save = GameSaveSystem.Instance;
@@ -157,7 +126,7 @@
     {
         bool needsUpdate = false;
 
-        // Visual smoothing for money and share displays
+        // Visual smoothing logic remains authoritative here
         if ( Math.Abs( _displayMoney - _targetMoney ) > 0.1 )
         {
            _displayMoney = MathX.Lerp( _displayMoney, _targetMoney, RealTime.Delta * 8.0f );
@@ -173,9 +142,7 @@
         if ( needsUpdate ) StateHasChanged();
     }
 
-    /// <summary>
-    /// Commits local-first plaintext ledger writes via the GameSaveSystem.
-    /// </summary>
+    /* --- TRANSACTION LOGIC --- */
     public void Transaction( double moneyAmount, double sharesAmount = 0 )
     {
         if ( moneyAmount != 0 )
@@ -190,34 +157,14 @@
         }
     }
 
-    /// <summary>
-    /// Swaps the 2D View and maintains navigation history.
-    /// </summary>
+    /* --- NAVIGATION & VIEW MANAGEMENT --- */
     public void SetView<T>( bool saveToHistory = true ) where T : Panel, new()
     {
-        if ( saveToHistory && _activeViewPanel != null )
-        {
-           _history.Push( _activeViewPanel.GetType() );
-        }
-
+        if ( saveToHistory && _activeViewPanel != null ) _history.Push( _activeViewPanel.GetType() );
         _mode = AppMode.UI;
         CreateViewByType( typeof( T ) );
     }
 
-    /// <summary>
-    /// Opens the OS and injects a specific view while purging history. 
-    /// Used for world-space Terminal/ATM interactions.
-    /// </summary>
-    public void OpenInteraction<T>() where T : Panel, new()
-    {
-        _history.Clear(); 
-        SetMenuState( true );
-        CreateViewByType( typeof( T ) );
-    }
-
-    /// <summary>
-    /// Handles context-aware "Back" logic, including 3D scene persistence.
-    /// </summary>
     public void GoBack()
     {
         if ( _mode == AppMode.UI && _history.Count > 0 )
@@ -225,55 +172,34 @@
            CreateViewByType( _history.Pop() );
            return;
         }
-
-        if ( _mode == AppMode.UI )
-        {
-           ClearView();
-           return;
-        }
-
-        if ( _mode == AppMode.Scene )
-        {
-           if ( IdleMonObject.IsValid() )
-           {
-              // Save roster state to authoritative ledger before disabling
-              IdleMonObject.Components.GetInChildren<RosterManager>()?.SaveRoster();
-              IdleMonObject.Enabled = false;
-           }
-
-           // Re-enable pointer events on the root OS background
-           if ( Panel.IsValid() ) Panel.Style.PointerEvents = PointerEvents.All;
-
-           _mode = AppMode.None;
-           StateHasChanged();
-           return;
-        }
-
+        if ( _mode == AppMode.UI ) { ClearView(); return; }
+        if ( _mode == AppMode.Scene ) { ExitSceneMode(); return; }
         CloseAndDestroy();
     }
 
-    /// <summary>
-    /// Uses TypeLibrary to instantiate Sandbox-whitelisted UI panels dynamically.
-    /// </summary>
+    private void ExitSceneMode()
+    {
+        if ( IdleMonObject.IsValid() )
+        {
+           IdleMonObject.Components.GetInChildren<RosterManager>()?.SaveRoster();
+           IdleMonObject.Enabled = false;
+        }
+        if ( Panel.IsValid() ) Panel.Style.PointerEvents = PointerEvents.All;
+        _mode = AppMode.None;
+        StateHasChanged();
+    }
+
     private void CreateViewByType( Type t )
     {
         _activeViewPanel?.Delete();
-    
         var contentArea = Panel.Descendants.OfType<Panel>().FirstOrDefault( x => x.HasClass( "hud-content" ) );
         if ( contentArea == null ) return;
 
         var newPanel = TypeLibrary.Create<Panel>( t );
-        if ( newPanel != null )
-        {
-           _activeViewPanel = contentArea.AddChild( newPanel );
-        }
-
+        if ( newPanel != null ) _activeViewPanel = contentArea.AddChild( newPanel );
         StateHasChanged();
     }
 
-    /// <summary>
-    /// Resets the OS to the desktop (None) state.
-    /// </summary>
     public void ClearView()
     {
         _activeViewPanel?.Delete();
@@ -285,9 +211,6 @@
 
     public void Open() => SetMenuState( true );
 
-    /// <summary>
-    /// Manages player control lock and mouse visibility.
-    /// </summary>
     public void SetMenuState( bool open )
     {
         _isOpen = open;
@@ -305,66 +228,39 @@
         }
     }
     
-    /// <summary>
-    /// Transitions from the 2D UI to the 3D SignMon Scene.
-    /// </summary>
     public void OpenIdleMon()
     {
         ClearView();
         _mode = AppMode.None; 
-        StateHasChanged();
-
         if ( IdleMonObject.IsValid() )
         {
            _mode = AppMode.Scene;
            IdleMonObject.Enabled = true;
-
-           // Prevents the OS background from blocking mouse clicks in the 3D world
            if ( Panel.IsValid() ) Panel.Style.PointerEvents = PointerEvents.None;
         }
-    
         Mouse.Visibility = MouseVisibility.Visible;
         StateHasChanged();
     }
 
-    /// <summary>
-    /// Final shutdown: Persists all data, restores player physics, and destroys the OS root.
-    /// </summary>
     public void CloseAndDestroy()
     {
-        // Ensure any active 3D game progress is saved
         if ( _mode == AppMode.Scene && IdleMonObject.IsValid() )
-        {
            IdleMonObject.Components.GetInChildren<RosterManager>()?.SaveRoster();
-        }
 
         var player = Scene.GetAllComponents<PlayerController>().FirstOrDefault( x => !x.IsProxy );
         if ( player.IsValid() )
         {
            var chair = player.GameObject.Parent?.Components.GetInAncestors<BaseChair>();
-           if ( chair.IsValid() )
-           {
-              chair.AskToLeave( player );
-              // Restore physical presence in world
-              player.GameObject.SetParent( null ); 
-              player.Body.Enabled = true;
-              player.ColliderObject.Enabled = true;
-           }
-
+           if ( chair.IsValid() ) chair.AskToLeave( player );
            player.UseLookControls = true;
            player.UseInputControls = true;
         }
 
         SetMenuState( false );
         if ( Instance == this ) Instance = null;
-    
-        // Destroying Root effectively shuts down the OS and the child IdleMon object
         GameObject.Root.Destroy();
     }
 
-    /// <summary>
-    /// Maps internal types to friendly names for the UI navigation.
-    /// </summary>
     private string GetActiveAppName()
     {
         if ( _mode == AppMode.Scene ) return "SignMon.ino";
@@ -378,25 +274,6 @@
            _ => "to Menu"
         };
     }
-    
-    private string FormatValue( double value )
-    {
-	    // Always round down to the nearest whole number
-	    double floorValue = Math.Floor( value );
-	    double absValue = Math.Abs( floorValue );
 
-	    // Only truncate and use suffixes for Millions (1,000,000+) and beyond
-	    if ( absValue >= 1000000 )
-	    {
-		    // "0.##" allows up to two decimal places if they exist (e.g., 1.25M)
-		    return ( floorValue / 1000000D ).ToString( "0.##" ) + "M";
-	    }
-
-	    // Display thousands (and everything else) as full standard numbers with commas
-	    // Example: 1500.50 -> 1,500
-	    return floorValue.ToString( "N0" );
-    }
-
-    private double GetSharesFromSave() => GameSaveSystem.Instance?.CurrentCharacter?.Shares ?? 0;
-    private double GetSharePrice() => FundinoMarketService.CurrentPrice;
+    public double GetSharePrice() => FundinoMarketService.CurrentPrice;
 }

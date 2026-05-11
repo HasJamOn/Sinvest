@@ -1,0 +1,63 @@
+﻿SystemStats {
+  display: flex;
+  align-items: center;
+  background-color: rgba(212, 208, 200, 1.0); // $gtk-bg
+  border-top: 2px solid rgba(255, 255, 255, 1.0);
+  border-left: 2px solid rgba(255, 255, 255, 1.0);
+  border-right: 2px solid rgba(64, 64, 64, 1.0);
+  border-bottom: 2px solid rgba(64, 64, 64, 1.0);
+  padding: 4px;
+
+  .stat-segment {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+
+    .mini-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px; // Use margin instead of gap
+      image-rendering: pixelated;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      width: 100px;
+
+      .label {
+        font-family: "MS Sans Serif", Arial;
+        font-size: 10px;
+        font-weight: bold;
+        color: rgba(128, 128, 128, 1.0); // $gtk-shadow
+      }
+
+      .value {
+        font-family: monospace;
+        font-size: 18px;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 1.0);
+      }
+
+      .value-row {
+        display: flex;
+        align-items: baseline;
+
+        .valuation {
+          margin-left: 6px; // Use margin instead of gap
+          font-family: monospace;
+          font-size: 11px;
+          color: rgba(76, 175, 80, 1.0); // $accent-money
+        }
+      }
+    }
+  }
+
+  .stat-divider {
+    width: 2px;
+    height: 32px;
+    border-left: 1px solid rgba(128, 128, 128, 1.0);
+    border-right: 1px solid rgba(255, 255, 255, 1.0);
+    margin: 0 4px;
+  }
+}
