@@ -381,10 +381,20 @@
     
     private string FormatValue( double value )
     {
-        double absValue = Math.Abs( value );
-        if ( absValue >= 1000000 ) return ( value / 1000000D ).ToString( "0.##" ) + "M";
-        if ( absValue >= 1000 ) return ( value / 1000D ).ToString( "0.#" ) + "K";
-        return value.ToString( "N0" );
+	    // Always round down to the nearest whole number
+	    double floorValue = Math.Floor( value );
+	    double absValue = Math.Abs( floorValue );
+
+	    // Only truncate and use suffixes for Millions (1,000,000+) and beyond
+	    if ( absValue >= 1000000 )
+	    {
+		    // "0.##" allows up to two decimal places if they exist (e.g., 1.25M)
+		    return ( floorValue / 1000000D ).ToString( "0.##" ) + "M";
+	    }
+
+	    // Display thousands (and everything else) as full standard numbers with commas
+	    // Example: 1500.50 -> 1,500
+	    return floorValue.ToString( "N0" );
     }
 
     private double GetSharesFromSave() => GameSaveSystem.Instance?.CurrentCharacter?.Shares ?? 0;

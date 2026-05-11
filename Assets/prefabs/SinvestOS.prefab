@@ -181,7 +181,7 @@
                   "AfterUILayer": false
                 },
                 "Shadows": false,
-                "Size": "100,100",
+                "Size": "1000,1000",
                 "Sprite": "ui/casino/navigation/wallpaper.sprite",
                 "StartingAnimationName": "Default",
                 "TextureFilter": "Bilinear"
@@ -279,7 +279,7 @@
           "94b06e93-18e1-4aa0-9d76-248a1360e254": "88234ace-a6f6-430e-a562-0fdc9875f8fc",
           "6d6f25a9-7ba2-49a3-bf3b-c062cda1b2d2": "f688cd14-8d7b-4924-be1d-4b9b8e469f2b",
           "308e6930-6931-4fd4-8856-9f8cc0ecda60": "1c944537-3dfa-4586-a18c-1fa99942a009",
-          "08e3172c-84c9-4cff-acd5-98ed79c17d4c": "202120d8-3e9f-4284-9a0c-bb93585edfd4",
+          "175b4819-7af4-479b-8ae1-c37d88c0af40": "0bb4f694-0455-4664-b3a9-be58d314e320",
           "959b41d8-a7e1-4be0-9790-5f703b03446e": "6c7e02c5-923d-4559-8bb2-76da50d022ba"
         }
       }
