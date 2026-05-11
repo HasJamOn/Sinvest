@@ -211,7 +211,7 @@
               "CreateAttachments": false,
               "LodOverride": null,
               "MaterialGroup": null,
-              "MaterialOverride": null,
+              "MaterialOverride": "materials/general/road.vmat",
               "Materials": null,
               "Model": "models/dishwasher/plate.vmdl",
               "OnComponentDestroy": null,
@@ -281,7 +281,7 @@
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "ShowProjectionVolumes": true,
+              "ShowProjectionVolumes": false,
               "Target": {
                 "_type": "component",
                 "component_id": "5aa636e8-0b90-401e-bffe-ca873e95cc90",

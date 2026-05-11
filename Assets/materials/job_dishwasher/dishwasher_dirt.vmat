@@ -1,6 +1,0 @@
-
-Layer0
-{
-	shader "shaders/job_dishwasher/dishwasher_dirt.shader_c"
-
-}
