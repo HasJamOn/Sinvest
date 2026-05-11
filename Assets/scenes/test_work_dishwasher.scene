@@ -166,7 +166,7 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "77b3825e-6718-4048-a2b1-1df1e81dcf4e": "d079c60b-2e71-450d-b885-520c757e35ca"
+        "92d96c57-f381-4019-b2c6-c0e321b0be34": "509dd1a1-3e88-4383-b96c-01e936d40be4"
       }
     },
     {
@@ -261,16 +261,14 @@
               "Flags": 0,
               "CleanPercentage": 0,
               "DecalSize": 0.5,
-              "DirtCount": 400,
+              "DirtCount": 40,
               "DirtDecal": "textures/dish_dirt.decal",
-              "DualSidedMode": true,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "SurfaceOffset": 0.001
+              "OnComponentUpdate": null
             },
             {
               "__type": "Sinvest.DishwasherDirtDebugger",
@@ -418,7 +416,6 @@
           "__guid": "92dd1cd6-ec39-4baa-aca3-6f294e79f895",
           "__enabled": true,
           "Flags": 0,
-          "NormalThreshold": -0.05,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
