@@ -23,7 +23,7 @@ public sealed class Dishwasher2DDynamicMask : Component
     [Property] public SoundEvent FinishSound { get; set; }
 
     [Property, ReadOnly] public float CleanPercentage { get; private set; } = 0f;
-
+    
     /// <summary>
     /// Reference to the spawner that created this plate. 
     /// Used to signal when the plate should be removed from the scene.
@@ -70,31 +70,37 @@ public sealed class Dishwasher2DDynamicMask : Component
         }
     }
 
+    /// <summary>
+    /// Fired when the plate reaches the completion threshold (92% clean).
+    /// </summary>
+    public System.Action OnDishCleaned { get; set; }
+
+    private bool _hasTriggeredReward = false;
+
     private void CheckForCompletion()
     {
-        // Completion threshold (e.g., 92% clean)
-        if ( CleanPercentage >= 92f )
-        {
-	        if ( FinishSound is not null )
-	        {
-		        // Play the sound - don't provide a position to keep it 2D
-		        var handle = Sound.Play( FinishSound );
-		        if ( handle.IsValid() )
-		        {
-			        // Force UI/Clear settings
-			        handle.ListenLocal = true;
-			        handle.DistanceAttenuation = false;
-			        handle.Occlusion = false;
-                
-			        // Use Mixer.Find to get the UI bus
-			        // If "UI" mixer doesn't exist, it will safely fallback to Master
-			        handle.TargetMixer = Mixer.FindMixerByName( "UI" );
-		        }
-	        }
+	    // Completion threshold (e.g., 92% clean)
+	    if ( CleanPercentage >= 92f && !_hasTriggeredReward )
+	    {
+		    _hasTriggeredReward = true; // Prevent double-counting the reward
+            
+		    // Invoke the event for the Economy/Scrubber
+		    OnDishCleaned?.Invoke();
 
-            // Notify the spawner to handle destruction/scoring
-            Spawner?.OnPlateCleaned( GameObject );
-        }
+		    if ( FinishSound is not null )
+		    {
+			    var handle = Sound.Play( FinishSound );
+			    if ( handle.IsValid() )
+			    {
+				    handle.ListenLocal = true;
+				    handle.DistanceAttenuation = false;
+				    handle.Occlusion = false;
+				    handle.TargetMixer = Mixer.FindMixerByName( "UI" );
+			    }
+		    }
+
+		    Spawner?.OnPlateCleaned( GameObject );
+	    }
     }
 
     /// <summary>

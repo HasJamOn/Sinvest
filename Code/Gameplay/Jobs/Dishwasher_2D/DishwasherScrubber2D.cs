@@ -12,81 +12,88 @@ public sealed class DishwasherScrubber2D : Component
     [Property, Group( "Audio" )] public SoundEvent ScrubSound { get; set; }
     [Property, Group( "Audio" )] public SoundEvent GrabSound { get; set; }
 
-    /// <summary>
-    /// The Mask component of the plate currently under the mouse.
-    /// Your UI can read this to show the specific plate's progress.
-    /// </summary>
     public Dishwasher2DDynamicMask CurrentHoveredTarget { get; private set; }
 
     private GameObject _activeDraggingObject;
     private SoundHandle _scrubSoundHandle;
-
     private CameraComponent _camera;
 
     protected override void OnStart()
     {
-	    // Grab the camera this component lives on — never use Scene.Camera,
-	    // which may resolve to the player's disabled camera mid-transition.
-	    _camera = Components.Get<CameraComponent>( FindMode.InSelf );
-	    Mouse.Visibility = MouseVisibility.Visible;
+        _camera = Components.Get<CameraComponent>( FindMode.InSelf );
+        Mouse.Visibility = MouseVisibility.Visible;
     }
 
     protected override void OnUpdate()
     {
-	    if ( Mouse.Visibility != MouseVisibility.Visible )
-		    Mouse.Visibility = MouseVisibility.Visible;
+        if ( Mouse.Visibility != MouseVisibility.Visible )
+           Mouse.Visibility = MouseVisibility.Visible;
 
-	    if ( _camera is null ) return;
+        if ( _camera is null ) return;
 
-	    var mouseRay = _camera.ScreenPixelToRay( Mouse.Position );
+        var mouseRay = _camera.ScreenPixelToRay( Mouse.Position );
         var tr = Scene.Trace.Ray( mouseRay, 1500f )
             .UsePhysicsWorld()
-            .WithTag( "plate" ) // Make sure your prefab root has the "plate" tag
+            .WithTag( "plate" ) 
             .Run();
 
-        // 3. Update the Hovered Target for the UI
+        // Target locking and Event subscription
         if ( tr.Hit && tr.GameObject.Components.TryGet<Dishwasher2DDynamicMask>( out var mask ) )
         {
-            CurrentHoveredTarget = mask;
+            if ( CurrentHoveredTarget != mask )
+            {
+                if ( CurrentHoveredTarget is not null )
+                    CurrentHoveredTarget.OnDishCleaned -= RewardLabor;
+
+                CurrentHoveredTarget = mask;
+                CurrentHoveredTarget.OnDishCleaned += RewardLabor;
+            }
         }
-        else if ( !Input.Down( "attack2" ) ) // Keep the target locked if we are still dragging it
+        else if ( !Input.Down( "attack2" ) )
         {
+            if ( CurrentHoveredTarget is not null )
+                CurrentHoveredTarget.OnDishCleaned -= RewardLabor;
+
             CurrentHoveredTarget = null;
         }
 
-        // --- Handle Dragging (Right Click / Attack2) ---
+        HandleDragging( tr );
+        HandleScrubbing( tr );
+    }
+
+    private void RewardLabor()
+    {
+        if ( EconomyManager.Instance is not null )
+        {
+            // Transaction: IN 1.0 "Dish Scrubber"
+            EconomyManager.Instance.AddLaborIncome( 1.0, "Dish Scrubber" );
+            Log.Info( "[ECONOMY] $1.00 rewarded for labor." );
+        }
+    }
+
+    private void HandleDragging( SceneTraceResult tr )
+    {
         if ( Input.Down( "attack2" ) )
         {
-            // Grab the object on the first frame of the click
             if ( Input.Pressed( "attack2" ) && tr.Hit )
             {
                 _activeDraggingObject = tr.GameObject;
-                
-                // Play 2D sound for immediate, clear feedback
                 if ( GrabSound is not null )
                 {
-	                // Play without a position to keep it 2D/Direct
-	                var handle = Sound.Play( GrabSound );
-	                if ( handle.IsValid() )
-	                {
-		                // Force UI/Clear settings manually in case the SoundEvent isn't marked as UI
-		                handle.ListenLocal = true;
-		                handle.DistanceAttenuation = false;
-		                handle.Occlusion = false;
-	                }
+                    var handle = Sound.Play( GrabSound );
+                    if ( handle.IsValid() )
+                    {
+                       handle.ListenLocal = true;
+                       handle.DistanceAttenuation = false;
+                       handle.Occlusion = false;
+                    }
                 }
             }
 
             if ( _activeDraggingObject.IsValid() )
             {
-                // Match world units to screen pixels using Camera Ortho height
                 float unitsPerPixel = _camera.OrthographicHeight / Screen.Height;
-
-                // Apply your verified axis-swap and inversion logic
-                float moveX = -Mouse.Delta.y * unitsPerPixel;
-                float moveY = -Mouse.Delta.x * unitsPerPixel;
-
-                Vector3 moveDir = new Vector3( moveX, moveY, 0 ) * DragSensitivity;
+                Vector3 moveDir = new Vector3( -Mouse.Delta.y * unitsPerPixel, -Mouse.Delta.x * unitsPerPixel, 0 ) * DragSensitivity;
                 _activeDraggingObject.WorldPosition += moveDir;
             }
         }
@@ -94,45 +101,41 @@ public sealed class DishwasherScrubber2D : Component
         {
             _activeDraggingObject = null;
         }
+    }
 
-        // --- Handle Scrubbing (Left Click / Attack1) ---
+    private void HandleScrubbing( SceneTraceResult tr )
+    {
         if ( Input.Down( "attack1" ) && tr.Hit )
         {
-            // Transform hit position to the local space of the specific plate
             var localPos = tr.GameObject.WorldTransform.PointToLocal( tr.HitPosition );
-
-            // Convert local units (-50 to 50) to UV (0 to 1)
-            // Assuming plane.vmdl (100x100) and your established axis rotation
-            Vector2 uv = new Vector2(
-                (localPos.y / 100f) + 0.5f,
-                (localPos.x / 100f) + 0.5f
-            );
+            Vector2 uv = new Vector2( (localPos.y / 100f) + 0.5f, (localPos.x / 100f) + 0.5f );
 
             if ( tr.GameObject.Components.TryGet<Dishwasher2DDynamicMask>( out var plateMask ) )
             {
-	            plateMask.CleanAtUV( uv, BrushRadius );
+                plateMask.CleanAtUV( uv, BrushRadius );
 
-	            if ( ScrubSound is not null && ( _scrubSoundHandle == null || !_scrubSoundHandle.IsPlaying ) )
-	            {
-		            // Play 2D for maximum clarity
-		            _scrubSoundHandle = Sound.Play( ScrubSound );
-		            if ( _scrubSoundHandle.IsValid() )
-		            {
-			            _scrubSoundHandle.ListenLocal = true;
-			            _scrubSoundHandle.DistanceAttenuation = false;
-			            _scrubSoundHandle.Occlusion = false;
-		            }
-	            }
+                if ( ScrubSound is not null && ( _scrubSoundHandle == null || !_scrubSoundHandle.IsPlaying ) )
+                {
+                   _scrubSoundHandle = Sound.Play( ScrubSound );
+                   if ( _scrubSoundHandle.IsValid() )
+                   {
+                      _scrubSoundHandle.ListenLocal = true;
+                      _scrubSoundHandle.DistanceAttenuation = false;
+                      _scrubSoundHandle.Occlusion = false;
+                   }
+                }
             }
         }
-        else
+        else if ( _scrubSoundHandle != null )
         {
-            // Stop scrubbing sound when mouse is released
-            if ( _scrubSoundHandle != null )
-            {
-                _scrubSoundHandle.Stop();
-                _scrubSoundHandle = null;
-            }
+            _scrubSoundHandle.Stop();
+            _scrubSoundHandle = null;
         }
+    }
+
+    protected override void OnDisabled()
+    {
+        if ( CurrentHoveredTarget is not null )
+            CurrentHoveredTarget.OnDishCleaned -= RewardLabor;
     }
 }
