@@ -16,10 +16,15 @@ public sealed class DishwasherDirtManager : Component
 	/// </summary>
 	[Property, Range( 0.05f, 1.0f )] public float AlphaStep { get; set; } = 0.25f;
 
+	/// <summary>
+	/// How far the decal "slides" away from the scrub point per hit.
+	/// </summary>
+	[Property] public float ScrubPushStrength { get; set; } = 0.5f;
+
 	// Read by the HUD
 	public int TotalScrubsNeeded { get; private set; }
 	public int TotalScrubsApplied { get; private set; }
-	
+
 	public float CleanPercentage => TotalScrubsNeeded <= 0
 		? 0f
 		: ((float)TotalScrubsApplied / TotalScrubsNeeded * 100f).Clamp( 0f, 100f );
@@ -29,7 +34,7 @@ public sealed class DishwasherDirtManager : Component
 		public GameObject Projector;
 		public Vector3 LocalSurfacePoint;
 		public float CurrentAlpha;
-		public bool IsInFinalStage; // Track if we are at the < 10% threshold
+		public bool IsInFinalStage; 
 	}
 
 	private readonly List<DirtData> _activeDirt = new();
@@ -71,7 +76,6 @@ public sealed class DishwasherDirtManager : Component
 			spawned++;
 		}
 
-		// Calculate total scrubs: (Alpha / Step) rounded up, + 1 for the final "10% to zero" scrub
 		int scrubsPerPiece = (int)MathF.Ceiling( 0.9f / AlphaStep ) + 1;
 		TotalScrubsNeeded = _activeDirt.Count * scrubsPerPiece;
 		TotalScrubsApplied = 0;
@@ -123,6 +127,7 @@ public sealed class DishwasherDirtManager : Component
 				continue;
 			}
 
+			// Get current world position of the dirt piece
 			Vector3 worldSurface = GameObject.WorldTransform.PointToWorld( dirt.LocalSurfacePoint );
 			float dist = Vector3.DistanceBetween( worldSurface, worldHitPosition );
 
@@ -135,9 +140,18 @@ public sealed class DishwasherDirtManager : Component
 			if ( session.Contains( dirt.Projector.Id ) ) continue;
 			session.Add( dirt.Projector.Id );
 
+			// Calculate push direction: From the cursor hit point toward the dirt
+			Vector3 pushDirection = (worldSurface - worldHitPosition).Normal;
+			
+			// Move the dirt piece world position based on strength
+			Vector3 newWorldPos = worldSurface + (pushDirection * ScrubPushStrength);
+			
+			// Update local point so it stays attached to the moving plate
+			dirt.LocalSurfacePoint = GameObject.WorldTransform.PointToLocal( newWorldPos );
+			dirt.Projector.WorldPosition = newWorldPos;
+
 			if ( !dirt.Projector.Components.TryGet<Decal>( out var decal ) ) continue;
 
-			// Logic: If already in final stage (10% alpha), destroy it
 			if ( dirt.IsInFinalStage )
 			{
 				TotalScrubsApplied = Math.Min( TotalScrubsApplied + 1, TotalScrubsNeeded );
@@ -146,10 +160,8 @@ public sealed class DishwasherDirtManager : Component
 				continue;
 			}
 
-			// Otherwise, reduce alpha
 			dirt.CurrentAlpha -= AlphaStep;
 
-			// Clamp to 10% if we go below it but aren't deleting yet
 			if ( dirt.CurrentAlpha <= 0.10f )
 			{
 				dirt.CurrentAlpha = 0.10f;

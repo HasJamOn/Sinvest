@@ -268,7 +268,8 @@
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
-              "OnComponentUpdate": null
+              "OnComponentUpdate": null,
+              "ScrubPushStrength": 0.3
             },
             {
               "__type": "Sinvest.DishwasherDirtDebugger",
@@ -423,7 +424,9 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "ReachDistance": 500,
-          "ScrubRadius": 3
+          "ScrubRadius": 3,
+          "ScrubSound": "sounds/dialog/type.sound",
+          "SoundInterval": 0.15
         }
       ],
       "Children": []
