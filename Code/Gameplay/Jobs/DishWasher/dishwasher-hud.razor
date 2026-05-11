@@ -6,22 +6,29 @@
 @inherits PanelComponent
 
 <root class="dishwasher-hud">
-	<div class="progress-container">
-		<div class="label">CLEANLINESS</div>
-		<div class="bar-background">
-			<div class="bar-fill" style="width: @(CleanPercentage)%"></div>
-		</div>
-		<div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
-	</div>
+    <div class="progress-container">
+       <div class="label">PLATE CLEANLINESS</div>
+       <div class="bar-background">
+          <div class="bar-fill" style="width: @(CleanPercentage)%; background-color: @GetBarColor()"></div>
+       </div>
+       <div class="percentage-text">@Math.Floor(CleanPercentage)%</div>
+    </div>
 </root>
 
 @code {
-	[Property] public DishwasherDirtManager Target { get; set; }
+    [Property] public DishwasherDirtManager Target { get; set; }
 
-	private float CleanPercentage => Target?.CleanPercentage ?? 0f;
+    private float CleanPercentage => Target?.CleanPercentage ?? 0f;
 
-	protected override int BuildHash() => System.HashCode.Combine( CleanPercentage );
-}
+    private string GetBarColor()
+    {
+       if ( CleanPercentage > 90f ) return "rgba(76, 217, 100, 0.9)"; // Success Green
+       return "rgba(0, 200, 255, 0.9)"; // Scrubbing Blue
+    }
+
+    // Hash ensures the UI re-renders. Added RealTime.Now to force updates while debugging.
+    protected override int BuildHash() => System.HashCode.Combine( RealTime.Now, CleanPercentage );
+} @* <--- Added this missing brace *@
 
 <style>
     .dishwasher-hud {
@@ -44,7 +51,7 @@
         color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
         font-weight: bold;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     }
 
     .bar-background {
@@ -55,12 +62,12 @@
         margin-top: 10px;
         margin-bottom: 5px;
         border-radius: 4px;
+        overflow: hidden;
     }
 
     .bar-fill {
         height: 100%;
-        background-color: rgba(0, 200, 255, 0.9);
-        transition: width 0.1s ease-out; 
+        transition: width 0.2s ease-in-out, background-color 0.5s ease; 
     }
 
     .percentage-text {

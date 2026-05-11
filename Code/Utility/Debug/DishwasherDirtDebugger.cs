@@ -8,93 +8,74 @@ namespace Sinvest;
 [Category( "Sinvest/Debug" )]
 public sealed class DishwasherDirtDebugger : Component
 {
-	[Property] public DishwasherDirtManager Target { get; set; }
-	[Property] public bool ShowProjectionVolumes { get; set; } = true;
-	[Property] public bool LiveUpdate { get; set; } = true;
+    [Property] public DishwasherDirtManager Target { get; set; }
+    [Property] public bool ShowProjectionVolumes { get; set; } = true;
 
-	/// <summary>
-	/// Click this button in the inspector to run a full diagnostic in the console.
-	/// </summary>
-	[Button( "Run Visibility Diagnostic" )]
-	public void RunDiagnostic()
-	{
-		if ( Target is null ) return;
+    // We keep internal tracking for the diagnostic UI
+    private float _lastSize = 0.5f;
+    private float _lastOffset = 0.05f;
 
-		Log.Info( "--- Starting Decal Visibility Diagnostic ---" );
+    [Button( "Run Visibility Diagnostic" )]
+    public void RunDiagnostic()
+    {
+       if ( Target is null ) return;
 
-		var decals = Target.GameObject.Children.Where( x => x.Name.Contains( "Dirt" ) ).ToList();
-		
-		if ( !decals.Any() )
-		{
-			Log.Warning( "No decals found under the Target. Check if SpawnDirt() was called." );
-			return;
-		}
+       Log.Info( "--- Starting Decal Visibility Diagnostic ---" );
+       
+       // Accessing children named "Dirt" as defined in your Manager
+       var decals = Target.GameObject.Children.Where( x => x.Name.Contains( "Dirt" ) ).ToList();
+       
+       if ( !decals.Any() )
+       {
+          Log.Warning( "No decals found. Ensure you have called SpawnDirt() in the manager." );
+          return;
+       }
 
-		foreach ( var go in decals )
-		{
-			var decalComp = go.Components.Get<Decal>();
-			
-			// Check 1: Component Existence
-			if ( decalComp is null )
-			{
-				Log.Error( $"Decal Object {go.Id} is missing the Decal Component!" );
-				continue;
-			}
+       foreach ( var go in decals )
+       {
+          if ( !go.Components.TryGet<Decal>( out var decalComp ) ) continue;
 
-			// Check 2: Asset Assignment
-			if ( decalComp.Decals == null || decalComp.Decals.Count == 0 )
-			{
-				Log.Error( $"Decal Object {go.Id} has no DecalDefinition assigned." );
-			}
+          // Your manager doesn't expose the calculated depth, so we fetch it from the component
+          float currentDepth = decalComp.Depth;
 
-			// Check 3: Depth vs Surface (Trace Test)
-			// Trace from the decal back toward its projection source to see if it hits the plate
-			var trace = Scene.Trace.Ray( go.WorldPosition, go.WorldPosition + go.WorldTransform.Forward * Target.DecalDepth )
-				.IgnoreGameObject( go )
-				.Run();
+          var trace = Scene.Trace.Ray( go.WorldPosition, go.WorldPosition + go.WorldTransform.Forward * currentDepth )
+             .IgnoreGameObject( go )
+             .Run();
 
-			if ( !trace.Hit )
-			{
-				Log.Warning( $"Decal {go.Id}: Projection volume does NOT intersect any geometry. Try increasing DecalDepth or moving the Spawn offset." );
-			}
-			else
-			{
-				Log.Info( $"Decal {go.Id}: Successfully hitting {trace.GameObject.Name} at distance {trace.Distance:F2}" );
-			}
-		}
+          if ( !trace.Hit )
+             Log.Warning( $"Decal {go.Id}: Missed geometry. Projection Depth: {currentDepth}" );
+          else
+             Log.Info( $"Decal {go.Id}: Hitting {trace.GameObject.Name} at {trace.Distance:F2} units." );
+       }
+    }
 
-		Log.Info( "--- Diagnostic Complete ---" );
-	}
+    protected override void OnUpdate()
+    {
+       if ( Target is null || !Target.IsValid ) return;
 
-	private float _lastSize;
-	private float _lastDepth;
+       // ShowProjectionVolumes logic mapped to existing Manager properties
+       if ( ShowProjectionVolumes )
+       {
+          foreach ( var go in Target.GameObject.Children )
+          {
+             if ( !go.IsValid || !go.Name.Contains( "Dirt" ) ) continue;
+             if ( !go.Components.TryGet<Decal>( out var decal ) ) continue;
 
-	protected override void OnUpdate()
-	{
-		if ( Target is null || !Target.IsValid ) return;
-
-		if ( LiveUpdate && (Target.DecalSize != _lastSize || Target.DecalDepth != _lastDepth) )
-		{
-			Target.ApplyChanges();
-			_lastSize = Target.DecalSize;
-			_lastDepth = Target.DecalDepth;
-		}
-
-		// Draw logic remains for visual confirmation
-		if ( ShowProjectionVolumes )
-		{
-			foreach ( var go in Target.GameObject.Children )
-			{
-				if ( !go.IsValid || !go.Name.Contains( "Dirt" ) ) continue;
-
-				using ( Gizmo.Scope( go.Name, go.WorldTransform ) )
-				{
-					Gizmo.Draw.Color = Color.Yellow.WithAlpha( 0.2f );
-					var size = new Vector3( Target.DecalDepth, Target.DecalSize, Target.DecalSize );
-					var center = new Vector3( Target.DecalDepth * 0.5f, 0, 0 );
-					Gizmo.Draw.LineBBox( new BBox( center - (size * 0.5f), center + (size * 0.5f) ) );
-				}
-			}
-		}
-	}
+             using ( Gizmo.Scope( go.Id.ToString(), go.WorldTransform ) )
+             {
+                Gizmo.Draw.Color = Color.Yellow.WithAlpha( 0.2f );
+                
+                // s&box Decals project along the X (Forward) axis.
+                // We pull the Depth and Size directly from the spawned component.
+                var size = new Vector3( decal.Depth, Target.DecalSize, Target.DecalSize );
+                var center = new Vector3( decal.Depth * 0.5f, 0, 0 );
+                
+                Gizmo.Draw.LineBBox( new BBox( center - (size * 0.5f), center + (size * 0.5f) ) );
+                
+                // Draw a small line indicating the orientation of the projection
+                Gizmo.Draw.Line( Vector3.Zero, Vector3.Forward * 0.2f );
+             }
+          }
+       }
+    }
 }

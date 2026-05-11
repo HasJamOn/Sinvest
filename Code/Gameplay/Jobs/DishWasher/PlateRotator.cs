@@ -7,17 +7,26 @@ public sealed class PlateRotator : Component
 	[Property] public GameObject PlateRoot { get; set; }
 	[Property] public float RotationSpeed { get; set; } = 5.0f;
 
+	private bool _wasRotating = false;
+
 	protected override void OnUpdate()
 	{
 		if ( !PlateRoot.IsValid() ) return;
 
-		// INDUSTRY STANDARD: Toggle between "Pointer Mode" and "Capture Mode"
-		if ( Input.Down( "attack2" ) )
+		bool isRotating = Input.Down( "attack2" );
+
+		if ( isRotating )
 		{
-			// 1. Hide and lock the cursor. 
-			// In s&box, MouseVisibility.Hidden enables raw delta input 
-			// so the cursor doesn't hit the edge of your screen.
 			Mouse.Visibility = MouseVisibility.Hidden;
+
+			// Skip input on the first frame of capture — MouseDelta spikes
+			// on the frame visibility switches, causing a large jump that
+			// leaves decal scene objects one frame behind (visible flicker).
+			if ( !_wasRotating )
+			{
+				_wasRotating = true;
+				return;
+			}
 
 			float mouseX = Input.MouseDelta.x;
 			float mouseY = Input.MouseDelta.y;
@@ -29,9 +38,8 @@ public sealed class PlateRotator : Component
 		}
 		else
 		{
-			// 2. Restore the cursor to 'Visible' mode.
-			// This allows the user to use the cursor to aim the 'DishwasherRaycast'.
 			Mouse.Visibility = MouseVisibility.Visible;
+			_wasRotating = false;
 		}
 	}
 }
