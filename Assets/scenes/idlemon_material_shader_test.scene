@@ -26,7 +26,7 @@
           "CreateAttachments": false,
           "LodOverride": null,
           "MaterialGroup": null,
-          "MaterialOverride": "shaders/idlemon_master_graph.vmat",
+          "MaterialOverride": "shaders/idlemon/idlemon_master_graph.vmat",
           "Materials": null,
           "Model": "models/dev/box.vmdl",
           "OnComponentDestroy": null,
@@ -219,6 +219,11 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "9586c8ca-3ef2-4275-888b-75ee1c81924e"

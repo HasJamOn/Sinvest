@@ -24,7 +24,7 @@
         "CreateAttachments": false,
         "LodOverride": null,
         "MaterialGroup": null,
-        "MaterialOverride": "shaders/idlemon_master_graph.vmat",
+        "MaterialOverride": "shaders/idlemon/idlemon_master_graph.vmat",
         "Materials": null,
         "Model": "models/signmon/sign_dollar_basic.vmdl",
         "OnComponentDestroy": null,

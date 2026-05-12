@@ -1,0 +1,11 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "shaders/recreational_dunes/animated_noise.shader"
+
+	Texture_ps_0 "textures/recreational_dunes/sands_diffuseoriginal.tga"
+
+	//---- Fog ----
+	g_bFogEnabled "1"
+}

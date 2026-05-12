@@ -1,0 +1,16 @@
+{
+  "AlbedoImage": "textures/recreational_dunes/sands_diffuseoriginal.tga",
+  "RoughnessImage": "textures/recreational_dunes/sands_smoothness.tga",
+  "NormalImage": "textures/recreational_dunes/sands_normal.tga",
+  "HeightImage": "textures/recreational_dunes/sands_height.tga",
+  "AOImage": "textures/recreational_dunes/sands_ao.tga",
+  "UVScale": 1,
+  "Metalness": 0,
+  "NormalStrength": 1,
+  "HeightBlendStrength": 1,
+  "DisplacementScale": 0,
+  "NoTiling": false,
+  "Surface": null,
+  "__references": [],
+  "__version": 0
+}

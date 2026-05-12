@@ -2,8 +2,12 @@
 
 Layer0
 {
-	shader "shaders/idlemon_master_graph.shader"
+	shader "shaders/idlemon/idlemon_master_graph.shader"
 
 	//---- Fog ----
 	g_bFogEnabled "1"
+
+	//---- Translucent ----
+	g_flAlphaTestReference "0.500"
+	g_flAntiAliasedEdgeStrength "1.000"
 }

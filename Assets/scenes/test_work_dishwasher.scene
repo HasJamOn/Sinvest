@@ -211,7 +211,7 @@
               "CreateAttachments": false,
               "LodOverride": null,
               "MaterialGroup": null,
-              "MaterialOverride": "materials/general/road.vmat",
+              "MaterialOverride": "materials/job_dishwasher/porcelain.vmat",
               "Materials": null,
               "Model": "models/dishwasher/plate.vmdl",
               "OnComponentDestroy": null,
@@ -410,7 +410,7 @@
             "_type": "gameobject",
             "go": "8e734b84-e9c2-4330-a467-e134219e93ce"
           },
-          "RotationSpeed": 5
+          "RotationSpeed": 10
         },
         {
           "__type": "Sinvest.DishwasherScrubber",

@@ -1,6 +1,6 @@
 {
   "IsSubgraph": false,
-  "Path": "shaders/idlemon_master_graph.shdrgrph",
+  "Path": "shaders/idlemon/idlemon_master_graph.shdrgrph",
   "Model": null,
   "Title": null,
   "Description": "",
@@ -232,7 +232,7 @@
       "Min": 0,
       "Max": 9999,
       "Value": 0,
-      "Name": "shadertime",
+      "Name": "ShaderTime",
       "IsAttribute": true,
       "UI": {
         "Type": "Default",

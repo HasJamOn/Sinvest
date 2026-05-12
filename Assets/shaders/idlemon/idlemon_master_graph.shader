@@ -90,7 +90,6 @@ PS
 		
 	SamplerState g_sSampler0 < Filter( ANISO ); AddressU( WRAP ); AddressV( WRAP ); >;
 	Texture2D g_tArtwork < Attribute( "Artwork" ); >;
-	float g_flshadertime < Attribute( "shadertime" ); Default1( 0 ); >;
 	float g_flShaderTime < Attribute( "ShaderTime" ); Default1( 0 ); >;
 	float g_flAddition < Attribute( "Addition" ); Default1( 0 ); >;
 	float g_flMultiplier < Attribute( "Multiplier" ); Default1( 0 ); >;
@@ -111,7 +110,7 @@ PS
 		m.Transmission = 0;
 		
 		float4 l_0 = Tex2DS( g_tArtwork, g_sSampler0, i.vTextureCoords.xy );
-		float l_1 = g_flshadertime;
+		float l_1 = g_flShaderTime;
 		float3 l_2 = 
 		        (fmod(l_1 * 0.066, 1.0) < 0.10 ? float3(0.29, 0.23, 0.16) : // Tier 1
 		         fmod(l_1 * 0.066, 1.0) < 0.20 ? float3(0.42, 0.35, 0.23) : 

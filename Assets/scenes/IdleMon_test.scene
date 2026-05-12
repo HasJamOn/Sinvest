@@ -29,16 +29,14 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "UnlockAllModifiers": false,
-          "UseCloud": false
+          "ShouldUseCloud": false,
+          "WorldScene": null
         },
         {
           "__type": "Sinvest.EconomyManager",
           "__guid": "871feae4-f1a0-4a15-b165-e92e7502dbec",
           "__enabled": true,
           "Flags": 0,
-          "CurrentMoney": 0,
-          "CurrentShares": 0,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -169,6 +167,14 @@
             },
             "Property": "Position",
             "Value": "-186.40271,-187.516449,150.689865"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "308e6930-6931-4fd4-8856-9f8cc0ecda60"
+            },
+            "Property": "MaterialOverride",
+            "Value": "shaders/idlemon/idlemon_master_graph.vmat"
           }
         ],
         "MovedObjects": []
@@ -177,10 +183,16 @@
         "6cf93e02-382d-48b3-a8b7-ba2b9a5d2474": "f70a1260-e70f-4339-b612-d2cbc4b970dd",
         "514d6f05-5bae-4557-a688-260fcc95db2e": "c64ac180-94a3-4f16-8806-4eb03ed607bf",
         "e1ecbca0-99c8-4992-8503-2e2575b09369": "9928e10b-d036-4863-80ec-e60f9212ed3b",
-        "36c42c3a-3d08-4300-a0f9-3d34a0817c28": "d5856fc0-e320-47d9-9aa6-0e690a7d3238",
+        "94b06e93-18e1-4aa0-9d76-248a1360e254": "44603536-a4f7-4dcf-82df-4fe8986bd0c3",
         "d4bafd5b-7929-407f-bbb0-28189676eb16": "02dfd3ac-22bb-40d4-866e-0e2aeffecc07",
         "a23b4cd2-8965-45e6-b46e-10bf65519842": "a7f1dd98-33ed-4026-9dbb-983914fb2eba",
-        "b3176b8a-1a88-4863-bf2a-21a250c58b27": "69128f78-e4dc-4a76-8e49-3f57b83919cf"
+        "b3176b8a-1a88-4863-bf2a-21a250c58b27": "69128f78-e4dc-4a76-8e49-3f57b83919cf",
+        "6d6f25a9-7ba2-49a3-bf3b-c062cda1b2d2": "9beb1651-a8ba-4239-aa91-f903d5956e01",
+        "27c1162e-8b7f-476d-b611-20467b484f2e": "7bf35167-48a8-487a-affb-a8cab2c234c9",
+        "35fc20fb-c26a-4e9f-a80a-94fcb1986b9e": "fb3aeef8-b29e-4ecf-b0b3-280667f01b4c",
+        "308e6930-6931-4fd4-8856-9f8cc0ecda60": "49cacf26-d318-4063-9004-2e47f4a1e83d",
+        "798774da-6e6b-4637-a28d-42b32a2e6836": "ac65fcc6-7d23-4a7f-9de7-f7ce758f8aca",
+        "959b41d8-a7e1-4be0-9790-5f703b03446e": "be6972be-0c83-420c-826b-b0234b6995ae"
       }
     }
   ],
@@ -204,6 +216,11 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "1940c86d-dec1-4073-be33-76dd3ff86ae2"
