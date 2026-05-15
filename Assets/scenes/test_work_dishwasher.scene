@@ -2,13 +2,13 @@
   "__guid": "198e2070-41d1-4427-8a1b-a42fdb94dee1",
   "GameObjects": [
     {
-      "__guid": "3643ecf8-3b16-4b37-9965-7c84cbaaa05d",
+      "__guid": "c9046ff9-86a8-4d03-8cb7-b61f5517fb96",
       "__version": 2,
       "Flags": 0,
-      "Name": "Plane",
-      "Position": "0,0,-46.3040237",
-      "Rotation": "0,0,0,1",
-      "Scale": "10,10,10",
+      "Name": "Background",
+      "Position": "3.50051498,0,-459.728333",
+      "Rotation": "0,0.70710665,0,0.707106829",
+      "Scale": "-1,1,1",
       "Tags": "",
       "Enabled": true,
       "NetworkMode": 2,
@@ -18,58 +18,44 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Sandbox.ModelRenderer",
-          "__guid": "0ff63000-b7ef-4e44-b983-223205b7b893",
+          "__type": "Sandbox.SpriteRenderer",
+          "__guid": "a27a4a72-7a0b-444e-a900-686c88cb870b",
           "__enabled": true,
           "Flags": 0,
-          "BodyGroups": 18446744073709551615,
-          "CreateAttachments": false,
-          "LodOverride": null,
-          "MaterialGroup": null,
-          "MaterialOverride": null,
-          "Materials": null,
-          "Model": "models/dev/plane.vmdl",
+          "__version": 2,
+          "Additive": false,
+          "AlphaCutoff": 0.5,
+          "Billboard": "None",
+          "Color": "1,1,1,1",
+          "DepthFeather": 0,
+          "FlipHorizontal": false,
+          "FlipVertical": false,
+          "FogStrength": 1,
+          "IsSorted": false,
+          "Lighting": false,
+          "OnAnimationEnd": null,
+          "OnAnimationStart": null,
+          "OnBroadcastMessage": null,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
+          "Opaque": false,
+          "OverlayColor": "1,1,1,0",
+          "PlaybackSpeed": 1,
           "RenderOptions": {
             "GameLayer": true,
             "OverlayLayer": false,
             "BloomLayer": false,
             "AfterUILayer": false
           },
-          "RenderType": "On",
-          "Tint": "1,1,1,1"
-        },
-        {
-          "__type": "Sandbox.PlaneCollider",
-          "__guid": "f1928c25-8842-412a-90e5-b08ddaf16394",
-          "__enabled": true,
-          "Flags": 0,
-          "Center": "0,0,0",
-          "ColliderFlags": 0,
-          "Elasticity": null,
-          "Friction": null,
-          "IsTrigger": false,
-          "Normal": "0,0,1",
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OnObjectTriggerEnter": null,
-          "OnObjectTriggerExit": null,
-          "OnTriggerEnter": null,
-          "OnTriggerExit": null,
-          "RollingResistance": null,
-          "Scale": "100,100",
-          "Static": true,
-          "Surface": null,
-          "SurfaceVelocity": "0,0,0"
+          "Shadows": false,
+          "Size": "1000,1000",
+          "Sprite": "sprites/dishwasher_2d/dishwasher_2d_background.sprite",
+          "StartingAnimationName": "Default",
+          "TextureFilter": "Bilinear"
         }
       ],
       "Children": []
@@ -166,134 +152,8 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "92d96c57-f381-4019-b2c6-c0e321b0be34": "509dd1a1-3e88-4383-b96c-01e936d40be4"
+        "5e1210a5-6c87-4807-b109-dc66b04bc1e5": "f5ddf273-9b7f-48d0-84ee-da5dbf550d05"
       }
-    },
-    {
-      "__guid": "8e734b84-e9c2-4330-a467-e134219e93ce",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "Plate_Root",
-      "Position": "0,0,0",
-      "Rotation": "0,7.4505806E-08,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [],
-      "Children": [
-        {
-          "__guid": "d574d770-ffb1-478e-abae-c43e182ba615",
-          "__version": 2,
-          "Flags": 0,
-          "Name": "Plate",
-          "Position": "-1.54858867E-07,0,0.365980625",
-          "Rotation": "0,0,0,1",
-          "Scale": "1,1,1",
-          "Tags": "",
-          "Enabled": true,
-          "NetworkMode": 2,
-          "NetworkFlags": 0,
-          "NetworkOrphaned": 0,
-          "NetworkTransmit": true,
-          "OwnerTransfer": 1,
-          "Components": [
-            {
-              "__type": "Sandbox.ModelRenderer",
-              "__guid": "a17fb39b-f8c3-40a3-89e9-bff37a4bae70",
-              "__enabled": true,
-              "Flags": 0,
-              "BodyGroups": 18446744073709551615,
-              "CreateAttachments": false,
-              "LodOverride": null,
-              "MaterialGroup": null,
-              "MaterialOverride": "materials/job_dishwasher/porcelain.vmat",
-              "Materials": null,
-              "Model": "models/dishwasher/plate.vmdl",
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "RenderType": "On",
-              "Tint": "1,1,1,1"
-            },
-            {
-              "__type": "Sandbox.ModelCollider",
-              "__guid": "95bf7dc7-1ec9-486e-ae02-00f314b45222",
-              "__enabled": true,
-              "Flags": 0,
-              "ColliderFlags": 0,
-              "Elasticity": null,
-              "Friction": null,
-              "IsTrigger": false,
-              "Model": "models/dishwasher/plate.vmdl",
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "OnObjectTriggerEnter": null,
-              "OnObjectTriggerExit": null,
-              "OnTriggerEnter": null,
-              "OnTriggerExit": null,
-              "RollingResistance": null,
-              "Static": false,
-              "Surface": null,
-              "SurfaceVelocity": "0,0,0"
-            },
-            {
-              "__type": "Sinvest.DishwasherDirtManager",
-              "__guid": "5aa636e8-0b90-401e-bffe-ca873e95cc90",
-              "__enabled": true,
-              "Flags": 0,
-              "AlphaStep": 0.14631335,
-              "DecalSize": 0.5,
-              "DirtCount": 100,
-              "DirtDecal": "textures/dish_dirt.decal",
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "ScrubPushStrength": 0.3
-            },
-            {
-              "__type": "Sinvest.DishwasherDirtDebugger",
-              "__guid": "4a724a2e-17eb-41aa-85a9-975110aa82c9",
-              "__enabled": true,
-              "Flags": 0,
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "ShowProjectionVolumes": false,
-              "Target": {
-                "_type": "component",
-                "component_id": "5aa636e8-0b90-401e-bffe-ca873e95cc90",
-                "go": "d574d770-ffb1-478e-abae-c43e182ba615",
-                "component_type": "DishwasherDirtManager"
-              }
-            }
-          ],
-          "Children": []
-        }
-      ]
     },
     {
       "__guid": "b77be2f8-69fb-4f2e-9958-cda419e27ac8",
@@ -321,8 +181,7 @@
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "Target": null
+          "OnComponentUpdate": null
         },
         {
           "__type": "Sandbox.ScreenPanel",
@@ -406,10 +265,6 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "PlateRoot": {
-            "_type": "gameobject",
-            "go": "8e734b84-e9c2-4330-a467-e134219e93ce"
-          },
           "RotationSpeed": 10
         },
         {
@@ -429,6 +284,102 @@
           "SoundInterval": 0.15
         }
       ],
+      "Children": []
+    },
+    {
+      "__guid": "b14b7007-52d9-43b0-b483-93f4195b10d0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "DishwasherManager",
+      "Position": "-149.575134,-0.78524971,-82.3029785",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sinvest.DishwasherManager",
+          "__guid": "1f9971a8-37bc-4a09-8148-20cc4662f896",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "5c364e91-36c9-4164-8fe5-c1d31157ad6a",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "DishPile",
+      "Position": "0,27.5876427,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sinvest.DishPile",
+          "__guid": "610371c5-13af-4528-a8ef-d49cb7ec9fdb",
+          "__enabled": true,
+          "Flags": 0,
+          "DishCount": 5,
+          "DishPrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/work_dishwasher/dish_pile_item.prefab"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "PlateRootPrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/work_dishwasher/plate_root.prefab"
+          },
+          "PlateScale": 2.5,
+          "SpreadRadius": 15,
+          "StackSpacing": 1.5,
+          "WorkspaceAnchor": {
+            "_type": "gameobject",
+            "go": "e24a5df7-5f84-4803-b33c-4894c72bf776"
+          }
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "e24a5df7-5f84-4803-b33c-4894c72bf776",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "WorkspaceAnchor ",
+      "Position": "9,0,-128",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
       "Children": []
     }
   ],
@@ -452,18 +403,18 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "69db0226-f6f9-46aa-a8b8-c5920a80ecad"
-        }
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
         }
       },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "69db0226-f6f9-46aa-a8b8-c5920a80ecad"
+        }
       }
     }
   },

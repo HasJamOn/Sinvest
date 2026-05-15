@@ -1,0 +1,155 @@
+{
+  "RootObject": {
+    "__guid": "9dd046ab-5cf6-4323-ba8e-780bf5d254c9",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "DishPrefab",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Sinvest.DishTransition",
+        "__guid": "bd7e9344-7d2a-4594-8eb4-3f72848f2ac2",
+        "__enabled": true,
+        "Flags": 0,
+        "ModelVisual": {
+          "_type": "gameobject",
+          "go": "8e734b84-e9c2-4330-a467-e134219e93ce"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "SpriteVisual": {
+          "_type": "gameobject",
+          "go": "672dee71-3c4b-4152-a4a0-0218b4293f70"
+        }
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "672dee71-3c4b-4152-a4a0-0218b4293f70",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "SpriteVisual",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "3.40000105,3.40000105,3.40000105",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.SpriteRenderer",
+            "__guid": "0f36b47f-8e0a-491c-aa9f-2834b9e833e0",
+            "__enabled": true,
+            "Flags": 0,
+            "__version": 2,
+            "Additive": false,
+            "AlphaCutoff": 0.5,
+            "Billboard": "Always",
+            "Color": "1,1,1,1",
+            "DepthFeather": 0,
+            "FlipHorizontal": false,
+            "FlipVertical": false,
+            "FogStrength": 1,
+            "IsSorted": false,
+            "Lighting": false,
+            "OnAnimationEnd": null,
+            "OnAnimationStart": null,
+            "OnBroadcastMessage": null,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Opaque": false,
+            "OverlayColor": "1,1,1,0",
+            "PlaybackSpeed": 1,
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "Shadows": false,
+            "Size": "1,1",
+            "Sprite": {
+              "$compiler": "embed",
+              "$source": null,
+              "data": {
+                "Animations": [
+                  {
+                    "Name": "Default",
+                    "FrameRate": 15,
+                    "Origin": "0.5,0.5",
+                    "LoopMode": "Loop",
+                    "Frames": [
+                      {
+                        "Texture": "sprites/dishwasher_2d/plate.png",
+                        "BroadcastMessages": []
+                      }
+                    ]
+                  }
+                ],
+                "__references": []
+              },
+              "compiled": null
+            },
+            "StartingAnimationName": "Default",
+            "TextureFilter": "Bilinear"
+          },
+          {
+            "__type": "Sandbox.SphereCollider",
+            "__guid": "c9ade350-aa8a-4ac2-9dda-05d36da946c1",
+            "__enabled": true,
+            "Flags": 0,
+            "Center": "0,0,0",
+            "ColliderFlags": 0,
+            "Elasticity": null,
+            "Friction": null,
+            "IsTrigger": true,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnObjectTriggerEnter": null,
+            "OnObjectTriggerExit": null,
+            "OnTriggerEnter": null,
+            "OnTriggerExit": null,
+            "Radius": 0.64000034,
+            "RollingResistance": null,
+            "Static": true,
+            "Surface": null,
+            "SurfaceVelocity": "0,0,0"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}

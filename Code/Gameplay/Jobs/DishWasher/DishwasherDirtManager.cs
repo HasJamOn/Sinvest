@@ -34,7 +34,7 @@ public sealed class DishwasherDirtManager : Component
 		public GameObject Projector;
 		public Vector3 LocalSurfacePoint;
 		public float CurrentAlpha;
-		public bool IsInFinalStage; 
+		public bool IsInFinalStage;
 	}
 
 	private readonly List<DirtData> _activeDirt = new();
@@ -61,10 +61,7 @@ public sealed class DishwasherDirtManager : Component
 			Vector3 start = bounds.Center + randomDir * radius;
 			Vector3 end = bounds.Center - randomDir * radius;
 
-			var tr = Scene.PhysicsWorld.Trace
-				.Ray( start, end )
-				.WithTag( "solid" )
-				.Run();
+			var tr = Scene.PhysicsWorld.Trace.Ray( start, end ).WithTag( "solid" ).Run();
 
 			if ( !tr.Hit || !tr.Shape.IsValid() || !tr.Shape.Body.IsValid() ) continue;
 			if ( !tr.Shape.Body.GameObject.IsDescendant( GameObject ) ) continue;
@@ -72,29 +69,38 @@ public sealed class DishwasherDirtManager : Component
 			Vector3 rayDir = (end - start).Normal;
 			if ( Vector3.Dot( tr.Normal, rayDir ) >= 0f ) continue;
 
-			CreateDirtEntry( tr.HitPosition, tr.Normal, spawned );
+			var localPos = GameObject.WorldTransform.PointToLocal( tr.HitPosition );
+			CreateDirtEntry( localPos, tr.Normal, 1.0f, spawned );
 			spawned++;
 		}
 
-		int scrubsPerPiece = (int)MathF.Ceiling( 0.9f / AlphaStep ) + 1;
-		TotalScrubsNeeded = _activeDirt.Count * scrubsPerPiece;
-		TotalScrubsApplied = 0;
-
-		Log.Info( $"[DirtManager] Spawned {_activeDirt.Count} dirt. Step: {AlphaStep}. Needed: {TotalScrubsNeeded}" );
+		// Fresh spawn — recalculate totals from scratch and reset applied count
+		RecalculateTotals( resetApplied: true );
 	}
 
-	private void CreateDirtEntry( Vector3 position, Vector3 normal, int index )
+	/// <summary>
+	/// Recalculates TotalScrubsNeeded based on active dirt.
+	/// Only resets TotalScrubsApplied when freshly spawning (not when restoring a save).
+	/// </summary>
+	private void RecalculateTotals( bool resetApplied )
+	{
+		int scrubsPerPiece = (int)MathF.Ceiling( 0.9f / AlphaStep ) + 1;
+		TotalScrubsNeeded = _activeDirt.Count * scrubsPerPiece;
+		if ( resetApplied ) TotalScrubsApplied = 0;
+	}
+
+	private void CreateDirtEntry( Vector3 localPosition, Vector3 normal, float alpha, int index )
 	{
 		var go = Scene.CreateObject();
 		go.Name = $"Dirt_{index}";
 		go.Parent = GameObject;
 
 		const float surfaceBias = 0.02f;
-		go.WorldPosition = position + (normal * surfaceBias);
+		go.LocalPosition = localPosition + (normal * surfaceBias);
 
 		Vector3 upDir = MathF.Abs( normal.Dot( Vector3.Up ) ) > 0.98f ? Vector3.Forward : Vector3.Up;
-		go.WorldRotation = Rotation.LookAt( -normal, upDir );
-		go.WorldRotation *= Rotation.FromRoll( Game.Random.Float( 0, 360 ) );
+		go.LocalRotation = Rotation.LookAt( -normal, upDir );
+		go.LocalRotation *= Rotation.FromRoll( Game.Random.Float( 0, 360 ) );
 
 		var decal = go.Components.Create<Decal>();
 		if ( DirtDecal is not null )
@@ -103,15 +109,15 @@ public sealed class DishwasherDirtManager : Component
 		float variance = Game.Random.Float( 0.8f, 1.2f );
 		decal.Size = new Vector2( DecalSize * variance, DecalSize * variance );
 		decal.Depth = 5f;
-		decal.ColorTint = Color.White;
+		decal.ColorTint = Color.White.WithAlpha( alpha );
 		decal.SortLayer = (uint)(index % 256);
 
 		_activeDirt.Add( new DirtData
 		{
 			Projector = go,
-			LocalSurfacePoint = GameObject.WorldTransform.PointToLocal( position ),
-			CurrentAlpha = 1.0f,
-			IsInFinalStage = false
+			LocalSurfacePoint = localPosition,
+			CurrentAlpha = alpha,
+			IsInFinalStage = alpha <= 0.1f
 		} );
 	}
 
@@ -127,7 +133,6 @@ public sealed class DishwasherDirtManager : Component
 				continue;
 			}
 
-			// Get current world position of the dirt piece
 			Vector3 worldSurface = GameObject.WorldTransform.PointToWorld( dirt.LocalSurfacePoint );
 			float dist = Vector3.DistanceBetween( worldSurface, worldHitPosition );
 
@@ -140,13 +145,9 @@ public sealed class DishwasherDirtManager : Component
 			if ( session.Contains( dirt.Projector.Id ) ) continue;
 			session.Add( dirt.Projector.Id );
 
-			// Calculate push direction: From the cursor hit point toward the dirt
+			// Push the decal away from the scrub point
 			Vector3 pushDirection = (worldSurface - worldHitPosition).Normal;
-			
-			// Move the dirt piece world position based on strength
 			Vector3 newWorldPos = worldSurface + (pushDirection * ScrubPushStrength);
-			
-			// Update local point so it stays attached to the moving plate
 			dirt.LocalSurfacePoint = GameObject.WorldTransform.PointToLocal( newWorldPos );
 			dirt.Projector.WorldPosition = newWorldPos;
 
@@ -171,5 +172,53 @@ public sealed class DishwasherDirtManager : Component
 			decal.ColorTint = Color.White.WithAlpha( dirt.CurrentAlpha );
 			TotalScrubsApplied = Math.Min( TotalScrubsApplied + 1, TotalScrubsNeeded );
 		}
+	}
+
+	public DishProgress SaveState()
+	{
+		var state = new DishProgress
+		{
+			IsInitialized = true,
+			SavedScrubsApplied = TotalScrubsApplied,
+			SavedScrubsNeeded = TotalScrubsNeeded
+		};
+
+		foreach ( var dirt in _activeDirt )
+		{
+			state.AlphaValues.Add( dirt.CurrentAlpha );
+			state.LocalPoints.Add( dirt.LocalSurfacePoint );
+		}
+
+		// Clear workspace visuals
+		foreach ( var dirt in _activeDirt ) dirt.Projector.Destroy();
+		_activeDirt.Clear();
+
+		return state;
+	}
+
+	public void LoadState( DishProgress state )
+	{
+		// Destroy any existing dirt in the workspace first
+		foreach ( var dirt in _activeDirt ) dirt.Projector.Destroy();
+		_activeDirt.Clear();
+
+		// Re-create all remaining dirt pieces from the saved state
+		for ( int i = 0; i < state.AlphaValues.Count; i++ )
+		{
+			CreateDirtEntry( state.LocalPoints[i], Vector3.Up, state.AlphaValues[i], i );
+		}
+
+		// Restore the saved scrub progress — do NOT recalculate from active dirt alone,
+		// because destroyed (fully scrubbed) pieces are no longer in the list.
+		TotalScrubsNeeded = state.SavedScrubsNeeded;
+		TotalScrubsApplied = state.SavedScrubsApplied;
+	}
+
+	public void ResetAndSpawn( bool shouldRandomize = true )
+	{
+		foreach ( var dirt in _activeDirt ) dirt.Projector.Destroy();
+		_activeDirt.Clear();
+
+		if ( shouldRandomize ) SpawnDirtRobust();
 	}
 }

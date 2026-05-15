@@ -1,121 +1,106 @@
 ﻿@using Sandbox;
 @using Sandbox.UI;
 @using System;
-@using System.Linq; @* Added for FirstOrDefault *@
 @namespace Sinvest
 @inherits PanelComponent
 
 <root class="dishwasher-hud">
 	@if (Target.IsValid())
 	{
-		<div class="progress-container">
-			<div class="label">PLATE CLEANLINESS</div>
-			<div class="bar-background">
-				<div class="bar-fill" style="width: @(TargetPct)%; background-color: @(BarColor);"></div>
-			</div>
-			<div class="percentage-text">@((int)MathF.Floor(TargetPct))%</div>
-			<div class="scrub-text">@(AppliedScrubs) / @(NeededScrubs) scrubs</div>
+	<div class="progress-container">
+		<div class="label">PLATE CLEANLINESS</div>
+		<div class="bar-background">
+			<div class="bar-fill" style="width: @(TargetPct)%; background-color: @(BarColor);"></div>
 		</div>
+		<div class="percentage-text">@((int)MathF.Floor(TargetPct))%</div>
+		<div class="scrub-text">@(AppliedScrubs) / @(NeededScrubs) scrubs</div>
+	</div>
 	}
 </root>
 
 @code {
-	[Property] public DishwasherDirtManager Target { get; set; }
+// Reads from the manager so it automatically follows whichever dish is active.
+// No manual wiring needed.
+private DishwasherDirtManager Target => DishwasherManager.Instance?.ActiveDirtManager;
 
-	private float TargetPct => Target.IsValid() ? Target.CleanPercentage : 0f;
-	private int AppliedScrubs => Target.IsValid() ? Target.TotalScrubsApplied : 0;
-	private int NeededScrubs => Target.IsValid() ? Target.TotalScrubsNeeded : 0;
+private float TargetPct    => Target.IsValid() ? Target.CleanPercentage : 0f;
+private int   AppliedScrubs => Target.IsValid() ? Target.TotalScrubsApplied : 0;
+private int   NeededScrubs  => Target.IsValid() ? Target.TotalScrubsNeeded : 0;
 
-	private string BarColor 
-	{
-		get 
-		{
-			float pct = TargetPct;
-			if ( pct > 99f ) return "rgba(76, 217, 100, 1)";
-			if ( pct > 75f ) return "rgba(120, 255, 150, 1)";
-			return "rgba(0, 199, 255, 1)";
-		}
-	}
+private string BarColor
+{
+get
+{
+float pct = TargetPct;
+if ( pct > 99f ) return "rgba(76, 217, 100, 1)";
+if ( pct > 75f ) return "rgba(120, 255, 150, 1)";
+return "rgba(0, 199, 255, 1)";
+}
+}
 
-	protected override void OnUpdate()
-	{
-		// If we don't have a target, try to find one in the scene
-		if ( !Target.IsValid() )
-		{
-			Target = Scene.GetAllComponents<DishwasherDirtManager>().FirstOrDefault();
-		}
-
-		StateHasChanged();
-	}
-
-	protected override int BuildHash()
-	{
-		return HashCode.Combine( TargetPct, AppliedScrubs, NeededScrubs );
-	}
+protected override int BuildHash()
+{
+return HashCode.Combine( TargetPct, AppliedScrubs, NeededScrubs );
+}
 }
 
 <style>
-    .dishwasher-hud {
-       position: absolute;
-       left: 0;
-       right: 0;
-       bottom: 0;
-       /* Remove 'top' so it doesn't stretch vertically */
-       
-       height: auto; 
-       display: flex;
-       justify-content: center;
-       align-items: flex-end; 
-       padding-bottom: 60px; /* Distance from the very bottom of the screen */
-       pointer-events: none;
-       z-index: 100;
-    }
+	.dishwasher-hud {
+		position: absolute;
+		left: 0; right: 0; bottom: 0;
+		height: auto;
+		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		padding-bottom: 60px;
+		pointer-events: none;
+		z-index: 100;
+	}
 
-    .progress-container {
-       width: 400px;
-       flex-direction: column;
-       align-items: center;
-       /* Background blur or semi-transparent backing makes it pop */
-       background-color: rgba(0, 0, 0, 0.4);
-       padding: 20px;
-       border-radius: 8px;
-    }
+	.progress-container {
+		width: 400px;
+		flex-direction: column;
+		align-items: center;
+		background-color: rgba(0, 0, 0, 0.4);
+		padding: 20px;
+		margin-bottom: 60px;
+		border-radius: 8px;
+	}
 
-    .label {
-       color: rgba(255, 255, 255, 0.8);
-       font-size: 14px;
-       font-weight: bold;
-       text-transform: uppercase;
-       letter-spacing: 1px;
-    }
+	.label {
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 14px;
+		font-weight: bold;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
 
-    .bar-background {
-       width: 100%;
-       height: 18px;
-       background-color: rgba(0, 0, 0, 0.6);
-       border: 1px solid rgba(255, 255, 255, 0.1);
-       margin: 10px 0;
-       border-radius: 2px;
-       overflow: hidden;
-    }
+	.bar-background {
+		width: 100%;
+		height: 18px;
+		background-color: rgba(0, 0, 0, 0.6);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		margin: 10px 0;
+		border-radius: 2px;
+		overflow: hidden;
+	}
 
-    .bar-fill {
-       height: 100%;
-       /* Smoothly animate the width and color changes */
-       transition: width 0.2s ease-out, background-color 0.3s ease;
-    }
+	.bar-fill {
+		height: 100%;
+		transition: width 0.1s ease-out;
+	}
 
-    .percentage-text {
-       color: white;
-       font-family: monospace;
-       font-size: 20px;
-       font-weight: bold;
-    }
+	.percentage-text {
+		color: white;
+		font-family: monospace;
+		font-size: 20px;
+		font-weight: bold;
+	}
 
-    .scrub-text {
-       color: rgba(255, 255, 255, 0.4);
-       font-family: monospace;
-       font-size: 11px;
-       margin-top: 4px;
-    }
+	.scrub-text {
+		color: rgba(255, 255, 255, 0.4);
+		font-family: monospace;
+		font-size: 11px;
+		margin-top: 4px;
+	}
 </style>
