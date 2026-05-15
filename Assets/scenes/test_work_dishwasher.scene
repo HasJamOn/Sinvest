@@ -354,7 +354,7 @@
             "prefab": "prefabs/work_dishwasher/plate_root.prefab"
           },
           "PlateScale": 2.5,
-          "SpreadRadius": 15,
+          "SpreadRadius": 5,
           "StackSpacing": 1.5,
           "WorkspaceAnchor": {
             "_type": "gameobject",
