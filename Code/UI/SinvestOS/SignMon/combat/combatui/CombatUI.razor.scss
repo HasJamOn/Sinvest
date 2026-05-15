@@ -1,0 +1,698 @@
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  Combat.razor.scss  —  Panorama-compatible build
+//
+//  Panorama CSS constraints enforced here:
+//    • NO rgba() anywhere — all colors use #rrggbbaa hex (8-digit)
+//    • NO display: grid / fr units — layouts are pure flexbox
+//    • NO @media queries — stripped entirely
+//    • NO background: transparent — use background-color: #00000000
+//    • NO clip-path
+//    • NO CSS custom properties (--var) in background shorthand
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// ── Design Tokens (8-digit hex only) ─────────────────────────────────────────
+//
+//  Format: #rrggbbaa  (aa = 00 transparent … ff opaque)
+//
+$bg-deep:        #0a0b0dff;
+$bg-panel:       #111318ff;
+$bg-card:        #181c24ff;
+$bg-card-hover:  #1e2330ff;
+$bg-card-dark:   #0f1218ff;
+
+// Amber family
+$amber:          #e8a83aff;
+$amber-light:    #f2be64ff;
+$amber-dim:      #7a5920ff;
+$amber-glow:     #e8a83a26;   // ~15% alpha
+
+// Crimson family
+$crimson:        #d94040ff;
+$crimson-light:  #e66e6eff;
+$crimson-dim:    #5a1c1cff;
+$crimson-glow:   #d940401f;   // ~12% alpha
+
+// Status colors
+$hp-green:       #3ecf6eff;
+$sta-blue:       #4a9edeff;
+
+// Pre-mixed background tints (Panorama can't do rgba in bg shorthand)
+$bg-amber-mix:   #302d26ff;
+$bg-crimson-mix: #352128ff;
+$bg-sta-mix:     #1e2b3aff;
+$bg-green-mix:   #1e2d23ff;
+
+// Phase overlay tints
+$tint-enemy:     #d940401f;
+$tint-player:    #e8a83a26;
+$tint-victory:   #3ecf6e14;
+$tint-defeat:    #d9404019;
+
+// Text
+$text-primary:   #d8dde8ff;
+$text-dim:       #6b738aff;
+$text-muted:     #3e4557ff;
+
+// Borders
+$border-subtle:  #252a35ff;
+$border-bright:  #3a4155ff;
+
+// Fonts
+$mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+$sans: 'Inter', system-ui, sans-serif;
+
+$radius-md: 8px;
+$radius-sm: 4px;
+
+// ── Keyframes ────────────────────────────────────────────────────────────────
+
+@keyframes pulse-emblem {
+  0%, 100% { opacity: 0.8; }
+  50%       { opacity: 1.0; }
+}
+
+@keyframes pulse-target {
+  0%, 100% { box-shadow: 0px 0px 8px  #d940401f; }
+  50%       { box-shadow: 0px 0px 20px #d940404d; }
+}
+
+@keyframes ring-spin {
+  from { transform: rotateZ(0deg); }
+  to   { transform: rotateZ(360deg); }
+}
+
+@keyframes blink-indicator {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes pulse-label {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1.0; }
+}
+
+// ── Root Container ───────────────────────────────────────────────────────────
+
+.combat-root {
+  display:          flex;
+  flex-direction:   column;
+  height:           100%;
+  width:           100%;
+  background-color: $bg-deep;
+  color:            $text-primary;
+  font-family:      $sans;
+  font-size:        13px;
+  overflow:         hidden;
+
+  // Physical overlay element for phase tint
+  .phase-overlay {
+    position:         absolute;
+    top:              0px;
+    left:             0px;
+    right:            0px;
+    bottom:           0px;
+    pointer-events:   none;
+    z-index:          0;
+    background-color: #00000000;
+    transition:       background-color 0.5s ease;
+  }
+
+  &.phase-enemy    .phase-overlay { background-color: $tint-enemy;   }
+  &.phase-player   .phase-overlay { background-color: $tint-player;  }
+  &.phase-victory  .phase-overlay { background-color: $tint-victory; }
+  &.phase-defeat   .phase-overlay { background-color: $tint-defeat;  }
+  &.phase-inactive .phase-overlay { background-color: #00000000;     }
+
+  > * { position: relative; z-index: 1; }
+}
+
+// ── Idle Screen ───────────────────────────────────────────────────────────────
+
+.combat-idle {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  flex:            1;
+
+  .idle-emblem {
+    font-size:     64px;
+    margin-bottom: 24px;
+    filter:        drop-shadow(0px 0px 24px $amber);
+    animation:     pulse-emblem 3s ease-in-out infinite;
+  }
+
+  .idle-title {
+    font-family:    $mono;
+    font-size:      32px;
+    font-weight:    700;
+    color:          $amber;
+    margin-bottom:  24px;
+    text-shadow:    0px 0px 40px $amber-dim;
+  }
+
+  .result-badge {
+    font-family:    $mono;
+    font-size:      12px;
+    font-weight:    700;
+    letter-spacing: 0.2em;
+    padding:        6px 20px;
+    border-radius:  $radius-sm;
+    text-transform: uppercase;
+    margin-bottom:  16px;
+
+    &.result-victory {
+      background-color: #3ecf6e26;
+      border:           1px solid #3ecf6e66;
+      color:            $hp-green;
+    }
+    &.result-defeat {
+      background-color: $crimson-glow;
+      border:           1px solid #d9404066;
+      color:            $crimson;
+    }
+  }
+}
+
+// ── Arena — flex row replacing grid ──────────────────────────────────────────
+//
+//  Original: grid-template-columns: 1fr 260px 1fr
+//  Replaced: two flex:1 team panels flanking a fixed-width log.
+
+.combat-arena {
+  display:        flex;
+  flex-direction: row;
+  width:          100%;
+  flex:           1;
+  min-height:     0;
+  overflow:       hidden;
+  padding:        6px;
+}
+
+// ── Team Sections ─────────────────────────────────────────────────────────────
+
+.team-section {
+  display:        flex;
+  flex-direction: column;
+  flex:           1 1 0%;
+  min-width:      0;
+  overflow:       hidden;
+  margin:         6px;
+}
+
+.team-header {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     baseline;
+  padding:         0px 4px 4px 4px;
+  border-bottom:   1px solid $border-subtle;
+  margin-bottom:   8px;
+}
+
+.team-label {
+  font-family:    $mono;
+  font-size:      10px;
+  font-weight:    700;
+  letter-spacing: 0.18em;
+  color:          $text-dim;
+  text-transform: uppercase;
+}
+
+.team-alive-count {
+  font-family: $mono;
+  font-size:   10px;
+  color:       $text-muted;
+}
+
+.team-enemy  .team-label { color: $crimson-light; }
+.team-player .team-label { color: $amber; }
+
+// ── Unit Grid — flex replacing grid ──────────────────────────────────────────
+//
+//  Original: grid 3-col × 2-row
+//  Replaced: column of two .unit-row flex rows, each with 3 equal cards.
+
+.unit-grid {
+  display:        flex;
+  flex-direction: column;
+  width:          100%;
+  flex:           1;
+  min-height:     0;
+}
+
+.unit-row {
+  display:    flex;
+  flex-direction: row;
+  width:      100%;
+  min-height: 0;
+}
+
+// ── Unit Cards ───────────────────────────────────────────────────────────────
+
+.unit-card {
+  position:         relative;
+  flex:             1 1 0%;
+  margin:           3px;
+  background-color: $bg-card;
+  border:           1px solid $border-subtle;
+  border-radius:    $radius-md;
+  padding:          8px;
+  overflow:         hidden;
+  transition:       border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+  cursor:           default;
+  min-height:       0;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+
+  &.slot-empty .unit-empty {
+    color:     $text-muted;
+    font-size: 16px;
+  }
+
+  &.slot-dead {
+    background-color: $bg-card-dark;
+    opacity:          0.45;
+
+    .unit-defeated {
+      display:        flex;
+      flex-direction: column;
+      align-items:    center;
+
+      .unit-name { margin-bottom: 2px; }
+    }
+    .unit-name      { color: $text-muted; font-size: 10px; }
+    .defeated-label { color: $crimson-dim; font-size: 18px; }
+  }
+
+  &.slot-active {
+    border-color:     $amber;
+    background-color: $bg-amber-mix;
+    box-shadow:       0px 0px 16px $amber-glow;
+
+    .active-indicator {
+      position:  absolute;
+      top:       6px;
+      left:      6px;
+      color:     $amber;
+      font-size: 10px;
+      animation: blink-indicator 0.8s step-end infinite;
+    }
+  }
+
+  &.slot-targetable {
+    cursor:           crosshair;
+    border:           1px solid $crimson;
+    background-color: $bg-crimson-mix;
+    box-shadow:       0px 0px 12px $crimson-glow;
+    animation:        pulse-target 1.2s ease-in-out infinite;
+
+    .target-ring {
+      position:       absolute;
+      top:            -4px;
+      left:           -4px;
+      right:          -4px;
+      bottom:         -4px;
+      border-radius:  50%;
+      border:         2px solid #00000000;
+      border-top:     2px solid $crimson;
+      border-left:    2px solid #d9404066;
+      animation:      ring-spin 1.5s linear infinite;
+      pointer-events: none;
+    }
+
+    &:hover {
+      border-color:     $crimson-light;
+      background-color: $bg-crimson-mix;
+    }
+  }
+
+  &.slot-alive { border-color: $border-subtle; }
+}
+
+// ── Unit Inner ────────────────────────────────────────────────────────────────
+
+.unit-inner {
+  display:        flex;
+  flex-direction: column;
+  width:          100%;
+
+  .unit-name      { margin-bottom: 4px; }
+  .slot-row-badge { margin-bottom: 4px; }
+  .stat-row       { margin-bottom: 4px; }
+}
+
+.unit-name {
+  font-family:   $mono;
+  font-size:     11px;
+  font-weight:   600;
+  color:         $text-primary;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+
+  .enemy-unit & { color: $crimson-light; }
+}
+
+.slot-row-badge {
+  display: flex;
+  font-family:    $mono;
+  font-size:      9px;
+  color:          $text-muted;
+  letter-spacing: 0.1em;
+  align-self: flex-start;
+}
+
+// ── Stat Bars ─────────────────────────────────────────────────────────────────
+
+.stat-row {
+  display:     flex;
+  align-items: center;
+
+  .stat-chip { margin-right: 4px; }
+  .bar-track { flex: 1;          }
+  .stat-val  { margin-left: 4px; }
+}
+
+.stat-chip {
+  font-family:    $mono;
+  font-size:      8px;
+  font-weight:    700;
+  letter-spacing: 0.06em;
+  padding:        1px 4px;
+  border-radius:  $radius-sm;
+
+  &.stat-hp  { background-color: #3ecf6e26; color: $hp-green; }
+  &.stat-sta { background-color: #4a9ede26; color: $sta-blue; }
+}
+
+.bar-track {
+  height:           5px;
+  background-color: $border-subtle;
+  border-radius:    2px;
+  overflow:         hidden;
+}
+
+.bar-fill {
+  height:        100%;
+  border-radius: 2px;
+  transition:    width 0.35s ease;
+
+  &.bar-hp  { background-color: $hp-green; }
+  &.bar-sta { background-color: $sta-blue; }
+}
+
+.stat-val {
+  font-family: $mono;
+  font-size:   9px;
+  color:       $text-dim;
+  min-width:   48px;
+  text-align:  right;
+}
+
+// ── Unit Meta ────────────────────────────────────────────────────────────────
+
+.unit-meta {
+  display: flex;
+
+  span {
+    font-family:  $mono;
+    font-size:    9px;
+    color:        $text-dim;
+    margin-right: 8px;
+  }
+}
+
+// ── Combat Log ───────────────────────────────────────────────────────────────
+
+.combat-log-panel {
+  flex:             0 0 260px;
+  width:            260px;
+  margin:           6px;
+  display:          flex;
+  flex-direction:   column;
+  background-color: $bg-panel;
+  border:           1px solid $border-subtle;
+  border-radius:    $radius-md;
+  overflow:         hidden;
+  min-height:       0;
+}
+
+.log-header {
+  display:          flex;
+  justify-content:  space-between;
+  align-items:      center;
+  padding:          8px 12px;
+  background-color: $bg-card;
+  border-bottom:    1px solid $border-subtle;
+  font-family:      $mono;
+  font-size:        10px;
+  font-weight:      700;
+  color:            $text-dim;
+  letter-spacing:   0.12em;
+  flex-shrink:      0;
+}
+
+.phase-tag {
+  color:          $amber;
+  font-size:      9px;
+  letter-spacing: 0.08em;
+}
+
+.log-entries {
+  flex:           1;
+  overflow-y:     scroll;
+  padding:        8px 12px;
+  display:        flex;
+  flex-direction: column;
+
+  .log-line { margin-bottom: 3px; }
+}
+
+.log-line {
+  font-family: $mono;
+  font-size:   10px;
+  color:       $text-dim;
+  line-height: 1.5;
+
+  &.log-round {
+    color:         $text-muted;
+    border-bottom: 1px solid #ffffff05;
+    margin-top:    4px;
+    margin-bottom: 6px;
+  }
+  &.log-enemy   { color: $crimson-light; }
+  &.log-crit    { color: $amber;    font-weight: 700; }
+  &.log-victory { color: $hp-green; font-weight: 700; }
+  &.log-defeat  { color: $crimson; }
+  &.log-warn    { color: $amber; }
+  &.log-bonus   { color: $sta-blue; }
+}
+
+// ── Action Bar ───────────────────────────────────────────────────────────────
+
+.action-bar {
+  display:          flex;
+  flex-direction:   column;
+  padding:          12px;
+  background-color: $bg-panel;
+  border-top:       1px solid $border-subtle;
+  flex-shrink:      0;
+
+  .action-context { margin-bottom: 8px; }
+  .action-buttons { margin-bottom: 4px; }
+}
+
+.action-context {
+  display:     flex;
+  align-items: baseline;
+
+  .acting-name { margin-right: 8px; }
+}
+
+.acting-name {
+  font-family: $mono;
+  font-size:   13px;
+  font-weight: 700;
+  color:       $amber;
+}
+
+.acting-prompt {
+  font-size: 11px;
+  color:     $text-dim;
+}
+
+.action-buttons {
+  display:   flex;
+  flex-wrap: wrap;
+
+  .action-btn {
+    margin-right:  8px;
+    margin-bottom: 8px;
+  }
+}
+
+.action-btn {
+  display:          flex;
+  flex-direction:   column;
+  align-items:      flex-start;
+  padding:          8px 14px;
+  background-color: $bg-card;
+  border:           1px solid $border-subtle;
+  border-radius:    $radius-md;
+  cursor:           pointer;
+  transition:       border-color 0.12s, background-color 0.12s, box-shadow 0.12s;
+  color:            $text-primary;
+  min-width:        100px;
+
+  .btn-icon  { margin-bottom: 2px; }
+  .btn-label { margin-bottom: 2px; }
+
+  &:hover:not(.btn-disabled) {
+    background-color: $bg-card-hover;
+    border-color:     $border-bright;
+  }
+
+  &.active {
+    border-color:     $amber;
+    background-color: $bg-amber-mix;
+    box-shadow:       0px 0px 12px $amber-glow;
+
+    .btn-icon { color: $amber; }
+  }
+
+  &.btn-disabled {
+    opacity: 0.38;
+    cursor:  not-allowed;
+  }
+}
+
+.btn-icon  { font-size: 14px; }
+
+.btn-label {
+  font-family: $mono;
+  font-size:   11px;
+  font-weight: 600;
+  color:       $text-primary;
+}
+
+.btn-hint {
+  font-family: $mono;
+  font-size:   9px;
+  color:       $text-dim;
+}
+
+.special-btn {
+  border-color: #4a9ede4d;
+
+  &:hover:not(.btn-disabled) {
+    border-color:     $sta-blue;
+    background-color: $bg-sta-mix;
+  }
+
+  &.active {
+    border-color:     $sta-blue;
+    background-color: $bg-sta-mix;
+    box-shadow:       0px 0px 12px #4a9ede33;
+  }
+}
+
+.guard-btn {
+  border-color: #3ecf6e40;
+
+  &:hover {
+    border-color:     $hp-green;
+    background-color: $bg-green-mix;
+  }
+}
+
+// ── Targeting Hint ────────────────────────────────────────────────────────────
+
+.targeting-hint {
+  font-family:      $mono;
+  font-size:        10px;
+  color:            $crimson;
+  letter-spacing:   0.06em;
+  padding:          4px 8px;
+  background-color: $crimson-glow;
+  border-left:      2px solid $crimson;
+  border-radius:    $radius-sm;
+}
+
+// ── Enemy Phase Bar ───────────────────────────────────────────────────────────
+
+.enemy-phase-bar {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         16px;
+
+  .enemy-phase-label {
+    font-family:    $mono;
+    font-size:      13px;
+    color:          $crimson;
+    letter-spacing: 0.12em;
+    animation:      pulse-label 1s ease-in-out infinite;
+  }
+}
+
+// ── Result Bar ────────────────────────────────────────────────────────────────
+
+.result-bar {
+  display:         flex;
+  flex-direction:  row;
+  align-items:     center;
+  justify-content: center;
+  padding:         20px;
+
+  .result-bar-label { margin-right: 24px; }
+
+  &.result-bar-victory { border-top: 1px solid #3ecf6e66; }
+  &.result-bar-defeat  { border-top: 1px solid #d9404066; }
+}
+
+.result-bar-label {
+  font-family:    $mono;
+  font-size:      18px;
+  font-weight:    700;
+  letter-spacing: 0.2em;
+
+  .result-bar-victory & { color: $hp-green; }
+  .result-bar-defeat  & { color: $crimson;  }
+}
+
+// ── Shared Buttons ────────────────────────────────────────────────────────────
+
+.btn-primary {
+  font-family:      $mono;
+  font-size:        12px;
+  font-weight:      700;
+  letter-spacing:   0.14em;
+  text-transform:   uppercase;
+  padding:          12px 36px;
+  background-color: $amber;
+  color:            $bg-deep;
+  border:           none;
+  border-radius:    $radius-md;
+  cursor:           pointer;
+  transition:       background-color 0.15s, box-shadow 0.15s;
+
+  &:hover  { background-color: $amber-light; box-shadow: 0px 0px 24px $amber-glow; }
+  &:active { background-color: $amber-dim; }
+}
+
+.btn-secondary {
+  font-family:      $mono;
+  font-size:        11px;
+  font-weight:      600;
+  letter-spacing:   0.1em;
+  padding:          8px 24px;
+  background-color: #00000000;
+  color:            $text-dim;
+  border:           1px solid $border-bright;
+  border-radius:    $radius-md;
+  cursor:           pointer;
+  transition:       border-color 0.12s, color 0.12s;
+
+  &:hover { border-color: $text-dim; color: $text-primary; }
+}

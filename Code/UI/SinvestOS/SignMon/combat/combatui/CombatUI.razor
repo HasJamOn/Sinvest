@@ -1,0 +1,498 @@
+@using Sandbox
+@using Sandbox.UI
+@using Sinvest
+@using System
+@using System.Linq
+@inherits PanelComponent
+
+<div class="combat-root @GetRootClass()">
+
+    @* ── INACTIVE SCREEN ── *@
+    @if ( Combat.Phase == CombatPhase.Inactive )
+    {
+        <div class="combat-idle">
+            <div class="idle-emblem">⚔</div>
+            <h1 class="idle-title">COMBAT</h1>
+            @if ( Combat.Result != CombatResult.None )
+            {
+                <div class="result-badge @(Combat.Result == CombatResult.Victory ? "result-victory" : "result-defeat")">
+                    @(Combat.Result == CombatResult.Victory ? "Victory" : "Defeat")
+                </div>
+            }
+            <div class="btn-primary" onclick="@StartCombat">Begin Encounter</div>
+        </div>
+        return;
+    }
+
+    @* ── ACTIVE COMBAT LAYOUT ── *@
+    <div class="combat-arena">
+
+        @* ENEMY TEAM *@
+        <section class="team-section team-enemy">
+            <header class="team-header">
+                <span class="team-label">ENEMIES</span>
+                <span class="team-alive-count">@AliveCount(Combat.EnemyUnits) alive</span>
+            </header>
+            <div class="unit-grid">
+                @* Front row: slots 0-2 *@
+                <div class="unit-row">
+                    @for ( int i = 0; i < 3; i++ )
+                    {
+                        var slot  = i;
+                        var unit  = Combat.EnemyUnits[slot];
+                        var isTargetable = Combat.Phase == CombatPhase.AwaitingPlayerInput
+                                           && _pendingAction != PendingAction.None
+                                           && unit != null && unit.IsAlive;
+
+                        <div class="unit-card enemy-unit @GetUnitClass(unit, isEnemy: true, isTargetable)"
+                             onclick="@(() => OnEnemySlotClick(slot))">
+                            @if ( unit == null )
+                            {
+                                <span class="unit-empty">—</span>
+                            }
+                            else if ( !unit.IsAlive )
+                            {
+                                <div class="unit-defeated">
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <span class="defeated-label">✕</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="unit-inner">
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <div class="stat-row">
+                                        <span class="stat-chip stat-hp">HP</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill bar-hp"
+                                                 style="width: @HpPercent(unit)%"></div>
+                                        </div>
+                                        <span class="stat-val">@unit.CurrentHP.ToString("F0")/@unit.Stats.MaxHP.ToString("F0")</span>
+                                    </div>
+                                    <div class="unit-meta">
+                                        <span>⚔ @unit.Stats.AttackPower.ToString("F1")</span>
+                                        <span>🛡 @unit.Stats.DamageResistance.ToString("P0")</span>
+                                    </div>
+                                    @if ( isTargetable )
+                                    {
+                                        <div class="target-ring"></div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                @* Back row: slots 3-5 *@
+                <div class="unit-row">
+                    @for ( int i = 3; i < 6; i++ )
+                    {
+                        var slot  = i;
+                        var unit  = Combat.EnemyUnits[slot];
+                        var isTargetable = Combat.Phase == CombatPhase.AwaitingPlayerInput
+                                           && _pendingAction != PendingAction.None
+                                           && unit != null && unit.IsAlive;
+
+                        <div class="unit-card enemy-unit @GetUnitClass(unit, isEnemy: true, isTargetable)"
+                             onclick="@(() => OnEnemySlotClick(slot))">
+                            @if ( unit == null )
+                            {
+                                <span class="unit-empty">—</span>
+                            }
+                            else if ( !unit.IsAlive )
+                            {
+                                <div class="unit-defeated">
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <span class="defeated-label">✕</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="unit-inner">
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <div class="stat-row">
+                                        <span class="stat-chip stat-hp">HP</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill bar-hp"
+                                                 style="width: @HpPercent(unit)%"></div>
+                                        </div>
+                                        <span class="stat-val">@unit.CurrentHP.ToString("F0")/@unit.Stats.MaxHP.ToString("F0")</span>
+                                    </div>
+                                    <div class="unit-meta">
+                                        <span>⚔ @unit.Stats.AttackPower.ToString("F1")</span>
+                                        <span>🛡 @unit.Stats.DamageResistance.ToString("P0")</span>
+                                    </div>
+                                    @if ( isTargetable )
+                                    {
+                                        <div class="target-ring"></div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        @* COMBAT LOG *@
+        <aside class="combat-log-panel">
+            <header class="log-header">
+                <span>ROUND @Combat.Round</span>
+                <span class="phase-tag">@GetPhaseLabel()</span>
+            </header>
+            <div class="log-entries" id="combat-log">
+                @foreach ( var line in Combat.CombatLog.TakeLast(40).Reverse() )
+                {
+                    <div class="log-line @GetLogLineClass(line)">@line</div>
+                }
+            </div>
+        </aside>
+
+        @* PLAYER TEAM *@
+        <section class="team-section team-player">
+            <header class="team-header">
+                <span class="team-label">YOUR SIGMON</span>
+                <span class="team-alive-count">@AliveCount(Combat.PlayerUnits) alive</span>
+            </header>
+            <div class="unit-grid">
+                @* Front row: slots 0-2 *@
+                <div class="unit-row">
+                    @for ( int i = 0; i < 3; i++ )
+                    {
+                        var slot     = i;
+                        var unit     = Combat.PlayerUnits[slot];
+                        var isActive = Combat.ActivePlayerUnitIndex == slot;
+
+                        <div class="unit-card player-unit @GetUnitClass(unit, isEnemy: false, isTargetable: false, isActive)">
+                            @if ( unit == null )
+                            {
+                                <span class="unit-empty">—</span>
+                            }
+                            else if ( !unit.IsAlive )
+                            {
+                                <div class="unit-defeated">
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <span class="defeated-label">✕</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="unit-inner">
+                                    @if ( isActive ) { <div class="active-indicator">▶</div> }
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <div class="slot-row-badge">Front</div>
+                                    <div class="stat-row">
+                                        <span class="stat-chip stat-hp">HP</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill bar-hp" style="width: @HpPercent(unit)%"></div>
+                                        </div>
+                                        <span class="stat-val">@unit.CurrentHP.ToString("F0")/@unit.Stats.MaxHP.ToString("F0")</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span class="stat-chip stat-sta">STA</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill bar-sta" style="width: @StaPercent(unit)%"></div>
+                                        </div>
+                                        <span class="stat-val">@unit.CurrentStamina.ToString("F0")</span>
+                                    </div>
+                                    <div class="unit-meta">
+                                        <span>⚔ @unit.Stats.AttackPower.ToString("F1")</span>
+                                        <span>💥 @unit.Stats.CritChance.ToString("P0")</span>
+                                        <span>💨 @unit.Stats.DodgeChance.ToString("P0")</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                @* Back row: slots 3-5 *@
+                <div class="unit-row">
+                    @for ( int i = 3; i < 6; i++ )
+                    {
+                        var slot     = i;
+                        var unit     = Combat.PlayerUnits[slot];
+                        var isActive = Combat.ActivePlayerUnitIndex == slot;
+
+                        <div class="unit-card player-unit @GetUnitClass(unit, isEnemy: false, isTargetable: false, isActive)">
+                            @if ( unit == null )
+                            {
+                                <span class="unit-empty">—</span>
+                            }
+                            else if ( !unit.IsAlive )
+                            {
+                                <div class="unit-defeated">
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <span class="defeated-label">✕</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="unit-inner">
+                                    @if ( isActive ) { <div class="active-indicator">▶</div> }
+                                    <span class="unit-name">@unit.Stats.Name</span>
+                                    <div class="slot-row-badge">Back</div>
+                                    <div class="stat-row">
+                                        <span class="stat-chip stat-hp">HP</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill bar-hp" style="width: @HpPercent(unit)%"></div>
+                                        </div>
+                                        <span class="stat-val">@unit.CurrentHP.ToString("F0")/@unit.Stats.MaxHP.ToString("F0")</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span class="stat-chip stat-sta">STA</span>
+                                        <div class="bar-track">
+                                            <div class="bar-fill bar-sta" style="width: @StaPercent(unit)%"></div>
+                                        </div>
+                                        <span class="stat-val">@unit.CurrentStamina.ToString("F0")</span>
+                                    </div>
+                                    <div class="unit-meta">
+                                        <span>⚔ @unit.Stats.AttackPower.ToString("F1")</span>
+                                        <span>💥 @unit.Stats.CritChance.ToString("P0")</span>
+                                        <span>💨 @unit.Stats.DodgeChance.ToString("P0")</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    </div>
+
+    @* ── ACTION BAR ── *@
+    @if ( Combat.Phase == CombatPhase.AwaitingPlayerInput && Combat.ActivePlayerUnit != null )
+    {
+        var active = Combat.ActivePlayerUnit;
+
+        <footer class="action-bar">
+            <div class="action-context">
+                <span class="acting-name">@active.Stats.Name</span>
+                <span class="acting-prompt">— choose an action</span>
+            </div>
+
+            <div class="action-buttons">
+                @* Basic Attack *@
+                <div class="action-btn @(_pendingAction == PendingAction.Attack ? "active" : "")"
+                        onclick="@OnAttackPress">
+                    <span class="btn-icon">⚔</span>
+                    <span class="btn-label">Attack</span>
+                    <span class="btn-hint">Pick a target</span>
+                </div>
+
+                @* Specials *@
+                @for ( int si = 0; si < SpecialAttackDefinition.Catalogue.Length; si++ )
+                {
+                    var idx  = si;
+                    var spec = SpecialAttackDefinition.Catalogue[idx];
+                    var canUse = active.CurrentStamina >= spec.StaminaCost;
+
+                    <div class="action-btn special-btn @(_pendingAction == PendingAction.Special && _pendingSpecialIndex == idx ? "active" : "") @(!canUse ? "btn-disabled" : "")"
+                            onclick="@(() => OnSpecialPress(idx))"
+                            title="@spec.Description">
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-label">@spec.Name</span>
+                        <span class="btn-hint">@spec.StaminaCost.ToString("F0") STA · ×@spec.DamageMultiplier.ToString("F2")</span>
+                    </div>
+                }
+
+                @* Guard *@
+                <div class="action-btn guard-btn" onclick="@OnGuard">
+                    <span class="btn-icon">🛡</span>
+                    <span class="btn-label">Guard</span>
+                    <span class="btn-hint">Recover stamina</span>
+                </div>
+            </div>
+
+            @if ( _pendingAction != PendingAction.None )
+            {
+                <div class="targeting-hint">Click an enemy to @(_pendingAction == PendingAction.Attack ? "attack" : "use " + SpecialAttackDefinition.Catalogue[_pendingSpecialIndex].Name)</div>
+            }
+        </footer>
+    }
+
+    @if ( Combat.Phase == CombatPhase.EnemyTurn )
+    {
+        <footer class="action-bar enemy-phase-bar">
+            <span class="enemy-phase-label">👾 Enemy Phase …</span>
+        </footer>
+    }
+
+    @if ( Combat.Phase == CombatPhase.CombatEnd )
+    {
+        <footer class="action-bar result-bar @(Combat.Result == CombatResult.Victory ? "result-bar-victory" : "result-bar-defeat")">
+            <span class="result-bar-label">
+                @(Combat.Result == CombatResult.Victory ? "🎉 VICTORY" : "💀 DEFEAT")
+            </span>
+            <div class="btn-secondary" onclick="@(() => Combat.ForceReset())">Return</div>
+        </footer>
+    }
+
+</div>
+
+@code {
+
+    // ── Singleton access — s&box has no DI container ──────────────────────────
+    private CombatManager Combat => CombatManager.Instance;
+
+    // ── Pending action state ──────────────────────────────────────────────────
+    private enum PendingAction { None, Attack, Special }
+    private PendingAction _pendingAction       = PendingAction.None;
+    private int           _pendingSpecialIndex = -1;
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
+    protected override void OnStart()
+    {
+        if ( Combat != null )
+        {
+            Combat.OnStateChanged -= StateHasChanged;
+            Combat.OnStateChanged += StateHasChanged;
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        if ( Combat != null )
+            Combat.OnStateChanged -= StateHasChanged;
+    }
+    
+    protected override void OnEnabled()
+    {
+	    // Force the cursor to be visible regardless of UI state
+	    Mouse.Visibility = MouseVisibility.Visible;
+    }
+
+    protected override void OnDisabled()
+    {
+	    // Return to Auto (only shows when UI is clickable) or Hidden
+	    Mouse.Visibility = MouseVisibility.Auto;
+    }
+
+    // BuildHash drives reactive re-renders without needing StateHasChanged calls.
+    // Include every piece of state the template reads so Panorama knows when to rebuild.
+    protected override int BuildHash() => System.HashCode.Combine(
+        Combat?.Phase,
+        Combat?.Round,
+        Combat?.ActivePlayerUnitIndex,
+        _pendingAction,
+        _pendingSpecialIndex
+    );
+
+    // ── Button handlers ───────────────────────────────────────────────────────
+
+    private void StartCombat()
+    {
+        _pendingAction = PendingAction.None;
+        Combat.StartCombat();
+    }
+
+    private void OnAttackPress()
+    {
+        _pendingAction       = _pendingAction == PendingAction.Attack
+                               ? PendingAction.None
+                               : PendingAction.Attack;
+        _pendingSpecialIndex = -1;
+    }
+
+    private void OnSpecialPress( int specialIndex )
+    {
+        if ( _pendingAction == PendingAction.Special && _pendingSpecialIndex == specialIndex )
+        {
+            _pendingAction = PendingAction.None;
+            return;
+        }
+
+        var spec   = SpecialAttackDefinition.Catalogue[specialIndex];
+        var active = Combat.ActivePlayerUnit;
+        if ( active == null ) return;
+
+        // Non-targeted specials resolve immediately
+        if ( spec.Targeting == TargetMode.AllEnemies || spec.Targeting == TargetMode.RandomEnemy )
+        {
+            Combat.PlayerUseSpecial( specialIndex, -1 );
+            _pendingAction = PendingAction.None;
+            return;
+        }
+
+        if ( spec.Targeting == TargetMode.Self )
+        {
+            Combat.PlayerUseSpecial( specialIndex, -1 );
+            _pendingAction = PendingAction.None;
+            return;
+        }
+
+        // SingleEnemy — enter targeting mode
+        _pendingAction       = PendingAction.Special;
+        _pendingSpecialIndex = specialIndex;
+    }
+
+    private void OnGuard()
+    {
+        _pendingAction = PendingAction.None;
+        Combat.PlayerGuard();
+    }
+
+    private void OnEnemySlotClick( int slot )
+    {
+        if ( _pendingAction == PendingAction.None ) return;
+
+        if ( _pendingAction == PendingAction.Attack )
+            Combat.PlayerAttack( slot );
+        else if ( _pendingAction == PendingAction.Special )
+            Combat.PlayerUseSpecial( _pendingSpecialIndex, slot );
+
+        _pendingAction       = PendingAction.None;
+        _pendingSpecialIndex = -1;
+    }
+
+    // ── CSS helpers ───────────────────────────────────────────────────────────
+
+    private string GetRootClass() => Combat.Phase switch
+    {
+        CombatPhase.Inactive   => "phase-inactive",
+        CombatPhase.EnemyTurn  => "phase-enemy",
+        CombatPhase.CombatEnd  => Combat.Result == CombatResult.Victory ? "phase-victory" : "phase-defeat",
+        _                      => "phase-player"
+    };
+
+    private string GetUnitClass( CombatUnit unit, bool isEnemy, bool isTargetable,
+                                 bool isActive = false )
+    {
+        var cls = isEnemy ? "enemy-unit" : "player-unit";
+        if ( unit == null )             cls += " slot-empty";
+        else if ( !unit.IsAlive )       cls += " slot-dead";
+        else if ( isTargetable )        cls += " slot-targetable";
+        else if ( isActive )            cls += " slot-active";
+        else                            cls += " slot-alive";
+        return cls;
+    }
+
+    private string GetPhaseLabel() => Combat.Phase switch
+    {
+        CombatPhase.AwaitingPlayerInput => $"Your Turn · Slot {Combat.ActivePlayerUnitIndex}",
+        CombatPhase.EnemyTurn           => "Enemy Phase",
+        CombatPhase.CombatEnd           => Combat.Result.ToString(),
+        _                               => "—"
+    };
+
+    private string GetLogLineClass( string line )
+    {
+        if ( line.Contains( "CRIT" ) )    return "log-crit";
+        if ( line.Contains( "Victory" ) || line.Contains( "🎉" ) ) return "log-victory";
+        if ( line.Contains( "Defeat" )  || line.Contains( "💀" ) ) return "log-defeat";
+        if ( line.Contains( "👾" ) )      return "log-enemy";
+        if ( line.Contains( "──" ) )      return "log-round";
+        if ( line.Contains( "⚠️" ) )      return "log-warn";
+        if ( line.Contains( "⬆" ) )       return "log-bonus";
+        return "";
+    }
+
+    // ── Stat helpers ──────────────────────────────────────────────────────────
+
+    private static double HpPercent( CombatUnit u )  =>
+        u.Stats.MaxHP > 0 ? Math.Clamp( u.CurrentHP  / u.Stats.MaxHP  * 100, 0, 100 ) : 0;
+
+    private static double StaPercent( CombatUnit u ) =>
+        u.Stats.MaxStamina > 0 ? Math.Clamp( u.CurrentStamina / u.Stats.MaxStamina * 100, 0, 100 ) : 0;
+
+    private static int AliveCount( CombatUnit[] units ) =>
+        units.Count( u => u != null && u.IsAlive );
+}
