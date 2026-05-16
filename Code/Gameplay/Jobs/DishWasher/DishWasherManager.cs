@@ -13,8 +13,12 @@ public sealed class DishwasherManager : Component
     /// <summary>The Plate_Root of whichever dish is currently in the workspace. Read by PlateRotator.</summary>
     public GameObject ActivePlateRoot => _currentActiveDish?.ModelVisual;
 
-    [Property] public float MinRespawnDelay { get; set; } = 2.0f;
+    [Property, Header( "Timing" )] public float MinRespawnDelay { get; set; } = 2.0f;
     [Property] public float MaxRespawnDelay { get; set; } = 5.0f;
+
+    [Property, Header( "Audio Tiers" )] public SoundEvent PerfectSound { get; set; }
+    [Property] public SoundEvent StandardPayoutSound { get; set; }
+    [Property] public SoundEvent PoorJobSound { get; set; }
 
     private DishTransition _currentActiveDish;
     private bool _isSubmitting;
@@ -52,14 +56,15 @@ public sealed class DishwasherManager : Component
        float cleanPct = ActiveDirtManager.CleanPercentage;
        double payout = CalculatePayout( cleanPct );
 
-       // 2. Process Ledger Transaction
+       // 2. Play Dynamic Sound & Process Ledger Transaction
+       PlayTierSound( cleanPct );
+
        if ( payout > 0 )
        {
-	       EconomyManager.Instance?.AddLaborIncome( payout, $"Dishwashing ({cleanPct:0}%)" );
-    
-	       // Pass along whether the completion reached perfect scoring thresholds
-	       bool perfectScore = cleanPct >= 96f;
-	       FloatingCashDisplay.Instance?.DisplayPayout( payout, perfectScore );
+           EconomyManager.Instance?.AddLaborIncome( payout, $"Dishwashing ({cleanPct:0}%)" );
+           
+           bool perfectScore = cleanPct >= 96f;
+           FloatingCashDisplay.Instance?.DisplayPayout( payout, perfectScore );
        }
 
        // 3. Cleanup Scene Objects
@@ -78,6 +83,26 @@ public sealed class DishwasherManager : Component
 
        // 5. Instantly release the submission state so player can click another dish
        _isSubmitting = false;
+    }
+
+    private void PlayTierSound( float percentage )
+    {
+        // Tier 1: Perfect Run (>= 96%)
+        if ( percentage >= 96f )
+        {
+            if ( PerfectSound != null ) Sound.Play( PerfectSound, Transform.Position );
+            return;
+        }
+
+        // Tier 2: Standard Payout (50% - 95.9%)
+        if ( percentage >= 50f )
+        {
+            if ( StandardPayoutSound != null ) Sound.Play( StandardPayoutSound, Transform.Position );
+            return;
+        }
+
+        // Tier 3: Poor Run / No Reward (< 50%)
+        if ( PoorJobSound != null ) Sound.Play( PoorJobSound, Transform.Position );
     }
 
     private async Task QueuePileReplenish( float secondsDelay )
