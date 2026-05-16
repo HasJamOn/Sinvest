@@ -162,7 +162,7 @@ public sealed class OilPumperMatchmaker : Component, Component.ITriggerListener,
 	    if ( EconomyManager.Instance.IsValid() )
 	    {
 		    // This correctly hits GameSaveSystem.Instance.CommitMoneyTransaction( "IN", ... )
-		    EconomyManager.Instance.AddLaborIncome( (double)amount, "Oil Pumper Payout" );
+		    EconomyManager.Instance.AddLaborIncome( (decimal)amount, "Oil Pumper Payout" );
 	    }
 
 	    // 2. Trigger the floating +$1000 (or amount) on the UI Screen

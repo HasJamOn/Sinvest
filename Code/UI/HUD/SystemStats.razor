@@ -14,7 +14,7 @@
         <img src="ui/casino/navigation/sincash.png" class="mini-icon" />
         <div class="content">
             <span class="label">CASH</span>
-            <span class="value">$@FormatValue(_displayMoney)</span>
+            <span class="value">$@FormatCash(_displayMoney)</span>
         </div>
     </div>
 
@@ -26,18 +26,19 @@
         <div class="content">
             <span class="label">SHARES</span>
             <div class="value-row">
-                <span class="value">@FormatValue(_displayShares)</span>
-                <span class="valuation">[$@FormatValue(_targetShares * GetSharePrice())]</span>
+               <span class="value">@FormatShares(_displayShares)</span>
+               <span class="valuation">[$@FormatCash(_targetShares * GetSharePrice())]</span>
             </div>
         </div>
     </div>
 </root>
 
 @code {
-    private double _displayMoney = 0;
-    private double _targetMoney = 0;
-    private double _displayShares = 0;
-    private double _targetShares = 0;
+    // Layout visual interpolators and targets over to type safe decimals
+    private decimal _displayMoney = 0m;
+    private decimal _targetMoney = 0m;
+    private decimal _displayShares = 0m;
+    private decimal _targetShares = 0m;
     private bool _initialized = false;
 
     protected override void OnAfterTreeRender(bool firstTime)
@@ -58,8 +59,8 @@
         var save = GameSaveSystem.Instance;
         if (!save.IsValid() || save.CurrentCharacter == null) return;
 
-        _targetMoney = save.CurrentCharacter.Money;
-        _targetShares = save.CurrentCharacter.Shares;
+        _targetMoney = (decimal)save.CurrentCharacter.Money;
+        _targetShares = (decimal)save.CurrentCharacter.Shares;
 
         if (!_initialized)
         {
@@ -75,33 +76,59 @@
     {
         bool needsUpdate = false;
 
-        // Smooth Lerp for visual counters
-        if (Math.Abs(_displayMoney - _targetMoney) > 0.1)
+        // Tightened threshold check down to 0.001m to allow smooth rolling decimals 
+        // to complete their transitions down to 2 digits without trapping truncation frames.
+        if (Math.Abs(_displayMoney - _targetMoney) > 0.001m)
         {
-            _displayMoney = MathX.Lerp(_displayMoney, _targetMoney, RealTime.Delta * 8.0f);
+            // MathX.Lerp expects float parameters, so explicit float casts keep the layout interpolation clean.
+            _displayMoney = (decimal)MathX.Lerp((float)_displayMoney, (float)_targetMoney, RealTime.Delta * 8.0f);
             needsUpdate = true;
         }
-
-        if (Math.Abs(_displayShares - _targetShares) > 0.1)
+        else
         {
-            _displayShares = MathX.Lerp(_displayShares, _targetShares, RealTime.Delta * 8.0f);
+            _displayMoney = _targetMoney; // Snap cleanly to the exact target
+        }
+
+        if (Math.Abs(_displayShares - _targetShares) > 0.001m)
+        {
+            _displayShares = (decimal)MathX.Lerp((float)_displayShares, (float)_targetShares, RealTime.Delta * 8.0f);
             needsUpdate = true;
+        }
+        else
+        {
+            _displayShares = _targetShares; // Snap cleanly to the exact target
         }
 
         if (needsUpdate) StateHasChanged();
     }
 
-    private double GetSharePrice() => FundinoMarketService.CurrentPrice;
+    private decimal GetSharePrice() => (decimal)FundinoMarketService.CurrentPrice;
 
-    private string FormatValue(double value)
+    /// <summary>
+    /// Formats currency values cleanly to exactly two decimal places.
+    /// </summary>
+    private string FormatCash(decimal value)
     {
-        double floorValue = Math.Floor(value);
-        double absValue = Math.Abs(floorValue);
+        decimal absValue = Math.Abs(value);
+        if (absValue >= 1000000m)
+           return (value / 1000000M).ToString("0.##") + "M";
 
-        if (absValue >= 1000000)
-            return (floorValue / 1000000D).ToString("0.##") + "M";
+        // "N2" guarantees exactly 2 decimal points for cash ($10.50)
+        return value.ToString("N2");
+    }
 
-        return floorValue.ToString("N0");
+    /// <summary>
+    /// Formats asset volumes to preserve full fractional precision without truncation bugs.
+    /// </summary>
+    private string FormatShares(decimal value)
+    {
+        decimal absValue = Math.Abs(value);
+        if (absValue >= 1000000m)
+           return (value / 1000000M).ToString("0.##") + "M";
+
+        // "G" format removes trailing zeroes but preserves the full fractional 
+        // precision (e.g., 1.5, 10.75, or 0.12345) dynamically as needed.
+        return value.ToString("G");
     }
 
     // Cleanup reference on deletion

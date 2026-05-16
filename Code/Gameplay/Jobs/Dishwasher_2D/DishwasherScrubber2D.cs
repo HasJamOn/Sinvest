@@ -65,8 +65,9 @@ public sealed class DishwasherScrubber2D : Component
     {
         if ( EconomyManager.Instance is not null )
         {
-            // Transaction: IN 1.0 "Dish Scrubber"
-            EconomyManager.Instance.AddLaborIncome( 1.0, "Dish Scrubber" );
+            // FIX: Added the 'm' suffix to explicitly pass a high-precision 
+            // decimal value. This now seamlessly aligns with the upgraded economy pipeline.
+            EconomyManager.Instance.AddLaborIncome( 1.0m, "Dish Scrubber" );
             Log.Info( "[ECONOMY] $1.00 rewarded for labor." );
         }
     }
@@ -135,6 +136,14 @@ public sealed class DishwasherScrubber2D : Component
 
     protected override void OnDisabled()
     {
+        if ( CurrentHoveredTarget is not null )
+            CurrentHoveredTarget.OnDishCleaned -= RewardLabor;
+    }
+
+    protected override void OnDestroy()
+    {
+        // Safety Catch: Ensure dynamic events completely tear down if the component 
+        // is deleted, preventing unmanaged memory hooks on old masks.
         if ( CurrentHoveredTarget is not null )
             CurrentHoveredTarget.OnDishCleaned -= RewardLabor;
     }

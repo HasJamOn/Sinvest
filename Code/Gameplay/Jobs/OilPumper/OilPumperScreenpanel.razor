@@ -116,7 +116,7 @@
         // This ensures the money moves even if the OS isn't running or was never created.
         if ( EconomyManager.Instance.IsValid() )
         {
-            double target = EconomyManager.Instance.CurrentMoney;
+            decimal target = EconomyManager.Instance.CurrentMoney;
             
             // Internal Lerp handles the "rolling number" effect locally in this component
             _displayCash = MathX.Lerp( (float)_displayCash, (float)target, Time.Delta * 8.0f );

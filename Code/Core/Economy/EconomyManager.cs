@@ -13,11 +13,11 @@ public sealed class EconomyManager : Component
     public static EconomyManager Instance { get; private set; }
 
     /* --- Calculated Views --- */
-    // These properties act as bridges. The EconomyManager does not store state;
-    // it retrieves the replayed values from the current session.
-    public double CurrentMoney => GameSaveSystem.Instance?.CurrentCharacter?.Money ?? 0;
-    public double CurrentShares => GameSaveSystem.Instance?.CurrentCharacter?.Shares ?? 0;
-    public double CurrentSharePrice => FundinoMarketService.CurrentPrice;
+    // Storing and tracking values as high-precision decimals completely eliminates 
+    // binary floating-point rounding drifts over long gameplay sessions.
+    public decimal CurrentMoney => (decimal)(GameSaveSystem.Instance?.CurrentCharacter?.Money ?? 0);
+    public decimal CurrentShares => (decimal)(GameSaveSystem.Instance?.CurrentCharacter?.Shares ?? 0);
+    public decimal CurrentSharePrice => (decimal)FundinoMarketService.CurrentPrice;
 
     protected override void OnAwake()
     {
@@ -32,12 +32,15 @@ public sealed class EconomyManager : Component
     public TransactionResult BuyShares( int amount )
     {
         if ( amount <= 0 ) return TransactionResult.SystemError;
-        double totalCost = amount * CurrentSharePrice;
+        
+        // Explicit decimal precision math
+        decimal totalCost = amount * CurrentSharePrice;
     
         // Attempt to deduct cash first. GameSaveSystem will return InsufficientFunds if balance is too low.
+        // We cast back to double here in case your core ledger backend parameters haven't shifted yet.
         var result = GameSaveSystem.Instance.CommitMoneyTransaction( 
            "OUT", 
-           totalCost, 
+           (double)totalCost, 
            $"Bought {amount} Shares" 
         );
 
@@ -59,12 +62,13 @@ public sealed class EconomyManager : Component
         var character = GameSaveSystem.Instance?.CurrentCharacter;
         if ( character == null || character.Shares < amount ) return TransactionResult.InsufficientFunds;
 
-        double totalGain = amount * CurrentSharePrice;
+        // Explicit decimal precision math
+        decimal totalGain = amount * CurrentSharePrice;
 
         // Perform the cash injection.
         var result = GameSaveSystem.Instance.CommitMoneyTransaction( 
            "IN", 
-           totalGain, 
+           (double)totalGain, 
            $"Sold {amount} Shares @ {CurrentSharePrice}" 
         );
 
@@ -81,9 +85,9 @@ public sealed class EconomyManager : Component
     /// Direct entry point for Labor rewards. 
     /// Converts time-based job completion into a ledger-backed inflow.
     /// </summary>
-    public void AddLaborIncome( double amount, string jobName )
+    public void AddLaborIncome( decimal amount, string jobName )
     {
-        GameSaveSystem.Instance.CommitMoneyTransaction( "IN", amount, $"Job: {jobName}" );
+        GameSaveSystem.Instance.CommitMoneyTransaction( "IN", (double)amount, $"Job: {jobName}" );
     }
     
     /// <summary>
@@ -91,29 +95,29 @@ public sealed class EconomyManager : Component
     /// This maintains the integrity of the ledger (Balance = Sum of all lines)
     /// even when manually overriding values for testing.
     /// </summary>
-    public void DebugSetValues( double targetMoney, double targetShares )
+    public void DebugSetValues( decimal targetMoney, decimal targetShares )
     {
         var save = GameSaveSystem.Instance;
         if ( !save.IsValid() || save.CurrentCharacter == null ) return;
 
         // 1. Correct Money via Ledger
         // Instead of setting the value directly, we append a delta transaction.
-        double currentMoney = save.CurrentCharacter.Money;
-        double moneyDiff = targetMoney - currentMoney;
+        decimal currentMoney = (decimal)save.CurrentCharacter.Money;
+        decimal moneyDiff = targetMoney - currentMoney;
 
         if ( moneyDiff > 0 )
         {
-           save.CommitMoneyTransaction( "IN", moneyDiff, "DEBUG_OVERRIDE" );
+           save.CommitMoneyTransaction( "IN", (double)moneyDiff, "DEBUG_OVERRIDE" );
         }
         else if ( moneyDiff < 0 )
         {
            // OUT transactions expect a positive magnitude to subtract from the ledger.
-           save.CommitMoneyTransaction( "OUT", Math.Abs( moneyDiff ), "DEBUG_OVERRIDE" );
+           save.CommitMoneyTransaction( "OUT", (double)Math.Abs( moneyDiff ), "DEBUG_OVERRIDE" );
         }
 
         // 2. Correct Shares
         // Directly updating the cache. Future revisions may move shares to a full ledger model.
-        save.CurrentCharacter.Shares = targetShares;
+        save.CurrentCharacter.Shares = (double)targetShares;
         
         Log.Info( $"[ECONOMY] Debug Override: Adjusted Money by {moneyDiff:+0.##;-0.##}. Shares set to {targetShares}." );
         

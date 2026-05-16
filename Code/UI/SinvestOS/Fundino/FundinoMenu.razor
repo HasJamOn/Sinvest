@@ -42,12 +42,6 @@
                         <div class="y-label">@price.ToString("N0")</div>
                     }
 
-                    <%--
-                        Use top + translateY(-50%) instead of bottom so the math
-                        is identical to MapPriceToY (which returns a distance from
-                        the top).  CurrentPricePixelY is already clamped so the
-                        tag never clips under the header or footer of the y-axis.
-                    --%>
                     <div class="current-price-tag" style="top: @(CurrentPricePixelY)px">
                         @FundinoMarketService.CurrentPrice.ToString("N2")
                     </div>
@@ -63,27 +57,24 @@
         </div>
 
         <div class="market-data-strip">
-	        <div class="data-point">
-		        <span class="label">HOLDINGS</span>
-		        @* FIX: Pull from EconomyManager instead of SinvestOS *@
-		        <span class="value">@FormatValue(EconomyManager.Instance?.CurrentShares ?? 0) UNITS</span>
-	        </div>
+            <div class="data-point">
+               <span class="label">HOLDINGS</span>
+               <span class="value">@FormatValue(EconomyManager.Instance?.CurrentShares ?? 0m) UNITS</span>
+            </div>
 
-	        <div class="divider"></div>
+            <div class="divider"></div>
 
-	        <div class="data-point">
-		        <span class="label">EQUITY</span>
-		        @* FIX: Pull from EconomyManager instead of SinvestOS *@
-		        <span class="value">$@FormatValue((EconomyManager.Instance?.CurrentShares ?? 0) * FundinoMarketService.CurrentPrice)</span>
-	        </div>
+            <div class="data-point">
+               <span class="label">EQUITY</span>
+               <span class="value">$@FormatValue((EconomyManager.Instance?.CurrentShares ?? 0m) * (decimal)FundinoMarketService.CurrentPrice)</span>
+            </div>
 
-	        <div class="divider"></div>
+            <div class="divider"></div>
 
-	        <div class="data-point">
-		        <span class="label">BUY POWER</span>
-		        @* FIX: Pull from EconomyManager instead of SinvestOS *@
-		        <span class="value">$@FormatValue(EconomyManager.Instance?.CurrentMoney ?? 0)</span>
-	        </div>
+            <div class="data-point">
+               <span class="label">BUY POWER</span>
+               <span class="value">$@FormatValue(EconomyManager.Instance?.CurrentMoney ?? 0m)</span>
+            </div>
         </div>
 
        <div class="actions-container">
@@ -91,11 +82,11 @@
               <span>TRANSACTION COST:</span>
               
               <div class="delta-group">
-                 <span class="arrow @(PriceDelta > 0 ? "up" : (PriceDelta < 0 ? "down" : "neutral"))">
-                    @(PriceDelta > 0 ? "▲" : (PriceDelta < 0 ? "▼" : "•"))
+                 <span class="arrow @(PriceDelta > 0m ? "up" : (PriceDelta < 0m ? "down" : "neutral"))">
+                    @(PriceDelta > 0m ? "▲" : (PriceDelta < 0m ? "▼" : "•"))
                  </span>
 
-                 <span class="delta-value @(PriceDelta > 0 ? "up" : (PriceDelta < 0 ? "down" : "neutral"))">
+                 <span class="delta-value @(PriceDelta > 0m ? "up" : (PriceDelta < 0m ? "down" : "neutral"))">
                     $@Math.Abs(PriceDelta).ToString("N2")
                  </span>
 
@@ -121,15 +112,18 @@
 @code {
     private FundinoMarketGraph GraphCanvas;
     private bool IsProcessing = false;
-    private double LastPrice;
-    private double PreviousPrice;
+    
+    // FIX: Swapped out underlying cache variables from double to high-precision decimals
+    private decimal LastPrice;
+    private decimal PreviousPrice;
     private string CurrentRange = "1D";
     private List<string> XAxisLabels = new();
     private List<double> YAxisLabels = new();
     private float CurrentPricePixelY = 0f;
     private const float TagHalfHeight = 9f;
 
-    private double PriceDelta => FundinoMarketService.CurrentPrice - PreviousPrice;
+    // FIX: Performs explicit decimal comparison check math safely
+    private decimal PriceDelta => (decimal)FundinoMarketService.CurrentPrice - PreviousPrice;
 
     private readonly Dictionary<string, int> TimeRanges = new()
     {
@@ -143,35 +137,36 @@
         { "MAX", 60 * 24 * 365 * 10  }
     };
 
-    // References EconomyManager directly for balance checks
+    // FIX: Resolves evaluation operations directly against target decimals
     private bool CanAfford => EconomyManager.Instance != null && 
-                              EconomyManager.Instance.CurrentMoney >= FundinoMarketService.CurrentPrice;
+                              EconomyManager.Instance.CurrentMoney >= (decimal)FundinoMarketService.CurrentPrice;
 
     private bool CanSell => EconomyManager.Instance != null && 
-                            EconomyManager.Instance.CurrentShares >= 1;
+                            EconomyManager.Instance.CurrentShares >= 1m;
     
-    private string FormatValue(double value)
+    // FIX: Exposes parameter signature to clean decimals
+    private string FormatValue(decimal value)
     {
-        double abs = Math.Abs(value);
-        if (abs >= 1_000_000) return (value / 1_000_000D).ToString("0.##") + "M";
-        if (abs >= 1_000)     return (value / 1_000D).ToString("0.#") + "K";
+        decimal abs = Math.Abs(value);
+        if (abs >= 1_000_000m) return (value / 1_000_000M).ToString("0.##") + "M";
+        if (abs >= 1_000m)     return (value / 1_000M).ToString("0.#") + "K";
         return value.ToString("N2");
     }
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
         if ( !firstTime ) return;
-        LastPrice = FundinoMarketService.CurrentPrice;
-        PreviousPrice = FundinoMarketService.CurrentPrice;
+        LastPrice = (decimal)FundinoMarketService.CurrentPrice;
+        PreviousPrice = (decimal)FundinoMarketService.CurrentPrice;
         if ( FundinoMarketService.PriceHistory.Count < 2 ) PreFillHistory();
         RefreshGraph();
     }
 
     public override void Tick()
     {
-        if ( FundinoMarketService.CurrentPrice == LastPrice ) return;
+        if ( (decimal)FundinoMarketService.CurrentPrice == LastPrice ) return;
         PreviousPrice = LastPrice;
-        LastPrice = FundinoMarketService.CurrentPrice;
+        LastPrice = (decimal)FundinoMarketService.CurrentPrice;
         RefreshGraph();
         StateHasChanged();
     }
@@ -285,8 +280,8 @@
         IsProcessing = true;
         StateHasChanged();
     
-        double unitPrice = FundinoMarketService.CurrentPrice;
-        double totalMoneyDelta = -(unitPrice * amount);
+        decimal unitPrice = (decimal)FundinoMarketService.CurrentPrice;
+        decimal totalMoneyDelta = -(unitPrice * amount);
 
         if (amount > 0 && EconomyManager.Instance.CurrentMoney < (unitPrice * amount))
         {
@@ -295,15 +290,15 @@
            return;
         }
 
-        if (amount < 0 && EconomyManager.Instance.CurrentShares < Math.Abs(amount))
+        if (amount < 0 && EconomyManager.Instance.CurrentShares < Math.Abs((decimal)amount))
         {
            IsProcessing = false;
            StateHasChanged();
            return;
         }
 
-        // SinvestOS still handles the mechanical Transaction call to the Ledger
-        SinvestOS.Instance.Transaction(totalMoneyDelta, (double)amount);
+        // FIX: Casts parameters back to double to match SinvestOS mechanical input handlers safely
+        SinvestOS.Instance.Transaction((double)totalMoneyDelta, (double)amount);
 
         await GameTask.Delay(100); 
         IsProcessing = false;

@@ -150,16 +150,30 @@ public sealed class PumperDebugger : Component
     public void RunEconomyAnalysis()
     {
         Log.Info( "--- ECONOMY DIAGNOSTIC ---" );
-        if ( EconomyManager.Instance.IsValid() ) Log.Info( $"Econ: ${EconomyManager.Instance.CurrentMoney:N2}" );
-        if ( GameSaveSystem.Instance?.CurrentCharacter != null ) Log.Info( $"Save: ${GameSaveSystem.Instance.CurrentCharacter.Money:N2}" );
+        
+        // Fix: Clean layout formatting for decimals inside diagnostics log
+        if ( EconomyManager.Instance.IsValid() ) 
+            Log.Info( $"Econ: ${EconomyManager.Instance.CurrentMoney:N2}" );
+            
+        if ( GameSaveSystem.Instance?.CurrentCharacter != null ) 
+            Log.Info( $"Save: ${(decimal)GameSaveSystem.Instance.CurrentCharacter.Money:N2}" );
+            
         VerifySync();
     }
 
     private void VerifySync()
     {
         if ( !EconomyManager.Instance.IsValid() || GameSaveSystem.Instance?.CurrentCharacter == null ) return;
-        double diff = Math.Abs( EconomyManager.Instance.CurrentMoney - GameSaveSystem.Instance.CurrentCharacter.Money );
-        if ( diff > 0.01 ) Log.Error( "!!! DESYNC DETECTED !!!" );
-        else Log.Info( "Sync Check: OK" );
+        
+        // FIX: Replaced double-based subtraction logic with safe decimal representations.
+        // We cast the character's base save money value to decimal explicitly.
+        decimal saveMoney = (decimal)GameSaveSystem.Instance.CurrentCharacter.Money;
+        decimal diff = Math.Abs( EconomyManager.Instance.CurrentMoney - saveMoney );
+        
+        // FIX: Appended 'm' suffix literal notation constraint check
+        if ( diff > 0.01m ) 
+            Log.Error( "!!! DESYNC DETECTED !!!" );
+        else 
+            Log.Info( "Sync Check: OK" );
     }
 }

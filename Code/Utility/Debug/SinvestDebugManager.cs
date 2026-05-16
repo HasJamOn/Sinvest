@@ -11,8 +11,8 @@ public sealed class SinvestDebugManager : Component
 {
     public static SinvestDebugManager Instance { get; private set; }
 
-    [Property, Group( "Economy" )] public double SetMoney { get; set; } = 1000;
-    [Property, Group( "Economy" )] public double SetShares { get; set; } = 0;
+    [Property, Group( "Economy" )] public decimal SetMoney { get; set; } = 1000;
+    [Property, Group( "Economy" )] public decimal SetShares { get; set; } = 0;
 
     [Property, Group( "Inventory" )] public bool ForceHasPhone { get; set; }
 

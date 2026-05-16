@@ -54,17 +54,22 @@ public sealed class DishwasherManager : Component
 
        // 1. Calculate Reward
        float cleanPct = ActiveDirtManager.CleanPercentage;
-       double payout = CalculatePayout( cleanPct );
+       
+       // FIX 1: Change local variable type to decimal to match CalculatePayout
+       decimal payout = CalculatePayout( cleanPct );
 
        // 2. Play Dynamic Sound & Process Ledger Transaction
        PlayTierSound( cleanPct );
 
-       if ( payout > 0 )
+       if ( payout > 0m )
        {
+           // This now maps perfectly to EconomyManager.Instance.AddLaborIncome( decimal, string )
            EconomyManager.Instance?.AddLaborIncome( payout, $"Dishwashing ({cleanPct:0}%)" );
            
            bool perfectScore = cleanPct >= 96f;
-           FloatingCashDisplay.Instance?.DisplayPayout( payout, perfectScore );
+           
+           // FIX 2: Explicitly cast to double since FloatingCashDisplay's interface expects a double
+           FloatingCashDisplay.Instance?.DisplayPayout( (double)payout, perfectScore );
        }
 
        // 3. Cleanup Scene Objects
@@ -114,12 +119,17 @@ public sealed class DishwasherManager : Component
         }
     }
 
-    private double CalculatePayout( float percentage )
+    private decimal CalculatePayout( float percentage )
     {
-        if ( percentage >= 96f ) return 2.00;
-        if ( percentage >= 80f ) return percentage / 100f;
-        if ( percentage >= 50f ) return (percentage / 100f) * 0.5f;
+        // 96-100% : Considered perfect, double money ($2.00)
+        if ( percentage >= 96f ) return 2.00m; // Note the 'm' suffix for literal decimals
+    
+        // 80-96% : Rewards 0.8 to 1.0
+        if ( percentage >= 80f ) return (decimal)percentage / 100m;
+    
+        // 50-80% : Rewards less than 0.50
+        if ( percentage >= 50f ) return ((decimal)percentage / 100m) * 0.5m;
 
-        return 0.0;
+        return 0.0m;
     }
 }
