@@ -37,11 +37,21 @@ public sealed class DishTransition : Component
 		if ( SpriteVisual is null || !SpriteVisual.Enabled ) return;
 		if ( !Input.Pressed( "attack1" ) ) return;
 
-		var ray = Scene.Camera.ScreenPixelToRay( Mouse.Position );
+		// Find the camera framing this specific minigame instance instead of using the global player head
+		var activeCam = Scene.GetAllComponents<CameraComponent>()
+			.FirstOrDefault( c => c.Enabled && c.GameObject.WorldPosition.Distance( GameObject.WorldPosition ) < 1000f );
+
+		// Fallback to Scene.Camera if no local workstation camera is found
+		var cameraToUse = activeCam ?? Scene.Camera;
+
+		Log.Info( $"[DishTrace] Ray shooting from Camera: '{cameraToUse.GameObject.Name}' at {cameraToUse.GameObject.WorldPosition}" );
+
+		var ray = cameraToUse.ScreenPixelToRay( Mouse.Position );
 		var tr = Scene.Trace
-			.Ray( ray, 500f )
+			.Ray( ray, 500f ) // 500f is plenty now that the ray starts at the actual table camera!
 			.UsePhysicsWorld()
 			.HitTriggers()
+			.WithoutTags( "player" ) 
 			.Run();
 
 		if ( !tr.Hit ) return;
@@ -49,7 +59,7 @@ public sealed class DishTransition : Component
 		var hit = tr.GameObject?.Components.GetInAncestorsOrSelf<DishTransition>();
 		if ( hit != this ) return;
 
-		Log.Info( $"[DishTransition] Clicked {GameObject.Name}" );
+		Log.Info( $"[DishTransition] Success! Clicked {GameObject.Name}" );
 		DishwasherManager.Instance?.RequestFocus( this );
 	}
 }

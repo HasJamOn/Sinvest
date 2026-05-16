@@ -1,6 +1,7 @@
 using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sinvest;
 
@@ -25,7 +26,14 @@ public sealed class DishwasherScrubber : Component
 
 	protected override void OnUpdate()
 	{
-		var ray = Scene.Camera.ScreenPixelToRay( Mouse.Position );
+		// Find the active camera framing this specific workspace instead of defaulting to global player eyes
+		var activeCam = Scene.GetAllComponents<CameraComponent>()
+			.FirstOrDefault( c => c.Enabled && c.GameObject.WorldPosition.Distance( GameObject.WorldPosition ) < 1000f );
+
+		// Fallback safely to Scene.Camera if no workspace context is found
+		var cameraToUse = activeCam ?? Scene.Camera;
+
+		var ray = cameraToUse.ScreenPixelToRay( Mouse.Position );
 
 		_positionTrace = Scene.Trace
 			.Ray( ray, ReachDistance )
@@ -64,10 +72,11 @@ public sealed class DishwasherScrubber : Component
 	{
 		if ( ScrubSound is null ) return;
 
-		// Play the sound at the hit position
-		var snd = Sound.Play( ScrubSound, _positionTrace.HitPosition );
+		// PLAY 2D/GLOBAL: Dropping the hit position parameter plays the sound 
+		// natively inside the player's headphones without distance dropoff.
+		var snd = Sound.Play( ScrubSound );
 		
-		// Optional: Tweak the pitch slightly for each play to make it feel more natural
+		// Tweak the pitch slightly for each play to make it feel more natural
 		snd.Pitch = Game.Random.Float( 0.95f, 1.15f );
 	}
 }

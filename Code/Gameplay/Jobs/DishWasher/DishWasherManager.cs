@@ -87,22 +87,21 @@ public sealed class DishwasherManager : Component
 
     private void PlayTierSound( float percentage )
     {
-        // Tier 1: Perfect Run (>= 96%)
+        // PLAY 2D/GLOBAL: By stripping out Transform.Position context,
+        // these reward alerts play at equal power regardless of game coordinate offsets.
         if ( percentage >= 96f )
         {
-            if ( PerfectSound != null ) Sound.Play( PerfectSound, Transform.Position );
+            if ( PerfectSound != null ) Sound.Play( PerfectSound );
             return;
         }
 
-        // Tier 2: Standard Payout (50% - 95.9%)
         if ( percentage >= 50f )
         {
-            if ( StandardPayoutSound != null ) Sound.Play( StandardPayoutSound, Transform.Position );
+            if ( StandardPayoutSound != null ) Sound.Play( StandardPayoutSound );
             return;
         }
 
-        // Tier 3: Poor Run / No Reward (< 50%)
-        if ( PoorJobSound != null ) Sound.Play( PoorJobSound, Transform.Position );
+        if ( PoorJobSound != null ) Sound.Play( PoorJobSound );
     }
 
     private async Task QueuePileReplenish( float secondsDelay )
@@ -117,16 +116,10 @@ public sealed class DishwasherManager : Component
 
     private double CalculatePayout( float percentage )
     {
-        // 96-100% : Considered perfect, double money ($2.00)
         if ( percentage >= 96f ) return 2.00;
-        
-        // 80-96% : Rewards 0.8 to 1.0 (Direct decimal mapping works perfectly here)
         if ( percentage >= 80f ) return percentage / 100f;
-        
-        // 50-80% : Rewards less than 0.50 (Scaling the percentage down by half ensures it stays < 0.50)
         if ( percentage >= 50f ) return (percentage / 100f) * 0.5f;
 
-        // < 50% : No reward
         return 0.0;
     }
 }

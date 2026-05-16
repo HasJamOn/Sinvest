@@ -52,11 +52,11 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "ba42c728-ca2a-42d7-9c54-aed9dd9038b1": "620ca315-e801-4bb5-a379-7724aa85e929"
+        "a6c4b90a-9c30-41ec-bd09-2a8218db9ebe": "0897520d-eff2-4ba8-a301-c2d6db4f71ad"
       }
     },
     {
-      "__guid": "bfdf4d4a-4238-4f76-afca-0aa90f7a0ee4",
+      "__guid": "d747d5ab-ad82-4a3e-99c8-11e2b8346ba3",
       "__version": 2,
       "__Prefab": "prefabs/work_dishwasher/dishwasher_game.prefab",
       "__PrefabInstancePatch": {
@@ -66,42 +66,34 @@
           {
             "Target": {
               "Type": "GameObject",
-              "IdValue": "599d6f4a-4428-431b-9ca3-f58169da9eab"
+              "IdValue": "cbbc100f-a0c8-4cf2-beba-19737cf592ff"
             },
-            "Property": "Position",
-            "Value": "3.50051498,0,-459.728333"
-          },
-          {
-            "Target": {
-              "Type": "GameObject",
-              "IdValue": "0db4b527-6f6a-42d3-92b7-1c477101302e"
-            },
-            "Property": "Position",
-            "Value": "-0,0,0"
+            "Property": "Rotation",
+            "Value": "0,0,0,1"
           }
         ],
         "MovedObjects": []
       },
       "__PrefabIdToInstanceId": {
-        "599d6f4a-4428-431b-9ca3-f58169da9eab": "bfdf4d4a-4238-4f76-afca-0aa90f7a0ee4",
-        "0db4b527-6f6a-42d3-92b7-1c477101302e": "c9046ff9-86a8-4d03-8cb7-b61f5517fb96",
-        "e8ce146d-d94c-4160-b5cf-8d734e5b8c87": "a27a4a72-7a0b-444e-a900-686c88cb870b",
-        "12b6e675-41aa-4e9c-bf4a-41877de43ecf": "663cdd01-3645-46d1-a26f-8ef1d4592dc6",
-        "bb78cd8e-4bcd-4790-9b87-22329cd882f7": "0714ed44-db13-4f41-9101-e658d161470f",
-        "6912b860-d2da-436b-9b6a-97a0b538c2fc": "b77be2f8-69fb-4f2e-9958-cda419e27ac8",
-        "87741ffd-70a0-494a-a400-c5ec23ec5c57": "e777a5d1-0396-44c7-8dd4-56b73782ff79",
-        "b83b5086-e1ab-4a9e-9c54-7fbe3d2e72e0": "6fd6e067-158c-438f-a1cd-493146929a28",
-        "dd98350b-0014-4efd-8ea3-f7f26af3dd94": "2509379e-6256-475b-9f68-176ba46ba249",
-        "37ddade2-14d1-43a9-ac2b-d8dcdea7f541": "477c6a5e-db9b-4496-8baf-8f3897c57c14",
-        "cbbc100f-a0c8-4cf2-beba-19737cf592ff": "a8ed96d1-5b64-4cd5-add4-c3dec0ceb8d6",
-        "8b50b37e-4717-48f5-960a-be7760c0150d": "b39533f7-26a7-486e-ad87-aec5c7bc3f06",
-        "36f05605-7663-4a35-abd5-262a78276ef3": "b30a367b-584c-414b-98d8-503510bcb783",
-        "06b05a12-8b5a-4b21-b8e8-4813b26f8925": "92dd1cd6-ec39-4baa-aca3-6f294e79f895",
-        "90083f48-356d-4ecb-adf9-34b1d25051e8": "b14b7007-52d9-43b0-b483-93f4195b10d0",
-        "d8687c97-0c9f-4bdc-a689-96b1c31a963c": "1f9971a8-37bc-4a09-8148-20cc4662f896",
-        "f7564268-a5a1-43f1-8015-c61d8ed7d9d0": "5c364e91-36c9-4164-8fe5-c1d31157ad6a",
-        "1317a425-d9c2-46b4-84cc-150368d1adb7": "610371c5-13af-4528-a8ef-d49cb7ec9fdb",
-        "4fff7321-c4ce-4c14-b8ff-6249f4a71787": "e24a5df7-5f84-4803-b33c-4894c72bf776"
+        "599d6f4a-4428-431b-9ca3-f58169da9eab": "d747d5ab-ad82-4a3e-99c8-11e2b8346ba3",
+        "0db4b527-6f6a-42d3-92b7-1c477101302e": "e89d3255-55f3-46c7-ac81-388eaf32762e",
+        "e8ce146d-d94c-4160-b5cf-8d734e5b8c87": "aa06d37a-9412-4a9c-8ec0-f8d43ebbfa07",
+        "12b6e675-41aa-4e9c-bf4a-41877de43ecf": "34a255d7-c710-4d7c-b294-e40a76f22e18",
+        "bb78cd8e-4bcd-4790-9b87-22329cd882f7": "286f2d75-7184-4694-adf0-bef754b53c1f",
+        "6912b860-d2da-436b-9b6a-97a0b538c2fc": "4ed8a731-fdfc-43dc-9d12-1146faa3aa7b",
+        "87741ffd-70a0-494a-a400-c5ec23ec5c57": "06cdc147-9ba8-416d-8e7e-8f8c93d7b5a2",
+        "b83b5086-e1ab-4a9e-9c54-7fbe3d2e72e0": "6dca3ab8-0852-4749-8a44-51e340efbe77",
+        "dd98350b-0014-4efd-8ea3-f7f26af3dd94": "5b5d0ec6-516c-473c-a16f-29dc62d7c6be",
+        "37ddade2-14d1-43a9-ac2b-d8dcdea7f541": "efedb038-12bd-4874-8155-cdf67d3ad145",
+        "cbbc100f-a0c8-4cf2-beba-19737cf592ff": "53fa4151-ee1f-4bd2-9a54-0e20de4da6ae",
+        "8b50b37e-4717-48f5-960a-be7760c0150d": "9b57058c-2985-44f6-8f68-45643307ac7a",
+        "36f05605-7663-4a35-abd5-262a78276ef3": "1afa163b-5fb0-4e93-a3ee-058aa442e74e",
+        "06b05a12-8b5a-4b21-b8e8-4813b26f8925": "1a6d7903-eab9-4e94-9afd-a069c3283d33",
+        "90083f48-356d-4ecb-adf9-34b1d25051e8": "e40aa0be-f24d-4ac6-8339-1272f25d5304",
+        "d8687c97-0c9f-4bdc-a689-96b1c31a963c": "da52955f-b348-4ae0-91dd-8d2a640709c1",
+        "f7564268-a5a1-43f1-8015-c61d8ed7d9d0": "8e1c91e5-f806-4049-96e2-d540a56aff43",
+        "1317a425-d9c2-46b4-84cc-150368d1adb7": "a1352e63-cd6a-4783-96ab-cb7fc273ab11",
+        "4fff7321-c4ce-4c14-b8ff-6249f4a71787": "1e0e52ec-1315-4f41-94e4-56023afa00cd"
       }
     }
   ],
@@ -125,17 +117,17 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "69db0226-f6f9-46aa-a8b8-c5920a80ecad"
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
         }
       },
       "Sandbox.MovieMaker.MovieRecorderSystem": {
         "DisableClientRecording": false
       },
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "69db0226-f6f9-46aa-a8b8-c5920a80ecad"
         }
       }
     }

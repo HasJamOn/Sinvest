@@ -1,4 +1,5 @@
 using Sandbox;
+using System.Linq;
 
 namespace Sinvest;
 
@@ -37,11 +38,19 @@ public sealed class PlateRotator : Component
 			return;
 		}
 
+		// Find the active camera framing this specific minigame instance instead of global player eyes
+		var activeCam = Scene.GetAllComponents<CameraComponent>()
+			.FirstOrDefault( c => c.Enabled && c.GameObject.WorldPosition.Distance( GameObject.WorldPosition ) < 1000f );
+
+		// Fallback safely to Scene.Camera if no workspace context is found
+		var cameraToUse = activeCam ?? Scene.Camera;
+
 		float mouseX = Input.MouseDelta.x;
 		float mouseY = Input.MouseDelta.y;
 
-		var rotationX = Rotation.FromAxis( Scene.Camera.WorldRotation.Up, -mouseX * RotationSpeed * Time.Delta );
-		var rotationY = Rotation.FromAxis( Scene.Camera.WorldRotation.Right, mouseY * RotationSpeed * Time.Delta );
+		// Compute axes based explicitly on the camera actually framing the plate!
+		var rotationX = Rotation.FromAxis( cameraToUse.WorldRotation.Up, -mouseX * RotationSpeed * Time.Delta );
+		var rotationY = Rotation.FromAxis( cameraToUse.WorldRotation.Right, mouseY * RotationSpeed * Time.Delta );
 
 		plateRoot.WorldRotation = rotationX * rotationY * plateRoot.WorldRotation;
 	}

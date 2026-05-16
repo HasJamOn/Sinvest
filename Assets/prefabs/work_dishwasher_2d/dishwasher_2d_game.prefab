@@ -219,7 +219,7 @@
         "Name": "Background",
         "Position": "3.50051498,-67.0623779,-1053.95178",
         "Rotation": "0,0.70710665,0,0.707106829",
-        "Scale": "-1,1,1",
+        "Scale": "1,1,1",
         "Tags": "",
         "Enabled": true,
         "NetworkMode": 2,
@@ -271,7 +271,28 @@
         ],
         "Children": []
       }
-    ]
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": false,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
+      }
+    },
+    "__variables": []
   },
   "ResourceVersion": 2,
   "ShowInMenu": false,
