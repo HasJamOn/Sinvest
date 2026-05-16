@@ -3,119 +3,157 @@
 @using System;
 @using System.Collections.Generic;
 @using System.Threading.Tasks;
+
 @namespace Sinvest
 @inherits PanelComponent
 
+@code {
+// Nested data struct expanded with layout type markers
+public sealed class FloatingIncome
+{
+public string Text { get; set; }
+public float Age { get; set; } = 0f;
+public float TopOffset { get; set; } = 0f;
+public bool IsPerfect { get; set; } = false;
+public bool IsError { get; set; } = false; // Added to catch low-percentage rejections
+}
+}
+
 <root class="income-canvas">
-    @foreach ( var notification in _activeIncomes )
-    {
-        <!-- Dynamic inline style maps aging to upward margin offset and opacity -->
-        <div class="income-container" style="margin-top: @(notification.TopOffset)px; opacity: @(1f - (notification.Age / MaxLifetime));">
-            @if ( notification.IsPerfect )
-            {
-                <div class="perfect-badge">PERFECT!</div>
-            }
-            <div class="income-text">
-                @notification.Text
-            </div>
-        </div>
-    }
+	@foreach ( var notification in _activeIncomes )
+	{
+	<div class="income-container" style="margin-top: @(notification.TopOffset)px; opacity: @(1f - (notification.Age / MaxLifetime));">
+		@if ( notification.IsPerfect )
+		{
+		<div class="perfect-badge">PERFECT!</div>
+		}
+
+		<div class="@(notification.IsError ? "warning-text" : "income-text")">
+			@notification.Text
+		</div>
+	</div>
+	}
 </root>
 
 @code {
-    public static FloatingCashDisplay Instance { get; private set; }
+public static FloatingCashDisplay Instance { get; private set; }
 
-    [Property] public float MaxLifetime { get; set; } = 1.2f;
-    [Property] public float RiseSpeed { get; set; } = 40f; // Pixels per second
+[Property] public float MaxLifetime { get; set; } = 1.2f;
+[Property] public float RiseSpeed { get; set; } = 40f; // Pixels per second
 
-    private List<FloatingIncome> _activeIncomes = new();
+private List<FloatingIncome> _activeIncomes = new();
 
-    protected override void OnAwake()
-    {
-        Instance = this;
-    }
+protected override void OnAwake()
+{
+Instance = this;
+}
 
-    protected override void OnDestroy()
-    {
-        if ( Instance == this ) Instance = null;
-    }
+protected override void OnDestroy()
+{
+if ( Instance == this ) Instance = null;
+}
 
-    /// <summary>
-    /// Spawns a floating cash indicator on the screen.
-    /// </summary>
-    public void DisplayPayout( double amount, bool isPerfect = false )
-    {
-        var item = new FloatingIncome 
-        { 
-            Text = $"+${amount:F2}",
-            IsPerfect = isPerfect
-        };
+/// <summary>
+/// Spawns a floating cash indicator on the screen.
+/// Changed from double to decimal to stay aligned with the updated economics pipeline!
+/// </summary>
+public void DisplayPayout( decimal amount, bool isPerfect = false )
+{
+var item = new FloatingIncome
+{
+Text = $"+${amount:F2}",
+IsPerfect = isPerfect,
+IsError = false
+};
 
-        _activeIncomes.Add( item );
-        _ = ProcessNotificationLifetime( item );
-    }
+_activeIncomes.Add( item );
+_ = ProcessNotificationLifetime( item );
+}
 
-    private async Task ProcessNotificationLifetime( FloatingIncome item )
-    {
-        while ( item.Age < MaxLifetime )
-        {
-            // Wait for next frame tick
-            await Task.Delay( 16 );
+/// <summary>
+/// Spawns an aggressive red warning flag notification directly over the viewport.
+/// </summary>
+public void DisplayWarning( string message )
+{
+var item = new FloatingIncome
+{
+Text = message,
+IsPerfect = false,
+IsError = true
+};
 
-            if ( !this.IsValid() ) return;
+_activeIncomes.Add( item );
+_ = ProcessNotificationLifetime( item );
+}
 
-            item.Age += 0.016f;
-            item.TopOffset -= RiseSpeed * 0.016f; // Negative top margin pulls elements upwards
-            
-            StateHasChanged();
-        }
+private async Task ProcessNotificationLifetime( FloatingIncome item )
+{
+while ( item.Age < MaxLifetime )
+{
+await Task.Delay( 16 );
 
-        _activeIncomes.Remove( item );
-        StateHasChanged();
-    }
+if ( !this.IsValid() ) return;
 
-    protected override int BuildHash()
-    {
-        return HashCode.Combine( _activeIncomes.Count );
-    }
+item.Age += 0.016f;
+item.TopOffset -= RiseSpeed * 0.016f;
+
+StateHasChanged();
+}
+
+_activeIncomes.Remove( item );
+StateHasChanged();
+}
+
+protected override int BuildHash()
+{
+// Combined with count changes so it triggers frame cycles cleanly on list updates
+return HashCode.Combine( _activeIncomes.Count );
+}
 }
 
 <style>
-    .income-canvas {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-        z-index: 500;
-    }
+	.income-canvas {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		pointer-events: none;
+		z-index: 500;
+	}
 
-    .income-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        transition: none; /* Layout updates managed per-frame explicitly */
-    }
+	.income-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		transition: none;
+	}
 
-    .perfect-badge {
-        font-size: 20px;
-        font-weight: 900;
-        color: rgba( 255, 220, 0, 1.0 ); /* Gold highlight */
-        text-shadow: 2px 2px 0px rgba( 0, 0, 0, 0.9 );
-        font-family: monospace;
-        margin-bottom: 2px; /* Layout constraint gap substitute */
-    }
+	.perfect-badge {
+		font-size: 20px;
+		font-weight: 900;
+		color: rgba( 255, 220, 0, 1.0 ); /* Gold highlight */
+		text-shadow: 2px 2px 0px rgba( 0, 0, 0, 0.9 );
+		font-family: monospace;
+		margin-bottom: 2px;
+	}
 
-    .income-text {
-        font-size: 32px;
-        font-weight: 800;
-        color: rgba( 40, 220, 80, 1.0 );
-        text-shadow: 2px 2px 0px rgba( 0, 0, 0, 0.8 );
-        font-family: monospace;
-    }
+	.income-text, .warning-text {
+		font-size: 32px;
+		font-weight: 800;
+		text-shadow: 2px 2px 0px rgba( 0, 0, 0, 0.8 );
+		font-family: monospace;
+	}
+
+	.income-text {
+		color: rgba( 40, 220, 80, 1.0 ); /* Green Payout */
+	}
+
+	.warning-text {
+		color: rgba( 255, 50, 50, 1.0 ); /* Red Warning */
+	}
 </style>

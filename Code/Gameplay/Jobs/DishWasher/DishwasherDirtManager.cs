@@ -8,7 +8,6 @@ namespace Sinvest;
 public sealed class DishwasherDirtManager : Component
 {
 	[Property] public DecalDefinition DirtDecal { get; set; }
-	[Property] public int DirtCount { get; set; } = 40;
 	[Property] public float DecalSize { get; set; } = 0.5f;
 
 	/// <summary>
@@ -39,22 +38,35 @@ public sealed class DishwasherDirtManager : Component
 
 	private readonly List<DirtData> _activeDirt = new();
 
-	protected override void OnStart()
-	{
-		SpawnDirtRobust();
-	}
-
-	private void SpawnDirtRobust()
+	public void SpawnDirtRobust()
 	{
 		var colliders = Components.GetAll<Collider>( FindMode.EverythingInSelfAndChildren ).ToList();
 		if ( !colliders.Any() ) return;
+
+		int targetCount = 40; // Fallback
+		if ( DishwasherManager.Instance.IsValid() )
+		{
+			int min = DishwasherManager.Instance.MinDirtCount;
+			int max = DishwasherManager.Instance.MaxDirtCount;
+			float power = DishwasherManager.Instance.DirtSkewPower;
+			int range = max - min;
+
+			float rawRandom = Game.Random.Float( 0f, 1f );
+			float skewedRandom = MathF.Pow( rawRandom, power );
+
+			targetCount = min + (int)MathF.Floor( skewedRandom * (range + 1) );
+			targetCount = targetCount.Clamp( min, max );
+		}
 
 		var bounds = GameObject.GetBounds();
 		float radius = bounds.Size.Length;
 		int spawned = 0;
 		int attempts = 0;
 
-		while ( spawned < DirtCount && attempts < DirtCount * 15 )
+		// FIX: Use a fixed safety cap of 500 attempts instead of scaling down to 15 when targetCount is 1
+		int maxAttempts = Math.Max( 500, targetCount * 15 );
+
+		while ( spawned < targetCount && attempts < maxAttempts )
 		{
 			attempts++;
 			Vector3 randomDir = Vector3.Random.Normal;
@@ -74,14 +86,9 @@ public sealed class DishwasherDirtManager : Component
 			spawned++;
 		}
 
-		// Fresh spawn — recalculate totals from scratch and reset applied count
 		RecalculateTotals( resetApplied: true );
 	}
 
-	/// <summary>
-	/// Recalculates TotalScrubsNeeded based on active dirt.
-	/// Only resets TotalScrubsApplied when freshly spawning (not when restoring a save).
-	/// </summary>
 	private void RecalculateTotals( bool resetApplied )
 	{
 		int scrubsPerPiece = (int)MathF.Ceiling( 0.9f / AlphaStep ) + 1;
@@ -106,8 +113,11 @@ public sealed class DishwasherDirtManager : Component
 		if ( DirtDecal is not null )
 			decal.Decals = new List<DecalDefinition> { DirtDecal };
 
+		// Let's copy dynamic size properties over from central system rules if possible
+		float globalSize = DishwasherManager.Instance.IsValid() ? DishwasherManager.Instance.GlobalDecalSize : DecalSize;
 		float variance = Game.Random.Float( 0.8f, 1.2f );
-		decal.Size = new Vector2( DecalSize * variance, DecalSize * variance );
+		decal.Size = new Vector2( globalSize * variance, globalSize * variance );
+		
 		decal.Depth = 5f;
 		decal.ColorTint = Color.White.WithAlpha( alpha );
 		decal.SortLayer = (uint)(index % 256);
@@ -145,7 +155,6 @@ public sealed class DishwasherDirtManager : Component
 			if ( session.Contains( dirt.Projector.Id ) ) continue;
 			session.Add( dirt.Projector.Id );
 
-			// Push the decal away from the scrub point
 			Vector3 pushDirection = (worldSurface - worldHitPosition).Normal;
 			Vector3 newWorldPos = worldSurface + (pushDirection * ScrubPushStrength);
 			dirt.LocalSurfacePoint = GameObject.WorldTransform.PointToLocal( newWorldPos );
@@ -189,7 +198,6 @@ public sealed class DishwasherDirtManager : Component
 			state.LocalPoints.Add( dirt.LocalSurfacePoint );
 		}
 
-		// Clear workspace visuals
 		foreach ( var dirt in _activeDirt ) dirt.Projector.Destroy();
 		_activeDirt.Clear();
 
@@ -198,18 +206,14 @@ public sealed class DishwasherDirtManager : Component
 
 	public void LoadState( DishProgress state )
 	{
-		// Destroy any existing dirt in the workspace first
 		foreach ( var dirt in _activeDirt ) dirt.Projector.Destroy();
 		_activeDirt.Clear();
 
-		// Re-create all remaining dirt pieces from the saved state
 		for ( int i = 0; i < state.AlphaValues.Count; i++ )
 		{
 			CreateDirtEntry( state.LocalPoints[i], Vector3.Up, state.AlphaValues[i], i );
 		}
 
-		// Restore the saved scrub progress — do NOT recalculate from active dirt alone,
-		// because destroyed (fully scrubbed) pieces are no longer in the list.
 		TotalScrubsNeeded = state.SavedScrubsNeeded;
 		TotalScrubsApplied = state.SavedScrubsApplied;
 	}

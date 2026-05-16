@@ -6,70 +6,76 @@
 <root class="submit-wrapper">
 	@if ( DishwasherManager.Instance?.ActiveDirtManager != null )
 	{
-		<div class="submit-button" onclick=@OnSubmitClicked>
-			<div class="submit-title">SUBMIT DISH</div>
-			<div class="submit-desc">Inspect and Finish</div>
-		</div>
+	<div class="submit-button" onclick=@OnSubmitClicked>
+		<div class="submit-title">SUBMIT DISH</div>
+		<div class="submit-desc">Inspect and Finish</div>
+	</div>
 	}
 </root>
 
 @code {
-	private void OnSubmitClicked()
-	{
-		DishwasherManager.Instance?.SubmitActiveDish();
-	}
+/// <summary>
+/// Routes the interaction click event straight into the job logic pipeline.
+/// </summary>
+private void OnSubmitClicked()
+{
+DishwasherManager.Instance?.SubmitActiveDish();
+}
 
-	protected override int BuildHash()
-	{
-		// Rebuilds when a dish is focused/unfocused
-		return DishwasherManager.Instance?.ActiveDirtManager?.GetHashCode() ?? 0;
-	}
+/// <summary>
+/// Triggers automated frame cycles cleanly on UI state updates whenever 
+/// a new dish is loaded or focused.
+/// </summary>
+protected override int BuildHash()
+{
+return DishwasherManager.Instance?.ActiveDirtManager?.GetHashCode() ?? 0;
+}
 }
 
 <style>
-    .submit-wrapper {
-        position: absolute;
-        right: 40px;
-        top: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center; /* Vertically centers without translate */
-        justify-content: center;
-        pointer-events: none; /* Let clicks pass through the wrapper */
-        z-index: 100;
-    }
+	.submit-wrapper {
+		position: absolute;
+		right: 40px;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: none;
+		z-index: 100;
+	}
 
-    .submit-button {
-        background-color: rgba( 30, 180, 70, 0.95 );
-        padding: 20px 40px;
-        border-radius: 8px;
-        border: 2px solid rgba( 255, 255, 255, 0.8 );
-        box-shadow: 0px 4px 15px rgba( 0, 0, 0, 0.6 );
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        pointer-events: all; /* Re-enable clicks on the button */
-        cursor: pointer;
-    }
+	.submit-button {
+		background-color: rgba( 30, 180, 70, 0.95 );
+		padding: 20px 40px;
+		border-radius: 8px;
+		border: 2px solid rgba( 255, 255, 255, 0.8 );
+		box-shadow: 0px 4px 15px rgba( 0, 0, 0, 0.6 );
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		pointer-events: all;
+		cursor: pointer;
+	}
 
-    .submit-button:hover {
-        background-color: rgba( 40, 210, 90, 1 );
-    }
+	.submit-button:hover {
+		background-color: rgba( 40, 210, 90, 1.0 );
+	}
 
-    .submit-button:active {
-        background-color: rgba( 20, 150, 50, 1 );
-    }
+	.submit-button:active {
+		background-color: rgba( 20, 150, 50, 1.0 );
+	}
 
-    .submit-title {
-        font-size: 24px;
-        font-weight: bold;
-        color: rgba( 255, 255, 255, 1 );
-        text-shadow: 0px 2px 4px rgba( 0, 0, 0, 0.5 );
-    }
+	.submit-title {
+		font-size: 24px;
+		font-weight: bold;
+		color: rgba( 255, 255, 255, 1.0 );
+		text-shadow: 0px 2px 4px rgba( 0, 0, 0, 0.5 );
+	}
 
-    .submit-desc {
-        font-size: 14px;
-        color: rgba( 255, 255, 255, 0.7 );
-        margin-top: 6px; /* Margin instead of gap */
-    }
+	.submit-desc {
+		font-size: 14px;
+		color: rgba( 255, 255, 255, 0.7 );
+		margin-top: 6px;
+	}
 </style>

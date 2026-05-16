@@ -20,6 +20,16 @@ public sealed class DishwasherManager : Component
     [Property] public SoundEvent StandardPayoutSound { get; set; }
     [Property] public SoundEvent PoorJobSound { get; set; }
 
+    [Property, Group( "Dirt Configuration Range" )] public int MinDirtCount { get; set; } = 25;
+    [Property, Group( "Dirt Configuration Range" )] public int MaxDirtCount { get; set; } = 50;
+    [Property, Group( "Dirt Configuration Range" )] public float GlobalDecalSize { get; set; } = 0.5f;
+
+    /// <summary>
+    /// Controls the mathematical curve of dirt distribution.
+    /// 1 = Linear, 2 = Quadratic (low dirt common), 3+ = Aggressive curve (high dirt rare).
+    /// </summary>
+    [Property, Group( "Dirt Configuration Range" ), Range( 0.1f, 5.0f )] public float DirtSkewPower { get; set; } = 2.0f;
+
     private DishTransition _currentActiveDish;
     private bool _isSubmitting;
 
@@ -35,15 +45,20 @@ public sealed class DishwasherManager : Component
 
     public void RequestFocus( DishTransition dish )
     {
-       if ( !dish.IsValid() || _currentActiveDish == dish || _isSubmitting ) return;
+        if ( !dish.IsValid() || _currentActiveDish == dish || _isSubmitting ) return;
 
-       if ( _currentActiveDish.IsValid() )
-          _currentActiveDish.SetMode( false );
+        if ( _currentActiveDish.IsValid() )
+           _currentActiveDish.SetMode( false );
 
-       _currentActiveDish = dish;
-       _currentActiveDish.SetMode( true );
+        _currentActiveDish = dish;
+        _currentActiveDish.SetMode( true );
 
-       ActiveDirtManager = dish.DirtManager;
+        ActiveDirtManager = dish.DirtManager;
+
+        if ( ActiveDirtManager.IsValid() && ActiveDirtManager.TotalScrubsNeeded == 0 )
+        {
+           ActiveDirtManager.SpawnDirtRobust();
+        }
     }
 
     public void SubmitActiveDish()
@@ -52,27 +67,25 @@ public sealed class DishwasherManager : Component
        
        _isSubmitting = true;
 
-       // 1. Calculate Reward
        float cleanPct = ActiveDirtManager.CleanPercentage;
-       
-       // FIX 1: Change local variable type to decimal to match CalculatePayout
        decimal payout = CalculatePayout( cleanPct );
 
-       // 2. Play Dynamic Sound & Process Ledger Transaction
        PlayTierSound( cleanPct );
 
+       // IF THEY EARNED MONEY: Process Ledger & Green Floating Text
        if ( payout > 0m )
        {
-           // This now maps perfectly to EconomyManager.Instance.AddLaborIncome( decimal, string )
            EconomyManager.Instance?.AddLaborIncome( payout, $"Dishwashing ({cleanPct:0}%)" );
            
            bool perfectScore = cleanPct >= 96f;
-           
-           // FIX 2: Explicitly cast to double since FloatingCashDisplay's interface expects a double
-           FloatingCashDisplay.Instance?.DisplayPayout( (double)payout, perfectScore );
+           FloatingCashDisplay.Instance?.DisplayPayout( payout, perfectScore );
+       }
+       // IF THEY FAILED (< 50% Clean): Trigger the Red Warning UI
+       else
+       {
+           FloatingCashDisplay.Instance?.DisplayWarning( "Too Dirty!" );
        }
 
-       // 3. Cleanup Scene Objects
        var dishObject = _currentActiveDish.GameObject;
        var plateModel = _currentActiveDish.ModelVisual;
 
@@ -82,18 +95,14 @@ public sealed class DishwasherManager : Component
        dishObject.Destroy();
        if ( plateModel.IsValid() ) plateModel.Destroy();
 
-       // 4. Trigger localized background replenishment task loop
        float delay = Game.Random.Float( MinRespawnDelay, MaxRespawnDelay );
        _ = QueuePileReplenish( delay );
 
-       // 5. Instantly release the submission state so player can click another dish
        _isSubmitting = false;
     }
 
     private void PlayTierSound( float percentage )
     {
-        // PLAY 2D/GLOBAL: By stripping out Transform.Position context,
-        // these reward alerts play at equal power regardless of game coordinate offsets.
         if ( percentage >= 96f )
         {
             if ( PerfectSound != null ) Sound.Play( PerfectSound );
@@ -121,13 +130,8 @@ public sealed class DishwasherManager : Component
 
     private decimal CalculatePayout( float percentage )
     {
-        // 96-100% : Considered perfect, double money ($2.00)
-        if ( percentage >= 96f ) return 2.00m; // Note the 'm' suffix for literal decimals
-    
-        // 80-96% : Rewards 0.8 to 1.0
+        if ( percentage >= 96f ) return 2.00m; 
         if ( percentage >= 80f ) return (decimal)percentage / 100m;
-    
-        // 50-80% : Rewards less than 0.50
         if ( percentage >= 50f ) return ((decimal)percentage / 100m) * 0.5m;
 
         return 0.0m;
