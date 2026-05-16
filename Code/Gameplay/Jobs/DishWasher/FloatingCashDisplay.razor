@@ -1,0 +1,121 @@
+﻿@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+@using System.Threading.Tasks;
+@namespace Sinvest
+@inherits PanelComponent
+
+<root class="income-canvas">
+    @foreach ( var notification in _activeIncomes )
+    {
+        <!-- Dynamic inline style maps aging to upward margin offset and opacity -->
+        <div class="income-container" style="margin-top: @(notification.TopOffset)px; opacity: @(1f - (notification.Age / MaxLifetime));">
+            @if ( notification.IsPerfect )
+            {
+                <div class="perfect-badge">PERFECT!</div>
+            }
+            <div class="income-text">
+                @notification.Text
+            </div>
+        </div>
+    }
+</root>
+
+@code {
+    public static FloatingCashDisplay Instance { get; private set; }
+
+    [Property] public float MaxLifetime { get; set; } = 1.2f;
+    [Property] public float RiseSpeed { get; set; } = 40f; // Pixels per second
+
+    private List<FloatingIncome> _activeIncomes = new();
+
+    protected override void OnAwake()
+    {
+        Instance = this;
+    }
+
+    protected override void OnDestroy()
+    {
+        if ( Instance == this ) Instance = null;
+    }
+
+    /// <summary>
+    /// Spawns a floating cash indicator on the screen.
+    /// </summary>
+    public void DisplayPayout( double amount, bool isPerfect = false )
+    {
+        var item = new FloatingIncome 
+        { 
+            Text = $"+${amount:F2}",
+            IsPerfect = isPerfect
+        };
+
+        _activeIncomes.Add( item );
+        _ = ProcessNotificationLifetime( item );
+    }
+
+    private async Task ProcessNotificationLifetime( FloatingIncome item )
+    {
+        while ( item.Age < MaxLifetime )
+        {
+            // Wait for next frame tick
+            await Task.Delay( 16 );
+
+            if ( !this.IsValid() ) return;
+
+            item.Age += 0.016f;
+            item.TopOffset -= RiseSpeed * 0.016f; // Negative top margin pulls elements upwards
+            
+            StateHasChanged();
+        }
+
+        _activeIncomes.Remove( item );
+        StateHasChanged();
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( _activeIncomes.Count );
+    }
+}
+
+<style>
+    .income-canvas {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 500;
+    }
+
+    .income-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: none; /* Layout updates managed per-frame explicitly */
+    }
+
+    .perfect-badge {
+        font-size: 20px;
+        font-weight: 900;
+        color: rgba( 255, 220, 0, 1.0 ); /* Gold highlight */
+        text-shadow: 2px 2px 0px rgba( 0, 0, 0, 0.9 );
+        font-family: monospace;
+        margin-bottom: 2px; /* Layout constraint gap substitute */
+    }
+
+    .income-text {
+        font-size: 32px;
+        font-weight: 800;
+        color: rgba( 40, 220, 80, 1.0 );
+        text-shadow: 2px 2px 0px rgba( 0, 0, 0, 0.8 );
+        font-family: monospace;
+    }
+</style>

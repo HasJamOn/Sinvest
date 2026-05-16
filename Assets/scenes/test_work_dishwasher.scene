@@ -152,7 +152,7 @@
       "__PrefabIdToInstanceId": {
         "df2b829f-cfb7-4e38-85c7-5676c84e706c": "d40b3f67-9def-487d-951e-915c56abe45c",
         "8611e950-dee8-401f-950f-459361d63675": "ddfbee23-bf06-4521-a3c8-50fd11c363fa",
-        "5e1210a5-6c87-4807-b109-dc66b04bc1e5": "f5ddf273-9b7f-48d0-84ee-da5dbf550d05"
+        "b2c1ccec-abc1-437d-a706-eafc19d400cc": "34af8ea9-3eec-4f15-8793-2c3c12a87dc2"
       }
     },
     {
@@ -205,6 +205,32 @@
             "component_type": "CameraComponent"
           },
           "ZIndex": 100
+        },
+        {
+          "__type": "Sinvest.DishSubmitHUD",
+          "__guid": "2509379e-6256-475b-9f68-176ba46ba249",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
+          "__type": "Sinvest.FloatingCashDisplay",
+          "__guid": "477c6a5e-db9b-4496-8baf-8f3897c57c14",
+          "__enabled": true,
+          "Flags": 0,
+          "MaxLifetime": 1.2,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RiseSpeed": 40
         }
       ],
       "Children": []
@@ -307,6 +333,8 @@
           "__guid": "1f9971a8-37bc-4a09-8148-20cc4662f896",
           "__enabled": true,
           "Flags": 0,
+          "MaxRespawnDelay": 5,
+          "MinRespawnDelay": 2,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -403,13 +431,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
         }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
       },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
